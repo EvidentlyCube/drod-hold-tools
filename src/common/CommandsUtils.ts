@@ -1,6 +1,7 @@
 import {Command} from "../data/Command";
+import {UINT_MINUS_1} from "./CommonTypes";
 
-class WrappedBuffer {
+class WrappedCommandBuffer {
 	private _buffer: number[];
 	private _index: number;
 
@@ -17,7 +18,7 @@ class WrappedBuffer {
 		return this._buffer.length;
 	}
 
-	public readString(characters: number): string {
+	public readWChar(characters: number): string {
 		const chars = [];
 		while (characters-- > 0 && this._index < this._buffer.length) {
 			chars.push(String.fromCharCode(this._buffer[this._index++]));
@@ -44,7 +45,40 @@ class WrappedBuffer {
 
 		this._index = index;
 
-		return n - 0x80;
+		const res = n - 0x80;
+
+		return res < 0
+			? res + UINT_MINUS_1 + 1
+			: res;
+	}
+
+	public writeBpUint(n: number) {
+		let s = 7;
+		while ((n >> s) && s < 32)
+			s += 7;
+
+		while (s)
+		{
+			s -= 7;
+			let divider = Math.pow(2, s);
+			let b = (n / divider) & 0x7f;
+			if (!s)
+				b |= 0x80;
+
+			this._buffer[this._index++] = b;
+		}
+	}
+
+	public writeWChar(s: string) {
+		for (let i = 0; i < s.length; i++) {
+			const charcode = s.charCodeAt(i);
+			if (charcode > 128) {
+				throw new Error(`Unssuported wchar with code ${charcode}`);
+			}
+
+			this._buffer[this._index++] = charcode;
+			this._buffer[this._index++] = 0;
+		}
 	}
 
 	public get isEnd() {
@@ -59,7 +93,7 @@ export const CommandsUtils = {
 			return commands;
 		}
 
-		const arr = new WrappedBuffer(buffer);
+		const arr = new WrappedCommandBuffer(buffer);
 
 		while (!arr.isEnd) {
 			const command = arr.readBpUint();
@@ -70,11 +104,31 @@ export const CommandsUtils = {
 			const flags = arr.readBpUint();
 			const speechId = arr.readBpUint();
 			const labelSize = arr.readBpUint();
-			const label = labelSize > 0 ? arr.readString(labelSize) : '';
+			const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
 			commands.push({command, x, y, w, h, flags, speechId, label});
 		}
 
 		return commands;
 	},
+
+
+	writeCommandsBuffer: (commands: Command[]) => {
+		const buffer:number[] = [];
+
+		const arr = new WrappedCommandBuffer(buffer);
+		for(const command of commands) {
+			arr.writeBpUint(command.command);
+			arr.writeBpUint(command.x);
+			arr.writeBpUint(command.y);
+			arr.writeBpUint(command.w);
+			arr.writeBpUint(command.h);
+			arr.writeBpUint(command.flags);
+			arr.writeBpUint(command.speechId);
+			arr.writeBpUint(command.label.length ? command.label.length * 2  : 0);
+			arr.writeWChar(command.label);
+		}
+
+		return buffer;
+	}
 };
