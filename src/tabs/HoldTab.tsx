@@ -75,6 +75,7 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 					<DropzoneAreaBase
 						fileObjects={fileObjects}
 						filesLimit={1}
+						dropzoneText={"Drag and drop a hold here or click"}
 						maxFileSize={1024 * 1024 * 1024}
 						onDrop={(files) => {
 							decoder.startDecode(files[0]);
