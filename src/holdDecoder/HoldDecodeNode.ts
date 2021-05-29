@@ -2,6 +2,7 @@ import {Hold} from "../data/Hold";
 import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 import {CommandsUtils} from "../common/CommandsUtils";
 import {UINT_MINUS_1} from "../common/CommonTypes";
+import {MonsterUtils} from "../common/MonsterUtils";
 
 
 export function decodeHoldNode(element: Element, hold: Hold) {
@@ -113,7 +114,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer("Commands", []));
 			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
 			const isVisible = extraVars.readBool('visible', false);
-			const characterType = extraVars.readUint('id', UINT_MINUS_1);
+			const characterType = MonsterUtils.fixCharacterType(extraVars.readUint('id', UINT_MINUS_1), hold);
 
 			room.monsters.push({
 				xml: element,
