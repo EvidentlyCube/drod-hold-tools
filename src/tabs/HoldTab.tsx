@@ -6,6 +6,7 @@ import {DropzoneAreaBase, FileObject} from "material-ui-dropzone";
 import {HoldDecoder} from "../holdDecoder/HoldDecoder";
 import {HoldDecoderStatus} from "./HoldDecoderStatus";
 import HoldSummary from "./HoldSummary";
+import HoldPendingChanges from "./HoldPendingChanges";
 
 const styles = (theme: Theme) => createStyles({
 	dropzone: {
@@ -68,7 +69,10 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 				</Container>
 			</div>;
 		} else if (hold.isLoaded) {
-			return <HoldSummary hold={hold}/>;
+			return <>
+				<HoldSummary hold={hold}/>
+				<HoldPendingChanges hold={hold}/>
+			</>;
 		} else {
 			return <div className={classes.dropzone}>
 				<Container maxWidth="sm">

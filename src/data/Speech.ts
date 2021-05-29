@@ -4,4 +4,5 @@ export interface Speech {
 	text: string;
 
 	linked?: string;
+	isDeleted?: true;
 }

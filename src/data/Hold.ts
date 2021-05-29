@@ -7,6 +7,7 @@ import {Speech} from "./Speech";
 import {Level} from "./Level";
 import {Room} from "./Room";
 import {WorldMap} from "./WorldMap";
+import {Change} from "./Change";
 
 export interface Hold {
 	isLoaded: boolean;
@@ -27,6 +28,8 @@ export interface Hold {
 	levels: Map<number, Level>;
 	rooms: Map<number, Room>;
 	worldMaps: Map<number, WorldMap>;
+
+	changes: Change[];
 }
 
 export function createNullHold(): Hold {
@@ -49,5 +52,7 @@ export function createNullHold(): Hold {
 		levels: new Map(),
 		rooms: new Map(),
 		worldMaps: new Map(),
+
+		changes: []
 	};
 }
