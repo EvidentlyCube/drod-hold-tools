@@ -6,6 +6,7 @@ import {Monster} from "../data/Monster";
 import {Room} from "../data/Room";
 import {MonsterUtils} from "../common/MonsterUtils";
 import {RoomUtils} from "../common/RoomUtils";
+import {Entrance} from "../data/Entrance";
 
 
 export const HoldLinker = {
@@ -51,17 +52,36 @@ export const HoldLinker = {
 				}
 					break;
 
-				default: {
+				default:
 					if (command.speechId) {
 						const speech = hold.speeches.get(command.speechId);
 						assert(speech, `Failed to find speech ${command.speechId}`);
 
 						speech.linked = `Command ${CommandNameMap.get(command.command)} by Character (${monsterName}) in Level ${level.name} ${coordinate}`;
 					}
-				}
-				break;
+					break;
 			}
 		}
 	},
+	linkEntranceToLevel(entrance: Entrance, hold: Hold) {
+		const room = hold.rooms.get(entrance.roomId);
+		assert(room, `Failed to find room of id ${entrance.roomId}`);
+		const level = hold.levels.get(room.levelId);
+		assert(level, `Failed to find level of id ${room.levelId}`);
 
+		if (entrance.isMainEntrance) {
+			level.entrances.unshift(entrance);
+			level.entranceX = room.roomX;
+			level.entranceY = room.roomY;
+		} else {
+			level.entrances.unshift(entrance);
+		}
+	},
+	fixRoomCoordinates(room: Room, hold: Hold) {
+		const level = hold.levels.get(room.levelId);
+		assert(level, `Failed to find level of id ${room.levelId}`);
+		room.roomX -= level.entranceX;
+		room.roomY -= level.entranceY;
+
+	},
 };

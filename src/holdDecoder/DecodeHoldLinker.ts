@@ -11,13 +11,16 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 				HoldLinker.linkCharacter(hold, character);
 			}
 
+			for (const entrance of hold.entrances.values()) {
+				HoldLinker.linkEntranceToLevel(entrance, hold);
+			}
+
 			for (const room of hold.rooms.values()) {
+				HoldLinker.fixRoomCoordinates(room, hold);
 				for (const monster of room.monsters) {
 					HoldLinker.linkMonster(hold, monster, room);
 				}
 			}
-
-			console.log(hold);
 
 			return true;
 		},

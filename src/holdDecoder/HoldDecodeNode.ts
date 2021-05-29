@@ -29,7 +29,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const entranceId = getInt(element, 'EntranceID');
 			hold.entrances.set(entranceId, {
 				xml: element,
+				roomId: getInt(element, 'RoomID'),
 				description: decodeText(element, 'DescriptionMessage'),
+				isMainEntrance: getInt(element, 'IsMainEntrance') === 1
 			});
 			break;
 
@@ -82,6 +84,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			hold.levels.set(levelId, {
 				xml: element,
 				name: decodeText(element, 'NameMessage'),
+				entranceX: 0,
+				entranceY: 0,
+				entrances: []
 			});
 			break;
 
