@@ -10,51 +10,56 @@ export enum PackedVarType {
 }
 
 interface PackedVar {
+	name: string;
 	type: PackedVarType;
 	value: any;
 }
 
 export class PackedVars {
-	private _vars: Map<string, PackedVar>;
+	private readonly _vars: PackedVar[];
+
+	public get vars(): ReadonlyArray<PackedVar> {
+		return this._vars;
+	}
 
 	constructor() {
-		this._vars = new Map();
+		this._vars = [];
 	}
 
 	writeInt(name: string, value: number) {
-		const packedVar = this._vars.get(name) || {} as PackedVar;
+		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Int;
 		packedVar.value = value;
 
-		this._vars.set(name, packedVar);
+		!isFound && this._vars.push(packedVar);
 	}
 
 	writeUint(name: string, value: number) {
-		const packedVar = this._vars.get(name) || {} as PackedVar;
+		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Uint;
 		packedVar.value = value;
 
-		this._vars.set(name, packedVar);
+		!isFound && this._vars.push(packedVar);
 	}
 
 	writeBool(name: string, value: boolean) {
-		const packedVar = this._vars.get(name) || {} as PackedVar;
+		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Bool;
 		packedVar.value = value;
 
-		this._vars.set(name, packedVar);
+		!isFound && this._vars.push(packedVar);
 	}
 
 	writeByteBuffer(name: string, value: number[]) {
-		const packedVar = this._vars.get(name) || {} as PackedVar
+		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.ByteBuffer;
 		packedVar.value = value;
 
-		this._vars.set(name, packedVar);
+		!isFound && this._vars.push(packedVar);
 	}
 
 	readByteBuffer(name: string, def: number[] | undefined) {
@@ -70,12 +75,22 @@ export class PackedVars {
 	}
 
 	private readVar(name: string, expectedType: PackedVarType, def: any) {
-		const packedVar = this._vars.get(name);
+		const [isFound, packedVar] = this.getVar(name);
 
-		if (!packedVar || packedVar.type !== expectedType) {
+		if (!isFound || packedVar.type !== expectedType) {
 			return def;
 		}
 
 		return packedVar.value;
+	}
+
+	private getVar(name: string): [boolean, PackedVar] {
+		for (const packedVar of this._vars) {
+			if (packedVar.name === name) {
+				return [true, packedVar];
+			}
+		}
+
+		return [false, {name, value: 0, type: PackedVarType.Unknown}];
 	}
 }
