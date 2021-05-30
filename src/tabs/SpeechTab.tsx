@@ -1,7 +1,7 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Box, Checkbox, Container, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
+import {Box, Container, createStyles, FormControlLabel, Switch, Theme, withStyles, WithStyles} from "@material-ui/core";
 import {Speech} from "../data/Speech";
 import {DataGrid, GridCellParams, GridColDef} from "@material-ui/data-grid";
 import {assert} from "../common/Assert";
@@ -41,7 +41,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 				{
 					field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
 				},
-			]
+			],
 		};
 	}
 
@@ -49,8 +49,10 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const onClick = () => {
 			this.onDeleteRowClicked(params.row.id);
 		};
-		return <Checkbox checked={params.value as boolean} onChange={onClick}/>;
-	}
+		return <FormControlLabel label="Delete" control={
+			<Switch checked={params.value as boolean} onChange={onClick}/>
+		}/>;
+	};
 
 	private onDeleteRowClicked = (speechId: number) => {
 		const {hold, rows} = this.state;
@@ -67,11 +69,11 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 
 		HoldUtils.addChange(hold, {
 			type: "Speech",
-			model: speech
+			model: speech,
 		});
 
 		this.setState({rows});
-	}
+	};
 
 	private speechToRow(speech: Speech) {
 		return {

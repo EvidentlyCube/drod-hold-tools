@@ -9,4 +9,6 @@ export interface Command {
 	flags: number;
 	speechId: number;
 	label: string;
+
+	changes?: Partial<Omit<Command, 'changes'>>;
 }
