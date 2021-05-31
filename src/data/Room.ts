@@ -13,4 +13,6 @@ export interface Room {
 	checkpoints: Point[];
 	monsters: Monster[];
 	scrolls: Scroll[];
+
+	characterCount: number;
 }

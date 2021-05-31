@@ -1,6 +1,6 @@
 import {Hold} from "../data/Hold";
 import {Character} from "../data/Character";
-import {CharCommand, CommandNameMap} from "../common/Enums";
+import {CharCommand, CommandNameMap, MonsterType} from "../common/Enums";
 import {assert} from "../common/Assert";
 import {Monster} from "../data/Monster";
 import {Room} from "../data/Room";
@@ -83,5 +83,11 @@ export const HoldLinker = {
 		room.roomX -= level.entranceX;
 		room.roomY -= level.entranceY;
 
+	},
+	countRoomCharacters(room: Room) {
+		room.characterCount = 0;
+		for (const monster of room.monsters) {
+			room.characterCount += monster.characterType === MonsterType.Character ? 1 : 0;
+		}
 	},
 };

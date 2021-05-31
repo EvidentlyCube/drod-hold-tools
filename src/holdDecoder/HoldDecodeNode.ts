@@ -100,6 +100,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				checkpoints: [],
 				monsters: [],
 				scrolls: [],
+				characterCount: 0
 			});
 			for (const child of element.children) {
 				decodeHoldNode(child, hold);

@@ -20,6 +20,10 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 				for (const monster of room.monsters) {
 					HoldLinker.linkMonster(hold, monster, room);
 				}
+				HoldLinker.countRoomCharacters(room);
+				hold.counts.monsters += room.monsters.length;
+				hold.counts.characters += room.characterCount;
+				hold.counts.scrolls += room.scrolls.length
 			}
 
 			return true;
