@@ -1,4 +1,3 @@
-import {Monster} from "../data/Monster";
 import {Hold} from "../data/Hold";
 import {MonsterNameMap, MonsterType} from "./Enums";
 import {assert} from "./Assert";
@@ -18,23 +17,19 @@ export const MonsterUtils = {
 		return characterType;
 	},
 
-	getMonsterName(monster: Monster, hold: Hold) {
-		const type = monster.type === MonsterType.Character
-			? monster.characterType
-			: monster.type;
-
-		if (type === UINT_MINUS_1) {
+	getMonsterName(monsterType: number, hold: Hold) {
+		if (monsterType === UINT_MINUS_1) {
 			return "None";
 		}
 
-		if (type >= MonsterType._CustomCharactersStart) {
-			const character = hold.characters.get(type);
-			assert(character, `Failed to find character for type ${type}`);
+		if (monsterType >= MonsterType._CustomCharactersStart) {
+			const character = hold.characters.get(monsterType);
+			assert(character, `Failed to find character for type ${monsterType}`);
 			return character.name;
 		}
 
-		const name = MonsterNameMap.get(type);
+		const name = MonsterNameMap.get(monsterType);
 
-		return name || `Unknown Type #${type}`;
-	}
-}
+		return name || `Unknown Type #${monsterType}`;
+	},
+};

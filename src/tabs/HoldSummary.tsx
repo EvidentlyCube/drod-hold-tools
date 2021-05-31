@@ -5,7 +5,7 @@ import {DateUtils} from "../common/DateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	section: {
-		marginBottom: theme.spacing(3)
+		marginBottom: theme.spacing(3),
 	},
 	content: {
 		padding: theme.spacing(4, 6),
@@ -15,11 +15,11 @@ const styles = (theme: Theme) => createStyles({
 		flex: 1,
 		display: 'flex',
 		flexDirection: 'column',
-		height: '100%'
+		height: '100%',
 	},
 	gridStat: {
 		padding: theme.spacing(0, 2),
-	}
+	},
 });
 
 const GridStat = ({className, name, value}: { className: string, name: string, value: number }) => (
@@ -48,7 +48,7 @@ class HoldSummary extends React.Component<HoldSummaryProps, HoldSummaryState> {
 		const {hold, classes} = this.props;
 
 		return <Grid container spacing={5} className={classes.section}>
-			<Grid item lg={6} alignItems={"stretch"}>
+			<Grid item lg={6}>
 				<Paper className={classes.holdTitle}>
 					<Typography variant="h5" noWrap align="center">
 						{hold.name}

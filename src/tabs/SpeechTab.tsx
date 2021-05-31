@@ -1,20 +1,29 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Box, Container, createStyles, FormControlLabel, Switch, Theme, withStyles, WithStyles} from "@material-ui/core";
+import {Box, Container, createStyles, lighten, Switch, Theme, withStyles, WithStyles} from "@material-ui/core/";
 import {Speech} from "../data/Speech";
-import {DataGrid, GridCellParams, GridColDef} from "@material-ui/data-grid";
+import {DataGrid, GridCellParams, GridColDef, GridRowParams} from "@material-ui/data-grid";
 import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
+import {SpeechUtils} from "../common/SpeechUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
 		padding: theme.spacing(8, 0, 6),
+
+		'& .to-delete': {
+			backgroundColor: lighten(theme.palette.error.main, 0.6),
+			'&:hover': {
+				backgroundColor: lighten(theme.palette.error.main, 0.8),
+			},
+		},
 	},
 	muted: {
 		color: '#AAA',
 		fontStyle: 'italic',
 	},
+	deletedSpeech: {},
 });
 
 interface SpeechTabProps extends WithStyles<typeof styles> {
@@ -31,15 +40,22 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 	constructor(props: Readonly<SpeechTabProps> | SpeechTabProps) {
 		super(props);
 
+		const hold = Store.loadedHold.value;
 		this.state = {
-			hold: Store.loadedHold.value,
-			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => this.speechToRow(speech)),
+			hold: hold,
+			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => this.speechToRow(speech, hold)),
 			columns: [
-				{field: "id", headerName: "ID", flex: 1},
-				{field: "speech", headerName: "Text", flex: 5},
-				{field: "location", headerName: "Location", flex: 3},
+				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
+				{field: "speech", headerName: "Text", flex: 6},
+				{field: "command", headerName: "Command", flex: 2},
+				{field: "speaker", headerName: "Speaker", flex: 2},
+				{field: "location", headerName: "Location", flex: 2},
 				{
 					field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
+					sortable: false,
+					filterable: false,
+					hide: false,
+					disableColumnMenu: true,
 				},
 			],
 		};
@@ -49,9 +65,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const onClick = () => {
 			this.onDeleteRowClicked(params.row.id);
 		};
-		return <FormControlLabel label="Delete" control={
-			<Switch checked={params.value as boolean} onChange={onClick}/>
-		}/>;
+		return <Switch checked={params.value as boolean} onChange={onClick}/>;
 	};
 
 	private onDeleteRowClicked = (speechId: number) => {
@@ -75,14 +89,20 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		this.setState({rows});
 	};
 
-	private speechToRow(speech: Speech) {
+	private speechToRow(speech: Speech, hold: Hold) {
 		return {
 			id: speech.id,
 			speech: speech.text,
-			location: speech.linked,
+			command: speech?.location?.commandName,
+			speaker: SpeechUtils.getDisplaySpeaker(speech, hold),
+			location: SpeechUtils.getDisplayLocation(speech),
 			delete: !!speech.isDeleted,
 		};
 	}
+
+	private getRawClassName = (params: GridRowParams) => {
+		return params.getValue(params.id, 'delete') ? 'to-delete' : '';
+	};
 
 	public render() {
 		const {classes} = this.props;
@@ -101,6 +121,8 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 					localeText={{}}
 					rowHeight={52}
 					pageSize={25}
+					disableSelectionOnClick={true}
+					getRowClassName={this.getRawClassName}
 					sortingOrder={[]}/>
 
 			</Container>

@@ -4,7 +4,6 @@ import {CommandsUtils} from "../common/CommandsUtils";
 import {UINT_MINUS_1} from "../common/CommonTypes";
 import {MonsterUtils} from "../common/MonsterUtils";
 
-
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
 		case 'Players':
@@ -31,7 +30,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				xml: element,
 				roomId: getInt(element, 'RoomID'),
 				description: decodeText(element, 'DescriptionMessage'),
-				isMainEntrance: getInt(element, 'IsMainEntrance') === 1
+				isMainEntrance: getInt(element, 'IsMainEntrance') === 1,
 			});
 			break;
 
@@ -56,8 +55,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 
 			hold.characters.set(characterId, {
 				xml: element,
+				id: characterId,
 				name: decodeText(element, 'CharNameText'),
-				commands, processingSequence
+				commands, processingSequence,
 			});
 			break;
 
@@ -72,10 +72,15 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 
 		case 'Speech':
 			const speechId = getInt(element, 'SpeechID');
+
 			hold.speeches.set(speechId, {
 				id: speechId,
 				xml: element,
-				text: decodeText(element, 'Message')
+				text: decodeText(element, 'Message'),
+				dataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0,
+				moodId: element.hasAttribute('Mood') ? getInt(element, 'Mood') : 0,
+				speakerId: element.hasAttribute('Character') ? getInt(element, 'Character') : 0,
+				delay: element.hasAttribute('Delay') ? getInt(element, 'Delay') : 0,
 			});
 			break;
 
@@ -86,7 +91,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				name: decodeText(element, 'NameMessage'),
 				entranceX: 0,
 				entranceY: 0,
-				entrances: []
+				entrances: [],
 			});
 			break;
 
@@ -100,7 +105,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				checkpoints: [],
 				monsters: [],
 				scrolls: [],
-				characterCount: 0
+				characterCount: 0,
 			});
 			for (const child of element.children) {
 				decodeHoldNode(child, hold);
@@ -128,7 +133,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				y: getInt(element, 'Y'),
 				o: getInt(element, 'O'),
 				type: getInt(element, 'Type'),
-				extraVars, commands, processingSequence, isVisible, characterType
+				extraVars, commands, processingSequence, isVisible, characterType,
 			});
 		}
 			break;

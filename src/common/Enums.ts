@@ -1,3 +1,5 @@
+import {UINT_MINUS_1} from "./CommonTypes";
+
 export enum CharCommand {
 	CC_Appear = 0,
 	CC_AppearAt,
@@ -89,10 +91,10 @@ export enum MonsterType {
 	RoachQueen = 1,
 	RoachEgg = 2,
 	Goblin = 3,
-	Neather=4,
-	Wraithwing=5,
-	EvilEye=6,
-	Serpent=7,
+	Neather = 4,
+	Wraithwing = 5,
+	EvilEye = 6,
+	Serpent = 7,
 	TarMother = 8,
 	TarBaby = 9,
 	Brain = 10,
@@ -100,31 +102,31 @@ export enum MonsterType {
 	Spider = 12,
 	Adder = 13,
 	Rattlesnake = 14,
-	RockGolem=15,
-	Waterskipper=16,
-	WaterskipperNest=17,
-	Aumtlich=18,
-	Clone=19,
-	Decoy=20,
-	Wubba=21,
-	Seep=22,
-	Stalwart=23,
-	HalphYoung=24,
-	Slayer39th=25,
-	Fegundo=26,
-	FegundoAshes=27,
-	Guard=28,
-	Character=29,
-	MudMother=30,
-	MudBaby=31,
-	GelMother=32,
-	GelBaby=33,
-	Citizen=34,
-	RockGiant=35,
+	RockGolem = 15,
+	Waterskipper = 16,
+	WaterskipperNest = 17,
+	Aumtlich = 18,
+	Clone = 19,
+	Decoy = 20,
+	Wubba = 21,
+	Seep = 22,
+	Stalwart = 23,
+	HalphYoung = 24,
+	Slayer39th = 25,
+	Fegundo = 26,
+	FegundoAshes = 27,
+	Guard = 28,
+	Character = 29,
+	MudMother = 30,
+	MudBaby = 31,
+	GelMother = 32,
+	GelBaby = 33,
+	Citizen = 34,
+	RockGiant = 35,
 	HalphOld = 36,
-	SlayerOther=37,
-	Soldier=38,
-	Architect=39,
+	SlayerOther = 37,
+	Soldier = 38,
+	Architect = 39,
 	Construct = 40,
 	Gentryii = 41,
 	TemporalClone = 42,
@@ -146,6 +148,80 @@ export enum MonsterType {
 	Gunthro = 10012,
 
 	_CustomCharactersStart = 20000
+}
+
+export enum Speaker {
+	Beethro = 0,
+	Gunthro = 51,
+	Citizen1 = 6,
+	Citizen2 = 7,
+	Citizen3 = 45,
+	Citizen4 = 46,
+	Custom = 5,
+	EyeActive = 15,
+	GoblinKing = 8,
+	Instructor = 10,
+	MudCoordinator = 11,
+	Negotiator = 3,
+	None = 4,
+	TarTechnician = 13,
+	BeethroInDisguise = 47,
+	Self = 50,
+	Player = 52,
+	Halph = 1,
+	Slayer = 2,
+	Goblin = 9,
+	RockGolem = 12,
+	Guard = 14,
+	Stalwart = 17,
+	Roach = 18,
+	QRoach = 19,
+	RoachEgg = 20,
+	WWing = 21,
+	Eye = 22,
+	Serpent = 23,
+	TarMother = 24,
+	TarBaby = 25,
+	Brain = 26,
+	Mimic = 27,
+	Spider = 28,
+	SerpentG = 29,
+	SerpentB = 30,
+	WaterSkipper = 31,
+	WaterSkipperNest = 32,
+	Aumtlich = 33,
+	Clone = 34,
+	Decoy = 35,
+	Wubba = 36,
+	Seep = 37,
+	Fegundo = 38,
+	FegundoAshes = 39,
+	MudMother = 40,
+	MudBaby = 41,
+	GelMother = 42,
+	GelBaby = 43,
+	Citizen = 16,
+	RockGiant = 44,
+	Slayer2 = 48,
+	Halph2 = 49,
+	Stalwart2 = 53,
+	Architect = 54,
+	Construct = 55,
+	Gentryii = 56,
+	TemporalClone = 57,
+	FluffBaby = 58,
+
+	HoldCharacter = UINT_MINUS_1
+}
+
+export enum Mood {
+	Normal = 0,
+	Aggressive = 1,
+	Nervous = 2,
+	Strike = 3,
+	Happy = 4,
+	Dying = 5,
+	Talking = 6,
 }
 
 const _MonsterNameMap: Map<number, string> = new Map();
@@ -294,3 +370,75 @@ _CommandNameMap.set(CharCommand.CC_FaceTowards, 'CC_FaceTowards');
 _CommandNameMap.set(CharCommand.CC_GetNaturalTarget, 'CC_GetNaturalTarget');
 _CommandNameMap.set(CharCommand.CC_GetEntityDirection, 'CC_GetEntityDirection');
 export const CommandNameMap: ReadonlyMap<number, string> = _CommandNameMap;
+
+const _SpeakerNameMap: Map<number, string> = new Map();
+_SpeakerNameMap.set(Speaker.Beethro, 'Beethro');
+_SpeakerNameMap.set(Speaker.Gunthro, 'Gunthro');
+_SpeakerNameMap.set(Speaker.Citizen1, 'Citizen1');
+_SpeakerNameMap.set(Speaker.Citizen2, 'Citizen2');
+_SpeakerNameMap.set(Speaker.Citizen3, 'Citizen3');
+_SpeakerNameMap.set(Speaker.Citizen4, 'Citizen4');
+_SpeakerNameMap.set(Speaker.Custom, 'Custom');
+_SpeakerNameMap.set(Speaker.EyeActive, 'EyeActive');
+_SpeakerNameMap.set(Speaker.GoblinKing, 'GoblinKing');
+_SpeakerNameMap.set(Speaker.Instructor, 'Instructor');
+_SpeakerNameMap.set(Speaker.MudCoordinator, 'MudCoordinator');
+_SpeakerNameMap.set(Speaker.Negotiator, 'Negotiator');
+_SpeakerNameMap.set(Speaker.None, 'None');
+_SpeakerNameMap.set(Speaker.TarTechnician, 'TarTechnician');
+_SpeakerNameMap.set(Speaker.BeethroInDisguise, 'BeethroInDisguise');
+_SpeakerNameMap.set(Speaker.Self, 'Self');
+_SpeakerNameMap.set(Speaker.Player, 'Player');
+_SpeakerNameMap.set(Speaker.Halph, 'Halph');
+_SpeakerNameMap.set(Speaker.Slayer, 'Slayer');
+_SpeakerNameMap.set(Speaker.Goblin, 'Goblin');
+_SpeakerNameMap.set(Speaker.RockGolem, 'RockGolem');
+_SpeakerNameMap.set(Speaker.Guard, 'Guard');
+_SpeakerNameMap.set(Speaker.Stalwart, 'Stalwart');
+_SpeakerNameMap.set(Speaker.Roach, 'Roach');
+_SpeakerNameMap.set(Speaker.QRoach, 'QRoach');
+_SpeakerNameMap.set(Speaker.RoachEgg, 'RoachEgg');
+_SpeakerNameMap.set(Speaker.WWing, 'WWing');
+_SpeakerNameMap.set(Speaker.Eye, 'Eye');
+_SpeakerNameMap.set(Speaker.Serpent, 'Serpent');
+_SpeakerNameMap.set(Speaker.TarMother, 'TarMother');
+_SpeakerNameMap.set(Speaker.TarBaby, 'TarBaby');
+_SpeakerNameMap.set(Speaker.Brain, 'Brain');
+_SpeakerNameMap.set(Speaker.Mimic, 'Mimic');
+_SpeakerNameMap.set(Speaker.Spider, 'Spider');
+_SpeakerNameMap.set(Speaker.SerpentG, 'SerpentG');
+_SpeakerNameMap.set(Speaker.SerpentB, 'SerpentB');
+_SpeakerNameMap.set(Speaker.WaterSkipper, 'WaterSkipper');
+_SpeakerNameMap.set(Speaker.WaterSkipperNest, 'WaterSkipperNest');
+_SpeakerNameMap.set(Speaker.Aumtlich, 'Aumtlich');
+_SpeakerNameMap.set(Speaker.Clone, 'Clone');
+_SpeakerNameMap.set(Speaker.Decoy, 'Decoy');
+_SpeakerNameMap.set(Speaker.Wubba, 'Wubba');
+_SpeakerNameMap.set(Speaker.Seep, 'Seep');
+_SpeakerNameMap.set(Speaker.Fegundo, 'Fegundo');
+_SpeakerNameMap.set(Speaker.FegundoAshes, 'FegundoAshes');
+_SpeakerNameMap.set(Speaker.MudMother, 'MudMother');
+_SpeakerNameMap.set(Speaker.MudBaby, 'MudBaby');
+_SpeakerNameMap.set(Speaker.GelMother, 'GelMother');
+_SpeakerNameMap.set(Speaker.GelBaby, 'GelBaby');
+_SpeakerNameMap.set(Speaker.Citizen, 'Citizen');
+_SpeakerNameMap.set(Speaker.RockGiant, 'RockGiant');
+_SpeakerNameMap.set(Speaker.Slayer2, 'Slayer2');
+_SpeakerNameMap.set(Speaker.Halph2, 'Halph2');
+_SpeakerNameMap.set(Speaker.Stalwart2, 'Stalwart2');
+_SpeakerNameMap.set(Speaker.Architect, 'Architect');
+_SpeakerNameMap.set(Speaker.Construct, 'Construct');
+_SpeakerNameMap.set(Speaker.Gentryii, 'Gentryii');
+_SpeakerNameMap.set(Speaker.TemporalClone, 'TemporalClone');
+_SpeakerNameMap.set(Speaker.FluffBaby, 'FluffBaby');
+export const SpeakerNameMap: ReadonlyMap<number, string> = _SpeakerNameMap;
+
+const _MoodNameMap: Map<number, string> = new Map();
+_MoodNameMap.set(Mood.Normal, 'Normal');
+_MoodNameMap.set(Mood.Aggressive, 'Aggressive');
+_MoodNameMap.set(Mood.Nervous, 'Nervous');
+_MoodNameMap.set(Mood.Strike, 'Strike');
+_MoodNameMap.set(Mood.Happy, 'Happy');
+_MoodNameMap.set(Mood.Dying, 'Dying');
+_MoodNameMap.set(Mood.Talking, 'Talking');
+export const MoodNameMap: ReadonlyMap<number, string> = _MoodNameMap;

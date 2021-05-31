@@ -1,68 +1,71 @@
 import {Hold} from "../data/Hold";
 import {Character} from "../data/Character";
-import {CharCommand, CommandNameMap, MonsterType} from "../common/Enums";
+import {CommandNameMap, MonsterType} from "../common/Enums";
 import {assert} from "../common/Assert";
 import {Monster} from "../data/Monster";
 import {Room} from "../data/Room";
 import {MonsterUtils} from "../common/MonsterUtils";
 import {RoomUtils} from "../common/RoomUtils";
 import {Entrance} from "../data/Entrance";
+import {Command} from "../data/Command";
 
+function getRoomDetails(room: Room | undefined, hold: Hold): undefined | { level: string, pos: string } {
+	if (!room) {
+		return undefined;
+	}
+
+	const level = hold.levels.get(room.levelId);
+	assert(level, `Failed to find level ${room.levelId}`);
+	const coordinate = RoomUtils.getCoordinateName(room.roomX, room.roomY);
+
+	return {
+		level: level.name,
+		pos: coordinate,
+	};
+}
 
 export const HoldLinker = {
 	linkCharacter(hold: Hold, character: Character) {
-		for (const command of character.commands) {
+	},
+	linkCommands(hold: Hold, commands: Command[], room: Room | undefined, sourceMonster?: Monster, sourceCharacter?: Character) {
+		if (!sourceMonster && !sourceCharacter) {
+			throw new Error("linkCommands requires one of source monster or source character but none was given.");
+		} else if (sourceMonster && sourceCharacter) {
+			throw new Error("linkCommands requires one of source monster or source character but both were given.");
+		}
+
+		const roomDetails = getRoomDetails(room, hold);
+		const monsterBaseType = sourceMonster ? sourceMonster.type : sourceCharacter!.id;
+		const monsterExtendedType = sourceMonster ? sourceMonster.characterType : sourceCharacter!.id;
+		const monsterType = monsterBaseType === MonsterType.Character
+			? monsterExtendedType
+			: monsterBaseType;
+
+		for (const command of commands) {
+
+			if (command.speechId) {
+				const speech = hold.speeches.get(command.speechId);
+				assert(speech, `Failed to find speech ${command.speechId}`);
+
+				speech.location = {
+					x: command.x,
+					y: command.y,
+					commandName: CommandNameMap.get(command.command) ?? `Unknown command #${command.command}`,
+					source: sourceMonster ? 'monster' : 'character',
+					characterName: MonsterUtils.getMonsterName(monsterType, hold),
+					location: roomDetails ? `${roomDetails.level} ${roomDetails.pos}` : '',
+				};
+			}
+
 			switch (command.command) {
-				case CharCommand.CC_Speech:
-					const speech = hold.speeches.get(command.speechId);
-					assert(speech, `Failed to find speech ${command.speechId}`);
-					speech.linked = `${character.name} (Hold Character)`;
+				default:
 					break;
 			}
 		}
 	},
 	linkMonster(hold: Hold, monster: Monster, room: Room) {
-		const level = hold.levels.get(room.levelId);
-		const monsterName = MonsterUtils.getMonsterName(monster, hold);
-		const coordinate = RoomUtils.getCoordinateName(room.roomX, room.roomY);
-
-		assert(level, `Failed to find level ${room.levelId}`);
-
-		for (const command of monster.commands) {
-			switch (command.command) {
-				case CharCommand.CC_Speech: {
-					const speech = hold.speeches.get(command.speechId);
-					assert(speech, `Failed to find speech ${command.speechId}`);
-
-					speech.linked = `Speech by Character (${monsterName}) in Level ${level.name} ${coordinate}`;
-				}
-					break;
-				case CharCommand.CC_FlashingText: {
-					const speech = hold.speeches.get(command.speechId);
-					assert(speech, `Failed to find speech ${command.speechId}`);
-
-					speech.linked = `Flashing Text by Character (${monsterName}) in Level ${level.name} ${coordinate}`;
-				}
-					break;
-				case CharCommand.CC_RoomLocationText: {
-					const speech = hold.speeches.get(command.speechId);
-					assert(speech, `Failed to find speech ${command.speechId}`);
-
-					speech.linked = `Room Location Text by Character (${monsterName}) in Level ${level.name} ${coordinate}`;
-				}
-					break;
-
-				default:
-					if (command.speechId) {
-						const speech = hold.speeches.get(command.speechId);
-						assert(speech, `Failed to find speech ${command.speechId}`);
-
-						speech.linked = `Command ${CommandNameMap.get(command.command)} by Character (${monsterName}) in Level ${level.name} ${coordinate}`;
-					}
-					break;
-			}
-		}
 	},
+
 	linkEntranceToLevel(entrance: Entrance, hold: Hold) {
 		const room = hold.rooms.get(entrance.roomId);
 		assert(room, `Failed to find room of id ${entrance.roomId}`);
