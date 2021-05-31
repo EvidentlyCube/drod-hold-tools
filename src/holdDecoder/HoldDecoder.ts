@@ -15,6 +15,7 @@ export class HoldDecoder {
 	private _state: DecodeState;
 	private _steps: DecodeStep[];
 	private _fileName: string;
+	private _lastError: string;
 
 	public onUpdate: Signal;
 
@@ -27,7 +28,7 @@ export class HoldDecoder {
 	}
 
 	public get progressFactor() {
-		return this._state.progressFactor;
+		return this._state?.progressFactor ?? -1;
 	}
 
 	public get fileName() {
@@ -38,15 +39,21 @@ export class HoldDecoder {
 		return this._state.hold;
 	}
 
+	public get lastError() {
+		return this._lastError;
+	}
+
 	constructor() {
 		this._state = undefined!;
 		this._steps = [];
 		this._fileName = "";
+		this._lastError = "";
 		this.onUpdate = new Signal();
 	}
 
 	public startDecode(file: File) {
 		this._fileName = file.name;
+		this._lastError = "";
 
 		this._steps = [
 			getDecoderReadFile(),
@@ -54,7 +61,7 @@ export class HoldDecoder {
 			getDecodeInflate(),
 			getDecodeReadToXml(),
 			getDecodeToHold(),
-			getDecodeHoldLinker()
+			getDecodeHoldLinker(),
 		];
 
 		this._state = {
@@ -71,17 +78,23 @@ export class HoldDecoder {
 	private update() {
 		const readUntil = Date.now() + MAX_TIME_PER_TICK;
 
-		while (Date.now() < readUntil) {
-			const step = this._steps[0];
+		try {
+			while (Date.now() < readUntil) {
+				const step = this._steps[0];
 
-			if (!step) {
-				break;
-			}
+				if (!step) {
+					break;
+				}
 
-			if (step.run(this._state)) {
-				step.after?.(this._state);
-				this._steps.shift();
+				if (step.run(this._state)) {
+					step.after?.(this._state);
+					this._steps.shift();
+				}
 			}
+		} catch (error) {
+			this._lastError = error?.message ?? "Unknown error";
+			this._steps.length = 0;
+			this.onUpdate.dispatch();
 		}
 
 		this.onUpdate.dispatch();

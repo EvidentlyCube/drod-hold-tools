@@ -1,4 +1,4 @@
-import {Container, createStyles, List, ListItem, ListItemText, Theme, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {createStyles, List, ListItem, ListItemText, Paper, Theme, Typography, WithStyles, withStyles} from "@material-ui/core";
 import React from "react";
 import {Hold} from "../data/Hold";
 import {Change} from "../data/Change";
@@ -45,14 +45,14 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 	render() {
 		const {hold, classes} = this.props;
 
-		return <Container maxWidth="sm" className={classes.content}>
+		return <Paper className={classes.content}>
 			<Typography variant="h5" noWrap align="center">
 				Pending changes:
 			</Typography>
 			<List>
 				{hold.changes.map((change, index) => this.renderChange(change, index))}
 			</List>
-		</Container>;
+		</Paper>;
 	}
 }
 

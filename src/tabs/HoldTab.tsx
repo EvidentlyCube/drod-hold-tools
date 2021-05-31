@@ -1,28 +1,21 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Container, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
-import {DropzoneAreaBase, FileObject} from "material-ui-dropzone";
+import {Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {HoldDecoder} from "../holdDecoder/HoldDecoder";
-import {HoldDecoderStatus} from "./HoldDecoderStatus";
+import HoldDecoderStatus from "./HoldDecoderStatus";
 import HoldSummary from "./HoldSummary";
 import HoldPendingChanges from "./HoldPendingChanges";
+import HoldUploader from "./HoldUploader";
 
-const styles = (theme: Theme) => createStyles({
-	dropzone: {
-		padding: theme.spacing(8, 0, 6),
-	},
-});
-
-interface HoldTabProps extends WithStyles<typeof styles> {
-
+interface HoldTabProps {
 }
 
 interface HoldTabState {
 	hold: Hold;
 	decoder: HoldDecoder;
-	fileObjects: FileObject[];
 	isHoldDecoding: boolean;
+	isShowingError: boolean;
 }
 
 class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
@@ -32,8 +25,8 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 		this.state = {
 			hold: Store.loadedHold.value,
 			decoder: new HoldDecoder(),
-			fileObjects: [],
 			isHoldDecoding: false,
+			isShowingError: false,
 		};
 	}
 
@@ -52,44 +45,51 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 	};
 
 	private handleDecoderUpdate = () => {
+		const {decoder} = this.state;
 		this.setState({
-			isHoldDecoding: this.state.decoder.isLoading,
-			hold: this.state.decoder.hold,
+			isHoldDecoding: decoder.isLoading,
+			isShowingError: !!decoder.lastError,
+			hold: decoder.hold,
 		});
 	};
 
-	public render() {
-		const {decoder, fileObjects, isHoldDecoding, hold} = this.state;
-		const {classes} = this.props;
+	private onErrorClose = () => {
+		this.setState({isShowingError: false});
+	};
+
+	public renderContent() {
+		const {decoder, isHoldDecoding, hold} = this.state;
 
 		if (isHoldDecoding) {
-			return <div className={classes.dropzone}>
-				<Container maxWidth="sm">
-					<HoldDecoderStatus decoder={decoder}/>
-				</Container>
-			</div>;
+			return <HoldDecoderStatus decoder={decoder}/>;
 		} else if (hold.isLoaded) {
 			return <>
 				<HoldSummary hold={hold}/>
 				<HoldPendingChanges hold={hold}/>
 			</>;
 		} else {
-			return <div className={classes.dropzone}>
-				<Container maxWidth="sm">
-					<DropzoneAreaBase
-						fileObjects={fileObjects}
-						filesLimit={1}
-						dropzoneText={"Drag and drop a hold here or click"}
-						maxFileSize={1024 * 1024 * 1024}
-						onDrop={(files) => {
-							decoder.startDecode(files[0]);
-						}}
-						showAlerts={false}
-					/>
-				</Container>
-			</div>;
+			return <HoldUploader holdDecoder={decoder}/>;
 		}
+	}
+
+	public render() {
+		const {isShowingError, decoder} = this.state;
+		return <Container maxWidth="lg">
+			{this.renderContent()}
+			<Dialog open={isShowingError} onClose={this.onErrorClose}>
+				<DialogTitle>Reading file "{decoder.fileName}" failed</DialogTitle>
+				<DialogContent>
+					<DialogContentText>Please make sure you've selected a valid DROD 5.0.1 hold. If you are sure, please send the hold file to 'skell' on DROD forums.</DialogContentText>
+					<DialogContentText>Reported error: {decoder.lastError}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={this.onErrorClose} color="primary" autoFocus>
+						Close
+					</Button>
+				</DialogActions>
+			</Dialog>
+		</Container>;
 	}
 }
 
-export default withStyles(styles)(HoldTab);
+export default HoldTab;
