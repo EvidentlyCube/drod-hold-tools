@@ -51,6 +51,7 @@
     ]
   },
   "devDependencies": {
-    "@types/signals": "^1.0.1"
+    "@types/signals": "^1.0.1",
+    "arraybuffer-loader": "^1.0.8"
   }
 }

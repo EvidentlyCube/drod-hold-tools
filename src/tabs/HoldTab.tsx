@@ -24,7 +24,7 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 
 		this.state = {
 			hold: Store.loadedHold.value,
-			decoder: new HoldDecoder(),
+			decoder: Store.holdDecoder,
 			isHoldDecoding: false,
 			isShowingError: false,
 		};

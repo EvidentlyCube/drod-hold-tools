@@ -44,7 +44,7 @@ class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState>
 			});
 		}
 
-		this.props.holdDecoder.startDecode(files[0]);
+		this.props.holdDecoder.startDecode(files[0], files[0].name);
 	};
 
 	private onCloseSnack = () => {

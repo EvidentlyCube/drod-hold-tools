@@ -52,8 +52,8 @@ export class HoldDecoder {
 		this.onUpdate = new Signal();
 	}
 
-	public startDecode(file: File) {
-		this._fileName = file.name;
+	public startDecode(fileOrData: File|Uint8Array, fileName: string) {
+		this._fileName = fileName;
 		this._lastError = "";
 
 		this._steps = [
@@ -67,8 +67,8 @@ export class HoldDecoder {
 		];
 
 		this._state = {
-			file,
-			holdBytes: new Uint8Array(),
+			file: fileOrData instanceof File ? fileOrData : undefined,
+			holdBytes: fileOrData instanceof File ? new Uint8Array() : fileOrData,
 			holdXml: document.implementation.createDocument(null, null),
 			hold: createNullHold(),
 			progressFactor: 0,

@@ -1,7 +1,7 @@
 import {Hold} from "../data/Hold";
 
 export interface DecodeState {
-	file: File;
+	file?: File;
 	holdBytes: Uint8Array;
 	holdXml: XMLDocument;
 	hold: Hold;

@@ -12,6 +12,10 @@ export const getDecoderReadFile = ():DecodeStep => {
 	return {
 		name: 'Read File',
 		run(decoder: DecodeState): boolean {
+			if (!decoder.file) {
+				return true;
+			}
+
 			if (!isLoading) {
 				fileReader.readAsArrayBuffer(decoder.file);
 				isLoading = true;

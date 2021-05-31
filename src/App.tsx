@@ -5,6 +5,7 @@ import {Store} from "./data/Store";
 import HoldTab from "./tabs/HoldTab";
 import SpeechTab from "./tabs/SpeechTab";
 import {Container} from "@material-ui/core/";
+import "./common.d.ts";
 
 const useStyles = makeStyles(theme => ({
 	tab: {
