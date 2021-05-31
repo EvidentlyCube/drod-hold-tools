@@ -8,6 +8,7 @@ import {Signal} from "signals";
 import {getDecodeToHold} from "./DecodeToHold";
 import {Store} from "../data/Store";
 import {getDecodeHoldLinker} from "./DecodeHoldLinker";
+import {getDecodeValidateXml} from "./DecodeValidateHold";
 
 const MAX_TIME_PER_TICK = 8;
 
@@ -60,6 +61,7 @@ export class HoldDecoder {
 			getDecodeXor(),
 			getDecodeInflate(),
 			getDecodeReadToXml(),
+			getDecodeValidateXml(),
 			getDecodeToHold(),
 			getDecodeHoldLinker(),
 		];
