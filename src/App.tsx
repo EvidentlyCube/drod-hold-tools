@@ -35,6 +35,7 @@ function TabPanel(props: React.PropsWithChildren<{ value: any, index: any, class
 			role="tabpanel"
 			id={`simple-tabpanel-${index}`}
 			aria-labelledby={`simple-tab-${index}`}
+			maxWidth="xl"
 		>
 			<Box>{children}</Box>
 		</Container>
@@ -64,7 +65,7 @@ function App() {
 			<AppBar position="static">
 				<Tabs value={selectedTab} onChange={handleChange} aria-label="simple tabs example">
 					<Tab label="Hold"/>
-					<Tab label="Speeches" disabled={!hasLoadedHold}/>
+					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
 			<TabPanel className={classes.tab} value={selectedTab} index={0}>

@@ -35,7 +35,7 @@ export interface Hold {
 		characters: number
 	}
 
-	changes: Change[];
+	changes: Set<Change>;
 }
 
 export function createNullHold(): Hold {
@@ -62,9 +62,9 @@ export function createNullHold(): Hold {
 		counts: {
 			characters: 0,
 			monsters: 0,
-			scrolls: 0
+			scrolls: 0,
 		},
 
-		changes: []
+		changes: new Set(),
 	};
 }

@@ -1,9 +1,9 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Box, Container, createStyles, lighten, Switch, Theme, withStyles, WithStyles} from "@material-ui/core/";
+import {Container, createStyles, lighten, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {Speech} from "../data/Speech";
-import {DataGrid, GridCellParams, GridColDef, GridRowParams} from "@material-ui/data-grid";
+import {DataGrid, GridCellParams, GridColDef, GridEditCellPropsParams, GridRowParams} from "@material-ui/data-grid";
 import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
 import {SpeechUtils} from "../common/SpeechUtils";
@@ -11,7 +11,7 @@ import {VolumeUp} from "@material-ui/icons";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
-		padding: theme.spacing(8, 0, 6),
+		padding: theme.spacing(4, 6),
 
 		'& .to-delete': {
 			backgroundColor: lighten(theme.palette.error.main, 0.6),
@@ -47,7 +47,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => this.speechToRow(speech, hold)),
 			columns: [
 				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
-				{field: "speech", headerName: "Text", flex: 6, renderCell: this.renderMessageRow},
+				{field: "text", headerName: "Text", flex: 6, renderCell: this.renderMessageRow, editable: true},
 				{field: "command", headerName: "Command", flex: 2},
 				{field: "speaker", headerName: "Speaker", flex: 2},
 				{field: "location", headerName: "Location", flex: 2},
@@ -57,6 +57,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 					filterable: false,
 					hide: false,
 					disableColumnMenu: true,
+
 				},
 			],
 		};
@@ -66,10 +67,10 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const hasAudio = params.row.hasAudio;
 
 		return <>
-			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}} />}
+			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}}/>}
 			{params.value as string}
-		</>
-	}
+		</>;
+	};
 
 	private renderDeleteRow = (params: GridCellParams) => {
 		const onClick = () => {
@@ -94,6 +95,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		HoldUtils.addChange(hold, {
 			type: "Speech",
 			model: speech,
+			changes: {delete: speech.isDeleted},
 		});
 
 		this.setState({rows});
@@ -102,12 +104,12 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 	private speechToRow(speech: Speech, hold: Hold) {
 		return {
 			id: speech.id,
-			speech: speech.text,
+			text: speech.changes.text ?? speech.text,
 			command: speech?.location?.commandName,
 			speaker: SpeechUtils.getDisplaySpeaker(speech, hold),
 			location: SpeechUtils.getDisplayLocation(speech),
 			delete: !!speech.isDeleted,
-			hasAudio: !!speech.dataId
+			hasAudio: !!speech.dataId,
 		};
 	}
 
@@ -115,12 +117,40 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		return params.getValue(params.id, 'delete') ? 'to-delete' : '';
 	};
 
+	private handleCellClick = (params: GridCellParams) => {
+		if (params.field === 'text' && params.api.setCellMode) {
+			params.api.setCellMode(params.id, 'text', "edit");
+		}
+	};
+	private handleCellEdited = (params: GridEditCellPropsParams) => {
+		const {hold} = this.state;
+		const speech = hold.speeches.get(params.id as number);
+		assert(speech, `No speech found for id '${params.id}'`);
+
+		speech.changes.text = params.props.value ? params.props.value.toString() : '';
+		if (speech.text === speech.changes.text) {
+			delete (speech.changes.text);
+		}
+
+		HoldUtils.addChange(hold, {
+			type: "Speech",
+			model: speech,
+			changes: {text: !!speech.changes.text},
+		});
+	};
+
 	public render() {
 		const {classes} = this.props;
 		const {rows, columns} = this.state;
 
-		return <Box className={classes.content}>
-			<Container maxWidth="lg">
+		return <Container maxWidth="xl">
+			<Paper className={classes.content}>
+				<Typography variant="h5" gutterBottom>
+					Commands text
+				</Typography>
+				<Typography variant="body1" gutterBottom>
+					This table contains all the texts from all the commands in every character (custom character's default script & placed character). Click on the text to edit it, press enter to save changes.
+				</Typography>
 				<DataGrid
 					columns={columns}
 					rows={rows}
@@ -134,10 +164,12 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 					pageSize={25}
 					disableSelectionOnClick={true}
 					getRowClassName={this.getRawClassName}
+					onCellClick={this.handleCellClick}
+					onEditCellChangeCommitted={this.handleCellEdited}
 					sortingOrder={[]}/>
+			</Paper>
 
-			</Container>
-		</Box>;
+		</Container>;
 	}
 }
 

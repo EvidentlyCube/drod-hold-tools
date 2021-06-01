@@ -10,6 +10,10 @@ export interface Speech {
 
 	isDeleted?: true;
 
+	changes: {
+		text?: string;
+	}
+
 	location?: {
 		source: 'monster' | 'character',
 		location: string,
