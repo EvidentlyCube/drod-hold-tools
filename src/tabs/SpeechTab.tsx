@@ -7,6 +7,7 @@ import {DataGrid, GridCellParams, GridColDef, GridRowParams} from "@material-ui/
 import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
 import {SpeechUtils} from "../common/SpeechUtils";
+import {VolumeUp} from "@material-ui/icons";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -46,7 +47,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => this.speechToRow(speech, hold)),
 			columns: [
 				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
-				{field: "speech", headerName: "Text", flex: 6},
+				{field: "speech", headerName: "Text", flex: 6, renderCell: this.renderMessageRow},
 				{field: "command", headerName: "Command", flex: 2},
 				{field: "speaker", headerName: "Speaker", flex: 2},
 				{field: "location", headerName: "Location", flex: 2},
@@ -59,6 +60,15 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 				},
 			],
 		};
+	}
+
+	private renderMessageRow = (params: GridCellParams) => {
+		const hasAudio = params.row.hasAudio;
+
+		return <>
+			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}} />}
+			{params.value as string}
+		</>
 	}
 
 	private renderDeleteRow = (params: GridCellParams) => {
@@ -97,6 +107,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			speaker: SpeechUtils.getDisplaySpeaker(speech, hold),
 			location: SpeechUtils.getDisplayLocation(speech),
 			delete: !!speech.isDeleted,
+			hasAudio: !!speech.dataId
 		};
 	}
 
