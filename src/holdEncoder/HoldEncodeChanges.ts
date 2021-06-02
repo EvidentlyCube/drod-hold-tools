@@ -8,6 +8,7 @@ import {StringUtils} from "../common/StringUtils";
 export const HoldEncodeChanges = {
 	hold(hold: Hold) {
 		hold.dateUpdated = new Date();
+		hold.changes.clear();
 		hold.xml.setAttribute('LastUpdated', Math.floor(hold.dateUpdated.getTime() / 1000).toString());
 	},
 	room(room: Room, hold: Hold) {
