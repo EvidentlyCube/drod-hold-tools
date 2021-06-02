@@ -51,14 +51,14 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 				{field: "command", headerName: "Command", flex: 2},
 				{field: "speaker", headerName: "Speaker", flex: 2},
 				{field: "location", headerName: "Location", flex: 2},
-				{
-					field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
-					sortable: false,
-					filterable: false,
-					hide: false,
-					disableColumnMenu: true,
-
-				},
+				// {
+				// 	field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
+				// 	sortable: false,
+				// 	filterable: false,
+				// 	hide: false,
+				// 	disableColumnMenu: true,
+				//
+				// },
 			],
 		};
 	}
