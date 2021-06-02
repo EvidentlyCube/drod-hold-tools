@@ -14,7 +14,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			break;
 
 		case 'Holds':
-			hold.xmlData = element;
+			hold.xml = element;
 			hold.name = decodeText(element, 'NameMessage');
 			hold.description = decodeText(element, 'DescriptionMessage');
 			hold.dateCreated = new Date(getInt(element, 'GID_Created') * 1000);

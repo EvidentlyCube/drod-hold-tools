@@ -12,7 +12,7 @@ import {Change} from "./Change";
 export interface Hold {
 	isLoaded: boolean;
 	xmlDocument: XMLDocument;
-	xmlData: Element;
+	xml: Element;
 
 	name: string;
 	description: string;
@@ -42,7 +42,7 @@ export function createNullHold(): Hold {
 	return {
 		isLoaded: false,
 		xmlDocument: document.implementation.createDocument(null, null),
-		xmlData: document.createElement('Holds'),
+		xml: document.createElement('Holds'),
 
 		name: '',
 		description: '',

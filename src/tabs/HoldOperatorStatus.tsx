@@ -1,6 +1,6 @@
-import {HoldDecoder} from "../holdDecoder/HoldDecoder";
 import {createStyles, LinearProgress, Paper, Theme, Typography, WithStyles, withStyles} from "@material-ui/core";
 import React from "react";
+import {HoldOperator} from "../common/CommonTypes";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -10,7 +10,7 @@ const styles = (theme: Theme) => createStyles({
 
 
 interface HoldDecoderStatusProps extends WithStyles<typeof styles> {
-	decoder: HoldDecoder;
+	operator: HoldOperator;
 }
 
 interface HoldDecoderStatusState {
@@ -18,40 +18,40 @@ interface HoldDecoderStatusState {
 	progressFactor: number;
 }
 
-class HoldDecoderStatus extends React.Component<HoldDecoderStatusProps, HoldDecoderStatusState> {
+class HoldOperatorStatus extends React.Component<HoldDecoderStatusProps, HoldDecoderStatusState> {
 	constructor(props: Readonly<HoldDecoderStatusProps> | HoldDecoderStatusProps) {
 		super(props);
 
 		this.state = {
-			stepName: props.decoder.currentStep?.name ?? "Unknown step",
-			progressFactor: props.decoder.progressFactor,
+			stepName: props.operator.currentStepName,
+			progressFactor: props.operator.progressFactor,
 		};
 	}
 
 	componentDidMount() {
-		this.props.decoder.onUpdate.add(this.onDecoderUpdate);
+		this.props.operator.onUpdate.add(this.onOperatorUpdate);
 	}
 
 	componentWillUnmount() {
-		this.props.decoder.onUpdate.remove(this.onDecoderUpdate);
+		this.props.operator.onUpdate.remove(this.onOperatorUpdate);
 	}
 
-	private onDecoderUpdate = () => {
-		const {decoder} = this.props;
+	private onOperatorUpdate = () => {
+		const {operator} = this.props;
 
 		this.setState({
-			progressFactor: decoder.progressFactor,
-			stepName: decoder.currentStep?.name ?? 'Unknown step',
+			progressFactor: operator.progressFactor,
+			stepName: operator.currentStepName,
 		});
 	};
 
 	render() {
-		const {decoder, classes} = this.props;
+		const {operator, classes} = this.props;
 		const {progressFactor, stepName} = this.state;
 
 		return <Paper className={classes.content}>
 			<Typography variant="h5" noWrap align="center" gutterBottom>
-				Reading file "{decoder.fileName || "Unknown file"}"
+				Reading file "{operator.fileName || "Unknown file"}"
 			</Typography>
 			<Typography variant="subtitle1" align="center" gutterBottom>
 				This may take a while and the browser can become unresponsive at times.
@@ -59,7 +59,7 @@ class HoldDecoderStatus extends React.Component<HoldDecoderStatusProps, HoldDeco
 			{
 				progressFactor === -1
 					? <LinearProgress variant="indeterminate"/>
-					: <LinearProgress variant="determinate" value={decoder.progressFactor * 100}/>
+					: <LinearProgress variant="determinate" value={operator.progressFactor * 100}/>
 			}
 			<Typography variant="subtitle1" align="center">
 				{stepName ?? "All steps finished"}
@@ -68,4 +68,4 @@ class HoldDecoderStatus extends React.Component<HoldDecoderStatusProps, HoldDeco
 	}
 }
 
-export default withStyles(styles)(HoldDecoderStatus);
+export default withStyles(styles)(HoldOperatorStatus);

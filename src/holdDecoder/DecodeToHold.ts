@@ -20,6 +20,7 @@ export const getDecodeToHold = (): DecodeStep => {
 			return pointer === children.length;
 		},
 		after(decoder) {
+			decoder.hold.xmlDocument = decoder.holdXml;
 			decoder.hold.isLoaded = true;
 		},
 	};

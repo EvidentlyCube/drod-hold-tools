@@ -2,7 +2,10 @@ import {
 	Box,
 	Button,
 	createStyles,
-	Dialog, DialogActions, DialogContent, DialogContentText,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
 	DialogTitle,
 	Divider,
 	List,
@@ -23,12 +26,15 @@ const styles = (theme: Theme) => createStyles({
 	content: {
 		padding: theme.spacing(4, 6),
 	},
+	divider: {
+		margin: theme.spacing(4, 0),
+	},
 	actions: {
 		textAlign: 'center',
 		'& > *': {
-			margin: theme.spacing(1)
-		}
-	}
+			margin: theme.spacing(1),
+		},
+	},
 });
 
 interface HoldPendingChangesProps extends WithStyles<typeof styles> {
@@ -46,24 +52,24 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 
 		this.state = {
 			showExport: false,
-			showClose: false
+			showClose: false,
 		};
 	}
 
 	private onExport = () => {
+		const {hold} = this.props;
 		const {showExport} = this.state;
 
 		if (showExport) {
-			alert("HOLD ENCODER ENGAGE");
 			this.setState({showExport: false});
+			Store.holdEncoder.startEncode(hold);
 
 		} else {
 			this.setState({showExport: true});
 		}
-	}
+	};
 
-	private onCloseHold = () =>
-	{
+	private onCloseHold = () => {
 		const {hold} = this.props;
 		const {showClose} = this.state;
 
@@ -74,14 +80,14 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 		} else {
 			this.setState({showClose: true});
 		}
-	}
+	};
 
 	private onCancelDialog = () => {
 		this.setState({
 			showExport: false,
-			showClose: false
+			showClose: false,
 		});
-	}
+	};
 
 	renderChange(change: Change, id: number) {
 		switch (change.type) {
@@ -120,7 +126,7 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 			<List>
 				{Array.from(hold.changes).map((change, index) => this.renderChange(change, index))}
 			</List>
-			<Divider/>
+			<Divider className={classes.divider}/>
 			<Box className={classes.actions}>
 				<Button variant="contained" color="primary" onClick={this.onExport}>Export Hold with Changes</Button>
 				<Button variant="contained" color="secondary" onClick={this.onCloseHold}>Close Hold</Button>

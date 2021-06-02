@@ -3,10 +3,12 @@ import {Hold} from "../data/Hold";
 import React from "react";
 import {Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
 import {HoldDecoder} from "../holdDecoder/HoldDecoder";
-import HoldDecoderStatus from "./HoldDecoderStatus";
+import HoldOperatorStatus from "./HoldOperatorStatus";
 import HoldSummary from "./HoldSummary";
 import HoldPendingChanges from "./HoldPendingChanges";
 import HoldUploader from "./HoldUploader";
+import {HoldEncoder} from "../holdEncoder/HoldEncoder";
+import HoldDownloadModal from "./HoldDownloadModal";
 
 interface HoldTabProps {
 }
@@ -14,8 +16,11 @@ interface HoldTabProps {
 interface HoldTabState {
 	hold: Hold;
 	decoder: HoldDecoder;
+	encoder: HoldEncoder;
 	isHoldDecoding: boolean;
-	isShowingError: boolean;
+	isHoldEncoding: boolean;
+	holdDecoderError: string;
+	holdEncoderError: string;
 }
 
 class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
@@ -25,19 +30,24 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 		this.state = {
 			hold: Store.loadedHold.value,
 			decoder: Store.holdDecoder,
+			encoder: Store.holdEncoder,
 			isHoldDecoding: false,
-			isShowingError: false,
+			isHoldEncoding: false,
+			holdDecoderError: '',
+			holdEncoderError: '',
 		};
 	}
 
 	componentDidMount() {
 		Store.loadedHold.addListener(this.handleLoadedHoldChange);
 		this.state.decoder.onUpdate.add(this.handleDecoderUpdate);
+		this.state.encoder.onUpdate.add(this.handleEncoderUpdate);
 	}
 
 	componentWillUnmount() {
 		Store.loadedHold.removeListener(this.handleLoadedHoldChange);
 		this.state.decoder.onUpdate.remove(this.handleDecoderUpdate);
+		this.state.encoder.onUpdate.remove(this.handleEncoderUpdate);
 	}
 
 	private handleLoadedHoldChange = (hold: Hold) => {
@@ -47,21 +57,29 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 	private handleDecoderUpdate = () => {
 		const {decoder} = this.state;
 		this.setState({
-			isHoldDecoding: decoder.isLoading,
-			isShowingError: !!decoder.lastError,
-			hold: decoder.hold,
+			isHoldDecoding: decoder.isRunning,
+			holdDecoderError: decoder.lastError,
+		});
+	};
+
+	private handleEncoderUpdate = () => {
+		const {encoder} = this.state;
+		this.setState({
+			isHoldEncoding: encoder.isRunning,
+			holdEncoderError: encoder.lastError,
 		});
 	};
 
 	private onErrorClose = () => {
-		this.setState({isShowingError: false});
+		this.setState({holdDecoderError: '', holdEncoderError: ''});
 	};
 
 	public renderContent() {
-		const {decoder, isHoldDecoding, hold} = this.state;
+		const {decoder, encoder, isHoldDecoding, isHoldEncoding, hold} = this.state;
 
-		if (isHoldDecoding) {
-			return <HoldDecoderStatus decoder={decoder}/>;
+		if (isHoldEncoding || isHoldDecoding) {
+			return <HoldOperatorStatus operator={isHoldEncoding ? encoder : decoder}/>;
+
 		} else if (hold.isLoaded) {
 			return <>
 				<HoldSummary hold={hold}/>
@@ -73,14 +91,14 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 	}
 
 	public render() {
-		const {isShowingError, decoder} = this.state;
+		const {holdDecoderError, holdEncoderError, decoder, hold} = this.state;
 		return <Container maxWidth="lg">
 			{this.renderContent()}
-			<Dialog open={isShowingError} onClose={this.onErrorClose}>
+			<Dialog open={!!holdDecoderError} onClose={this.onErrorClose}>
 				<DialogTitle>Reading file "{decoder.fileName}" failed</DialogTitle>
 				<DialogContent>
 					<DialogContentText>Please make sure you've selected a valid DROD 5.0.1 hold. If you are sure, please send the hold file to 'skell' on DROD forums.</DialogContentText>
-					<DialogContentText>Reported error: {decoder.lastError}</DialogContentText>
+					<DialogContentText>Reported error: {holdDecoderError}</DialogContentText>
 				</DialogContent>
 				<DialogActions>
 					<Button onClick={this.onErrorClose} color="primary" autoFocus>
@@ -88,6 +106,19 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 					</Button>
 				</DialogActions>
 			</Dialog>
+			<Dialog open={!!holdEncoderError} onClose={this.onErrorClose}>
+				<DialogTitle>Exporting hold "{hold.name}" failed</DialogTitle>
+				<DialogContent>
+					<DialogContentText>It appears something went wrong.</DialogContentText>
+					<DialogContentText>Reported error: {holdEncoderError}</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={this.onErrorClose} color="primary" autoFocus>
+						Close
+					</Button>
+				</DialogActions>
+			</Dialog>
+			<HoldDownloadModal/>
 		</Container>;
 	}
 }

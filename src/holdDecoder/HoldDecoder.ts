@@ -9,23 +9,21 @@ import {getDecodeToHold} from "./DecodeToHold";
 import {Store} from "../data/Store";
 import {getDecodeHoldLinker} from "./DecodeHoldLinker";
 import {getDecodeValidateXml} from "./DecodeValidateHold";
+import {HoldOperator} from "../common/CommonTypes";
+import {assert} from "../common/Assert";
 
 const MAX_TIME_PER_TICK = 8;
 
-export class HoldDecoder {
-	private _state: DecodeState;
+export class HoldDecoder implements HoldOperator {
+	private _state?: DecodeState;
 	private _steps: DecodeStep[];
 	private _fileName: string;
 	private _lastError: string;
 
 	public onUpdate: Signal;
 
-	public get isLoading() {
+	public get isRunning() {
 		return this._steps.length > 0;
-	}
-
-	public get currentStep(): DecodeStep | undefined {
-		return this._steps[0];
 	}
 
 	public get progressFactor() {
@@ -36,12 +34,12 @@ export class HoldDecoder {
 		return this._fileName;
 	}
 
-	public get hold() {
-		return this._state.hold;
-	}
-
 	public get lastError() {
 		return this._lastError;
+	}
+
+	public get currentStepName(): string {
+		return this._steps[0]?.name || "All steps finished";
 	}
 
 	constructor() {
@@ -52,7 +50,7 @@ export class HoldDecoder {
 		this.onUpdate = new Signal();
 	}
 
-	public startDecode(fileOrData: File|Uint8Array, fileName: string) {
+	public startDecode(fileOrData: File | Uint8Array, fileName: string) {
 		this._fileName = fileName;
 		this._lastError = "";
 
@@ -78,6 +76,9 @@ export class HoldDecoder {
 	}
 
 	private update() {
+		const state = this._state;
+		assert(state, "Hold Decoder tries to run with no state, something went wrong");
+
 		const readUntil = Date.now() + MAX_TIME_PER_TICK;
 
 		try {
@@ -88,8 +89,8 @@ export class HoldDecoder {
 					break;
 				}
 
-				if (step.run(this._state)) {
-					step.after?.(this._state);
+				if (step.run(state)) {
+					step.after?.(state);
 					this._steps.shift();
 				}
 			}
@@ -104,7 +105,8 @@ export class HoldDecoder {
 		if (this._steps.length) {
 			requestAnimationFrame(() => this.update());
 		} else {
-			Store.loadedHold.value = this._state.hold;
+			Store.loadedHold.value = state.hold;
+			this._state = undefined;
 		}
 	}
 }
