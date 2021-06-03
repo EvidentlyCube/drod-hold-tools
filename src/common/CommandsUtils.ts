@@ -1,5 +1,6 @@
 import {Command} from "../data/Command";
 import {UINT_MINUS_1} from "./CommonTypes";
+import {CharCommand} from "./Enums";
 
 class WrappedCommandBuffer {
 	private _buffer: number[];
@@ -87,7 +88,7 @@ class WrappedCommandBuffer {
 }
 
 export const CommandsUtils = {
-	readCommandsBuffer: (buffer: number[]) => {
+	readCommandsBuffer(buffer: number[]) {
 		const commands: Command[] = [];
 		if (buffer.length === 0) {
 			return commands;
@@ -106,14 +107,14 @@ export const CommandsUtils = {
 			const labelSize = arr.readBpUint();
 			const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
-			commands.push({command, x, y, w, h, flags, speechId, label});
+			commands.push({command, x, y, w, h, flags, speechId, label, changes: {}});
 		}
 
 		return commands;
 	},
 
 
-	writeCommandsBuffer: (commands: Command[]) => {
+	writeCommandsBuffer(commands: Command[]) {
 		const buffer:number[] = [];
 
 		const arr = new WrappedCommandBuffer(buffer);
@@ -130,5 +131,13 @@ export const CommandsUtils = {
 		}
 
 		return buffer;
+	},
+
+	doesRequireSpeech(command: CharCommand) {
+		return command === CharCommand.CC_Speech
+			|| command === CharCommand.CC_FlashingText
+			|| command === CharCommand.CC_AnswerOption
+			|| command === CharCommand.CC_Question
+			|| command === CharCommand.CC_RoomLocationText;
 	}
 };

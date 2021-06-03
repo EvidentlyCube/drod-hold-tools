@@ -11,7 +11,6 @@ export interface Monster {
 
 	extraVars: PackedVars;
 	commands: Command[];
-
 	processingSequence: number;
 	isVisible: boolean;
 	characterType: number;

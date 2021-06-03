@@ -108,7 +108,6 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 				} else {
 					return null;
 				}
-
 		}
 		return <li>
 

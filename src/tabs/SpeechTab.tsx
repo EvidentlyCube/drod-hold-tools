@@ -8,6 +8,7 @@ import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
 import {SpeechUtils} from "../common/SpeechUtils";
 import {VolumeUp} from "@material-ui/icons";
+import {CommandsUtils} from "../common/CommandsUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -44,21 +45,20 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const hold = Store.loadedHold.value;
 		this.state = {
 			hold: hold,
-			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => this.speechToRow(speech, hold)),
+			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => SpeechTab.speechToRow(speech, hold)),
 			columns: [
 				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
 				{field: "text", headerName: "Text", flex: 6, renderCell: this.renderMessageRow, editable: true},
 				{field: "command", headerName: "Command", flex: 2},
 				{field: "speaker", headerName: "Speaker", flex: 2},
 				{field: "location", headerName: "Location", flex: 2},
-				// {
-				// 	field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
-				// 	sortable: false,
-				// 	filterable: false,
-				// 	hide: false,
-				// 	disableColumnMenu: true,
-				//
-				// },
+				{
+					field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
+					sortable: false,
+					filterable: false,
+					hide: false,
+					disableColumnMenu: true,
+				},
 			],
 		};
 	}
@@ -76,7 +76,10 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const onClick = () => {
 			this.onDeleteRowClicked(params.row.id);
 		};
-		return <Switch checked={params.value as boolean} onChange={onClick}/>;
+
+		return params.row.deletable
+			? <Switch checked={params.value as boolean} onChange={onClick}/>
+			: <span/>;
 	};
 
 	private onDeleteRowClicked = (speechId: number) => {
@@ -98,10 +101,20 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			changes: {delete: speech.isDeleted},
 		});
 
+		if (speech.command) {
+			speech.command.changes.speechId = speech.isDeleted ? 0 : speech.id;
+
+			HoldUtils.addChange(hold, {
+				type: "Command",
+				model: speech.command,
+				changes: {speechId: speech.isDeleted},
+			});
+		}
+
 		this.setState({rows});
 	};
 
-	private speechToRow(speech: Speech, hold: Hold) {
+	private static speechToRow(speech: Speech, hold: Hold) {
 		return {
 			id: speech.id,
 			text: speech.changes.text ?? speech.text,
@@ -110,6 +123,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			location: SpeechUtils.getDisplayLocation(speech),
 			delete: !!speech.isDeleted,
 			hasAudio: !!speech.dataId,
+			deletable: speech.command ? !CommandsUtils.doesRequireSpeech(speech.command.command) : true
 		};
 	}
 

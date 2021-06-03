@@ -50,14 +50,14 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				),
 			);
 
-			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer("Commands", [])!);
+			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer('Commands', [])!);
 			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
 
 			hold.characters.set(characterId, {
 				xml: element,
 				id: characterId,
 				name: decodeText(element, 'CharNameText'),
-				commands, processingSequence,
+				commands, processingSequence, extraVars
 			});
 			break;
 

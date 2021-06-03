@@ -1,4 +1,5 @@
 import {Speech} from "./Speech";
+import {Command} from "./Command";
 
 interface SpeechChange {
 	type: "Speech";
@@ -9,4 +10,12 @@ interface SpeechChange {
 	}
 }
 
-export type Change = SpeechChange;
+interface CommandChange {
+	type: "Command",
+	model: Command;
+	changes: {
+		speechId?: boolean
+	}
+}
+
+export type Change = SpeechChange | CommandChange;

@@ -8,5 +8,7 @@ export const StringUtils = {
 
 		return wchars.join('');
 	},
-
+	bytesArrToBase64(arr: number[]) {
+		return btoa(String.fromCharCode.apply(null, arr));
+	},
 };

@@ -10,5 +10,5 @@ export interface Command {
 	speechId: number;
 	label: string;
 
-	changes?: Partial<Omit<Command, 'changes'>>;
+	changes: Partial<Omit<Command, 'changes'>>;
 }

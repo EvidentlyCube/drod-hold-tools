@@ -42,11 +42,11 @@ export const HoldLinker = {
 			: monsterBaseType;
 
 		for (const command of commands) {
-
 			if (command.speechId) {
 				const speech = hold.speeches.get(command.speechId);
 				assert(speech, `Failed to find speech ${command.speechId}`);
 
+				speech.command = command;
 				speech.location = {
 					x: command.x,
 					y: command.y,

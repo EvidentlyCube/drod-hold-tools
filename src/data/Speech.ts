@@ -1,3 +1,5 @@
+import {Command} from "./Command";
+
 export interface Speech {
 	id: number;
 	xml: Element;
@@ -13,6 +15,8 @@ export interface Speech {
 	changes: {
 		text?: string;
 	}
+
+	command?: Command;
 
 	location?: {
 		source: 'monster' | 'character',
