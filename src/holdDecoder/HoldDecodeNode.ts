@@ -28,6 +28,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const entranceId = getInt(element, 'EntranceID');
 			hold.entrances.set(entranceId, {
 				xml: element,
+				id: entranceId,
 				roomId: getInt(element, 'RoomID'),
 				description: decodeText(element, 'DescriptionMessage'),
 				isMainEntrance: getInt(element, 'IsMainEntrance') === 1,

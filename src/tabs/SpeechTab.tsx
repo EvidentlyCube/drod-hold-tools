@@ -7,7 +7,7 @@ import {DataGrid, GridCellParams, GridColDef, GridEditCellPropsParams, GridRowPa
 import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
 import {SpeechUtils} from "../common/SpeechUtils";
-import {VolumeUp} from "@material-ui/icons";
+import {History, VolumeUp} from "@material-ui/icons";
 import {CommandsUtils} from "../common/CommandsUtils";
 
 const styles = (theme: Theme) => createStyles({
@@ -68,6 +68,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 
 		return <>
 			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}}/>}
+			{params.row.isEdited && <History color="primary" style={{marginRight: "8px"}}/>}
 			{params.value as string}
 		</>;
 	};
@@ -123,6 +124,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			location: SpeechUtils.getDisplayLocation(speech),
 			delete: !!speech.isDeleted,
 			hasAudio: !!speech.dataId,
+			isEdited: speech.changes.text !== undefined,
 			deletable: speech.command ? !CommandsUtils.doesRequireSpeech(speech.command.command) : true
 		};
 	}
@@ -136,6 +138,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			params.api.setCellMode(params.id, 'text', "edit");
 		}
 	};
+
 	private handleCellEdited = (params: GridEditCellPropsParams) => {
 		const {hold} = this.state;
 		const speech = hold.speeches.get(params.id as number);
@@ -151,6 +154,12 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			model: speech,
 			changes: {text: !!speech.changes.text},
 		});
+
+		for (const row of this.state.rows) {
+			if (row.id === params.id) {
+				row.isEdited = speech.changes.text !== undefined;
+			}
+		}
 	};
 
 	public render() {
