@@ -55,7 +55,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			hold: Store.loadedHold.value,
 			rows: this.getRows(),
 			columns: [
-				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
+				{field: "isEdited", headerName: "Edited", flex: 1, renderCell: this.renderIsEditedCell, align: "center"},
 				{field: "text", headerName: "Text", flex: 6, renderCell: this.renderMessageRow, editable: true},
 				{field: "command", headerName: "Command", flex: 2},
 				{field: "speaker", headerName: "Speaker", flex: 2},
@@ -71,12 +71,9 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		};
 	}
 
-	private renderMessageRow = (params: GridCellParams) => {
-		const hasAudio = params.row.hasAudio;
-
-		return <>
-			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}}/>}
-			{params.row.isEdited && <LightTooltip arrow leaveDelay={999999} title={<React.Fragment>
+	private renderIsEditedCell = (params: GridCellParams) => {
+		if (params.row.isEdited) {
+			return <LightTooltip arrow leaveDelay={999999} title={<React.Fragment>
 				<Typography variant="body2" gutterBottom><Box textAlign="center" fontWeight="fontWeightBold">Click to undo changes</Box></Typography>
 				<Typography variant="body2">
 					<Box fontSize={12} fontWeight="fontWeightMedium" display="inline">Original text:</Box>&nbsp;
@@ -86,8 +83,17 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 				<IconButton>
 					<History onClick={e => this.resetRow(e, params.row.id)} color="primary"/>
 				</IconButton>
-			</LightTooltip>
-			}
+			</LightTooltip>;
+		}
+
+		return <span/>;
+	}
+
+	private renderMessageRow = (params: GridCellParams) => {
+		const hasAudio = params.row.hasAudio;
+
+		return <>
+			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}}/>}
 			{params.value as string}
 		</>;
 	};
@@ -109,7 +115,6 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const {hold} = this.state;
 		const speech = hold.speeches.get(id);
 		assert(speech, `Failed to find speech with ID '${id}'`);
-		speech.text = speech.changes.text ?? speech.text;
 		delete(speech.changes.text);
 
 		HoldUtils.addChange(hold, {
