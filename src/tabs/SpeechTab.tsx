@@ -1,7 +1,7 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Container, createStyles, lighten, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Box, Container, createStyles, lighten, Paper, Switch, Theme, Tooltip, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {Speech} from "../data/Speech";
 import {DataGrid, GridCellParams, GridColDef, GridEditCellPropsParams, GridRowParams} from "@material-ui/data-grid";
 import {assert} from "../common/Assert";
@@ -19,7 +19,7 @@ const styles = (theme: Theme) => createStyles({
 			'&:hover': {
 				backgroundColor: lighten(theme.palette.error.main, 0.8),
 			},
-		},
+		}
 	},
 	muted: {
 		color: '#AAA',
@@ -27,6 +27,15 @@ const styles = (theme: Theme) => createStyles({
 	},
 	deletedSpeech: {},
 });
+
+const LightTooltip = withStyles((theme: Theme) => ({
+	tooltip: {
+	  backgroundColor: theme.palette.common.white,
+	  color: 'rgba(0, 0, 0, 0.87)',
+	  boxShadow: theme.shadows[1],
+	  fontSize: 11,
+	},
+  }))(Tooltip);
 
 interface SpeechTabProps extends WithStyles<typeof styles> {
 
@@ -42,10 +51,9 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 	constructor(props: Readonly<SpeechTabProps> | SpeechTabProps) {
 		super(props);
 
-		const hold = Store.loadedHold.value;
 		this.state = {
-			hold: hold,
-			rows: Array.from(Store.loadedHold.value.speeches.values()).map(speech => SpeechTab.speechToRow(speech, hold)),
+			hold: Store.loadedHold.value,
+			rows: this.getRows(),
 			columns: [
 				{field: "id", headerName: "ID", flex: 1, disableColumnMenu: true},
 				{field: "text", headerName: "Text", flex: 6, renderCell: this.renderMessageRow, editable: true},
@@ -68,7 +76,16 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 
 		return <>
 			{hasAudio && <VolumeUp color="primary" style={{marginRight: "8px"}}/>}
-			{params.row.isEdited && <History color="primary" style={{marginRight: "8px"}}/>}
+			{params.row.isEdited && <LightTooltip arrow leaveDelay={999999} title={<React.Fragment>
+				<Typography variant="body2" gutterBottom><Box textAlign="center" fontWeight="fontWeightBold">Click to undo changes</Box></Typography>
+				<Typography variant="body2">
+					<Box fontSize={12} fontWeight="fontWeightMedium" display="inline">Original text:</Box>&nbsp;
+					<Box fontSize={12} fontWeight="fontWeightLight" display="inline">{params.row.originalText}</Box>
+				</Typography>
+			</React.Fragment>}>
+				<History color="primary" style={{marginRight: "8px"}}/>
+			</LightTooltip>
+			}
 			{params.value as string}
 		</>;
 	};
@@ -90,12 +107,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		assert(speech, `Marking for deletion speech which does not exist #${speechId}`);
 
 		speech.isDeleted = speech.isDeleted ? undefined : true;
-		for (const row of rows) {
-			if (row.id === speechId) {
-				row.delete = !!speech.isDeleted;
-			}
-		}
-
+		
 		HoldUtils.addChange(hold, {
 			type: "Speech",
 			model: speech,
@@ -112,13 +124,14 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			});
 		}
 
-		this.setState({rows});
+		this.setState({rows: this.getRows()});
 	};
 
 	private static speechToRow(speech: Speech, hold: Hold) {
 		return {
 			id: speech.id,
 			text: speech.changes.text ?? speech.text,
+			originalText: speech.text,
 			command: speech?.location?.commandName,
 			speaker: SpeechUtils.getDisplaySpeaker(speech, hold),
 			location: SpeechUtils.getDisplayLocation(speech),
@@ -138,6 +151,11 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			params.api.setCellMode(params.id, 'text', "edit");
 		}
 	};
+
+	private getRows = () => {
+		const hold = Store.loadedHold.value;
+		return Array.from(Store.loadedHold.value.speeches.values()).map(speech => SpeechTab.speechToRow(speech, hold));
+	}
 
 	private handleCellEdited = (params: GridEditCellPropsParams) => {
 		const {hold} = this.state;
@@ -160,6 +178,8 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 				row.isEdited = speech.changes.text !== undefined;
 			}
 		}
+
+		this.setState({rows: this.getRows()});
 	};
 
 	public render() {
