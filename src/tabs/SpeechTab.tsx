@@ -1,7 +1,7 @@
 import {Store} from "../data/Store";
 import {Hold} from "../data/Hold";
 import React from "react";
-import {Box, Container, createStyles, lighten, Paper, Switch, Theme, Tooltip, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Box, Container, createStyles, IconButton, lighten, Paper, Switch, Theme, Tooltip, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {Speech} from "../data/Speech";
 import {DataGrid, GridCellParams, GridColDef, GridEditCellPropsParams, GridRowParams} from "@material-ui/data-grid";
 import {assert} from "../common/Assert";
@@ -83,7 +83,9 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 					<Box fontSize={12} fontWeight="fontWeightLight" display="inline">{params.row.originalText}</Box>
 				</Typography>
 			</React.Fragment>}>
-				<History color="primary" style={{marginRight: "8px"}}/>
+				<IconButton>
+					<History onClick={e => this.resetRow(e, params.row.id)} color="primary"/>
+				</IconButton>
 			</LightTooltip>
 			}
 			{params.value as string}
@@ -99,6 +101,25 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			? <Switch checked={params.value as boolean} onChange={onClick}/>
 			: <span/>;
 	};
+
+	private resetRow(event: React.MouseEvent, id: number) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		const {hold} = this.state;
+		const speech = hold.speeches.get(id);
+		assert(speech, `Failed to find speech with ID '${id}'`);
+		speech.text = speech.changes.text ?? speech.text;
+		delete(speech.changes.text);
+
+		HoldUtils.addChange(hold, {
+			type: "Speech",
+			model: speech,
+			changes: {text: false},
+		});
+
+		this.setState({rows: this.getRows()});
+	}
 
 	private onDeleteRowClicked = (speechId: number) => {
 		const {hold, rows} = this.state;
