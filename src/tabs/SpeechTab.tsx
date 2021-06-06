@@ -7,7 +7,7 @@ import {DataGrid, GridCellParams, GridColDef, GridEditCellPropsParams, GridRowPa
 import {assert} from "../common/Assert";
 import {HoldUtils} from "../common/HoldUtils";
 import {SpeechUtils} from "../common/SpeechUtils";
-import {History, VolumeUp} from "@material-ui/icons";
+import {Delete, History, PlayArrow, PlayCircleOutline, Publish, SwapHoriz, SwapHorizOutlined, VolumeUp} from "@material-ui/icons";
 import {CommandsUtils} from "../common/CommandsUtils";
 
 const styles = (theme: Theme) => createStyles({
@@ -55,13 +55,14 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			hold: Store.loadedHold.value,
 			rows: this.getRows(),
 			columns: [
-				{field: "isEdited", headerName: "Edited", flex: 1, renderCell: this.renderIsEditedCell, align: "center"},
-				{field: "text", headerName: "Text", flex: 6, renderCell: this.renderMessageRow, editable: true},
-				{field: "command", headerName: "Command", flex: 2},
-				{field: "speaker", headerName: "Speaker", flex: 2},
-				{field: "location", headerName: "Location", flex: 2},
+				{field: "hasAudio", headerName: "Sound", width: 164, renderCell: this.renderSoundCell, align: "center"},
+				{field: "isEdited", headerName: "Edited", width: 68, renderCell: this.renderIsEditedCell, align: "center"},
+				{field: "text", headerName: "Text", flex: 1, renderCell: this.renderMessageRow, editable: true},
+				{field: "command", headerName: "Command", width: 172},
+				{field: "speaker", headerName: "Speaker", width: 172},
+				{field: "location", headerName: "Location", width: 172},
 				{
-					field: "delete", headerName: "Delete", flex: 1, renderCell: this.renderDeleteRow,
+					field: "delete", headerName: "Delete", width: 78, renderCell: this.renderDeleteRow,
 					sortable: false,
 					filterable: false,
 					hide: false,
@@ -71,9 +72,49 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		};
 	}
 
+	private renderSoundCell = (params: GridCellParams) => {
+		if (params.row.hasAudio) {
+			return <React.Fragment>
+				<LightTooltip title="Play Sound">
+					<IconButton>
+						<PlayArrow color="primary"/>
+					</IconButton>
+				</LightTooltip>
+				<LightTooltip title="Replace Sound">
+					<IconButton>
+						<SwapHoriz color="primary"/>
+					</IconButton>
+				</LightTooltip>
+				<LightTooltip title="Remove Sound">
+					<IconButton>
+						<Delete color="primary"/>
+					</IconButton>
+				</LightTooltip>
+			</React.Fragment>
+		}
+
+		return <React.Fragment>
+			<LightTooltip title="Play Sound">
+				<IconButton disabled={true}>
+					<PlayCircleOutline color="disabled"/>
+				</IconButton>
+			</LightTooltip>
+			<LightTooltip title="Add Sound">
+				<IconButton>
+					<Publish color="primary"/>
+				</IconButton>
+			</LightTooltip>
+			<LightTooltip title="Remove Sound">
+				<IconButton disabled={true}>
+					<Delete color="disabled"/>
+				</IconButton>
+			</LightTooltip>
+		</React.Fragment>;
+	}
+
 	private renderIsEditedCell = (params: GridCellParams) => {
 		if (params.row.isEdited) {
-			return <LightTooltip arrow leaveDelay={999999} title={<React.Fragment>
+			return <LightTooltip title={<React.Fragment>
 				<Typography variant="body2" gutterBottom><Box textAlign="center" fontWeight="fontWeightBold">Click to undo changes</Box></Typography>
 				<Typography variant="body2">
 					<Box fontSize={12} fontWeight="fontWeightMedium" display="inline">Original text:</Box>&nbsp;

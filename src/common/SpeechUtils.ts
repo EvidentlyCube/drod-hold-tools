@@ -1,5 +1,5 @@
 import {Speech} from "../data/Speech";
-import {Mood, MoodNameMap, Speaker, SpeakerNameMap} from "./Enums";
+import {CharCommand, Mood, MoodNameMap, Speaker, SpeakerNameMap} from "./Enums";
 import {MonsterUtils} from "./MonsterUtils";
 import {Hold} from "../data/Hold";
 
@@ -16,6 +16,11 @@ export const SpeechUtils = {
 		}
 	},
 	getDisplaySpeaker(speech: Speech, hold: Hold) {
+		if (speech.command && speech.command.command !== CharCommand.CC_Speech) {
+			// Only Speech command uses speaker
+			return '';
+		}
+
 		const x = speech.location?.x.toString() ?? undefined;
 		const y = speech.location?.y.toString() ?? undefined;
 

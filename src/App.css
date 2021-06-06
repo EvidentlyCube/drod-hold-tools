@@ -9,3 +9,8 @@ body .MuiDataGrid-root .MuiDataGrid-cell {
     overflow: visible !important;
     white-space: normal !important;
 }
+
+.body .MuiDataGrid-root .MuiDataGrid-row {
+    min-height: auto !important;
+    max-height: none !important;
+}
