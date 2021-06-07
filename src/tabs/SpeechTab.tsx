@@ -55,8 +55,8 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			hold: Store.loadedHold.value,
 			rows: this.getRows(),
 			columns: [
-				{field: "hasAudio", headerName: "Sound", width: 164, renderCell: this.renderSoundCell, align: "center"},
-				{field: "isEdited", headerName: "Edited", width: 68, renderCell: this.renderIsEditedCell, align: "center"},
+				// {field: "hasAudio", headerName: "Sound", width: 164, renderCell: this.renderSoundCell, align: "center"},
+				{field: "isEdited", headerName: "Edited", width: 68, renderCell: this.renderIsEditedCell, align: "center", disableColumnMenu: true},
 				{field: "text", headerName: "Text", flex: 1, renderCell: this.renderMessageRow, editable: true},
 				{field: "command", headerName: "Command", width: 172},
 				{field: "speaker", headerName: "Speaker", width: 172},
