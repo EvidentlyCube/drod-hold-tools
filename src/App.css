@@ -1,16 +1,3 @@
-body .MuiDataGrid-root .MuiDataGrid-cell {
-    min-height: auto !important;
-    max-height: none !important;
-    display: flex !important;
-    align-items: center !important;
-    line-height: 20px !important;
-    padding-top: 15px !important;
-    padding-bottom: 15px !important;
-    overflow: visible !important;
-    white-space: normal !important;
-}
-
-.body .MuiDataGrid-root .MuiDataGrid-row {
-    min-height: auto !important;
-    max-height: none !important;
+body .MuiTableCell-body {
+    word-break: break-word;
 }

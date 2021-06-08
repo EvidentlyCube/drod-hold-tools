@@ -10,7 +10,7 @@ export const SpeechUtils = {
 		}
 
 		if (speech.location.source === 'monster') {
-			return `${speech.location.characterName} in ${speech.location.location}`;
+			return `${speech.location.location}: ${speech.location.characterName}`;
 		} else {
 			return `Hold character ${speech.location.characterName}`;
 		}

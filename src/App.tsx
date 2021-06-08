@@ -6,6 +6,7 @@ import HoldTab from "./tabs/HoldTab";
 import SpeechTab from "./tabs/SpeechTab";
 import {Container} from "@material-ui/core/";
 import "./common.d.ts";
+import EntrancesTab from "./tabs/EntrancesTab";
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -63,9 +64,10 @@ function App() {
 		<div>
 			<CssBaseline/>
 			<AppBar position="static">
-				<Tabs value={selectedTab} onChange={handleChange} aria-label="simple tabs example">
+				<Tabs value={selectedTab} onChange={handleChange}>
 					<Tab label="Hold"/>
 					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
+					<Tab label="Entrances" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
 			<TabPanel className={classes.tab} value={selectedTab} index={0}>
@@ -73,6 +75,9 @@ function App() {
 			</TabPanel>
 			<TabPanel className={classes.tab} value={selectedTab} index={1}>
 				<SpeechTab/>
+			</TabPanel>
+			<TabPanel className={classes.tab} value={selectedTab} index={2}>
+				<EntrancesTab/>
 			</TabPanel>
 			<Divider/>
 			<Container>
