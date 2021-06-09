@@ -19,16 +19,19 @@ export const ChangeUtils = {
 			changes: {delete: speech.isDeleted},
 		});
 
-		if (speech.command) {
+		if (speech.command && speech.source) {
 			speech.command.changes.speechId = speech.isDeleted ? 0 : speech.id;
 
 			HoldUtils.addChange(hold, {
 				type: "Command",
 				model: speech.command,
+				source: speech.source,
 				changes: {speechId: speech.isDeleted},
 			});
 		}
 	},
+
+
 	entranceDescription(entrance: Entrance, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Entrance",

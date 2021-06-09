@@ -1,5 +1,20 @@
 import {UINT_MINUS_1} from "./CommonTypes";
 
+export enum ModelType {
+	Character,
+	Data,
+	Entrance,
+	Hold,
+	Level,
+	Monster,
+	Player,
+	Room,
+	Scroll,
+	Speech,
+	WorldMap,
+	Var,
+}
+
 export enum CharCommand {
 	CC_Appear = 0,
 	CC_AppearAt,

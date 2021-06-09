@@ -7,10 +7,6 @@ import {
 	DialogContent,
 	DialogContentText,
 	DialogTitle,
-	Divider,
-	List,
-	ListItem,
-	ListItemText,
 	Paper,
 	Theme,
 	Typography,
@@ -19,8 +15,8 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import {createNullHold, Hold} from "../data/Hold";
-import {Change} from "../data/Change";
 import {Store} from "../data/Store";
+import {HoldPendingChangesTable} from "./HoldPendingChangesTable";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -96,60 +92,13 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 			<Typography variant="h5" noWrap align="center">
 				Pending changes:
 			</Typography>
-			<List>
-				{Array.from(hold.changes).map((change, index) => this.renderChange(change, index))}
-			</List>
-			<Divider className={classes.divider}/>
+			<HoldPendingChangesTable hold={hold}/>
 			<Box className={classes.actions}>
 				<Button variant="contained" color="primary" onClick={this.onExport}>Export Hold with Changes</Button>
 				<Button variant="contained" color="secondary" onClick={this.onCloseHold}>Close Hold</Button>
 			</Box>
 			{this.renderDialogs()}
 		</Paper>;
-	}
-
-	private renderChange(change: Change, id: number) {
-		const content = this.renderChangeContent(change);
-
-		if (content) {
-			return <ListItem key={id}>
-				<ListItemText>
-					{content}
-				</ListItemText>
-			</ListItem>;
-		}
-
-		return null;
-	}
-
-	private renderChangeContent(change: Change) {
-		switch (change.type) {
-			case "Speech":
-				const speechText = change.model.changes.text ?? change.model.text;
-				if (change.changes.delete) {
-					return <>
-						<strong>Delete speech #{change.model.id}:</strong> {speechText}
-					</>;
-				} else if (change.changes.text) {
-					return <>
-						<strong>Change speech #{change.model.id}:</strong> {speechText}
-					</>;
-				}
-				break;
-
-			case "Entrance":
-				if (change.changes.description) {
-					return <>
-						<strong>Change entrance #{change.model.id}:</strong> <pre>{change.model.changes.description}</pre>
-					</>;
-				}
-				break;
-		}
-
-
-		return <>
-			<strong>Unknown change:</strong> {change.type}
-		</>;
 	}
 
 	private renderDialogs() {

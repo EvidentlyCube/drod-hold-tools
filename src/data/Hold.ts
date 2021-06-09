@@ -8,9 +8,11 @@ import {Level} from "./Level";
 import {Room} from "./Room";
 import {WorldMap} from "./WorldMap";
 import {Change} from "./Change";
+import {ModelType} from "../common/Enums";
 
 export interface Hold {
 	isLoaded: boolean;
+	modelType: ModelType.Hold;
 	xmlDocument: XMLDocument;
 	xml: Element;
 
@@ -41,6 +43,7 @@ export interface Hold {
 export function createNullHold(): Hold {
 	return {
 		isLoaded: false,
+		modelType: ModelType.Hold,
 		xmlDocument: document.implementation.createDocument(null, null),
 		xml: document.createElement('Holds'),
 

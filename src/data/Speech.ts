@@ -1,8 +1,13 @@
 import {Command} from "./Command";
+import {ModelType} from "../common/Enums";
+import {Character} from "./Character";
+import {Monster} from "./Monster";
 
 export interface Speech {
-	id: number;
+	modelType: ModelType.Speech;
 	xml: Element;
+
+	id: number;
 	text: string;
 	dataId: number;
 
@@ -17,6 +22,7 @@ export interface Speech {
 	}
 
 	command?: Command;
+	source?: Character | Monster;
 
 	location?: {
 		source: 'monster' | 'character',

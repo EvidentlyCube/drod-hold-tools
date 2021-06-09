@@ -1,3 +1,5 @@
+import {ModelType} from "../common/Enums";
+
 export enum DataFormat {
 	BMP = 1,
 	JPG = 2,
@@ -9,7 +11,9 @@ export enum DataFormat {
 }
 
 export interface Data {
+	modelType: ModelType.Data;
 	xml: Element;
+
 	format: DataFormat;
 	name: string;
 }

@@ -1,6 +1,8 @@
 import {Speech} from "./Speech";
 import {Command} from "./Command";
 import {Entrance} from "./Entrance";
+import {Character} from "./Character";
+import {Monster} from "./Monster";
 
 interface SpeechChange {
 	type: "Speech";
@@ -14,6 +16,7 @@ interface SpeechChange {
 interface CommandChange {
 	type: "Command",
 	model: Command;
+	source: Character | Monster;
 	changes: {
 		speechId?: boolean
 	}

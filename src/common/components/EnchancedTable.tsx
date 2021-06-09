@@ -47,6 +47,8 @@ interface EnchancedTableProps extends WithStyles<typeof styles> {
 	columns: EnchancedTableColumn[];
 	rows: any[];
 
+	className?: string;
+
 	idField: string;
 	rowsPerPage?: number;
 
@@ -197,10 +199,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	};
 
 	public render() {
-		const {columns, rowsPerPage, rows, classes} = this.props;
+		const {columns, rowsPerPage, rows, classes, className} = this.props;
 		const {orderBy, orderDir, visibleRows, page} = this.state;
 
-		return <TableContainer>
+		return <TableContainer className={className}>
 			<Table className={classes.table}>
 				<colgroup>
 					{columns.map(col => this.renderColumnWidth(col))}

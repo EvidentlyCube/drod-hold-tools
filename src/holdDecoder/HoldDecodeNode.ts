@@ -3,11 +3,13 @@ import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 import {CommandsUtils} from "../common/CommandsUtils";
 import {UINT_MINUS_1} from "../common/CommonTypes";
 import {MonsterUtils} from "../common/MonsterUtils";
+import {ModelType} from "../common/Enums";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
 		case 'Players':
 			hold.author = {
+				modelType: ModelType.Player,
 				xml: element,
 				name: decodeText(element, 'NameMessage'),
 			};
@@ -27,6 +29,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Entrances':
 			const entranceId = getInt(element, 'EntranceID');
 			hold.entrances.set(entranceId, {
+				modelType: ModelType.Entrance,
 				xml: element,
 				id: entranceId,
 				roomId: getInt(element, 'RoomID'),
@@ -39,6 +42,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Vars':
 			const varId = getInt(element, 'VarID');
 			hold.vars.set(varId, {
+				modelType: ModelType.Var,
 				xml: element,
 				name: decodeText(element, 'VarNameText'),
 			});
@@ -56,6 +60,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
 
 			hold.characters.set(characterId, {
+				modelType: ModelType.Character,
 				xml: element,
 				id: characterId,
 				name: decodeText(element, 'CharNameText'),
@@ -66,6 +71,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Data':
 			const dataId = getInt(element, 'DataID');
 			hold.datas.set(dataId, {
+				modelType: ModelType.Data,
 				xml: element,
 				format: getInt(element, 'DataFormat'),
 				name: decodeText(element, 'DataNameText'),
@@ -76,6 +82,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const speechId = getInt(element, 'SpeechID');
 
 			hold.speeches.set(speechId, {
+				modelType: ModelType.Speech,
 				id: speechId,
 				xml: element,
 				text: decodeText(element, 'Message'),
@@ -90,6 +97,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Levels':
 			const levelId = getInt(element, 'LevelID');
 			hold.levels.set(levelId, {
+				modelType: ModelType.Level,
 				xml: element,
 				name: decodeText(element, 'NameMessage'),
 				entranceX: 0,
@@ -101,7 +109,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Rooms': {
 			const roomId = getInt(element, 'RoomID');
 			hold.rooms.set(roomId, {
+				modelType: ModelType.Room,
 				xml: element,
+				roomId: roomId,
 				levelId: getInt(element, 'LevelID'),
 				roomX: getInt(element, 'RoomX'),
 				roomY: getInt(element, 'RoomY'),
@@ -131,7 +141,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const characterType = MonsterUtils.fixCharacterType(extraVars.readUint('id', UINT_MINUS_1), hold);
 
 			room.monsters.push({
+				modelType: ModelType.Monster,
 				xml: element,
+				roomId: roomId,
 				x: getInt(element, 'X'),
 				y: getInt(element, 'Y'),
 				o: getInt(element, 'O'),
@@ -157,6 +169,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const room = hold.rooms.get(roomId)!;
 
 			room.scrolls.push({
+				modelType: ModelType.Scroll,
 				xml: element,
 				text: decodeText(element, 'Message'),
 				x: getInt(element, 'X'),
@@ -169,6 +182,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			const worldMapId = getInt(element, 'WorldMap');
 
 			hold.worldMaps.set(worldMapId, {
+				modelType: ModelType.WorldMap,
 				xml: element,
 				name: decodeText(element, 'WorldMapNameText'),
 			});

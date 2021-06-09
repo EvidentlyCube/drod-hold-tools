@@ -9,21 +9,6 @@ import {RoomUtils} from "../common/RoomUtils";
 import {Entrance} from "../data/Entrance";
 import {Command} from "../data/Command";
 
-function getRoomDetails(room: Room | undefined, hold: Hold): undefined | { level: string, pos: string } {
-	if (!room) {
-		return undefined;
-	}
-
-	const level = hold.levels.get(room.levelId);
-	assert(level, `Failed to find level ${room.levelId}`);
-	const coordinate = RoomUtils.getCoordinateName(room.roomX, room.roomY);
-
-	return {
-		level: level.name,
-		pos: coordinate,
-	};
-}
-
 export const HoldLinker = {
 	linkCharacter(hold: Hold, character: Character) {
 	},
@@ -34,7 +19,6 @@ export const HoldLinker = {
 			throw new Error("linkCommands requires one of source monster or source character but both were given.");
 		}
 
-		const roomDetails = getRoomDetails(room, hold);
 		const monsterBaseType = sourceMonster ? sourceMonster.type : sourceCharacter!.id;
 		const monsterExtendedType = sourceMonster ? sourceMonster.characterType : sourceCharacter!.id;
 		const monsterType = monsterBaseType === MonsterType.Character
@@ -46,6 +30,7 @@ export const HoldLinker = {
 				const speech = hold.speeches.get(command.speechId);
 				assert(speech, `Failed to find speech ${command.speechId}`);
 
+				speech.source = sourceMonster || sourceCharacter;
 				speech.command = command;
 				speech.location = {
 					x: command.x,
@@ -53,7 +38,7 @@ export const HoldLinker = {
 					commandName: CommandNameMap.get(command.command) ?? `Unknown command #${command.command}`,
 					source: sourceMonster ? 'monster' : 'character',
 					characterName: MonsterUtils.getMonsterName(monsterType, hold),
-					location: roomDetails ? `${roomDetails.level} ${roomDetails.pos}` : '',
+					location: room ? RoomUtils.getDisplayLocation(room.roomId, hold) : '',
 				};
 			}
 
