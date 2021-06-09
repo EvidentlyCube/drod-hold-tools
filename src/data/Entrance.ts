@@ -1,4 +1,3 @@
-
 export interface Entrance {
 	xml: Element;
 
@@ -7,4 +6,8 @@ export interface Entrance {
 	roomId: number;
 	description: string;
 	isMainEntrance: boolean;
+
+	changes: {
+		description?: string;
+	}
 }

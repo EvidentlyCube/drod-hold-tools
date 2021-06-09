@@ -12,7 +12,7 @@ export const getEncoderDeflate = (): EncodeStep => {
 			const to = Math.min(pointer + BATCH_SIZE, state.holdBytes.length);
 			const isLast = to === state.holdBytes.length;
 
-			deflater.push(new Uint8Array(state.holdBytes, pointer, to - pointer), isLast);
+			deflater.push(new Uint8Array(state.holdBytes.buffer, pointer, to - pointer), isLast);
 			pointer = to;
 
 			state.progressFactor = to / state.holdBytes.length;

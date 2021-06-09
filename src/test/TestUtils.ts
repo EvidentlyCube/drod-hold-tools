@@ -4,7 +4,7 @@ import {PackedVars} from "../common/PackedVars";
 import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 
 export const TestUtils = {
-	getHoldXml(holdName: string): Document {
+	getHoldString(holdName: string) {
 		const path = __dirname + `/assets/${holdName}.hold`;
 		const holdBuffer = fs.readFileSync(path);
 
@@ -12,7 +12,10 @@ export const TestUtils = {
 			holdBuffer[i] = holdBuffer[i] ^ 0xFF;
 		}
 
-		const holdString = Array.from(inflate(holdBuffer)).map(x => String.fromCharCode(x)).join('');
+		return Array.from(inflate(holdBuffer)).map(x => String.fromCharCode(x)).join('');
+	},
+	getHoldXml(holdName: string): Document {
+		const holdString = TestUtils.getHoldString(holdName);
 
 		const domParser = new DOMParser();
 		return domParser.parseFromString(holdString, 'text/xml');

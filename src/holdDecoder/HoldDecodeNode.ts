@@ -32,6 +32,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				roomId: getInt(element, 'RoomID'),
 				description: decodeText(element, 'DescriptionMessage'),
 				isMainEntrance: getInt(element, 'IsMainEntrance') === 1,
+				changes: {},
 			});
 			break;
 
@@ -58,7 +59,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				xml: element,
 				id: characterId,
 				name: decodeText(element, 'CharNameText'),
-				commands, processingSequence, extraVars
+				commands, processingSequence, extraVars,
 			});
 			break;
 
@@ -204,7 +205,8 @@ function getText(element: Element, attribute: string, safe: boolean = false) {
 }
 
 function decodeText(element: Element, attribute: string) {
-	return atob(getText(element, attribute)).replace(/\0/g, '');
+	const text = atob(getText(element, attribute)).replace(/\0/g, '');
+	return text.replace(/\r/g, "\n");
 }
 
 function getInt(element: Element, attribute: string) {

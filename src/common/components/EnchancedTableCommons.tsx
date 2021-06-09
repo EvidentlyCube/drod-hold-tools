@@ -10,7 +10,10 @@ export interface EnchancedTableColumn {
 	sortable?: boolean;
 	editable?: boolean;
 	width?: string;
+
 	renderCell?: (row: any) => React.ReactNode;
+	renderEditor?: (row: any, onCancel: () => void, onSave: (value: string) => void) => React.ReactNode;
 
 	editMaxLength?: number;
+	editMultiline?: boolean;
 }

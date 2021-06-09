@@ -8,6 +8,7 @@ import {MonsterType} from "../common/Enums";
 import {CommandsUtils} from "../common/CommandsUtils";
 import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 import {Character} from "../data/Character";
+import {Entrance} from "../data/Entrance";
 
 
 export const HoldEncodeChanges = {
@@ -63,7 +64,7 @@ export const HoldEncodeChanges = {
 			wasChanged = true;
 		}
 
-		delete(command.changes.speechId);
+		delete (command.changes.speechId);
 
 		return wasChanged;
 	},
@@ -76,6 +77,15 @@ export const HoldEncodeChanges = {
 			delete (speech.changes.text);
 
 			speech.xml.setAttribute('Message', btoa(StringUtils.stringToWString(speech.text)));
+		}
+	},
+
+	entrance(entrance: Entrance, hold: Hold) {
+		if (entrance.changes.description) {
+			entrance.description = entrance.changes.description;
+			delete (entrance.changes.description);
+
+			entrance.xml.setAttribute('DescriptionMessage', StringUtils.stringToHoldString(entrance.description));
 		}
 	},
 };

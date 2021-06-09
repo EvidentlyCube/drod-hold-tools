@@ -254,7 +254,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			key={key}
 			align={align}
 			onClick={onClick}
-			className={column.editable ? 'editable' : ''}
+			className={`cell-${column.id}` + (column.editable ? ' editable' : '')}
 			padding={column.padding ?? "default"}
 		>
 			{column.renderCell
@@ -266,11 +266,16 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 
 	private renderEditedCell(column: EnchancedTableColumn, row: any, key: string) {
 		return <TableCell key={key} ref={this._editedCellRef}>
-			<DefaultEditor
-				onCancel={this.onCancelEdit}
-				onSave={this.onSaveEdit}
-				defaultValue={row[column.id].toString()}
-				maxLength={column.editMaxLength}/>
+			{column.renderEditor
+				? column.renderEditor(row, this.onCancelEdit, this.onSaveEdit)
+				: <DefaultEditor
+					onCancel={this.onCancelEdit}
+					onSave={this.onSaveEdit}
+					defaultValue={row[column.id].toString()}
+					maxLength={column.editMaxLength}
+					multiline={column.editMultiline || false}/>
+			}
+
 		</TableCell>;
 	}
 }
@@ -279,12 +284,15 @@ interface DefaultEditorProps {
 	onCancel: () => void;
 	onSave: (newValue: string) => void;
 	defaultValue: string;
+	multiline: boolean;
 	maxLength?: number;
 }
 
 const DefaultEditor = (props: DefaultEditorProps) => {
-	const {onCancel, onSave, defaultValue, maxLength} = props;
+	const {onCancel, onSave, defaultValue, maxLength, multiline} = props;
 
+	(window as any).duck = defaultValue;
+	console.log(defaultValue);
 	const [value, setValue] = useState(defaultValue);
 	const onChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setValue(event.target.value);
@@ -292,21 +300,32 @@ const DefaultEditor = (props: DefaultEditorProps) => {
 
 	const onKeyDown = useCallback((event: React.KeyboardEvent) => {
 		if (event.key === 'Enter') {
-			onSave(value);
+			if (!multiline || event.ctrlKey) {
+				onSave(value);
+			}
 
 		} else if (event.key === 'Escape') {
 			onCancel();
 		}
-	}, [onCancel, onSave, value]);
+	}, [onCancel, onSave, value, multiline]);
+
+	const label = multiline
+		? "Ctrl+Enter to save, Escape/Click away to cancel"
+		: "Enter to save, Escape/Click away to cancel";
 
 	return <TextField
 		autoFocus
+
+		label={label}
 		value={value}
+
 		variant="outlined"
 		style={{width: "100%"}}
-		label="Enter to save, Escape/Click away to cancel"
-		onChange={onChange}
+
+		multiline={multiline}
 		inputProps={{maxLength: maxLength}}
+
+		onChange={onChange}
 		onKeyDown={onKeyDown}/>;
 };
 

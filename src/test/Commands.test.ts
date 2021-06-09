@@ -63,6 +63,7 @@ for (const hold of ['TestCommandReading', 'DrodTouch']) {
 function expectCommand(command: Command, type: CharCommand, x: number, y: number, w: number, h: number, flags: number, speechId: number, label: string) {
 	const expectedCommand: Command = {
 		command: type,
+		changes: {},
 		x, y, w, h, flags, speechId, label,
 	};
 	expect(command).toEqual(expectedCommand);

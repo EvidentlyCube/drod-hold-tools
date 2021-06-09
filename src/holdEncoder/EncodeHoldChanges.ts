@@ -15,6 +15,10 @@ export const getEncodeHoldChanges = (): EncodeStep => {
 				HoldEncodeChanges.speech(speech, state.hold);
 			}
 
+			for (const entrance of state.hold.entrances.values()) {
+				HoldEncodeChanges.entrance(entrance, state.hold);
+			}
+
 			state.holdXml = state.hold.xmlDocument;
 			state.progressFactor = 1;
 			return true;

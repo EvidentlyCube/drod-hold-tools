@@ -1,4 +1,5 @@
 import {EncodeState, EncodeStep} from "./EncoderCommon";
+import {StringUtils} from "../common/StringUtils";
 
 export const getEncodeToArray = (): EncodeStep => {
 	return {
@@ -10,7 +11,7 @@ export const getEncodeToArray = (): EncodeStep => {
 			console.log(state.holdXml);
 			console.log(xmlString);
 
-			state.holdBytes = new Uint8Array(xmlString.split('').map(x => x.charCodeAt(0)));
+			state.holdBytes = StringUtils.stringToUint8(xmlString);
 
 			state.progressFactor = -1;
 			return true;

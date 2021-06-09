@@ -1,5 +1,6 @@
 import {Speech} from "./Speech";
 import {Command} from "./Command";
+import {Entrance} from "./Entrance";
 
 interface SpeechChange {
 	type: "Speech";
@@ -18,4 +19,12 @@ interface CommandChange {
 	}
 }
 
-export type Change = SpeechChange | CommandChange;
+interface EntranceChange {
+	type: "Entrance",
+	model: Entrance;
+	changes: {
+		description?: boolean
+	}
+}
+
+export type Change = SpeechChange | CommandChange | EntranceChange;
