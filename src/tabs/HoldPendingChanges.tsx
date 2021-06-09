@@ -89,34 +89,8 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 		});
 	};
 
-	renderChange(change: Change, id: number) {
-		switch (change.type) {
-			case "Speech":
-				const speechText = change.model.changes.text ?? change.model.text;
-				if (change.changes.delete) {
-					return <ListItem key={id}>
-						<ListItemText>
-							<strong>Delete speech #{change.model.id}:</strong> {speechText}
-						</ListItemText>
-					</ListItem>;
-				} else if (change.changes.text) {
-					return <ListItem key={id}>
-						<ListItemText>
-							<strong>Change speech #{change.model.id}:</strong> {speechText}
-						</ListItemText>
-					</ListItem>;
-				} else {
-					return null;
-				}
-		}
-		return <li>
-
-		</li>;
-	}
-
 	render() {
 		const {hold, classes} = this.props;
-		const {showClose, showExport} = this.state;
 
 		return <Paper className={classes.content}>
 			<Typography variant="h5" noWrap align="center">
@@ -130,6 +104,58 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 				<Button variant="contained" color="primary" onClick={this.onExport}>Export Hold with Changes</Button>
 				<Button variant="contained" color="secondary" onClick={this.onCloseHold}>Close Hold</Button>
 			</Box>
+			{this.renderDialogs()}
+		</Paper>;
+	}
+
+	private renderChange(change: Change, id: number) {
+		const content = this.renderChangeContent(change);
+
+		if (content) {
+			return <ListItem key={id}>
+				<ListItemText>
+					{content}
+				</ListItemText>
+			</ListItem>;
+		}
+
+		return null;
+	}
+
+	private renderChangeContent(change: Change) {
+		switch (change.type) {
+			case "Speech":
+				const speechText = change.model.changes.text ?? change.model.text;
+				if (change.changes.delete) {
+					return <>
+						<strong>Delete speech #{change.model.id}:</strong> {speechText}
+					</>;
+				} else if (change.changes.text) {
+					return <>
+						<strong>Change speech #{change.model.id}:</strong> {speechText}
+					</>;
+				}
+				break;
+
+			case "Entrance":
+				if (change.changes.description) {
+					return <>
+						<strong>Change entrance #{change.model.id}:</strong> <pre>{change.model.changes.description}</pre>
+					</>;
+				}
+				break;
+		}
+
+
+		return <>
+			<strong>Unknown change:</strong> {change.type}
+		</>;
+	}
+
+	private renderDialogs() {
+		const {showClose, showExport} = this.state;
+
+		return <>
 			<Dialog
 				disableBackdropClick
 				disableEscapeKeyDown
@@ -172,7 +198,7 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 					</Button>
 				</DialogActions>
 			</Dialog>
-		</Paper>;
+		</>;
 	}
 }
 

@@ -292,7 +292,7 @@ const DefaultEditor = (props: DefaultEditorProps) => {
 	const {onCancel, onSave, defaultValue, maxLength, multiline} = props;
 
 	(window as any).duck = defaultValue;
-	console.log(defaultValue);
+
 	const [value, setValue] = useState(defaultValue);
 	const onChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setValue(event.target.value);
