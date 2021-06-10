@@ -5,10 +5,16 @@ export interface Level {
 	modelType: ModelType.Level;
 	xml: Element;
 
+	id: number;
+	index: number;
 	name: string;
 
 	entranceX: number;
 	entranceY: number;
 
 	entrances: Entrance[];
+
+	changes: {
+		name?: string
+	}
 }

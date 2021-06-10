@@ -4,6 +4,7 @@ import {Entrance} from "./Entrance";
 import {Character} from "./Character";
 import {Monster} from "./Monster";
 import {Scroll} from "./Scroll";
+import {Level} from "./Level";
 
 interface SpeechChange {
 	type: "Speech";
@@ -39,4 +40,12 @@ interface ScrollChange {
 	}
 }
 
-export type Change = SpeechChange | CommandChange | EntranceChange | ScrollChange;
+interface LevelChange {
+	type: "Level",
+	model: Level;
+	changes: {
+		name?: boolean
+	}
+}
+
+export type Change = SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange;

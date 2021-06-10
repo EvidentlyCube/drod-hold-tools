@@ -108,6 +108,13 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.newValue = change.model.changes.text;
 				}
 				break;
+			case "Level":
+				row.location = `#${change.model.index}`;
+				if (change.changes.name) {
+					row.operationType = "Change Name";
+					row.oldValue = change.model.name;
+					row.newValue = change.model.changes.name;
+				}
 		}
 
 		return row;

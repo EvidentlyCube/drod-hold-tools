@@ -100,10 +100,13 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			hold.levels.set(levelId, {
 				modelType: ModelType.Level,
 				xml: element,
+				id: levelId,
+				index: hold.levels.size + 1,
 				name: decodeText(element, 'NameMessage'),
 				entranceX: 0,
 				entranceY: 0,
 				entrances: [],
+				changes: {},
 			});
 			break;
 

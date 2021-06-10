@@ -3,11 +3,12 @@ import './App.css';
 import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, makeStyles, Tab, Tabs, Toolbar} from "@material-ui/core";
 import {Store} from "./data/Store";
 import HoldTab from "./tabs/HoldTab";
-import SpeechTab from "./tabs/SpeechTab";
+import SpeechTab from "./tabs/standalone/SpeechTab";
 import {Container} from "@material-ui/core/";
 import "./common.d.ts";
-import EntrancesTab from "./tabs/EntrancesTab";
-import ScrollsTab from "./tabs/ScrollsTab";
+import EntrancesTab from "./tabs/standalone/EntrancesTab";
+import ScrollsTab from "./tabs/standalone/ScrollsTab";
+import MiscTab from "./tabs/misc/MiscTab";
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -70,6 +71,7 @@ function App() {
 					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
 					<Tab label="Entrances" disabled={!hasLoadedHold}/>
 					<Tab label="Scrolls" disabled={!hasLoadedHold}/>
+					<Tab label="Misc" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
 			<TabPanel className={classes.tab} value={selectedTab} index={0}>
@@ -83,6 +85,9 @@ function App() {
 			</TabPanel>
 			<TabPanel className={classes.tab} value={selectedTab} index={3}>
 				<ScrollsTab/>
+			</TabPanel>
+			<TabPanel className={classes.tab} value={selectedTab} index={4}>
+				<MiscTab/>
 			</TabPanel>
 			<Divider/>
 			<Container>

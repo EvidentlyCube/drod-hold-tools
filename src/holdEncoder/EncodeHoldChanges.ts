@@ -8,6 +8,10 @@ export const getEncodeHoldChanges = (): EncodeStep => {
 			const {hold} = state;
 			HoldEncodeChanges.hold(hold);
 
+			for (const level of hold.levels.values()) {
+				HoldEncodeChanges.level(level, hold);
+			}
+
 			for (const room of hold.rooms.values()) {
 				HoldEncodeChanges.room(room, hold);
 			}

@@ -1,17 +1,17 @@
-import {Store} from "../data/Store";
-import {Hold} from "../data/Hold";
+import {Store} from "../../data/Store";
+import {Hold} from "../../data/Hold";
 import React from "react";
 import {Box, Container, createStyles, IconButton, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {Speech} from "../data/Speech";
-import {assert} from "../common/Assert";
-import {HoldUtils} from "../common/HoldUtils";
-import {SpeechUtils} from "../common/SpeechUtils";
+import {Speech} from "../../data/Speech";
+import {assert} from "../../common/Assert";
+import {HoldUtils} from "../../common/HoldUtils";
+import {SpeechUtils} from "../../common/SpeechUtils";
 import {History} from "@material-ui/icons";
-import {CommandsUtils} from "../common/CommandsUtils";
-import {LightTooltip} from "../common/components/LightTooltip";
-import {EnchancedTableColumn} from "../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../common/components/EnchancedTable";
-import {ChangeUtils} from "../common/ChangeUtils";
+import {CommandsUtils} from "../../common/CommandsUtils";
+import {LightTooltip} from "../../common/components/LightTooltip";
+import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {ChangeUtils} from "../../common/ChangeUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {

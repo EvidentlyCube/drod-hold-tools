@@ -1,15 +1,15 @@
-import {Store} from "../data/Store";
-import {Hold} from "../data/Hold";
+import {Store} from "../../data/Store";
+import {Hold} from "../../data/Hold";
 import React from "react";
 import {Box, Container, createStyles, IconButton, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {assert} from "../common/Assert";
+import {assert} from "../../common/Assert";
 import {History} from "@material-ui/icons";
-import {LightTooltip} from "../common/components/LightTooltip";
-import {EnchancedTableColumn} from "../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../common/components/EnchancedTable";
-import {ChangeUtils} from "../common/ChangeUtils";
-import {RoomUtils} from "../common/RoomUtils";
-import {Scroll} from "../data/Scroll";
+import {LightTooltip} from "../../common/components/LightTooltip";
+import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {ChangeUtils} from "../../common/ChangeUtils";
+import {RoomUtils} from "../../common/RoomUtils";
+import {Scroll} from "../../data/Scroll";
 
 const styles = (theme: Theme) => createStyles({
 	content: {

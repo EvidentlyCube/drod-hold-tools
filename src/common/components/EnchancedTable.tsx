@@ -40,6 +40,8 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface EnchancedTableApi {
+	rerender(): void;
+
 	rerenderRow(id: any): void;
 }
 
@@ -113,6 +115,11 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		}
 
 		this.onCancelEdit();
+	};
+
+	public rerender = () => {
+		const {visibleRows} = this.state;
+		this.setState({visibleRows: visibleRows.concat()});
 	};
 
 	public rerenderRow = (id: any) => {

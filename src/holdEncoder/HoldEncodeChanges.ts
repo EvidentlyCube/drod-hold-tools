@@ -10,6 +10,7 @@ import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 import {Character} from "../data/Character";
 import {Entrance} from "../data/Entrance";
 import {Scroll} from "../data/Scroll";
+import {Level} from "../data/Level";
 
 
 export const HoldEncodeChanges = {
@@ -21,6 +22,14 @@ export const HoldEncodeChanges = {
 	room(room: Room, hold: Hold) {
 		for (const monster of room.monsters) {
 			HoldEncodeChanges.monster(monster, room, hold);
+		}
+	},
+	level(level: Level, hold: Hold) {
+		if (level.changes.name !== undefined) {
+			level.name = level.changes.name;
+			delete (level.changes.name);
+
+			level.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(level.name));
 		}
 	},
 	character(character: Character, hold: Hold) {
@@ -77,7 +86,7 @@ export const HoldEncodeChanges = {
 			speech.text = speech.changes.text;
 			delete (speech.changes.text);
 
-			speech.xml.setAttribute('Message', btoa(StringUtils.stringToWString(speech.text)));
+			speech.xml.setAttribute('Message', StringUtils.stringToHoldString(speech.text));
 		}
 	},
 

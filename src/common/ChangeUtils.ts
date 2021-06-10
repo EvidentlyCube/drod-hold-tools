@@ -3,6 +3,7 @@ import {Hold} from "../data/Hold";
 import {HoldUtils} from "./HoldUtils";
 import {Speech} from "../data/Speech";
 import {Scroll} from "../data/Scroll";
+import {Level} from "../data/Level";
 
 export const ChangeUtils = {
 	speechText(speech: Speech, hold: Hold) {
@@ -45,6 +46,14 @@ export const ChangeUtils = {
 			type: "Scroll",
 			model: scroll,
 			changes: {text: scroll.changes.text !== undefined},
+		});
+	},
+
+	levelName(level: Level, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Level",
+			model: level,
+			changes: {name: level.changes.name !== undefined},
 		});
 	},
 };
