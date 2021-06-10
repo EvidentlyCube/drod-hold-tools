@@ -5,21 +5,26 @@ export const getEncodeHoldChanges = (): EncodeStep => {
 	return {
 		name: 'Encode Changes',
 		run(state): boolean {
-			HoldEncodeChanges.hold(state.hold);
+			const {hold} = state;
+			HoldEncodeChanges.hold(hold);
 
-			for (const room of state.hold.rooms.values()) {
-				HoldEncodeChanges.room(room, state.hold);
+			for (const room of hold.rooms.values()) {
+				HoldEncodeChanges.room(room, hold);
 			}
 
-			for (const speech of state.hold.speeches.values()) {
-				HoldEncodeChanges.speech(speech, state.hold);
+			for (const speech of hold.speeches.values()) {
+				HoldEncodeChanges.speech(speech, hold);
 			}
 
-			for (const entrance of state.hold.entrances.values()) {
-				HoldEncodeChanges.entrance(entrance, state.hold);
+			for (const entrance of hold.entrances.values()) {
+				HoldEncodeChanges.entrance(entrance, hold);
 			}
 
-			state.holdXml = state.hold.xmlDocument;
+			for (const scroll of hold.scrolls.values()) {
+				HoldEncodeChanges.scroll(scroll, hold);
+			}
+
+			state.holdXml = hold.xmlDocument;
 			state.progressFactor = 1;
 			return true;
 		},

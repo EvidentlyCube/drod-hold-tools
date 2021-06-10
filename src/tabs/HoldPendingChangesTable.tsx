@@ -100,6 +100,14 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.newValue = (change.model.changes.speechId || 0).toString();
 				}
 				break;
+			case "Scroll":
+				row.location = LocationUtils.getDisplay(change.model, hold);
+				if (change.changes.text) {
+					row.operationType = "Change Text";
+					row.oldValue = change.model.text;
+					row.newValue = change.model.changes.text;
+				}
+				break;
 		}
 
 		return row;

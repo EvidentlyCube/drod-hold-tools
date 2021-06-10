@@ -7,6 +7,7 @@ import SpeechTab from "./tabs/SpeechTab";
 import {Container} from "@material-ui/core/";
 import "./common.d.ts";
 import EntrancesTab from "./tabs/EntrancesTab";
+import ScrollsTab from "./tabs/ScrollsTab";
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -68,6 +69,7 @@ function App() {
 					<Tab label="Hold"/>
 					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
 					<Tab label="Entrances" disabled={!hasLoadedHold}/>
+					<Tab label="Scrolls" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
 			<TabPanel className={classes.tab} value={selectedTab} index={0}>
@@ -78,6 +80,9 @@ function App() {
 			</TabPanel>
 			<TabPanel className={classes.tab} value={selectedTab} index={2}>
 				<EntrancesTab/>
+			</TabPanel>
+			<TabPanel className={classes.tab} value={selectedTab} index={3}>
+				<ScrollsTab/>
 			</TabPanel>
 			<Divider/>
 			<Container>

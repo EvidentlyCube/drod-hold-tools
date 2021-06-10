@@ -2,6 +2,7 @@ import {Entrance} from "../data/Entrance";
 import {Hold} from "../data/Hold";
 import {HoldUtils} from "./HoldUtils";
 import {Speech} from "../data/Speech";
+import {Scroll} from "../data/Scroll";
 
 export const ChangeUtils = {
 	speechText(speech: Speech, hold: Hold) {
@@ -31,12 +32,19 @@ export const ChangeUtils = {
 		}
 	},
 
-
 	entranceDescription(entrance: Entrance, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Entrance",
 			model: entrance,
 			changes: {description: entrance.changes.description !== undefined},
+		});
+	},
+
+	scrollText(scroll: Scroll, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Scroll",
+			model: scroll,
+			changes: {text: scroll.changes.text !== undefined},
 		});
 	},
 };

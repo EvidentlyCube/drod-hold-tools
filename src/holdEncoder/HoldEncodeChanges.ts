@@ -9,6 +9,7 @@ import {CommandsUtils} from "../common/CommandsUtils";
 import {PackedVarsUtils} from "../common/PackagedVarsUtils";
 import {Character} from "../data/Character";
 import {Entrance} from "../data/Entrance";
+import {Scroll} from "../data/Scroll";
 
 
 export const HoldEncodeChanges = {
@@ -81,11 +82,20 @@ export const HoldEncodeChanges = {
 	},
 
 	entrance(entrance: Entrance, hold: Hold) {
-		if (entrance.changes.description) {
+		if (entrance.changes.description !== undefined) {
 			entrance.description = entrance.changes.description;
 			delete (entrance.changes.description);
 
 			entrance.xml.setAttribute('DescriptionMessage', StringUtils.stringToHoldString(entrance.description));
+		}
+	},
+
+	scroll(scroll: Scroll, hold: Hold) {
+		if (scroll.changes.text !== undefined) {
+			scroll.text = scroll.changes.text;
+			delete (scroll.changes.text);
+
+			scroll.xml.setAttribute('Message', StringUtils.stringToHoldString(scroll.text));
 		}
 	},
 };

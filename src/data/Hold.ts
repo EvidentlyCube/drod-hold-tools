@@ -9,6 +9,7 @@ import {Room} from "./Room";
 import {WorldMap} from "./WorldMap";
 import {Change} from "./Change";
 import {ModelType} from "../common/Enums";
+import {Scroll} from "./Scroll";
 
 export interface Hold {
 	isLoaded: boolean;
@@ -27,6 +28,7 @@ export interface Hold {
 	entrances: Map<number, Entrance>;
 	levels: Map<number, Level>;
 	rooms: Map<number, Room>;
+	scrolls: Map<number, Scroll>;
 	speeches: Map<number, Speech>;
 	worldMaps: Map<number, WorldMap>;
 	vars: Map<number, Var>;
@@ -57,6 +59,7 @@ export function createNullHold(): Hold {
 		vars: new Map(),
 		characters: new Map(),
 		datas: new Map(),
+		scrolls: new Map(),
 		speeches: new Map(),
 		levels: new Map(),
 		rooms: new Map(),

@@ -4,6 +4,7 @@ import {CommandsUtils} from "../common/CommandsUtils";
 import {UINT_MINUS_1} from "../common/CommonTypes";
 import {MonsterUtils} from "../common/MonsterUtils";
 import {ModelType} from "../common/Enums";
+import {Scroll} from "../data/Scroll";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
@@ -167,14 +168,20 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Scrolls': {
 			const roomId = getInt(element.parentElement!, 'RoomID');
 			const room = hold.rooms.get(roomId)!;
-
-			room.scrolls.push({
+			const scrollId = hold.scrolls.size + 1;
+			const scroll: Scroll = {
 				modelType: ModelType.Scroll,
 				xml: element,
+				id: scrollId,
+				roomId: roomId,
 				text: decodeText(element, 'Message'),
 				x: getInt(element, 'X'),
 				y: getInt(element, 'Y'),
-			});
+				changes: {},
+			};
+
+			hold.scrolls.set(scrollId, scroll);
+			room.scrolls.push(scroll);
 		}
 			break;
 
