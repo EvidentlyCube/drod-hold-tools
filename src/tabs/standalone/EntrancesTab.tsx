@@ -134,10 +134,10 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 		return <Container maxWidth="xl">
 			<Paper className={classes.content}>
 				<Typography variant="h5" gutterBottom>
-					Commands text
+					Entrances
 				</Typography>
 				<Typography variant="body1" gutterBottom>
-					This table contains all the texts from all the commands in every character (custom character's default script & placed character). Click on the text to edit it, press enter to save changes.
+					This table contains all the entrances and their descriptions. Click on a description to edit it and ctrl+enter to save it.
 				</Typography>
 				<EnchancedTable
 					columns={columns}

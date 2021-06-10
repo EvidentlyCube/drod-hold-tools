@@ -132,10 +132,10 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		return <Container maxWidth="xl">
 			<Paper className={classes.content}>
 				<Typography variant="h5" gutterBottom>
-					Commands text
+					Scrolls
 				</Typography>
 				<Typography variant="body1" gutterBottom>
-					This table contains all the texts from all the commands in every character (custom character's default script & placed character). Click on the text to edit it, press enter to save changes.
+					This table contains all the scrolls and their text. Click on the text to edit it, press ctrl+enter to save changes.
 				</Typography>
 				<EnchancedTable
 					columns={columns}
