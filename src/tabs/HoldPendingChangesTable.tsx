@@ -52,7 +52,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 			columns: [
 				{id: 'dataType', label: 'Data', width: "10%"},
 				{id: 'operationType', label: 'Operation', width: "15%"},
-				{id: 'location', label: 'Locaton', width: "20%"},
+				{id: 'location', label: 'Location', width: "20%"},
 				{id: 'oldValue', label: 'Old Value'},
 				{id: 'newValue', label: 'New Value'},
 			],
@@ -115,6 +115,15 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
 				}
+				break;
+			case "Character":
+				row.location = '';
+				if (change.changes.name) {
+					row.operationType = "Change Name";
+					row.oldValue = change.model.name;
+					row.newValue = change.model.changes.name;
+				}
+				break;
 		}
 
 		return row;

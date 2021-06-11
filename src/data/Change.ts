@@ -48,4 +48,12 @@ interface LevelChange {
 	}
 }
 
-export type Change = SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange;
+interface CharacterChange {
+	type: "Character",
+	model: Character;
+	changes: {
+		name?: boolean
+	}
+}
+
+export type Change = SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange;

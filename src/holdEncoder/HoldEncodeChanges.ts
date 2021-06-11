@@ -48,6 +48,13 @@ export const HoldEncodeChanges = {
 			const packedVarsBuffer = PackedVarsUtils.writeBuffer(character.extraVars);
 			character.xml.setAttribute('ExtraVars', StringUtils.bytesArrToBase64(packedVarsBuffer));
 		}
+
+		if (character.changes.name !== undefined) {
+			character.name = character.changes.name;
+			delete character.changes.name;
+
+			character.xml.setAttribute('CharNameText', StringUtils.stringToHoldString(character.name, 255));
+		}
 	},
 	monster(monster: Monster, room: Room, hold: Hold) {
 		let commandsDirty = false;

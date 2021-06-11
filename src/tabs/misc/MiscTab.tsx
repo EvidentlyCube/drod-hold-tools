@@ -3,6 +3,7 @@ import {Hold} from "../../data/Hold";
 import React from "react";
 import {Container, createStyles, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {MiscLevels} from "./MiscLevels";
+import {MiscCharacters} from "./MiscCharacters";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -37,6 +38,7 @@ class MiscTab extends React.Component<MiscTabProps, MiscTabState> {
 					Various data
 				</Typography>
 				<MiscLevels/>
+				<MiscCharacters/>
 			</Paper>
 		</Container>;
 	}

@@ -28,6 +28,10 @@ export const getEncodeHoldChanges = (): EncodeStep => {
 				HoldEncodeChanges.scroll(scroll, hold);
 			}
 
+			for (const character of hold.characters.values()) {
+				HoldEncodeChanges.character(character, hold);
+			}
+
 			state.holdXml = hold.xmlDocument;
 			state.progressFactor = 1;
 			return true;

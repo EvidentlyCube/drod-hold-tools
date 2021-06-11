@@ -66,6 +66,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				id: characterId,
 				name: decodeText(element, 'CharNameText'),
 				commands, processingSequence, extraVars,
+				changes: {},
 			});
 			break;
 

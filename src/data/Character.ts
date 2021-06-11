@@ -13,4 +13,8 @@ export interface Character {
 	extraVars: PackedVars;
 	commands: Command[];
 	processingSequence: number;
+
+	changes: {
+		name?: string
+	}
 }
