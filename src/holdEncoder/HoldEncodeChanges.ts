@@ -29,7 +29,7 @@ export const HoldEncodeChanges = {
 			level.name = level.changes.name;
 			delete (level.changes.name);
 
-			level.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(level.name));
+			level.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(level.name, 255));
 		}
 	},
 	character(character: Character, hold: Hold) {
@@ -86,7 +86,7 @@ export const HoldEncodeChanges = {
 			speech.text = speech.changes.text;
 			delete (speech.changes.text);
 
-			speech.xml.setAttribute('Message', StringUtils.stringToHoldString(speech.text));
+			speech.xml.setAttribute('Message', StringUtils.stringToHoldString(speech.text, 1024));
 		}
 	},
 
@@ -95,7 +95,7 @@ export const HoldEncodeChanges = {
 			entrance.description = entrance.changes.description;
 			delete (entrance.changes.description);
 
-			entrance.xml.setAttribute('DescriptionMessage', StringUtils.stringToHoldString(entrance.description));
+			entrance.xml.setAttribute('DescriptionMessage', StringUtils.stringToHoldString(entrance.description, 1350));
 		}
 	},
 
@@ -104,7 +104,7 @@ export const HoldEncodeChanges = {
 			scroll.text = scroll.changes.text;
 			delete (scroll.changes.text);
 
-			scroll.xml.setAttribute('Message', StringUtils.stringToHoldString(scroll.text));
+			scroll.xml.setAttribute('Message', StringUtils.stringToHoldString(scroll.text, 1350));
 		}
 	},
 };

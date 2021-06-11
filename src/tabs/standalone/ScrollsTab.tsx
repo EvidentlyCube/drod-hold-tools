@@ -53,7 +53,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Text', editable: true, editMultiline: true},
+				{id: 'text', label: 'Text', editable: true, editMultiline: true, editMaxLength: 1350},
 				{id: 'level', label: 'Level', width: "15%"},
 				{id: 'room', label: 'Room', width: "15%"},
 			],

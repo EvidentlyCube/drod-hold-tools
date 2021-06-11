@@ -43,7 +43,7 @@ export class MiscLevels extends React.Component<MiscLevelsProps, MiscLevelsState
 			columns: [
 				{id: 'index', label: 'Index', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Name', editable: true},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
 			],
 		};
 	}

@@ -11,8 +11,12 @@ export const StringUtils = {
 	bytesArrToBase64(arr: number[]) {
 		return btoa(String.fromCharCode.apply(null, arr));
 	},
-	stringToHoldString(str: string) {
+	stringToHoldString(str: string, maxLength?: number) {
 		str = str.replace(/\n/g, "\r");
+
+		if (maxLength !== undefined && str.length > maxLength) {
+			str = str.substr(0, str.length);
+		}
 
 		return btoa(StringUtils.stringToWString(str));
 	},
