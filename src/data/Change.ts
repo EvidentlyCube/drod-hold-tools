@@ -5,6 +5,17 @@ import {Character} from "./Character";
 import {Monster} from "./Monster";
 import {Scroll} from "./Scroll";
 import {Level} from "./Level";
+import {Hold} from "./Hold";
+
+interface HoldChange {
+	type: "Hold";
+	model: Hold;
+	changes: {
+		name?: boolean;
+		description?: boolean;
+		ending?: boolean;
+	}
+}
 
 interface SpeechChange {
 	type: "Speech";
@@ -56,4 +67,4 @@ interface CharacterChange {
 	}
 }
 
-export type Change = SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange;
+export type Change = HoldChange | SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange;

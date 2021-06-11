@@ -4,6 +4,9 @@ import React from "react";
 import {Container, createStyles, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {MiscLevels} from "./MiscLevels";
 import {MiscCharacters} from "./MiscCharacters";
+import {MiscHoldName} from "./MiscHoldName";
+import {MiscHoldDescription} from "./MiscHoldDescription";
+import {MiscHoldEnding} from "./MiscHoldEnding";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -39,6 +42,9 @@ class MiscTab extends React.Component<MiscTabProps, MiscTabState> {
 				</Typography>
 				<MiscLevels/>
 				<MiscCharacters/>
+				<MiscHoldName />
+				<MiscHoldDescription />
+				<MiscHoldEnding />
 			</Paper>
 		</Container>;
 	}

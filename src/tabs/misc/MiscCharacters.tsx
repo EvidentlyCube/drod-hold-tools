@@ -47,7 +47,7 @@ export class MiscCharacters extends React.Component<MiscCharactersProps, MiscCha
 		};
 	}
 
-	private handleResetRow(id: number) {
+	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
 		const character = hold.characters.get(id);
 		assert(character, `Failed to find character with ID '${id}'`);

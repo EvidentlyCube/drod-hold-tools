@@ -69,7 +69,7 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 		const {hold} = this.props;
 		const {showClose} = this.state;
 
-		if (hold.changes.size === 0 || showClose) {
+		if (hold.dataChanges.size === 0 || showClose) {
 			Store.loadedHold.value = createNullHold();
 			this.setState({showClose: false});
 

@@ -61,7 +61,7 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 		};
 	}
 
-	private handleResetRow(id: number) {
+	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
 		const entrance = hold.entrances.get(id);
 		assert(entrance, `Failed to find entrance with ID '${id}'`);

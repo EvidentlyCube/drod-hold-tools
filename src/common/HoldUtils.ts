@@ -3,13 +3,13 @@ import {Change} from "../data/Change";
 
 export const HoldUtils = {
 	addChange(hold: Hold, change: Change) {
-		for (const existingChange of hold.changes) {
+		for (const existingChange of hold.dataChanges) {
 			if (existingChange.type === change.type && existingChange.model === change.model) {
 				change.changes = {
 					...existingChange.changes,
 					...change.changes,
 				};
-				hold.changes.delete(existingChange);
+				hold.dataChanges.delete(existingChange);
 				break;
 			}
 		}
@@ -21,7 +21,7 @@ export const HoldUtils = {
 		}
 
 		if (Object.keys(change.changes).length > 0) {
-			hold.changes.add(change);
+			hold.dataChanges.add(change);
 		}
 	},
 };

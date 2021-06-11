@@ -11,7 +11,6 @@ import {
 	TablePagination,
 	TableRow,
 	TextField,
-	Theme,
 	WithStyles,
 	withStyles,
 } from "@material-ui/core";
@@ -20,7 +19,7 @@ import {Create} from "@material-ui/icons";
 
 const DefaultRowsPerPage = 25;
 
-const styles = (theme: Theme) => createStyles({
+const styles = () => createStyles({
 	table: {
 		'& .editable': {
 			cursor: 'pointer',
@@ -34,7 +33,8 @@ const styles = (theme: Theme) => createStyles({
 		},
 		'& .edit-icon': {
 			position: 'absolute',
-			right: theme.spacing(1),
+			top: 'calc(50% - 10px)',
+			right: '16px',
 		},
 	},
 });
@@ -48,6 +48,7 @@ export interface EnchancedTableApi {
 interface EnchancedTableProps extends WithStyles<typeof styles> {
 	columns: EnchancedTableColumn[];
 	rows: any[];
+	pagination?: boolean;
 
 	className?: string;
 
@@ -206,8 +207,8 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	};
 
 	public render() {
-		const {columns, rowsPerPage, rows, classes, className} = this.props;
-		const {orderBy, orderDir, visibleRows, page} = this.state;
+		const {columns, classes, className} = this.props;
+		const {orderBy, orderDir, visibleRows} = this.state;
 
 		return <TableContainer className={className}>
 			<Table className={classes.table}>
@@ -218,19 +219,30 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 				<TableBody>
 					{visibleRows.map(row => this.renderRow(row))}
 				</TableBody>
-				<TableFooter>
-					<TableRow>
-						<TablePagination
-							count={rows.length}
-							page={page}
-							rowsPerPage={rowsPerPage ?? DefaultRowsPerPage}
-							rowsPerPageOptions={[]}
-							onChangePage={this.onChangePage}
-						/>
-					</TableRow>
-				</TableFooter>
+				{this.renderPagination()}
 			</Table>
 		</TableContainer>;
+	}
+
+	private renderPagination() {
+		if (this.props.pagination === false) {
+			return null;
+		}
+
+		const {rowsPerPage, rows} = this.props;
+		const {page} = this.state;
+
+		return <TableFooter>
+			<TableRow>
+				<TablePagination
+					count={rows.length}
+					page={page}
+					rowsPerPage={rowsPerPage ?? DefaultRowsPerPage}
+					rowsPerPageOptions={[]}
+					onChangePage={this.onChangePage}
+				/>
+			</TableRow>
+		</TableFooter>;
 	}
 
 	private renderColumnWidth(column: EnchancedTableColumn) {

@@ -60,7 +60,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		};
 	}
 
-	private handleResetRow(id: number) {
+	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
 		const scroll = hold.scrolls.get(id);
 		assert(scroll, `Failed to find scroll with ID '${id}'`);

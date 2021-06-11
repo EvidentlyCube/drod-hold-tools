@@ -65,7 +65,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		};
 	}
 
-	private handleResetRow(id: number) {
+	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
 		const speech = hold.speeches.get(id);
 		assert(speech, `Failed to find speech with ID '${id}'`);

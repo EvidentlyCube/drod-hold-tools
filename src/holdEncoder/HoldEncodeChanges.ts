@@ -16,8 +16,27 @@ import {Level} from "../data/Level";
 export const HoldEncodeChanges = {
 	hold(hold: Hold) {
 		hold.dateUpdated = new Date();
-		hold.changes.clear();
+		hold.dataChanges.clear();
 		hold.xml.setAttribute('LastUpdated', Math.floor(hold.dateUpdated.getTime() / 1000).toString());
+
+		if (hold.changes.name !== undefined) {
+			hold.name = hold.changes.name;
+			delete hold.changes.name;
+
+			hold.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(hold.name, 255));
+		}
+		if (hold.changes.description !== undefined) {
+			hold.description = hold.changes.description;
+			delete hold.changes.description;
+
+			hold.xml.setAttribute('DescriptionMessage', StringUtils.stringToHoldString(hold.description, 1350));
+		}
+		if (hold.changes.ending !== undefined) {
+			hold.ending = hold.changes.ending;
+			delete hold.changes.ending;
+
+			hold.xml.setAttribute('EndHoldMessage', StringUtils.stringToHoldString(hold.ending, 1350));
+		}
 	},
 	room(room: Room, hold: Hold) {
 		for (const monster of room.monsters) {

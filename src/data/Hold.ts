@@ -19,6 +19,7 @@ export interface Hold {
 
 	name: string;
 	description: string;
+	ending: string;
 	dateCreated: Date;
 	dateUpdated: Date;
 
@@ -39,7 +40,12 @@ export interface Hold {
 		characters: number
 	}
 
-	changes: Set<Change>;
+	changes: {
+		name?: string,
+		description?: string,
+		ending?: string
+	}
+	dataChanges: Set<Change>;
 }
 
 export function createNullHold(): Hold {
@@ -51,6 +57,7 @@ export function createNullHold(): Hold {
 
 		name: '',
 		description: '',
+		ending: '',
 		dateCreated: new Date(),
 		dateUpdated: new Date(),
 
@@ -71,6 +78,7 @@ export function createNullHold(): Hold {
 			scrolls: 0,
 		},
 
-		changes: new Set(),
+		changes: {},
+		dataChanges: new Set(),
 	};
 }

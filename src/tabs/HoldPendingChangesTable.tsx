@@ -9,6 +9,20 @@ import {createStyles, WithStyles} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/";
 import {LocationUtils} from "../common/LocationUtils";
 
+let rowIdCounter = 1;
+
+function newRow(type: string): ChangeRow {
+	return {
+		id: ++rowIdCounter,
+		dataType: type,
+		operationType: "",
+		location: "",
+		oldValue: "",
+		newValue: "",
+	};
+
+}
+
 const RowsPerPage = 25;
 
 const styles = () => createStyles({
@@ -59,18 +73,13 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 		};
 	}
 
-	private static changeToRow(change: Change, hold: Hold, index: number): ChangeRow | undefined {
-		const row: ChangeRow = {
-			id: index,
-			dataType: change.type,
-			operationType: "",
-			location: "",
-			oldValue: "",
-			newValue: "",
-		};
+	private static changeToRow(change: Change, hold: Hold): ChangeRow[] {
+		const rows: ChangeRow[] = [];
 
 		switch (change.type) {
-			case "Speech":
+			case "Speech": {
+				const row = newRow(change.type);
+				rows.push(row);
 				row.location = change.model.source
 					? LocationUtils.getDisplay(change.model.source, hold)
 					: "Unknown";
@@ -82,8 +91,11 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.oldValue = change.model.text;
 					row.newValue = change.model.changes.text ?? change.model.text;
 				}
+			}
 				break;
-			case "Entrance":
+			case "Entrance": {
+				const row = newRow(change.type);
+				rows.push(row);
 				row.location = RoomUtils.getDisplayLocation(change.model.roomId, hold);
 
 				if (change.changes.description) {
@@ -91,49 +103,92 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.oldValue = change.model.description;
 					row.newValue = change.model.changes.description ?? change.model.description;
 				}
+			}
 				break;
-			case "Command":
+			case "Command": {
+				const row = newRow(change.type);
+				rows.push(row);
+
 				row.location = LocationUtils.getDisplay(change.source, hold);
 				if (change.changes.speechId) {
 					row.operationType = "Change SpeechID";
 					row.oldValue = change.model.speechId.toString();
 					row.newValue = (change.model.changes.speechId || 0).toString();
 				}
+			}
 				break;
-			case "Scroll":
+			case "Scroll": {
+				const row = newRow(change.type);
+				rows.push(row);
+
 				row.location = LocationUtils.getDisplay(change.model, hold);
 				if (change.changes.text) {
 					row.operationType = "Change Text";
 					row.oldValue = change.model.text;
 					row.newValue = change.model.changes.text;
 				}
+			}
 				break;
-			case "Level":
+			case "Level": {
+				const row = newRow(change.type);
+				rows.push(row);
+
 				row.location = `#${change.model.index}`;
 				if (change.changes.name) {
 					row.operationType = "Change Name";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
 				}
+			}
 				break;
-			case "Character":
+			case "Character": {
+				const row = newRow(change.type);
+				rows.push(row);
+
 				row.location = '';
 				if (change.changes.name) {
 					row.operationType = "Change Name";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
 				}
+			}
 				break;
+			case "Hold":
+				if (change.changes.name) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Change Name";
+					row.oldValue = change.model.name;
+					row.newValue = change.model.changes.name;
+				}
+				if (change.changes.description) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Change Description";
+					row.oldValue = change.model.description;
+					row.newValue = change.model.changes.description;
+				}
+				if (change.changes.ending) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Change Ending";
+					row.oldValue = change.model.ending;
+					row.newValue = change.model.changes.ending;
+				}
+			break;
 		}
 
-		return row;
+		return rows;
 	}
 
 	private getRows = () => {
 		const hold = Store.loadedHold.value;
-		return Array.from(hold.changes.values())
-			.map((change, index) => _HoldPendingChangesTable.changeToRow(change, hold, index))
-			.filter(x => !!x) as ChangeRow[];
+		return Array.from(hold.dataChanges.values())
+			.map(change => _HoldPendingChangesTable.changeToRow(change, hold))
+			.flat();
 	};
 
 	public render() {

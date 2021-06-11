@@ -48,7 +48,7 @@ export class MiscLevels extends React.Component<MiscLevelsProps, MiscLevelsState
 		};
 	}
 
-	private handleResetRow(id: number) {
+	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
 		const level = hold.levels.get(id);
 		assert(level, `Failed to find level with ID '${id}'`);

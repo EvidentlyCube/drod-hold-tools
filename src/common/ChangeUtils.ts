@@ -65,4 +65,28 @@ export const ChangeUtils = {
 			changes: {name: character.changes.name !== undefined},
 		});
 	},
+
+	holdName(hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Hold",
+			model: hold,
+			changes: {name: hold.changes.name !== undefined},
+		});
+	},
+
+	holdDescription(hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Hold",
+			model: hold,
+			changes: {description: hold.changes.description !== undefined},
+		});
+	},
+
+	holdEnding(hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Hold",
+			model: hold,
+			changes: {ending: hold.changes.ending !== undefined},
+		});
+	}
 };

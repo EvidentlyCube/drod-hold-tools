@@ -20,6 +20,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			hold.xml = element;
 			hold.name = decodeText(element, 'NameMessage');
 			hold.description = decodeText(element, 'DescriptionMessage');
+			hold.ending = decodeText(element, 'EndHoldMessage');
 			hold.dateCreated = new Date(getInt(element, 'GID_Created') * 1000);
 			hold.dateUpdated = new Date(getInt(element, 'LastUpdated') * 1000);
 			for (const child of element.children) {
