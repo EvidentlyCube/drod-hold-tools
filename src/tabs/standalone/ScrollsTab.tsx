@@ -1,15 +1,14 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Box, Container, createStyles, IconButton, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Container, createStyles, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {assert} from "../../common/Assert";
-import {History} from "@material-ui/icons";
-import {LightTooltip} from "../../common/components/LightTooltip";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {RoomUtils} from "../../common/RoomUtils";
 import {Scroll} from "../../data/Scroll";
+import {IsEditedCell} from "../../common/components/IsEditedCell";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -61,10 +60,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		};
 	}
 
-	private handleResetRow(event: React.MouseEvent, id: number) {
-		event.preventDefault();
-		event.stopPropagation();
-
+	private handleResetRow(id: number) {
 		const {hold} = this.state;
 		const scroll = hold.scrolls.get(id);
 		assert(scroll, `Failed to find scroll with ID '${id}'`);
@@ -151,17 +147,10 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 
 	private renderIsEditedCell = (row: ScrollRow) => {
 		if (row.isEdited) {
-			return <LightTooltip title={<React.Fragment>
-				<Typography variant="body2" gutterBottom><Box textAlign="center" fontWeight="fontWeightBold">Click to undo changes</Box></Typography>
-				<Typography variant="body2">
-					<Box fontSize={12} fontWeight="fontWeightMedium" display="inline">Original text:</Box>&nbsp;
-					<Box fontSize={12} fontWeight="fontWeightLight" display="inline">{row.originalText}</Box>
-				</Typography>
-			</React.Fragment>}>
-				<IconButton onClick={e => this.handleResetRow(e, row.id)}>
-					<History color="primary"/>
-				</IconButton>
-			</LightTooltip>;
+			return <IsEditedCell
+				rowId={row.id}
+				resetHandler={this.handleResetRow}
+				originalText={row.originalText}/>;
 		}
 
 		return <span/>;

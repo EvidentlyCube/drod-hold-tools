@@ -1,14 +1,14 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Accordion, AccordionDetails, AccordionSummary, Box, IconButton, Typography} from "@material-ui/core/";
+import {Accordion, AccordionDetails, AccordionSummary} from "@material-ui/core/";
 import {assert} from "../../common/Assert";
-import {ExpandMore, History} from "@material-ui/icons";
-import {LightTooltip} from "../../common/components/LightTooltip";
+import {ExpandMore} from "@material-ui/icons";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {Level} from "../../data/Level";
+import {IsEditedCell} from "../../common/components/IsEditedCell";
 
 const RowsPerPage = 25;
 
@@ -48,10 +48,7 @@ export class MiscLevels extends React.Component<MiscLevelsProps, MiscLevelsState
 		};
 	}
 
-	private handleResetRow(event: React.MouseEvent, id: number) {
-		event.preventDefault();
-		event.stopPropagation();
-
+	private handleResetRow(id: number) {
 		const {hold} = this.state;
 		const level = hold.levels.get(id);
 		assert(level, `Failed to find level with ID '${id}'`);
@@ -63,7 +60,7 @@ export class MiscLevels extends React.Component<MiscLevelsProps, MiscLevelsState
 		dataRow.text = dataRow.originalText;
 		dataRow.isEdited = false;
 
-		this._tableApi.current?.rerender();
+		this._tableApi.current?.rerenderRow(id);
 	}
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
@@ -130,17 +127,10 @@ export class MiscLevels extends React.Component<MiscLevelsProps, MiscLevelsState
 
 	private renderIsEditedCell = (row: LevelRow) => {
 		if (row.isEdited) {
-			return <LightTooltip title={<React.Fragment>
-				<Typography variant="body2" gutterBottom><Box textAlign="center" fontWeight="fontWeightBold">Click to undo changes</Box></Typography>
-				<Typography variant="body2">
-					<Box fontSize={12} fontWeight="fontWeightMedium" display="inline">Original text:</Box>&nbsp;
-					<Box fontSize={12} fontWeight="fontWeightLight" display="inline">{row.originalText}</Box>
-				</Typography>
-			</React.Fragment>}>
-				<IconButton onClick={e => this.handleResetRow(e, row.id)}>
-					<History color="primary"/>
-				</IconButton>
-			</LightTooltip>;
+			return <IsEditedCell
+				rowId={row.id}
+				resetHandler={this.handleResetRow}
+				originalText={row.originalText}/>;
 		}
 
 		return <span/>;
