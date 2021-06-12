@@ -2,7 +2,7 @@ import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
 import {Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {Speech} from "../../data/Speech";
+import {Player} from "../../data/Player";
 import {assert} from "../../common/Assert";
 import {HoldUtils} from "../../common/HoldUtils";
 import {SpeechUtils} from "../../common/SpeechUtils";
@@ -24,6 +24,8 @@ interface PlayerRow {
 	id: number
 	text: string
 	originalText: string
+
+	levelCount: number;
 
 	isEdited: boolean;
 	isNew: boolean;
@@ -55,6 +57,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 				{id: 'id', label: 'ID', width: "5%", padding: "none", renderCell: this.renderIdCell},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
 				{id: 'text', label: 'Text', editable: true, editMaxLength: 1024},
+				{id: 'levelCount', label: 'Used in Levels', width: '10%'},
 				{id: 'isDeleted', label: 'Delete', width: "5%", sortable: false, padding: "none", renderCell: this.renderDeleteRow},
 			],
 		};
@@ -105,21 +108,26 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 	};
 
 	private static playerToRow(player: Player, hold: Hold): PlayerRow {
+		const levelCount = Array.from(hold.levels.values())
+			.filter(level => level.playerId === player.id)
+			.length;																														
+		
 		return {
 			id: player.id,
 			text: player.changes.name ?? player.name,
 			originalText: player.name,
 			isNew: player.isNew,
+			levelCount,
 			isEdited: player.changes.name !== undefined,
 			isDeleted: player.isDeleted,
-			isDeletable: hold.playerId !== player.id
+			isDeletable: levelCount === 0 && hold.playerId !== player.id
 		};
 	}
 
 	private getRows = () => {
 		const hold = Store.loadedHold.value;
 		return Array.from(Store.loadedHold.value.players.values())
-			.map(player => PlayersTab.playerToRow(speech, hold));
+			.map(player => PlayersTab.playerToRow(player, hold));
 	};
 
 	private getRowById = (id: number) => {
@@ -142,7 +150,10 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 					Players
 				</Typography>
 				<Typography variant="body1" gutterBottom>
-					This table contains all the texts from all the commands in every character (custom character's default script & placed character). Click on the text to edit it, press enter to save changes.
+					This table all the players in the hold. Players are used for displaying
+					author for each level. You can only delete players who are not assigned to any levels.
+					You can create new players as needed, and authors can be reassigned in the
+					&#32;<strong>Level</strong>&#32;tab. 
 				</Typography>
 				<EnchancedTable
 					columns={columns}

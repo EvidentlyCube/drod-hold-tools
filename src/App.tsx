@@ -9,6 +9,7 @@ import "./common.d.ts";
 import EntrancesTab from "./tabs/standalone/EntrancesTab";
 import ScrollsTab from "./tabs/standalone/ScrollsTab";
 import MiscTab from "./tabs/misc/MiscTab";
+import AuthorsTab from './tabs/standalone/AuthorsTab';
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -71,6 +72,7 @@ function App() {
 					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
 					<Tab label="Entrances" disabled={!hasLoadedHold}/>
 					<Tab label="Scrolls" disabled={!hasLoadedHold}/>
+					<Tab label="Players" disabled={!hasLoadedHold}/>
 					<Tab label="Misc" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
@@ -87,6 +89,9 @@ function App() {
 				<ScrollsTab/>
 			</TabPanel>
 			<TabPanel className={classes.tab} value={selectedTab} index={4}>
+				<AuthorsTab/>
+			</TabPanel>
+			<TabPanel className={classes.tab} value={selectedTab} index={5}>
 				<MiscTab/>
 			</TabPanel>
 			<Divider/>
