@@ -7,6 +7,8 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 		run(decoder: DecodeState): boolean {
 			const {hold} = decoder;
 
+			HoldLinker.linkHold(hold);
+
 			for (const character of hold.characters.values()) {
 				HoldLinker.linkCharacter(hold, character);
 				HoldLinker.linkCommands(hold, character.commands, undefined, undefined, character);

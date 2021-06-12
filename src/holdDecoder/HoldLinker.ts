@@ -10,6 +10,12 @@ import {Entrance} from "../data/Entrance";
 import {Command} from "../data/Command";
 
 export const HoldLinker = {
+	linkHold(hold: Hold) {
+		const author = hold.players.get(hold.playerId);
+		assert(author, `No player found for id '${hold.playerId}'`);
+
+		hold.author = author;
+	},
 	linkCharacter(hold: Hold, character: Character) {
 	},
 	linkCommands(hold: Hold, commands: Command[], room: Room | undefined, sourceMonster?: Monster, sourceCharacter?: Character) {

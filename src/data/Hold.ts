@@ -20,6 +20,7 @@ export interface Hold {
 	name: string;
 	description: string;
 	ending: string;
+	playerId: number;
 	dateCreated: Date;
 	dateUpdated: Date;
 
@@ -28,6 +29,7 @@ export interface Hold {
 	datas: Map<number, Data>;
 	entrances: Map<number, Entrance>;
 	levels: Map<number, Level>;
+	players: Map<number, Player>;
 	rooms: Map<number, Room>;
 	scrolls: Map<number, Scroll>;
 	speeches: Map<number, Speech>;
@@ -58,19 +60,21 @@ export function createNullHold(): Hold {
 		name: '',
 		description: '',
 		ending: '',
+		playerId: 0,
 		dateCreated: new Date(),
 		dateUpdated: new Date(),
 
 		author: createNullPlayer(),
-		entrances: new Map(),
-		vars: new Map(),
 		characters: new Map(),
 		datas: new Map(),
+		entrances: new Map(),
+		levels: new Map(),
+		players: new Map(),
+		rooms: new Map(),
 		scrolls: new Map(),
 		speeches: new Map(),
-		levels: new Map(),
-		rooms: new Map(),
 		worldMaps: new Map(),
+		vars: new Map(),
 
 		counts: {
 			characters: 0,

@@ -8,19 +8,28 @@ import {Scroll} from "../data/Scroll";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
-		case 'Players':
-			hold.author = {
-				modelType: ModelType.Player,
+		case 'Players': {
+			const playerId = getInt(element, "PlayerID");
+			hold.players.set(playerId, {
 				xml: element,
+				modelType: ModelType.Player,
+				id: playerId,
 				name: decodeText(element, 'NameMessage'),
-			};
-			break;
+
+				isNew: false,
+				isDeleted: false,
+
+				changes: {}
+			});
+		}
+		break;
 
 		case 'Holds':
 			hold.xml = element;
 			hold.name = decodeText(element, 'NameMessage');
 			hold.description = decodeText(element, 'DescriptionMessage');
 			hold.ending = decodeText(element, 'EndHoldMessage');
+			hold.playerId = getInt(element, 'GID_PlayerID');
 			hold.dateCreated = new Date(getInt(element, 'GID_Created') * 1000);
 			hold.dateUpdated = new Date(getInt(element, 'LastUpdated') * 1000);
 			for (const child of element.children) {
@@ -103,7 +112,8 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				modelType: ModelType.Level,
 				xml: element,
 				id: levelId,
-				index: hold.levels.size + 1,
+				playerId: getInt(element, 'PlayerID'),
+				index: getInt(element, 'OrderIndex'),
 				name: decodeText(element, 'NameMessage'),
 				entranceX: 0,
 				entranceY: 0,

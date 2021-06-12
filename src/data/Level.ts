@@ -6,6 +6,7 @@ export interface Level {
 	xml: Element;
 
 	id: number;
+	playerId: number;
 	index: number;
 	name: string;
 

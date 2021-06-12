@@ -6,6 +6,7 @@ import {Monster} from "./Monster";
 import {Scroll} from "./Scroll";
 import {Level} from "./Level";
 import {Hold} from "./Hold";
+import {Player} from "./Player";
 
 interface HoldChange {
 	type: "Hold";
@@ -14,6 +15,16 @@ interface HoldChange {
 		name?: boolean;
 		description?: boolean;
 		ending?: boolean;
+	}
+}
+
+interface PlayerChange {
+	type: "Player";
+	model: Player;
+	changes: {
+		delete?: boolean;
+		create?: boolean;
+		name?: boolean;
 	}
 }
 
@@ -67,4 +78,4 @@ interface CharacterChange {
 	}
 }
 
-export type Change = HoldChange | SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange;
+export type Change = HoldChange | SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange | PlayerChange;
