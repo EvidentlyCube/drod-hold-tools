@@ -43,6 +43,8 @@ export interface EnchancedTableApi {
 	rerender(): void;
 
 	rerenderRow(id: any): void;
+
+	suppressClickAwayForFrame(): void;
 }
 
 interface EnchancedTableProps extends WithStyles<typeof styles> {
@@ -70,6 +72,7 @@ interface EnchancedTableState {
 }
 
 class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTableState> implements EnchancedTableApi {
+	private _suppressClickAway = false;
 	private _editedCellRef = React.createRef<HTMLElement>();
 
 	constructor(props: Readonly<EnchancedTableProps> | EnchancedTableProps) {
@@ -106,7 +109,12 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	}
 
 	private onDocumentClick = (event: MouseEvent) => {
+		if (this._suppressClickAway) {
+			return;
+		}
+
 		let node = event.target as HTMLElement | null;
+
 		while (node) {
 			if (node === this._editedCellRef.current) {
 				return;
@@ -134,6 +142,12 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			}
 		}
 	};
+
+	public suppressClickAwayForFrame() {
+		this._suppressClickAway = true;
+
+		requestAnimationFrame(() => this._suppressClickAway = false);
+	}
 
 	private getSortedRows(orderBy: string, orderDir: 'asc' | 'desc') {
 		const {rows, idField} = this.props;

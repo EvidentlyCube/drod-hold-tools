@@ -1,7 +1,7 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React, { useCallback, useState } from "react";
-import {Accordion, AccordionDetails, AccordionSummary, FormControl, InputLabel, MenuItem, Select} from "@material-ui/core/";
+import {Accordion, AccordionDetails, AccordionSummary, ClickAwayListener, Container, createStyles, FormControl, InputLabel, MenuItem, Paper, Select, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {assert} from "../../common/Assert";
 import {ExpandMore} from "@material-ui/icons";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
@@ -11,6 +11,12 @@ import {Level} from "../../data/Level";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import { PlayerUtils } from "../../common/PlayerUtils";
 import { Player } from "../../data/Player";
+
+const styles = (theme: Theme) => createStyles({
+	content: {
+		padding: theme.spacing(4, 6),
+	},
+});
 
 const RowsPerPage = 25;
 
@@ -27,7 +33,7 @@ interface LevelRow {
 	isAuthorEdited: boolean;
 }
 
-interface LevelsTabProps {
+interface LevelsTabProps extends WithStyles<typeof styles> {
 
 }
 
@@ -38,7 +44,7 @@ interface LevelsTabState {
 	columns: EnchancedTableColumn[];
 }
 
-export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
+class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 	private _tableApi = React.createRef<EnchancedTableApi>();
 
 	constructor(props: Readonly<LevelsTabProps> | LevelsTabProps) {
@@ -55,7 +61,7 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 				{id: 'isTextEdited', label: 'Δ', width: "5%", renderCell: this.renderIsTextEditedCell, padding: "none"},
 				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
 				{id: 'isAuthorEdited', label: 'Δ', width: "5%", renderCell: this.renderIsAuthorEditedCell, padding: "none"},
-				{id: 'authorId', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor},
+				{id: 'authorName', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor, },
 			],
 		};
 	}
@@ -91,7 +97,16 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		this._tableApi.current?.rerenderRow(id);
 	}
 
-	private handleTextEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: any, field: string, newValue: string) => {
+		console.log(field);
+		if (field === 'text') {
+			this.handleTextEdited(row, newValue);
+		} else if (field === 'authorName') {
+			this.handleAuthorEdited(row, newValue); 
+		}
+	}
+
+	private handleTextEdited = (row: any, newValue: string) => {
 		const {hold} = this.state;
 		const level = hold.levels.get(row.id as number);
 		assert(level, `No level found for id '${row.id}'`);
@@ -111,6 +126,8 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		if (Number.isNaN(playerId)) {
 			throw new Error(`Tried to set level author to non-numeric value '${newValue}'`);
 		}
+		console.log(playerId);
+		console.log(row.authorId);
 		const {hold} = this.state;
 		const level = hold.levels.get(row.id as number);
 		assert(level, `No level found for id '${row.id}'`);
@@ -126,7 +143,7 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		ChangeUtils.levelPlayer(level, hold);
 
 		row.authorId = playerId;
-		row.authorName = player.name
+		row.authorName = PlayerUtils.getName(player);
 		row.isAuthorEdited = level.changes.playerId !== undefined;
 	};
 
@@ -168,23 +185,30 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 	};
 
 	public render() {
+		const {classes} = this.props;
 		const {allRows, columns} = this.state;
 
-		return <Accordion>
-			<AccordionSummary
-				expandIcon={<ExpandMore/>}
-			>Levels</AccordionSummary>
-			<AccordionDetails>
+		return <Container maxWidth="xl">
+			<Paper className={classes.content}>
+				<Typography variant="h5" gutterBottom>
+					Levels
+				</Typography>
+				<Typography variant="body1" gutterBottom>
+					This table containst all the players in the hold. You can edit a level's
+					name and change the author - which is the name displayed with entrance
+					messages for given levels. Authors must use one of the Players that
+					are defined in the hold - new players can be added in Players tab.
+				</Typography>
 				<EnchancedTable
 					columns={columns}
 					rows={allRows}
 					idField="id"
 					rowsPerPage={RowsPerPage}
-					onEditedCell={this.handleTextEdited}
+					onEditedCell={this.handleCellEdited}
 					apiRef={this._tableApi}
 				/>
-			</AccordionDetails>
-		</Accordion>;
+			</Paper>
+		</Container>;
 	}
 
 	private renderIsTextEditedCell = (row: LevelRow) => {
@@ -199,11 +223,11 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 	};
 
 	private renderIsAuthorEditedCell = (row: LevelRow) => {
-		if (row.isTextEdited) {
+		if (row.isAuthorEdited) {
 			return <IsEditedCell
 				rowId={row.id}
 				resetHandler={this.handleResetAuthorRow}
-				originalText={row.originalText}/>;
+				originalText={row.originalAuthorName}/>;
 		}
 
 		return <span/>;
@@ -214,8 +238,9 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		const ID = `level-author-${row.id}`;
 
 		return <AuthorEditor
+			api={this._tableApi.current!}
 			onCancel={onCancel}
-			onSave={value => this.handleAuthorEdited(row, value)}
+			onSave={onSave}
 			defaultValue={row.authorId.toString()}
 			players={players}/>
 	}
@@ -223,6 +248,7 @@ export class LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 
 interface AuthorEditorProps {
+	api: EnchancedTableApi;
 	onCancel: () => void;
 	onSave: (newValue: string) => void;
 	defaultValue: string;
@@ -230,7 +256,7 @@ interface AuthorEditorProps {
 }
 
 const AuthorEditor = (props: AuthorEditorProps) => {
-	const {onCancel, onSave, defaultValue, players} = props;
+	const {api, onCancel, onSave, defaultValue, players} = props;
 
 	const [value, setValue] = useState(defaultValue);
 	const onChange = useCallback((event: React.ChangeEvent<{value: unknown}>) => {
@@ -238,27 +264,38 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 	}, [setValue]);
 
 	const onKeyDown = useCallback((event: React.KeyboardEvent) => {
-		if (event.key === 'Enter') {
-				onSave(value);
+		if (event.key === 'Enter' && event.ctrlKey) {
+			event.preventDefault();
+			event.stopPropagation();
+			onSave(value);
 
 		} else if (event.key === 'Escape') {
 			onCancel();
 		}
 	}, [onCancel, onSave, value]);
 
-	return <FormControl variant="filled">
+	return <FormControl variant="filled" fullWidth={true}>
 		<InputLabel id="level-author-editor">
-		Enter to save, Escape/Click away to cancel
+		Ctrl+Enter to save, Escape/Click away to cancel
 		</InputLabel>
 		<Select
+			autoFocus
+			native
 			labelId="level-author-editor"
 			value={value}
+			onOpen={() => api.suppressClickAwayForFrame()}
 			onChange={onChange}
 			onKeyDown={onKeyDown}
+			inputProps={{
+				name: 'age',
+				id: 'level-author-editor',
+			}}
 			>
-		{players.map(player => <MenuItem value={player.id.toString()}>
+		{players.map(player => <option value={player.id.toString()} key={player.id}>
 			{PlayerUtils.getName(player)}
-		</MenuItem>)}
+		</option>)}
 		</Select>
 	</FormControl>;
 };
+
+export const LevelsTab = withStyles(styles)(_LevelsTab);

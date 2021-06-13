@@ -4,9 +4,6 @@ import React from "react";
 import {Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {Player} from "../../data/Player";
 import {assert} from "../../common/Assert";
-import {HoldUtils} from "../../common/HoldUtils";
-import {SpeechUtils} from "../../common/SpeechUtils";
-import {CommandsUtils} from "../../common/CommandsUtils";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
@@ -150,7 +147,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 					Players
 				</Typography>
 				<Typography variant="body1" gutterBottom>
-					This table all the players in the hold. Players are used for displaying
+					This table contains all the players in the hold. Players are used for displaying
 					author for each level. You can only delete players who are not assigned to any levels.
 					You can create new players as needed, and authors can be reassigned in the
 					&#32;<strong>Level</strong>&#32;tab. 
