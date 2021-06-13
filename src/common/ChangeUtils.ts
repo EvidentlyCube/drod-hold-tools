@@ -59,6 +59,15 @@ export const ChangeUtils = {
 		});
 	},
 
+
+	levelPlayer(level: Level, hold: Hold) { 
+		HoldUtils.addChange(hold, {
+			type: "Level",
+			model: level,
+			changes: {playerId: level.changes.playerId !== undefined},
+		});
+	},
+
 	characterName(character: Character, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Character",

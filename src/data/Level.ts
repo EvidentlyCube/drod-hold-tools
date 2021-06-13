@@ -16,6 +16,7 @@ export interface Level {
 	entrances: Entrance[];
 
 	changes: {
-		name?: string
+		name?: string,
+		playerId?: number
 	}
 }

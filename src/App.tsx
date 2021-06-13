@@ -10,6 +10,7 @@ import EntrancesTab from "./tabs/standalone/EntrancesTab";
 import ScrollsTab from "./tabs/standalone/ScrollsTab";
 import MiscTab from "./tabs/misc/MiscTab";
 import AuthorsTab from './tabs/standalone/AuthorsTab';
+import { LevelsTab } from './tabs/standalone/LevelsTab';
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -73,6 +74,7 @@ function App() {
 					<Tab label="Entrances" disabled={!hasLoadedHold}/>
 					<Tab label="Scrolls" disabled={!hasLoadedHold}/>
 					<Tab label="Players" disabled={!hasLoadedHold}/>
+					<Tab label="Levels" disabled={!hasLoadedHold}/>
 					<Tab label="Misc" disabled={!hasLoadedHold}/>
 				</Tabs>
 			</AppBar>
@@ -92,6 +94,9 @@ function App() {
 				<AuthorsTab/>
 			</TabPanel>
 			<TabPanel className={classes.tab} value={selectedTab} index={5}>
+				<LevelsTab/>
+			</TabPanel>
+			<TabPanel className={classes.tab} value={selectedTab} index={6}>
 				<MiscTab/>
 			</TabPanel>
 			<Divider/>
