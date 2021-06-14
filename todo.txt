@@ -1,0 +1,2 @@
+ - Changing level author should check if the author is not about to be deleted - auto fix if yes
+ - Allow editing level creation dates
