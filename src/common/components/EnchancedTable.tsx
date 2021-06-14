@@ -44,6 +44,7 @@ export interface EnchancedTableApi {
 
 	rerenderRow(id: any): void;
 
+	setDelayedClickAway(enabled: boolean): void;
 	suppressClickAwayForFrame(): void;
 }
 
@@ -73,6 +74,7 @@ interface EnchancedTableState {
 
 class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTableState> implements EnchancedTableApi {
 	private _suppressClickAway = false;
+	private _delayedClickAway = false;
 	private _editedCellRef = React.createRef<HTMLElement>();
 
 	constructor(props: Readonly<EnchancedTableProps> | EnchancedTableProps) {
@@ -135,6 +137,18 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	private onDocumentClick = (event: MouseEvent) => {
 		if (this._suppressClickAway) {
 			return;
+
+		} else if (this._delayedClickAway) {
+			requestAnimationFrame(() => this.handleDocumentClick(event));
+			
+		} else {
+			this.handleDocumentClick(event);
+		}
+	};
+
+	private handleDocumentClick = (event: MouseEvent) => {
+		if (this._suppressClickAway) {
+			return;
 		}
 
 		let node = event.target as HTMLElement | null;
@@ -148,7 +162,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		}
 
 		this.onCancelEdit();
-	};
+	}
 
 	public rerender = () => {
 		const {visibleRows} = this.state;
@@ -171,6 +185,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		this._suppressClickAway = true;
 
 		requestAnimationFrame(() => this._suppressClickAway = false);
+	}
+
+	public setDelayedClickAway(enabled: boolean) {
+		this._delayedClickAway = enabled;
 	}
 
 	private getSortedRows(orderBy: string, orderDir: 'asc' | 'desc') {

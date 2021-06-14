@@ -1,15 +1,16 @@
-import {Store} from "../../data/Store";
-import {Hold} from "../../data/Hold";
-import React, {useCallback, useState} from "react";
-import {Container, createStyles, FormControl, InputLabel, Paper, Select, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {assert} from "../../common/Assert";
-import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
-import {Level} from "../../data/Level";
-import {IsEditedCell} from "../../common/components/IsEditedCell";
-import {PlayerUtils} from "../../common/PlayerUtils";
-import {Player} from "../../data/Player";
+import { Container, createStyles, MenuItem, Paper, Select, Theme, Typography, withStyles, WithStyles } from "@material-ui/core/";
+import React, { useCallback, useEffect } from "react";
+import { assert } from "../../common/Assert";
+import { ChangeUtils } from "../../common/ChangeUtils";
+import { EnchancedTable, EnchancedTableApi } from "../../common/components/EnchancedTable";
+import { EnchancedTableColumn } from "../../common/components/EnchancedTableCommons";
+import { IsEditedCell } from "../../common/components/IsEditedCell";
+import { useDocumentKeydown } from "../../common/Hooks";
+import { PlayerUtils } from "../../common/PlayerUtils";
+import { Hold } from "../../data/Hold";
+import { Level } from "../../data/Level";
+import { Player } from "../../data/Player";
+import { Store } from "../../data/Store";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -276,44 +277,34 @@ interface AuthorEditorProps {
 const AuthorEditor = (props: AuthorEditorProps) => {
 	const {api, onCancel, onSave, defaultValue, players} = props;
 
-	const [value, setValue] = useState(defaultValue);
 	const onChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
-		setValue(event.target.value as string);
-	}, [setValue]);
-
-	const onKeyDown = useCallback((event: React.KeyboardEvent) => {
-		if (event.key === 'Enter' && event.ctrlKey) {
-			event.preventDefault();
-			event.stopPropagation();
-			onSave(value);
-
-		} else if (event.key === 'Escape') {
+		onSave(event.target.value as string);
+	}, [onSave]);
+ 
+	const onKeyDown = useCallback((event: {key: string}) => {
+		if (event.key === 'Escape') {
 			onCancel();
 		}
-	}, [onCancel, onSave, value]);
+	}, [onCancel]);
 
-	return <FormControl variant="filled" fullWidth={true}>
-		<InputLabel id="level-author-editor">
-			Ctrl+Enter to save, Escape/Click away to cancel
-		</InputLabel>
-		<Select
-			autoFocus
-			native
-			labelId="level-author-editor"
-			value={value}
-			onOpen={() => api.suppressClickAwayForFrame()}
-			onChange={onChange}
-			onKeyDown={onKeyDown}
-			inputProps={{
-				name: 'age',
-				id: 'level-author-editor',
-			}}
-		>
-			{players.map(player => <option value={player.id.toString()} key={player.id}>
-				{PlayerUtils.getName(player)}
-			</option>)}
-		</Select>
-	</FormControl>;
+	useEffect(() => {
+		api.setDelayedClickAway(true);
+		return () => api.setDelayedClickAway(false);
+	})
+
+	useDocumentKeydown(onKeyDown, true)
+
+	return <Select
+		autoFocus
+		value={defaultValue}
+		open={true}
+		onChange={onChange}
+		onKeyDown={onKeyDown}
+	>
+		{players.map(player => <MenuItem value={player.id.toString()} key={player.id}>
+			{PlayerUtils.getName(player)}
+		</MenuItem>)}
+	</Select>;
 };
 
 export const LevelsTab = withStyles(styles)(_LevelsTab);
