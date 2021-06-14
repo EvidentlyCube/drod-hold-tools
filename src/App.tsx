@@ -9,7 +9,7 @@ import "./common.d.ts";
 import EntrancesTab from "./tabs/standalone/EntrancesTab";
 import ScrollsTab from "./tabs/standalone/ScrollsTab";
 import MiscTab from "./tabs/misc/MiscTab";
-import AuthorsTab from './tabs/standalone/AuthorsTab';
+import AuthorsTab from './tabs/standalone/PlayersTab';
 import { LevelsTab } from './tabs/standalone/LevelsTab';
 
 const useStyles = makeStyles(theme => ({
