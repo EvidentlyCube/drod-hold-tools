@@ -82,6 +82,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 
 		const sortedRows = this.getSortedRows(props.idField, 'asc');
 
+		if (!props.columns.find(col => col.id === props.idField)) {
+			throw new Error(`ID field is set to '${props.idField}' but this column does not exist.`);
+		}
+
 		this.state = {
 			sortedRows: sortedRows,
 			visibleRows: sortedRows.slice(0, rowsPerPage),
