@@ -11,6 +11,7 @@ import {Character} from "../data/Character";
 import {Entrance} from "../data/Entrance";
 import {Scroll} from "../data/Scroll";
 import {Level} from "../data/Level";
+import { Player } from "../data/Player";
 
 
 export const HoldEncodeChanges = {
@@ -38,6 +39,35 @@ export const HoldEncodeChanges = {
 			hold.xml.setAttribute('EndHoldMessage', StringUtils.stringToHoldString(hold.ending, 1350));
 		}
 	},
+	player(player: Player, hold: Hold) {
+		if (player.isNew) {
+			player.xml.setAttribute('GID_OriginalNameMessage', StringUtils.stringToHoldString(player.name));
+			player.xml.setAttribute('GID_Created', (Date.now() / 1000 | 0).toString());
+			player.xml.setAttribute('LastUpdated', '0');
+			player.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(player.name));
+			player.xml.setAttribute('ForumName', '0');
+			player.xml.setAttribute('ForumPassword', '0');
+			player.xml.setAttribute('IsLocal', '0');
+			player.xml.setAttribute('PlayerID', player.id.toString());
+
+			// Since the hold author is always the first node this will insert all the
+			// new players right after
+			hold.xmlDrod.insertBefore(player.xml, hold.xmlDrod.firstElementChild!.nextElementSibling);
+		}
+
+		if (player.isDeleted) {
+			player.xml.remove();
+			hold.players.delete(player.id);
+			return;
+		}
+
+		if (player.changes.name !== undefined) {
+			player.name = player.changes.name;
+			delete player.changes.name;
+
+			player.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(player.name));
+		}
+	},
 	room(room: Room, hold: Hold) {
 		for (const monster of room.monsters) {
 			HoldEncodeChanges.monster(monster, room, hold);
@@ -46,9 +76,16 @@ export const HoldEncodeChanges = {
 	level(level: Level, hold: Hold) {
 		if (level.changes.name !== undefined) {
 			level.name = level.changes.name;
-			delete (level.changes.name);
+			delete level.changes.name;
 
 			level.xml.setAttribute('NameMessage', StringUtils.stringToHoldString(level.name, 255));
+		}
+
+		if (level.changes.playerId !== undefined) {
+			level.playerId = level.changes.playerId;
+			delete level.changes.playerId;
+		
+			level.xml.setAttribute('PlayerID', level.playerId.toString());
 		}
 	},
 	character(character: Character, hold: Hold) {

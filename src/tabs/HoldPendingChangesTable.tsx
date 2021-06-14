@@ -8,6 +8,8 @@ import {RoomUtils} from "../common/RoomUtils";
 import {createStyles, WithStyles} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/";
 import {LocationUtils} from "../common/LocationUtils";
+import { PlayerUtils } from "../common/PlayerUtils";
+import { assert } from "../common/Assert";
 
 let rowIdCounter = 1;
 
@@ -77,6 +79,8 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 	private static changeToRow(change: Change, hold: Hold): ChangeRow[] {
 		const rows: ChangeRow[] = [];
 
+		console.log(change);
+
 		switch (change.type) {
 			case "Speech": {
 				const row = newRow(change.type);
@@ -87,6 +91,8 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 
 				if (change.changes.delete) {
 					row.operationType = "Delete";
+					row.oldValue = change.model.text;
+				
 				} else {
 					row.operationType = "Change Text";
 					row.oldValue = change.model.text;
@@ -131,14 +137,29 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 			}
 				break;
 			case "Level": {
-				const row = newRow(change.type);
-				rows.push(row);
-
-				row.location = `#${change.model.index}`;
-				if (change.changes.name) {
+				if (change.changes.name !== undefined) {
+					const row = newRow(change.type);
+					rows.push(row);
+	
+					row.location = `#${change.model.index}`;
 					row.operationType = "Change Name";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
+				}
+				
+				if (change.changes.playerId) {
+					const oldPlayer = hold.players.get(change.model.playerId);
+					const newPlayer = hold.players.get(change.model.changes.playerId!);
+					assert(oldPlayer, `Failed to find player for id '${change.model.playerId}'`);
+					assert(newPlayer, `Failed to find player for id '${change.model.changes.playerId}'`);
+
+					const row = newRow(change.type);
+					rows.push(row);
+	
+					row.location = `#${change.model.index}`;
+					row.operationType = "Change Author";
+					row.oldValue = PlayerUtils.getName(oldPlayer);
+					row.newValue = PlayerUtils.getName(newPlayer);
 				}
 			}
 				break;
@@ -178,6 +199,30 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.operationType = "Change Ending";
 					row.oldValue = change.model.ending;
 					row.newValue = change.model.changes.ending;
+				}
+			break;
+			case "Player":
+				if (change.changes.create) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Create";
+					row.oldValue = "";
+					row.newValue = change.model.name ?? change.model.changes.name;
+				} else if (change.changes.delete) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Delete";
+					row.oldValue = change.model.name;
+					row.newValue = '';
+				} else if (change.changes.name) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.operationType = "Rename";
+					row.oldValue = change.model.name;
+					row.newValue = change.model.changes.name;	
 				}
 			break;
 		}

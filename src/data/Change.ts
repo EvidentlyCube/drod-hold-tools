@@ -79,4 +79,11 @@ interface CharacterChange {
 	}
 }
 
-export type Change = HoldChange | SpeechChange | CommandChange | EntranceChange | ScrollChange | LevelChange | CharacterChange | PlayerChange;
+export type Change = HoldChange 
+	| SpeechChange 
+	| CommandChange
+	| EntranceChange
+	| ScrollChange
+	| LevelChange 
+	| CharacterChange 
+	| PlayerChange;

@@ -120,7 +120,13 @@ export const ChangeUtils = {
 		HoldUtils.addChange(hold, {
 			type: "Player",
 			model: player,
-			changes: {create: player.isNew},
+			changes: {
+				create: player.isNew,
+				// Setting these to false so that the whole change record is 
+				// removed when a newly created player is deleted
+				delete: false,
+				name: false
+			},
 		});
 	},
 

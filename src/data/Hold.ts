@@ -15,6 +15,7 @@ export interface Hold {
 	isLoaded: boolean;
 	modelType: ModelType.Hold;
 	xmlDocument: XMLDocument;
+	xmlDrod: Element;
 	xml: Element;
 
 	name: string;
@@ -55,6 +56,7 @@ export function createNullHold(): Hold {
 		isLoaded: false,
 		modelType: ModelType.Hold,
 		xmlDocument: document.implementation.createDocument(null, null),
+		xmlDrod: document.createElement('drod'),
 		xml: document.createElement('Holds'),
 
 		name: '',

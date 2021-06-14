@@ -9,7 +9,16 @@ export const getDecodeToHold = (): DecodeStep => {
 		name: 'Read XML',
 		run(decoder: DecodeState): boolean {
 			if (!children) {
-				children = decoder.holdXml.children[0].children;
+				const drodElement = decoder.holdXml.firstElementChild;
+				if (!drodElement) {
+					throw new Error("No hold data found");
+				} else if (drodElement.tagName !== 'drod') {
+					throw new Error(`Root node must be <drod> but got <${drodElement.tagName}> instead.`)
+				}
+				
+				decoder.hold.xmlDrod = drodElement;
+				decoder.hold.xmlDocument = decoder.holdXml;
+				children = drodElement.children;
 			}
 
 			if (pointer < children.length) {
@@ -20,7 +29,6 @@ export const getDecodeToHold = (): DecodeStep => {
 			return pointer === children.length;
 		},
 		after(decoder) {
-			decoder.hold.xmlDocument = decoder.holdXml;
 			decoder.hold.isLoaded = true;
 		},
 	};
