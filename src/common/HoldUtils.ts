@@ -24,4 +24,12 @@ export const HoldUtils = {
 			hold.dataChanges.add(change);
 		}
 	},
+	getNextPlayerId(hold: Hold){
+		let maxId = 0;
+		for (const player of hold.players.values()) {
+			maxId = Math.max(maxId, player.id);
+		}
+
+		return maxId+1;
+	}
 };

@@ -1,18 +1,23 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {Player} from "../../data/Player";
+import {Box, Button, Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {createNullPlayer, Player} from "../../data/Player";
 import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import { HoldUtils } from "../../common/HoldUtils";
+import { ModelType } from "../../common/Enums";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
 		padding: theme.spacing(4, 6),
 	},
+	table: {
+		marginBottom: theme.spacing(1)
+	}
 });
 
 const RowsPerPage = 25;
@@ -46,9 +51,10 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 	constructor(props: Readonly<PlayersTabProps> | PlayersTabProps) {
 		super(props);
 
-		const allRows = this.getRows();
+		const hold = Store.loadedHold.value;
+		const allRows = this.getRows(hold);
 		this.state = {
-			hold: Store.loadedHold.value,
+			hold,
 			allRows: allRows,
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none", renderCell: this.renderIdCell},
@@ -104,7 +110,27 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 		this.getRowById(row.id).isEdited = player.changes.name !== undefined;
 	};
 
-	private static playerToRow(player: Player, hold: Hold): PlayerRow {
+	private handleAddPlayer = () => {
+		const {hold, allRows} = this.state;
+		const newId = HoldUtils.getNextPlayerId(hold);
+		const player: Player = {
+			modelType: ModelType.Player,
+			xml: hold.xmlDocument.createElement('Players'),
+			id: newId,
+			name: `Player #${newId}`,
+			isNew: true,
+			isDeleted: false,
+			changes: {}
+		};
+
+		hold.players.set(newId, player);
+		ChangeUtils.playerCreated(player, hold);
+
+		const row = this.playerToRow(player, hold);
+		this.setState({allRows: allRows.concat([row])})
+	}
+
+	private playerToRow(player: Player, hold: Hold): PlayerRow {
 		const levelCount = Array.from(hold.levels.values())
 			.filter(level => level.playerId === player.id)
 			.length;																														
@@ -121,10 +147,9 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 		};
 	}
 
-	private getRows = () => {
-		const hold = Store.loadedHold.value;
-		return Array.from(Store.loadedHold.value.players.values())
-			.map(player => PlayersTab.playerToRow(player, hold));
+	private getRows = (hold: Hold) => {
+		return Array.from(hold.players.values())
+			.map(player => this.playerToRow(player, hold));
 	};
 
 	private getRowById = (id: number) => {
@@ -153,6 +178,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 					&#32;<strong>Level</strong>&#32;tab. 
 				</Typography>
 				<EnchancedTable
+					className={classes.table}
 					columns={columns}
 					rows={allRows}
 					idField="id"
@@ -160,6 +186,11 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 					onEditedCell={this.handleCellEdited}
 					apiRef={this._tableApi}
 				/>
+				<Box display="flex" justifyContent="flex-end">
+					<Button variant="contained" color="primary" onClick={this.handleAddPlayer}>
+						Add new player
+					</Button>
+				</Box>
 			</Paper>
 		</Container>;
 	}
