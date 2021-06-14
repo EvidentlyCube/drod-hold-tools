@@ -12,6 +12,8 @@ import MiscTab from "./tabs/misc/MiscTab";
 import AuthorsTab from './tabs/standalone/PlayersTab';
 import { LevelsTab } from './tabs/standalone/LevelsTab';
 import { SystemMessages } from './common/components/SystemMessages';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -67,48 +69,50 @@ function App() {
 
 	return (
 		<div>
-			<CssBaseline/>
-			<AppBar position="static">
-				<Tabs value={selectedTab} onChange={handleChange}>
-					<Tab label="Hold"/>
-					<Tab label="Commands Text" disabled={!hasLoadedHold}/>
-					<Tab label="Entrances" disabled={!hasLoadedHold}/>
-					<Tab label="Scrolls" disabled={!hasLoadedHold}/>
-					<Tab label="Players" disabled={!hasLoadedHold}/>
-					<Tab label="Levels" disabled={!hasLoadedHold}/>
-					<Tab label="Misc" disabled={!hasLoadedHold}/>
-				</Tabs>
-			</AppBar>
-			<TabPanel className={classes.tab} value={selectedTab} index={0}>
-				<HoldTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={1}>
-				<SpeechTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={2}>
-				<EntrancesTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={3}>
-				<ScrollsTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={4}>
-				<AuthorsTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={5}>
-				<LevelsTab/>
-			</TabPanel>
-			<TabPanel className={classes.tab} value={selectedTab} index={6}>
-				<MiscTab/>
-			</TabPanel>
-			<Divider/>
-			<Container>
-				<Toolbar className={classes.footer}>
-					<ButtonGroup variant="text">
-						<Button className={classes.footerButton} href="https://www.evidentlycube.com">by Maurycy Zarzycki</Button>
-						<Button className={classes.footerButton} href="https://github.com/EvidentlyCube/drod-hold-tools">GitHub</Button>
-					</ButtonGroup>
-				</Toolbar>
-			</Container>
+			<MuiPickersUtilsProvider utils={DateFnsUtils}>
+				<CssBaseline/>
+				<AppBar position="static">
+					<Tabs value={selectedTab} onChange={handleChange}>
+						<Tab label="Hold"/>
+						<Tab label="Commands Text" disabled={!hasLoadedHold}/>
+						<Tab label="Entrances" disabled={!hasLoadedHold}/>
+						<Tab label="Scrolls" disabled={!hasLoadedHold}/>
+						<Tab label="Players" disabled={!hasLoadedHold}/>
+						<Tab label="Levels" disabled={!hasLoadedHold}/>
+						<Tab label="Misc" disabled={!hasLoadedHold}/>
+					</Tabs>
+				</AppBar>
+				<TabPanel className={classes.tab} value={selectedTab} index={0}>
+					<HoldTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={1}>
+					<SpeechTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={2}>
+					<EntrancesTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={3}>
+					<ScrollsTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={4}>
+					<AuthorsTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={5}>
+					<LevelsTab/>
+				</TabPanel>
+				<TabPanel className={classes.tab} value={selectedTab} index={6}>
+					<MiscTab/>
+				</TabPanel>
+				<Divider/>
+				<Container>
+					<Toolbar className={classes.footer}>
+						<ButtonGroup variant="text">
+							<Button className={classes.footerButton} href="https://www.evidentlycube.com">by Maurycy Zarzycki</Button>
+							<Button className={classes.footerButton} href="https://github.com/EvidentlyCube/drod-hold-tools">GitHub</Button>
+						</ButtonGroup>
+					</Toolbar>
+				</Container>
+			</MuiPickersUtilsProvider>
 			<SystemMessages />
 		</div>
 	);

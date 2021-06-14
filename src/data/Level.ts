@@ -9,6 +9,7 @@ export interface Level {
 	playerId: number;
 	index: number;
 	name: string;
+	dateCreated: Date;
 
 	entranceX: number;
 	entranceY: number;
@@ -17,6 +18,7 @@ export interface Level {
 
 	changes: {
 		name?: string,
-		playerId?: number
+		playerId?: number,
+		dateCreated?: Date
 	}
 }

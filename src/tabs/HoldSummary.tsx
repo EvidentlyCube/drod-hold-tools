@@ -60,12 +60,12 @@ class HoldSummary extends React.Component<HoldSummaryProps, HoldSummaryState> {
 					<Grid container justify="space-between">
 						<Grid item>
 							<Typography variant="body2" color="textSecondary">
-								<strong>Created:</strong> {DateUtils.format(hold.dateCreated)}
+								<strong>Created:</strong> {DateUtils.formatDateTime(hold.dateCreated)}
 							</Typography>
 						</Grid>
 						<Grid item>
 							<Typography variant="body2" color="textSecondary">
-								<strong>Updated:</strong> {DateUtils.format(hold.dateUpdated)}
+								<strong>Updated:</strong> {DateUtils.formatDateTime(hold.dateUpdated)}
 							</Typography>
 						</Grid>
 					</Grid>
