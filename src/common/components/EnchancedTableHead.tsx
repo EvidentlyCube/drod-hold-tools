@@ -1,6 +1,7 @@
 import {TableCell, TableHead, TableRow, TableSortLabel} from "@material-ui/core";
 import React from "react";
 import {EnchancedTableColumn} from "./EnchancedTableCommons";
+import {LightTooltip} from "./LightTooltip";
 
 
 interface EnchancedTableHeadProps {
@@ -29,19 +30,25 @@ export class EnchancedTableHead extends React.Component<EnchancedTableHeadProps>
 		const isSortingColumn = orderBy === column.id;
 		const sortHandler = column.sortable !== false ? () => onSort(column.id) : undefined;
 
+		let middle = <TableSortLabel
+			active={isSortingColumn}
+			direction={isSortingColumn ? orderDir : "asc"}
+			onClick={sortHandler}
+		>
+			{column.label}
+		</TableSortLabel>;
+
+		if (column.headerTitle) {
+			middle = <LightTooltip title={column.headerTitle}>{middle}</LightTooltip>
+		}
+
 		return (
 			<TableCell
 				key={column.id}
 				align={align}
 				sortDirection={isSortingColumn ? orderDir : false}
 			>
-				<TableSortLabel
-					active={isSortingColumn}
-					direction={isSortingColumn ? orderDir : "asc"}
-					onClick={sortHandler}
-				>
-					{column.label}
-				</TableSortLabel>
+				{middle}
 			</TableCell>
 		);
 	}

@@ -1,15 +1,18 @@
 import React from "react";
 import {Padding} from "@material-ui/core";
 
+export type EnchancedTableColumnType = 'text' | 'numeric';
+
 export interface EnchancedTableColumn {
 	id: string;
 	label: string;
 
 	padding?: Padding;
-	type?: 'text' | 'numeric';
+	type?: EnchancedTableColumnType;
 	sortable?: boolean;
 	editable?: boolean;
 	width?: string;
+	headerTitle?: string;
 
 	renderCell?: (row: any) => React.ReactNode;
 	renderEditor?: (row: any, onCancel: () => void, onSave: (value: string) => void) => React.ReactNode;

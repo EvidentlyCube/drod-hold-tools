@@ -154,9 +154,11 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	}
 
 	private getSortedRows(orderBy: string, orderDir: 'asc' | 'desc') {
-		const {rows, idField} = this.props;
+		const {rows, columns, idField} = this.props;
 
-		return SortUtils.stableSort<any>(rows, idField, SortUtils.getComparator<any>(orderDir, orderBy));
+		const column = columns.find(col => col.id === orderBy)!;
+
+		return SortUtils.stableSort<any>(rows, idField, SortUtils.getComparator<any>(orderDir, orderBy, column.type));
 	}
 
 	private onSort = (newOrderBy: string) => {
