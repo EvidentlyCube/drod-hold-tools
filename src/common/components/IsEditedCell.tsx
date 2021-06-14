@@ -49,7 +49,7 @@ export const IsEditedCell = (props: IsEditedCellProps) => {
 
 	}, [rowId, resetHandler]);
 
-	return <LightTooltip leaveDelay={999999} title={<TooltipContents originalText={originalText}/>}>
+	return <LightTooltip title={<TooltipContents originalText={originalText}/>}>
 		<IconButton onClick={onReset}>
 			<History color="primary"/>
 		</IconButton>
