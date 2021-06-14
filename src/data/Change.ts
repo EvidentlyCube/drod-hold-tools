@@ -67,7 +67,8 @@ interface LevelChange {
 	model: Level;
 	changes: {
 		name?: boolean,
-		playerId?: boolean
+		playerId?: boolean,
+		dateCreated?: boolean
 	}
 }
 

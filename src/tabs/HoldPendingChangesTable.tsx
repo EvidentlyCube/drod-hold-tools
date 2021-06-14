@@ -9,6 +9,7 @@ import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {LocationUtils} from "../common/LocationUtils";
 import {PlayerUtils} from "../common/PlayerUtils";
 import {assert} from "../common/Assert";
+import {DateUtils} from "../common/DateUtils";
 
 let rowIdCounter = 1;
 
@@ -135,7 +136,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 				}
 			}
 				break;
-			case "Level": {
+			case "Level":
 				if (change.changes.name !== undefined) {
 					const row = newRow(change.type);
 					rows.push(row);
@@ -160,7 +161,15 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.oldValue = PlayerUtils.getName(oldPlayer);
 					row.newValue = PlayerUtils.getName(newPlayer);
 				}
-			}
+				if (change.changes.dateCreated) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.location = `#${change.model.index}`;
+					row.operationType = "Creation Date";
+					row.oldValue = DateUtils.formatDate(change.model.dateCreated);
+					row.newValue = DateUtils.formatDate(change.model.changes.dateCreated ?? change.model.dateCreated);
+				}
 				break;
 			case "Character": {
 				const row = newRow(change.type);

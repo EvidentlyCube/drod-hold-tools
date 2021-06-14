@@ -1,6 +1,6 @@
-import {Container, MenuItem, Paper, Select, TextField, Theme, Typography} from "@material-ui/core/";
+import {Container, Dialog, DialogTitle, MenuItem, Paper, Select, TextField, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {assert} from "../../common/Assert";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
@@ -13,7 +13,8 @@ import {Hold} from "../../data/Hold";
 import {Level} from "../../data/Level";
 import {Player} from "../../data/Player";
 import {Store} from "../../data/Store";
-import {DatePicker} from "@material-ui/lab";
+import {CalendarPicker} from "@material-ui/lab";
+import {parseISO} from "date-fns";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -100,7 +101,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		const {hold} = this.state;
 		const level = hold.levels.get(id);
 		assert(level, `Failed to find level with ID '${id}'`);
-		delete (level.changes.playerId);
+		delete level.changes.playerId;
 
 		ChangeUtils.levelPlayer(level, hold);
 		this.handleAuthorChanged(level);
@@ -113,15 +114,32 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		this._tableApi.current?.rerenderRow(dataRow.index);
 	};
 
+	private handleResetDateCreatedRow = (id: number) => {
+		const {hold} = this.state;
+		const level = hold.levels.get(id);
+		assert(level, `Failed to find level with ID '${id}'`);
+		delete level.changes.dateCreated;
+
+		ChangeUtils.levelDateCreated(level, hold);
+
+		const dataRow = this.getRowById(id);
+		dataRow.dateCreated = dataRow.originalDateCreated;
+		dataRow.isDateCreatedEdited = false;
+
+		this._tableApi.current?.rerenderRow(dataRow.index);
+	};
+
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		if (field === 'text') {
 			this.handleTextEdited(row, newValue);
 		} else if (field === 'authorName') {
 			this.handleAuthorEdited(row, newValue);
+		}else if (field === 'dateCreated') {
+			this.handleDateCreatedEdited(row, newValue);
 		}
 	};
 
-	private handleTextEdited = (row: any, newValue: string) => {
+	private handleTextEdited = (row: LevelRow, newValue: string) => {
 		const {hold} = this.state;
 		const level = hold.levels.get(row.id as number);
 		assert(level, `No level found for id '${row.id}'`);
@@ -136,7 +154,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		this.getRowById(row.id).isTextEdited = level.changes.name !== undefined;
 	};
 
-	private handleAuthorEdited = (row: any, newValue: string) => {
+	private handleAuthorEdited = (row: LevelRow, newValue: string) => {
 		const playerId = parseInt(newValue);
 		if (Number.isNaN(playerId)) {
 			throw new Error(`Tried to set level author to non-numeric value '${newValue}'`);
@@ -160,6 +178,22 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		row.authorId = playerId;
 		row.authorName = PlayerUtils.getName(player);
 		row.isAuthorEdited = level.changes.playerId !== undefined;
+	};
+
+	private handleDateCreatedEdited = (row: LevelRow, newValue: string) => {
+		const {hold} = this.state;
+		const level = hold.levels.get(row.id as number);
+		assert(level, `No level found for id '${row.id}'`);
+
+		level.changes.dateCreated = parseISO(newValue);
+		if (DateUtils.formatDate(level.dateCreated) === DateUtils.formatDate(level.changes.dateCreated)) {
+			delete level.changes.dateCreated;
+		}
+
+		ChangeUtils.levelDateCreated(level, hold);
+
+		row.dateCreated = newValue;
+		row.isDateCreatedEdited = level.changes.dateCreated !== undefined;
 	};
 
 	private handleAuthorChanged = (level: Level) => {
@@ -278,7 +312,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		if (row.isDateCreatedEdited) {
 			return <IsEditedCell
 				rowId={row.id}
-				resetHandler={this.handleResetAuthorRow}
+				resetHandler={this.handleResetDateCreatedRow}
 				originalText={row.originalDateCreated}/>;
 		}
 
@@ -315,6 +349,18 @@ interface DateEditorProps {
 const DateEditor = (props: DateEditorProps) => {
 	const {api, onCancel, onSave, defaultValue} = props;
 
+	const [view, setView] = useState<'year' | 'day' | 'month'>('day');
+
+	const onChangeView = useCallback((view: 'year' | 'day' | 'month') => {
+		setView(view);
+	}, [setView]);
+	const onChange = useCallback((value: Date | null) => {
+		if (view === 'year') {
+			setView('day');
+		} else if (value) {
+			onSave(DateUtils.formatDate(value));
+		}
+	}, [view, setView, onSave]);
 	const onKeyDown = useCallback((event: { key: string }) => {
 		if (event.key === 'Escape') {
 			onCancel();
@@ -323,21 +369,19 @@ const DateEditor = (props: DateEditorProps) => {
 
 	useDocumentKeydown(onKeyDown, true);
 
-	useEffect(() => {
-		api.setDelayedClickAway(true);
-		return () => api.setDelayedClickAway(false);
-	});
+	api.disableClickAwayClose();
 
-	console.log(defaultValue);
-	return <DatePicker
-		label="Basic example"
-
-		value={defaultValue}
-		onChange={(newValue) => {
-			console.log(newValue);
-		}}
-		renderInput={(params) => <TextField {...params} />}
-	/>;
+	return <>
+		<TextField value={defaultValue} variant="standard"/>
+		<Dialog open={true} onBackdropClick={onCancel}>
+			<DialogTitle>Select Date</DialogTitle>
+			<CalendarPicker
+				view={view}
+				onViewChange={onChangeView}
+				onChange={onChange}
+				date={parseISO(defaultValue)}/>
+		</Dialog>
+	</>;
 
 	// return <DatePicker
 	// 	open={true}

@@ -59,12 +59,19 @@ export const ChangeUtils = {
 		});
 	},
 
-
-	levelPlayer(level: Level, hold: Hold) { 
+	levelPlayer(level: Level, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Level",
 			model: level,
 			changes: {playerId: level.changes.playerId !== undefined},
+		});
+	},
+
+	levelDateCreated(level: Level, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Level",
+			model: level,
+			changes: {dateCreated: level.changes.dateCreated !== undefined},
 		});
 	},
 

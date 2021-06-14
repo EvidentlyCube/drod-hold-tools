@@ -35,8 +35,8 @@ export interface EnchancedTableApi {
 	rerenderRow(id: any): void;
 
 	setDelayedClickAway(enabled: boolean): void;
-
 	suppressClickAwayForFrame(): void;
+	disableClickAwayClose(): void;
 }
 
 interface EnchancedTableProps extends WithStyles<typeof styles> {
@@ -175,6 +175,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		this._suppressClickAway = true;
 
 		requestAnimationFrame(() => this._suppressClickAway = false);
+	}
+
+	public disableClickAwayClose() {
+		document.removeEventListener('click', this.onDocumentClick, {capture: true});
 	}
 
 	public setDelayedClickAway(enabled: boolean) {

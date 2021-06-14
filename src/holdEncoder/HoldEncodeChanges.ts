@@ -87,6 +87,13 @@ export const HoldEncodeChanges = {
 		
 			level.xml.setAttribute('PlayerID', level.playerId.toString());
 		}
+
+		if (level.changes.dateCreated !== undefined) {
+			level.dateCreated = level.changes.dateCreated;
+			delete level.changes.dateCreated;
+
+			level.xml.setAttribute('Created', (level.dateCreated.getTime() / 1000).toFixed(0));
+		}
 	},
 	character(character: Character, hold: Hold) {
 		let commandsDirty = false;
