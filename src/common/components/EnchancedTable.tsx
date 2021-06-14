@@ -110,6 +110,17 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		if (this.props.apiRef) {
 			(this.props.apiRef as any).current = this;
 		}
+
+		if (prevProps.rows !== this.props.rows) {
+			const {orderBy, orderDir, page} = this.state;
+			const rowsPerPage = this.props.rowsPerPage ?? DefaultRowsPerPage;
+			const sortedRows = this.getSortedRows(orderBy, orderDir);
+			
+			this.setState({
+				sortedRows, 
+				visibleRows: sortedRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+			});
+		}
 	}
 
 	private onDocumentClick = (event: MouseEvent) => {
