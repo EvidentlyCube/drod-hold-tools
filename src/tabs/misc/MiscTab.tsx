@@ -2,7 +2,6 @@ import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
 import {Container, createStyles, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {MiscLevels} from "./MiscLevels";
 import {MiscCharacters} from "./MiscCharacters";
 import {MiscHoldName} from "./MiscHoldName";
 import {MiscHoldDescription} from "./MiscHoldDescription";
@@ -40,7 +39,6 @@ class MiscTab extends React.Component<MiscTabProps, MiscTabState> {
 				<Typography variant="h5" gutterBottom>
 					Various data
 				</Typography>
-				<MiscLevels/>
 				<MiscCharacters/>
 				<MiscHoldName />
 				<MiscHoldDescription />
