@@ -11,6 +11,7 @@ import ScrollsTab from "./tabs/standalone/ScrollsTab";
 import MiscTab from "./tabs/misc/MiscTab";
 import AuthorsTab from './tabs/standalone/PlayersTab';
 import { LevelsTab } from './tabs/standalone/LevelsTab';
+import { SystemMessages } from './common/components/SystemMessages';
 
 const useStyles = makeStyles(theme => ({
 	tab: {
@@ -61,6 +62,10 @@ function App() {
 	}, [onHoldLoaded, setHasLoadedHold]);
 
 	const handleChange = (event: React.ChangeEvent<{}>, newValue: any) => {
+		Store.addSystemMessage({message: newValue.toString(), color: "success"});
+		Store.addSystemMessage({message: newValue.toString(), color: "error"});
+		Store.addSystemMessage({message: newValue.toString(), color: "info"});
+		Store.addSystemMessage({message: newValue.toString(), color: "warning"});
 		setSelectedTab(newValue);
 	};
 
@@ -108,6 +113,7 @@ function App() {
 					</ButtonGroup>
 				</Toolbar>
 			</Container>
+			<SystemMessages />
 		</div>
 	);
 }
