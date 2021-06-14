@@ -1,16 +1,15 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
-import React, { useCallback, useState } from "react";
-import {Accordion, AccordionDetails, AccordionSummary, ClickAwayListener, Container, createStyles, FormControl, InputLabel, MenuItem, Paper, Select, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import React, {useCallback, useState} from "react";
+import {Container, createStyles, FormControl, InputLabel, Paper, Select, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
 import {assert} from "../../common/Assert";
-import {ExpandMore} from "@material-ui/icons";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {Level} from "../../data/Level";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
-import { PlayerUtils } from "../../common/PlayerUtils";
-import { Player } from "../../data/Player";
+import {PlayerUtils} from "../../common/PlayerUtils";
+import {Player} from "../../data/Player";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -57,11 +56,11 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			allRows: allRows,
 			players: Array.from(hold.players.values()),
 			columns: [
-				{id: 'index', label: 'Index', width: "5%", padding: "none"},
-				{id: 'isTextEdited', label: 'Δ', width: "5%", renderCell: this.renderIsTextEditedCell, padding: "none"},
+				{id: 'index', label: 'Index', type: 'numeric', width: "5%", padding: "none"},
+				{id: 'isTextEdited', label: 'Δ', width: "5%", renderCell: this.renderIsTextEditedCell, padding: "none", headerTitle: "Is text changed?"},
 				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
-				{id: 'isAuthorEdited', label: 'Δ', width: "5%", renderCell: this.renderIsAuthorEditedCell, padding: "none"},
-				{id: 'authorName', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor, },
+				{id: 'isAuthorEdited', label: 'Δ', width: "5%", renderCell: this.renderIsAuthorEditedCell, padding: "none", headerTitle: "Is author changed?"},
+				{id: 'authorName', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor, width: '30%'},
 			],
 		};
 	}
@@ -79,32 +78,31 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		dataRow.isTextEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
-	}
+	};
 
 	private handleResetAuthorRow = (id: number) => {
 		const {hold} = this.state;
 		const level = hold.levels.get(id);
 		assert(level, `Failed to find level with ID '${id}'`);
-		delete (level.changes.name);
+		delete (level.changes.playerId);
 
 		ChangeUtils.levelPlayer(level, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.authorId = dataRow.originalAuthorId;
 		dataRow.authorName = dataRow.originalAuthorName;
-		dataRow.isTextEdited = false;
+		dataRow.isAuthorEdited = false;
 
-		this._tableApi.current?.rerenderRow(id);
-	}
+		this._tableApi.current?.rerenderRow(dataRow.index);
+	};
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
-		console.log(field);
 		if (field === 'text') {
 			this.handleTextEdited(row, newValue);
 		} else if (field === 'authorName') {
-			this.handleAuthorEdited(row, newValue); 
+			this.handleAuthorEdited(row, newValue);
 		}
-	}
+	};
 
 	private handleTextEdited = (row: any, newValue: string) => {
 		const {hold} = this.state;
@@ -126,8 +124,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		if (Number.isNaN(playerId)) {
 			throw new Error(`Tried to set level author to non-numeric value '${newValue}'`);
 		}
-		console.log(playerId);
-		console.log(row.authorId);
+
 		const {hold} = this.state;
 		const level = hold.levels.get(row.id as number);
 		assert(level, `No level found for id '${row.id}'`);
@@ -161,11 +158,11 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			text: level.changes.name ?? level.name,
 			originalText: level.name,
 			isTextEdited: level.changes.name !== undefined,
-			authorId: playerId, 
+			authorId: playerId,
 			originalAuthorId: originalPlayerId,
 			authorName: PlayerUtils.getName(player),
 			originalAuthorName: PlayerUtils.getName(originalPlayer),
-			isAuthorEdited: playerId !== originalPlayerId
+			isAuthorEdited: playerId !== originalPlayerId,
 		};
 	}
 
@@ -202,7 +199,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 				<EnchancedTable
 					columns={columns}
 					rows={allRows}
-					idField="id"
+					idField="index"
 					rowsPerPage={RowsPerPage}
 					onEditedCell={this.handleCellEdited}
 					apiRef={this._tableApi}
@@ -235,15 +232,14 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 	private renderAuthorEditor = (row: LevelRow, onCancel: () => void, onSave: (value: string) => void) => {
 		const {players} = this.state;
-		const ID = `level-author-${row.id}`;
 
 		return <AuthorEditor
 			api={this._tableApi.current!}
 			onCancel={onCancel}
 			onSave={onSave}
 			defaultValue={row.authorId.toString()}
-			players={players}/>
-	}
+			players={players}/>;
+	};
 }
 
 
@@ -259,7 +255,7 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 	const {api, onCancel, onSave, defaultValue, players} = props;
 
 	const [value, setValue] = useState(defaultValue);
-	const onChange = useCallback((event: React.ChangeEvent<{value: unknown}>) => {
+	const onChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
 		setValue(event.target.value as string);
 	}, [setValue]);
 
@@ -276,7 +272,7 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 
 	return <FormControl variant="filled" fullWidth={true}>
 		<InputLabel id="level-author-editor">
-		Ctrl+Enter to save, Escape/Click away to cancel
+			Ctrl+Enter to save, Escape/Click away to cancel
 		</InputLabel>
 		<Select
 			autoFocus
@@ -290,10 +286,10 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 				name: 'age',
 				id: 'level-author-editor',
 			}}
-			>
-		{players.map(player => <option value={player.id.toString()} key={player.id}>
-			{PlayerUtils.getName(player)}
-		</option>)}
+		>
+			{players.map(player => <option value={player.id.toString()} key={player.id}>
+				{PlayerUtils.getName(player)}
+			</option>)}
 		</Select>
 	</FormControl>;
 };
