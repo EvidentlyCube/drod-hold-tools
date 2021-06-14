@@ -2,7 +2,7 @@ import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
 import {Box, Button, Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
-import {createNullPlayer, Player} from "../../data/Player";
+import {Player} from "../../data/Player";
 import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
@@ -84,13 +84,29 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 	private handleDeleteRowClicked = (id: number) => {
 		const {hold} = this.state;
 
+		const row = this.getRowById(id);
 		const player = hold.players.get(id);
 		assert(player, `Marking for deletion player which does not exist #${id}`);
+
+		if (player.isNew) {
+			// remove from changes
+			player.isNew = false;
+			ChangeUtils.playerCreated(player, hold);
+
+			// Remove from Hold
+			hold.players.delete(id);
+
+			// Remove from table
+			const allRows = this.state.allRows.concat();
+			allRows.splice(allRows.indexOf(row), 1);
+			this.setState({allRows});
+			return;
+		}
 
 		player.isDeleted = !player.isDeleted;
 
 		ChangeUtils.playerDeleted(player, hold);
-		this.getRowById(id).isDeleted = player.isDeleted;
+		row.isDeleted = player.isDeleted;
 
 		this._tableApi.current?.rerenderRow(id);
 	};
@@ -132,7 +148,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 
 	private playerToRow(player: Player, hold: Hold): PlayerRow {
 		const levelCount = Array.from(hold.levels.values())
-			.filter(level => level.playerId === player.id)
+			.filter(level => player.id === (level.changes.playerId ?? level.playerId))
 			.length;																														
 		
 		return {
@@ -211,6 +227,16 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 			this.handleDeleteRowClicked(row.id);
 		};
 
+		if (row.isNew) {
+			return <Button 
+				variant="contained" 
+				color="secondary"
+				onClick={onClick}
+				disabled={!row.isDeletable} 
+			>
+				Delete
+			</Button>
+		}
 		return row.isDeletable
 			? <Switch checked={row.isDeleted} onChange={onClick}/>
 			: <span/>;
