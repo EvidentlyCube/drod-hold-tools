@@ -87,6 +87,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		delete (level.changes.playerId);
 
 		ChangeUtils.levelPlayer(level, hold);
+		this.handleAuthorChanged(level);
 
 		const dataRow = this.getRowById(id);
 		dataRow.authorId = dataRow.originalAuthorId;
@@ -138,11 +139,32 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		}
 
 		ChangeUtils.levelPlayer(level, hold);
+		this.handleAuthorChanged(level);
 
 		row.authorId = playerId;
 		row.authorName = PlayerUtils.getName(player);
 		row.isAuthorEdited = level.changes.playerId !== undefined;
 	};
+
+	private handleAuthorChanged = (level: Level) => {
+		const {hold} = this.state;
+		const levelName = level.changes.name ?? level.name;
+		const playerId = level.changes.playerId ?? level.playerId;
+		const player = hold.players.get(playerId);
+		assert(player, `Failed to find player with ID '${playerId}'`);
+
+		if (player.isDeleted) {
+			player.isDeleted = false;
+			ChangeUtils.playerDeleted(player, hold);
+			Store.addSystemMessage({
+				message: <p>
+					Player&nbsp;<strong>{PlayerUtils.getName(player)}</strong>&nbsp;is no longer marked
+					for deletion, as it's now the author of level&nbsp;<strong>{levelName}</strong>. 
+				</p>,
+				color: "info"
+			})
+		}
+	}
 
 	private levelToRow(level: Level, hold: Hold): LevelRow {
 		const playerId = level.changes.playerId ?? level.playerId;

@@ -62,10 +62,6 @@ function App() {
 	}, [onHoldLoaded, setHasLoadedHold]);
 
 	const handleChange = (event: React.ChangeEvent<{}>, newValue: any) => {
-		Store.addSystemMessage({message: newValue.toString(), color: "success"});
-		Store.addSystemMessage({message: newValue.toString(), color: "error"});
-		Store.addSystemMessage({message: newValue.toString(), color: "info"});
-		Store.addSystemMessage({message: newValue.toString(), color: "warning"});
 		setSelectedTab(newValue);
 	};
 
