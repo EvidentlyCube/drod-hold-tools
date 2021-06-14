@@ -64,6 +64,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 		this.state = {
 			allRows: allRows,
 			columns: [
+				{id: 'id', label: 'ID', width: '5%', type: 'numeric'},
 				{id: 'dataType', label: 'Data', width: "10%"},
 				{id: 'operationType', label: 'Operation', width: "15%"},
 				{id: 'location', label: 'Location', width: "20%"},
