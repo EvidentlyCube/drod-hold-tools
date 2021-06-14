@@ -1,7 +1,8 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Container, Paper, Switch, Theme, Typography} from "@material-ui/core/";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {Speech} from "../../data/Speech";
 import {assert} from "../../common/Assert";
 import {HoldUtils} from "../../common/HoldUtils";
@@ -78,7 +79,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		dataRow.isEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
-	}
+	};
 
 	private handleDeleteRowClicked = (speechId: number) => {
 		const {hold} = this.state;

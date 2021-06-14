@@ -1,21 +1,11 @@
 import React, {useCallback, useState} from "react";
 import {EnchancedTableColumn} from "./EnchancedTableCommons";
 import {SortUtils} from "../SortUtils";
-import {
-	createStyles,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableFooter,
-	TablePagination,
-	TableRow,
-	TextField,
-	WithStyles,
-	withStyles,
-} from "@material-ui/core";
+import {Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TextField} from "@material-ui/core";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {EnchancedTableHead} from "./EnchancedTableHead";
 import {Create} from "@material-ui/icons";
+import {assert} from "../Assert";
 
 const DefaultRowsPerPage = 25;
 
@@ -45,6 +35,7 @@ export interface EnchancedTableApi {
 	rerenderRow(id: any): void;
 
 	setDelayedClickAway(enabled: boolean): void;
+
 	suppressClickAwayForFrame(): void;
 }
 
@@ -80,13 +71,12 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	constructor(props: Readonly<EnchancedTableProps> | EnchancedTableProps) {
 		super(props);
 
-		const rowsPerPage = this.props.rowsPerPage ?? DefaultRowsPerPage;
-
-		const sortedRows = this.getSortedRows(props.idField, 'asc');
-
 		if (!props.columns.find(col => col.id === props.idField)) {
 			throw new Error(`ID field is set to '${props.idField}' but this column does not exist.`);
 		}
+
+		const rowsPerPage = this.props.rowsPerPage ?? DefaultRowsPerPage;
+		const sortedRows = this.getSortedRows(props.idField, 'asc');
 
 		this.state = {
 			sortedRows: sortedRows,
@@ -117,18 +107,18 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			const {orderBy, orderDir, page} = this.state;
 			const rowsPerPage = this.props.rowsPerPage ?? DefaultRowsPerPage;
 			const sortedRows = this.getSortedRows(orderBy, orderDir);
-			const visibleRows = sortedRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+			const visibleRows = sortedRows.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
 			if (visibleRows.length === 0) {
 				this.setState({
 					page: 0,
-					sortedRows, 
-					visibleRows: sortedRows.slice(0, rowsPerPage)
-				});	
+					sortedRows,
+					visibleRows: sortedRows.slice(0, rowsPerPage),
+				});
 			} else {
 				this.setState({
-					sortedRows, 
-					visibleRows: visibleRows
+					sortedRows,
+					visibleRows: visibleRows,
 				});
 			}
 		}
@@ -140,7 +130,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 
 		} else if (this._delayedClickAway) {
 			requestAnimationFrame(() => this.handleDocumentClick(event));
-			
+
 		} else {
 			this.handleDocumentClick(event);
 		}
@@ -162,7 +152,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		}
 
 		this.onCancelEdit();
-	}
+	};
 
 	public rerender = () => {
 		const {visibleRows} = this.state;
@@ -194,7 +184,9 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	private getSortedRows(orderBy: string, orderDir: 'asc' | 'desc') {
 		const {rows, columns, idField} = this.props;
 
-		const column = columns.find(col => col.id === orderBy)!;
+		const column = columns.find(col => col.id === orderBy);
+
+		assert(column, `No column with id '${orderBy}' found`);
 
 		return SortUtils.stableSort<any>(rows, idField, SortUtils.getComparator<any>(orderDir, orderBy, column.type));
 	}
@@ -297,7 +289,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 					page={page}
 					rowsPerPage={rowsPerPage ?? DefaultRowsPerPage}
 					rowsPerPageOptions={[]}
-					onChangePage={this.onChangePage}
+					onPageChange={this.onChangePage}
 				/>
 			</TableRow>
 		</TableFooter>;
@@ -334,12 +326,12 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			align={align}
 			onClick={onClick}
 			className={`cell-${column.id}` + (column.editable ? ' editable' : '')}
-			padding={column.padding ?? "default"}
+			padding={column.padding ?? "normal"}
 		>
 			{column.renderCell
 				? column.renderCell(row)
 				: row[column.id] || <span>&nbsp;</span>}
-			{column.editable && <Create className='edit-icon' fontSize="small"/>}
+			{column.editable && <Create className="edit-icon" fontSize="small"/>}
 		</TableCell>;
 	}
 

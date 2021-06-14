@@ -1,7 +1,8 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Container, createStyles, Paper, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Container, Paper, Theme, Typography} from "@material-ui/core/";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
@@ -74,7 +75,7 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 		dataRow.isEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
-	}
+	};
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		const {hold} = this.state;

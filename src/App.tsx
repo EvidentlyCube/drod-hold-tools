@@ -1,6 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
-import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, makeStyles, Tab, Tabs, Toolbar} from "@material-ui/core";
+import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, Toolbar} from "@material-ui/core";
+import {makeStyles} from '@material-ui/styles';
+import {createTheme} from '@material-ui/core/styles';
 import {Store} from "./data/Store";
 import HoldTab from "./tabs/HoldTab";
 import SpeechTab from "./tabs/standalone/SpeechTab";
@@ -10,12 +12,21 @@ import EntrancesTab from "./tabs/standalone/EntrancesTab";
 import ScrollsTab from "./tabs/standalone/ScrollsTab";
 import MiscTab from "./tabs/misc/MiscTab";
 import AuthorsTab from './tabs/standalone/PlayersTab';
-import { LevelsTab } from './tabs/standalone/LevelsTab';
-import { SystemMessages } from './common/components/SystemMessages';
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
+import {LevelsTab} from './tabs/standalone/LevelsTab';
+import {SystemMessages} from './common/components/SystemMessages';
+import {LocalizationProvider} from "@material-ui/lab";
+import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 
-const useStyles = makeStyles(theme => ({
+
+const theme = createTheme({
+	palette: {
+		secondary: {
+			main: '#f50057',
+		},
+	},
+});
+
+const useStyles = makeStyles(() => ({
 	tab: {
 		...theme.mixins.toolbar,
 		paddingTop: theme.spacing(4),
@@ -69,51 +80,53 @@ function App() {
 
 	return (
 		<div>
-			<MuiPickersUtilsProvider utils={DateFnsUtils}>
-				<CssBaseline/>
-				<AppBar position="static">
-					<Tabs value={selectedTab} onChange={handleChange}>
-						<Tab label="Hold"/>
-						<Tab label="Commands Text" disabled={!hasLoadedHold}/>
-						<Tab label="Entrances" disabled={!hasLoadedHold}/>
-						<Tab label="Scrolls" disabled={!hasLoadedHold}/>
-						<Tab label="Players" disabled={!hasLoadedHold}/>
-						<Tab label="Levels" disabled={!hasLoadedHold}/>
-						<Tab label="Misc" disabled={!hasLoadedHold}/>
-					</Tabs>
-				</AppBar>
-				<TabPanel className={classes.tab} value={selectedTab} index={0}>
-					<HoldTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={1}>
-					<SpeechTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={2}>
-					<EntrancesTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={3}>
-					<ScrollsTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={4}>
-					<AuthorsTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={5}>
-					<LevelsTab/>
-				</TabPanel>
-				<TabPanel className={classes.tab} value={selectedTab} index={6}>
-					<MiscTab/>
-				</TabPanel>
-				<Divider/>
-				<Container>
-					<Toolbar className={classes.footer}>
-						<ButtonGroup variant="text">
-							<Button className={classes.footerButton} href="https://www.evidentlycube.com">by Maurycy Zarzycki</Button>
-							<Button className={classes.footerButton} href="https://github.com/EvidentlyCube/drod-hold-tools">GitHub</Button>
-						</ButtonGroup>
-					</Toolbar>
-				</Container>
-			</MuiPickersUtilsProvider>
-			<SystemMessages />
+			<ThemeProvider theme={theme}>
+				<LocalizationProvider dateAdapter={AdapterDateFns}>
+					<CssBaseline/>
+					<AppBar position="static">
+						<Tabs value={selectedTab} onChange={handleChange} textColor="inherit" variant="fullWidth">
+							<Tab label="Hold"/>
+							<Tab label="Commands Text" disabled={!hasLoadedHold}/>
+							<Tab label="Entrances" disabled={!hasLoadedHold}/>
+							<Tab label="Scrolls" disabled={!hasLoadedHold}/>
+							<Tab label="Players" disabled={!hasLoadedHold}/>
+							<Tab label="Levels" disabled={!hasLoadedHold}/>
+							<Tab label="Misc" disabled={!hasLoadedHold}/>
+						</Tabs>
+					</AppBar>
+					<TabPanel className={classes.tab} value={selectedTab} index={0}>
+						<HoldTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={1}>
+						<SpeechTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={2}>
+						<EntrancesTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={3}>
+						<ScrollsTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={4}>
+						<AuthorsTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={5}>
+						<LevelsTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={6}>
+						<MiscTab/>
+					</TabPanel>
+					<Divider/>
+					<Container>
+						<Toolbar className={classes.footer}>
+							<ButtonGroup variant="text">
+								<Button className={classes.footerButton} href="https://www.evidentlycube.com">by Maurycy Zarzycki</Button>
+								<Button className={classes.footerButton} href="https://github.com/EvidentlyCube/drod-hold-tools">GitHub</Button>
+							</ButtonGroup>
+						</Toolbar>
+					</Container>
+				</LocalizationProvider>
+				<SystemMessages/>
+			</ThemeProvider>
 		</div>
 	);
 }

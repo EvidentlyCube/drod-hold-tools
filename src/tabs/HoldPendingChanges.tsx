@@ -1,18 +1,5 @@
-import {
-	Box,
-	Button,
-	createStyles,
-	Dialog,
-	DialogActions,
-	DialogContent,
-	DialogContentText,
-	DialogTitle,
-	Paper,
-	Theme,
-	Typography,
-	WithStyles,
-	withStyles,
-} from "@material-ui/core";
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Theme, Typography} from "@material-ui/core";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
 import {createNullHold, Hold} from "../data/Hold";
 import {Store} from "../data/Store";
@@ -27,7 +14,7 @@ const styles = (theme: Theme) => createStyles({
 	},
 	actions: {
 		textAlign: 'center',
-		'& > *': {
+		'& > button': {
 			margin: theme.spacing(1),
 		},
 	},
@@ -106,7 +93,6 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 
 		return <>
 			<Dialog
-				disableBackdropClick
 				disableEscapeKeyDown
 				maxWidth="xs"
 				open={showExport}
@@ -127,7 +113,6 @@ class HoldPendingChanges extends React.Component<HoldPendingChangesProps, HoldPe
 				</DialogActions>
 			</Dialog>
 			<Dialog
-				disableBackdropClick
 				disableEscapeKeyDown
 				maxWidth="xs"
 				open={showClose}

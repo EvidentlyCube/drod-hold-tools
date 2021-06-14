@@ -2,23 +2,25 @@ import {ObservableProperty} from "../common/ObservableProperty";
 import {createNullHold, Hold} from "./Hold";
 import {HoldDecoder} from "../holdDecoder/HoldDecoder";
 
-// import AutoUploadHold from '../assets/auto-upload-hold.hold';
+import AutoUploadHold from '../assets/auto-upload-hold.hold';
 // import AutoUploadHold from '../test/assets/DrodTouch.hold';
 // import AutoUploadHold from '../test/assets/TheSecondSkyDemo.hold';
 // import AutoUploadHold from '../test/assets/SpeechTest.hold';
-import AutoUploadHold from '../test/assets/TestCommandReading.hold';
+// import AutoUploadHold from '../test/assets/TestCommandReading.hold';
 import {HoldEncoder} from "../holdEncoder/HoldEncoder";
-import { SystemMessage } from "./SystemMessage";
+import {SystemMessage} from "./SystemMessage";
 
 interface StoreInterface {
 	loadedHold: ObservableProperty<Hold>;
-	downloadableHold: ObservableProperty<Blob|undefined>;
-	
+	downloadableHold: ObservableProperty<Blob | undefined>;
+
 	holdDecoder: HoldDecoder;
 	holdEncoder: HoldEncoder;
 
-	systemMessage: ObservableProperty<SystemMessage|undefined>;
+	systemMessage: ObservableProperty<SystemMessage | undefined>;
+
 	addSystemMessage(message: SystemMessage): void;
+
 	popSystemMessage(): void;
 }
 
@@ -31,7 +33,7 @@ export const Store: StoreInterface = {
 	holdDecoder: new HoldDecoder(),
 	holdEncoder: new HoldEncoder(),
 
-	systemMessage: new ObservableProperty<SystemMessage|undefined>(undefined),
+	systemMessage: new ObservableProperty<SystemMessage | undefined>(undefined),
 	addSystemMessage(message: SystemMessage) {
 		messageQueue.push(message);
 
@@ -41,7 +43,7 @@ export const Store: StoreInterface = {
 	},
 	popSystemMessage() {
 		Store.systemMessage.value = messageQueue.shift();
-	}
+	},
 };
 
 const autoLoad = true;

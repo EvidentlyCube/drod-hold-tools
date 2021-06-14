@@ -1,4 +1,5 @@
-import {createStyles, LinearProgress, Paper, Theme, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {LinearProgress, Paper, Theme, Typography} from "@material-ui/core";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
 import {HoldOperator} from "../common/CommonTypes";
 

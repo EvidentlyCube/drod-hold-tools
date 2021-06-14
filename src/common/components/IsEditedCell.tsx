@@ -1,9 +1,10 @@
 import React, {useCallback} from "react";
-import {Divider, IconButton, makeStyles, Typography} from "@material-ui/core";
+import {Divider, IconButton, Theme, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/styles";
 import {History} from "@material-ui/icons";
 import {LightTooltip} from "./LightTooltip";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
 	undo: {
 		textAlign: 'center',
 	},

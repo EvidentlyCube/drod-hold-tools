@@ -1,18 +1,19 @@
-import { Container, createStyles, MenuItem, Paper, Select, Theme, Typography, withStyles, WithStyles } from "@material-ui/core/";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import React, { useCallback, useEffect } from "react";
-import { assert } from "../../common/Assert";
-import { ChangeUtils } from "../../common/ChangeUtils";
-import { EnchancedTable, EnchancedTableApi } from "../../common/components/EnchancedTable";
-import { EnchancedTableColumn } from "../../common/components/EnchancedTableCommons";
-import { IsEditedCell } from "../../common/components/IsEditedCell";
-import { DateUtils } from "../../common/DateUtils";
-import { useDocumentKeydown } from "../../common/Hooks";
-import { PlayerUtils } from "../../common/PlayerUtils";
-import { Hold } from "../../data/Hold";
-import { Level } from "../../data/Level";
-import { Player } from "../../data/Player";
-import { Store } from "../../data/Store";
+import {Container, MenuItem, Paper, Select, TextField, Theme, Typography} from "@material-ui/core/";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
+import React, {useCallback, useEffect} from "react";
+import {assert} from "../../common/Assert";
+import {ChangeUtils} from "../../common/ChangeUtils";
+import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {DateUtils} from "../../common/DateUtils";
+import {useDocumentKeydown} from "../../common/Hooks";
+import {PlayerUtils} from "../../common/PlayerUtils";
+import {Hold} from "../../data/Hold";
+import {Level} from "../../data/Level";
+import {Player} from "../../data/Player";
+import {Store} from "../../data/Store";
+import {DatePicker} from "@material-ui/lab";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -67,7 +68,14 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
 				{id: 'isAuthorEdited', label: 'Δ', width: "5%", renderCell: this.renderIsAuthorEditedCell, padding: "none", headerTitle: "Is author changed?"},
 				{id: 'authorName', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor, width: '30%'},
-				{id: 'isDateCreatedEdited', label: 'Δ', width: "5%", renderCell: this.renderIsDateCreatedEditedCell, padding: "none", headerTitle: "Is author changed?"},
+				{
+					id: 'isDateCreatedEdited',
+					label: 'Δ',
+					width: "5%",
+					renderCell: this.renderIsDateCreatedEditedCell,
+					padding: "none",
+					headerTitle: "Is author changed?",
+				},
 				{id: 'dateCreated', label: 'Created', editable: true, width: '126px', renderEditor: this.renderCreatedEditor},
 			],
 		};
@@ -167,12 +175,12 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			Store.addSystemMessage({
 				message: <p>
 					Player&nbsp;<strong>{PlayerUtils.getName(player)}</strong>&nbsp;is no longer marked
-					for deletion, as it's now the author of level&nbsp;<strong>{levelName}</strong>. 
+					for deletion, as it's now the author of level&nbsp;<strong>{levelName}</strong>.
 				</p>,
-				color: "info"
-			})
+				color: "info",
+			});
 		}
-	}
+	};
 
 	private levelToRow(level: Level, hold: Hold): LevelRow {
 		const playerId = level.changes.playerId ?? level.playerId;
@@ -276,7 +284,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 		return <span/>;
 	};
-	
+
 	private renderAuthorEditor = (row: LevelRow, onCancel: () => void, onSave: (value: string) => void) => {
 		const {players} = this.state;
 
@@ -293,7 +301,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			api={this._tableApi.current!}
 			onCancel={onCancel}
 			onSave={onSave}
-			defaultValue={row.dateCreated}/>
+			defaultValue={row.dateCreated}/>;
 	};
 }
 
@@ -307,31 +315,43 @@ interface DateEditorProps {
 const DateEditor = (props: DateEditorProps) => {
 	const {api, onCancel, onSave, defaultValue} = props;
 
-	const onKeyDown = useCallback((event: {key: string}) => {
+	const onKeyDown = useCallback((event: { key: string }) => {
 		if (event.key === 'Escape') {
 			onCancel();
 		}
 	}, [onCancel]);
-	
-	useDocumentKeydown(onKeyDown, true)
+
+	useDocumentKeydown(onKeyDown, true);
 
 	useEffect(() => {
 		api.setDelayedClickAway(true);
 		return () => api.setDelayedClickAway(false);
-	})
+	});
 
 	console.log(defaultValue);
-	
-	return <KeyboardDatePicker 
-		open={true}
+	return <DatePicker
+		label="Basic example"
+
 		value={defaultValue}
-		format="yyyy-MM-dd"
-		keyboardIcon={false}
-		PopoverProps={{
-			onClick: () => {api.suppressClickAwayForFrame(); alert("lol");}
+		onChange={(newValue) => {
+			console.log(newValue);
 		}}
-		onChange={(a, b) => console.log(a, b)}/>;
-}
+		renderInput={(params) => <TextField {...params} />}
+	/>;
+
+	// return <DatePicker
+	// 	open={true}
+	// 	value={defaultValue}
+	// 	format="yyyy-MM-dd"
+	// 	keyboardIcon={false}
+	// 	KeyboardButtonProps={{
+	// 		style: {display: 'none'}
+	// 	}}
+	// 	PopperProps={{
+	// 		onClick: () => {api.suppressClickAwayForFrame(); alert("lol");}
+	// 	}}
+	// 	onChange={(a, b) => console.log(a, b)}/>;
+};
 
 interface AuthorEditorProps {
 	api: EnchancedTableApi;
@@ -347,8 +367,8 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 	const onChange = useCallback((event: React.ChangeEvent<{ value: unknown }>) => {
 		onSave(event.target.value as string);
 	}, [onSave]);
- 
-	const onKeyDown = useCallback((event: {key: string}) => {
+
+	const onKeyDown = useCallback((event: { key: string }) => {
 		if (event.key === 'Escape') {
 			onCancel();
 		}
@@ -357,9 +377,9 @@ const AuthorEditor = (props: AuthorEditorProps) => {
 	useEffect(() => {
 		api.setDelayedClickAway(true);
 		return () => api.setDelayedClickAway(false);
-	})
+	});
 
-	useDocumentKeydown(onKeyDown, true)
+	useDocumentKeydown(onKeyDown, true);
 
 	return <Select
 		autoFocus

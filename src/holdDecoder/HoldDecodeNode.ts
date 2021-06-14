@@ -19,10 +19,10 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				isNew: false,
 				isDeleted: false,
 
-				changes: {}
+				changes: {},
 			});
 		}
-		break;
+			break;
 
 		case 'Holds':
 			hold.xml = element;
@@ -107,7 +107,6 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			break;
 
 		case 'Levels':
-			console.log(element);
 			const levelId = getInt(element, 'LevelID');
 			hold.levels.set(levelId, {
 				modelType: ModelType.Level,

@@ -1,5 +1,4 @@
 import React from "react";
-import {Padding} from "@material-ui/core";
 
 export type EnchancedTableColumnType = 'text' | 'numeric';
 
@@ -7,7 +6,7 @@ export interface EnchancedTableColumn {
 	id: string;
 	label: string;
 
-	padding?: Padding;
+	padding?: 'normal' | 'checkbox' | 'none';
 	type?: EnchancedTableColumnType;
 	sortable?: boolean;
 	editable?: boolean;

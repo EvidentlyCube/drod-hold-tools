@@ -1,23 +1,24 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Box, Button, Container, createStyles, Paper, Switch, Theme, Typography, withStyles, WithStyles} from "@material-ui/core/";
+import {Box, Button, Container, Paper, Switch, Theme, Typography} from "@material-ui/core/";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {Player} from "../../data/Player";
 import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
-import { HoldUtils } from "../../common/HoldUtils";
-import { ModelType } from "../../common/Enums";
+import {HoldUtils} from "../../common/HoldUtils";
+import {ModelType} from "../../common/Enums";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
 		padding: theme.spacing(4, 6),
 	},
 	table: {
-		marginBottom: theme.spacing(1)
-	}
+		marginBottom: theme.spacing(1),
+	},
 });
 
 const RowsPerPage = 25;
@@ -79,7 +80,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 		dataRow.isEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
-	}
+	};
 
 	private handleDeleteRowClicked = (id: number) => {
 		const {hold} = this.state;
@@ -136,21 +137,21 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 			name: `Player #${newId}`,
 			isNew: true,
 			isDeleted: false,
-			changes: {}
+			changes: {},
 		};
 
 		hold.players.set(newId, player);
 		ChangeUtils.playerCreated(player, hold);
 
 		const row = this.playerToRow(player, hold);
-		this.setState({allRows: allRows.concat([row])})
-	}
+		this.setState({allRows: allRows.concat([row])});
+	};
 
 	private playerToRow(player: Player, hold: Hold): PlayerRow {
 		const levelCount = Array.from(hold.levels.values())
 			.filter(level => player.id === (level.changes.playerId ?? level.playerId))
-			.length;																														
-		
+			.length;
+
 		return {
 			id: player.id,
 			text: player.changes.name ?? player.name,
@@ -159,7 +160,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 			levelCount,
 			isEdited: player.changes.name !== undefined,
 			isDeleted: player.isDeleted,
-			isDeletable: levelCount === 0 && hold.playerId !== player.id
+			isDeletable: levelCount === 0 && hold.playerId !== player.id,
 		};
 	}
 
@@ -191,7 +192,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 					This table contains all the players in the hold. Players are used for displaying
 					author for each level. You can only delete players who are not assigned to any levels.
 					You can create new players as needed, and authors can be reassigned in the
-					&#32;<strong>Level</strong>&#32;tab. 
+					&#32;<strong>Level</strong>&#32;tab.
 				</Typography>
 				<EnchancedTable
 					className={classes.table}
@@ -228,14 +229,14 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 		};
 
 		if (row.isNew) {
-			return <Button 
-				variant="contained" 
+			return <Button
+				variant="contained"
 				color="secondary"
 				onClick={onClick}
-				disabled={!row.isDeletable} 
+				disabled={!row.isDeletable}
 			>
 				Delete
-			</Button>
+			</Button>;
 		}
 		return row.isDeletable
 			? <Switch checked={row.isDeleted} onChange={onClick}/>
@@ -244,7 +245,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 
 	private renderIdCell = (row: PlayerRow) => {
 		return row.id;
-	}
+	};
 }
 
 export default withStyles(styles)(PlayersTab);

@@ -1,4 +1,5 @@
-import {createStyles, Grid, Paper, Theme, Typography, WithStyles, withStyles} from "@material-ui/core";
+import {Grid, Paper, Theme, Typography} from "@material-ui/core";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
 import {Hold} from "../data/Hold";
 import {DateUtils} from "../common/DateUtils";
@@ -23,7 +24,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 const GridStat = ({className, name, value}: { className: string, name: string, value: number }) => (
-	<Grid item container lg={4} justify={"space-between"} className={className}>
+	<Grid item container lg={4} className={className} justifyContent="space-between">
 		<strong>{name}:</strong>
 		<span>{value}</span>
 	</Grid>
@@ -57,7 +58,7 @@ class HoldSummary extends React.Component<HoldSummaryProps, HoldSummaryState> {
 						by <strong>{hold.author.name}</strong>
 					</Typography>
 					<div style={{flex: 1}}/>
-					<Grid container justify="space-between">
+					<Grid container justifyContent="space-between">
 						<Grid item>
 							<Typography variant="body2" color="textSecondary">
 								<strong>Created:</strong> {DateUtils.formatDateTime(hold.dateCreated)}

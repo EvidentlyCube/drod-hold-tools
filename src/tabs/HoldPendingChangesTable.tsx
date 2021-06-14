@@ -5,11 +5,10 @@ import {EnchancedTableColumn} from "../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../common/components/EnchancedTable";
 import {Change} from "../data/Change";
 import {RoomUtils} from "../common/RoomUtils";
-import {createStyles, WithStyles} from "@material-ui/core";
-import {withStyles} from "@material-ui/core/";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {LocationUtils} from "../common/LocationUtils";
-import { PlayerUtils } from "../common/PlayerUtils";
-import { assert } from "../common/Assert";
+import {PlayerUtils} from "../common/PlayerUtils";
+import {assert} from "../common/Assert";
 
 let rowIdCounter = 1;
 
@@ -92,7 +91,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 				if (change.changes.delete) {
 					row.operationType = "Delete";
 					row.oldValue = change.model.text;
-				
+
 				} else {
 					row.operationType = "Change Text";
 					row.oldValue = change.model.text;
@@ -140,13 +139,13 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 				if (change.changes.name !== undefined) {
 					const row = newRow(change.type);
 					rows.push(row);
-	
+
 					row.location = `#${change.model.index}`;
 					row.operationType = "Change Name";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
 				}
-				
+
 				if (change.changes.playerId) {
 					const oldPlayer = hold.players.get(change.model.playerId);
 					const newPlayer = hold.players.get(change.model.changes.playerId!);
@@ -155,7 +154,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 
 					const row = newRow(change.type);
 					rows.push(row);
-	
+
 					row.location = `#${change.model.index}`;
 					row.operationType = "Change Author";
 					row.oldValue = PlayerUtils.getName(oldPlayer);
@@ -200,7 +199,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.oldValue = change.model.ending;
 					row.newValue = change.model.changes.ending;
 				}
-			break;
+				break;
 			case "Player":
 				if (change.changes.create) {
 					const row = newRow(change.type);
@@ -222,9 +221,9 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 
 					row.operationType = "Rename";
 					row.oldValue = change.model.name;
-					row.newValue = change.model.changes.name;	
+					row.newValue = change.model.changes.name;
 				}
-			break;
+				break;
 		}
 
 		return rows;

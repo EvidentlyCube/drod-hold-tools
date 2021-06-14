@@ -1,4 +1,5 @@
-import {Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Theme, WithStyles, withStyles} from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Theme} from "@material-ui/core";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
 import {Store} from "../data/Store";
 
@@ -54,7 +55,6 @@ class HoldDownloadModal extends React.Component<HoldDownloadModalProps, HoldDown
 		const {isOpen, holdUrl, holdName} = this.state;
 
 		return <Dialog
-			disableBackdropClick
 			disableEscapeKeyDown
 			maxWidth="xs"
 			open={isOpen}

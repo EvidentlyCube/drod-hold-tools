@@ -1,7 +1,11 @@
+body {
+    overflow-y: scroll;
+}
+
 body .MuiTableCell-body {
     word-break: break-word;
 }
 
 .MuiTableCell-body.cell-text {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }

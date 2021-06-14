@@ -43,8 +43,8 @@ export class MiscHoldDescription extends React.Component<MiscHoldDescriptionProp
 				isEdited: hold.changes.description !== undefined,
 			}],
 			columns: [
-				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Name', editable: true, editMaxLength: 1350, editMultiline: true},
+				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", sortable: false},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 1350, editMultiline: true, sortable: false},
 			],
 		};
 	}
@@ -61,7 +61,7 @@ export class MiscHoldDescription extends React.Component<MiscHoldDescriptionProp
 		dataRow.isEdited = false;
 
 		this._tableApi.current?.rerender();
-	}
+	};
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		const {hold, allRows} = this.state;
@@ -87,7 +87,7 @@ export class MiscHoldDescription extends React.Component<MiscHoldDescriptionProp
 				<EnchancedTable
 					columns={columns}
 					rows={allRows}
-					idField="id"
+					idField="isEdited"
 					rowsPerPage={RowsPerPage}
 					pagination={false}
 					onEditedCell={this.handleCellEdited}
