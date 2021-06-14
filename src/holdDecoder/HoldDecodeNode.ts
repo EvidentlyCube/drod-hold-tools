@@ -107,6 +107,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			break;
 
 		case 'Levels':
+			console.log(element);
 			const levelId = getInt(element, 'LevelID');
 			hold.levels.set(levelId, {
 				modelType: ModelType.Level,
@@ -115,6 +116,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				playerId: getInt(element, 'PlayerID'),
 				index: getInt(element, 'OrderIndex'),
 				name: decodeText(element, 'NameMessage'),
+				dateCreated: new Date(getInt(element, 'Created') * 1000),
 				entranceX: 0,
 				entranceY: 0,
 				entrances: [],
