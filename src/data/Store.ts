@@ -46,7 +46,7 @@ export const Store: StoreInterface = {
 	},
 };
 
-const autoLoad = true;
+const autoLoad = false;
 const autoEncode = false;
 
 if (autoLoad) {

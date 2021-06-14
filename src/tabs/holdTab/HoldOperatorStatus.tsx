@@ -1,7 +1,7 @@
 import {LinearProgress, Paper, Theme, Typography} from "@material-ui/core";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
-import {HoldOperator} from "../common/CommonTypes";
+import {HoldOperator} from "../../common/CommonTypes";
 
 const styles = (theme: Theme) => createStyles({
 	content: {

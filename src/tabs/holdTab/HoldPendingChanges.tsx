@@ -1,8 +1,8 @@
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Theme, Typography} from "@material-ui/core";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
-import {createNullHold, Hold} from "../data/Hold";
-import {Store} from "../data/Store";
+import {createNullHold, Hold} from "../../data/Hold";
+import {Store} from "../../data/Store";
 import {HoldPendingChangesTable} from "./HoldPendingChangesTable";
 
 const styles = (theme: Theme) => createStyles({

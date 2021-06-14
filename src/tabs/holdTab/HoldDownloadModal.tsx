@@ -1,7 +1,7 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Theme} from "@material-ui/core";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
-import {Store} from "../data/Store";
+import {Store} from "../../data/Store";
 
 const styles = (theme: Theme) => createStyles({
 	content: {

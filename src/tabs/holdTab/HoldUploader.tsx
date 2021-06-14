@@ -1,8 +1,9 @@
 import {Box, Paper, Snackbar, Theme, Typography} from "@material-ui/core";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
-import {HoldDecoder} from "../holdDecoder/HoldDecoder";
+import {HoldDecoder} from "../../holdDecoder/HoldDecoder";
 import {Alert} from "@material-ui/lab";
+import {Dropzone} from "./Dropzone";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -17,7 +18,6 @@ interface HoldUploaderProps extends WithStyles<typeof styles> {
 interface HoldUploaderState {
 	isSnackOpened: boolean;
 	snackMessage: string;
-	files: any[];
 }
 
 class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState> {
@@ -27,7 +27,6 @@ class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState>
 		this.state = {
 			isSnackOpened: false,
 			snackMessage: '',
-			files: [],
 		};
 	}
 
@@ -53,7 +52,7 @@ class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState>
 
 	render() {
 		const {classes} = this.props;
-		const {isSnackOpened, files, snackMessage} = this.state;
+		const {isSnackOpened, snackMessage} = this.state;
 
 		return <Paper className={classes.content}>
 			<Box>
@@ -63,14 +62,7 @@ class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState>
 				<Typography variant="subtitle2" gutterBottom>
 					You can either drop a hold file or click the area below to select it.
 				</Typography>
-				{/*				<DropzoneAreaBase
-					fileObjects={files}
-					filesLimit={1}
-					dropzoneText={"Drag and drop a hold here or click"}
-					maxFileSize={1024 * 1024 * 1024}
-					onDrop={this.onDrop}
-					showAlerts={false}
-				/>*/}
+				<Dropzone onDrop={this.onDrop}/>
 			</Box>
 			<Snackbar
 				anchorOrigin={{

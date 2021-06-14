@@ -4,7 +4,7 @@ import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, Theme
 import {makeStyles} from '@material-ui/styles';
 import {createTheme} from '@material-ui/core/styles';
 import {Store} from "./data/Store";
-import HoldTab from "./tabs/HoldTab";
+import HoldTab from "./tabs/holdTab/HoldTab";
 import SpeechTab from "./tabs/standalone/SpeechTab";
 import {Container} from "@material-ui/core/";
 import "./common.d.ts";

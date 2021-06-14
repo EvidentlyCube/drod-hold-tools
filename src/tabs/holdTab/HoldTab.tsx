@@ -1,13 +1,13 @@
-import {Store} from "../data/Store";
-import {Hold} from "../data/Hold";
+import {Store} from "../../data/Store";
+import {Hold} from "../../data/Hold";
 import React from "react";
 import {Button, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@material-ui/core";
-import {HoldDecoder} from "../holdDecoder/HoldDecoder";
+import {HoldDecoder} from "../../holdDecoder/HoldDecoder";
 import HoldOperatorStatus from "./HoldOperatorStatus";
 import HoldSummary from "./HoldSummary";
 import HoldPendingChanges from "./HoldPendingChanges";
 import HoldUploader from "./HoldUploader";
-import {HoldEncoder} from "../holdEncoder/HoldEncoder";
+import {HoldEncoder} from "../../holdEncoder/HoldEncoder";
 import HoldDownloadModal from "./HoldDownloadModal";
 
 interface HoldTabProps {

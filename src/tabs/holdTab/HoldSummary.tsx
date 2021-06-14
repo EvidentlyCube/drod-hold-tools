@@ -1,8 +1,8 @@
 import {Grid, Paper, Theme, Typography} from "@material-ui/core";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
-import {Hold} from "../data/Hold";
-import {DateUtils} from "../common/DateUtils";
+import {Hold} from "../../data/Hold";
+import {DateUtils} from "../../common/DateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	section: {

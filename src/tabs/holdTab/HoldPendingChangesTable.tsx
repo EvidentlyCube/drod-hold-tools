@@ -1,15 +1,15 @@
-import {Store} from "../data/Store";
-import {Hold} from "../data/Hold";
+import {Store} from "../../data/Store";
+import {Hold} from "../../data/Hold";
 import React from "react";
-import {EnchancedTableColumn} from "../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../common/components/EnchancedTable";
-import {Change} from "../data/Change";
-import {RoomUtils} from "../common/RoomUtils";
+import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {Change} from "../../data/Change";
+import {RoomUtils} from "../../common/RoomUtils";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
-import {LocationUtils} from "../common/LocationUtils";
-import {PlayerUtils} from "../common/PlayerUtils";
-import {assert} from "../common/Assert";
-import {DateUtils} from "../common/DateUtils";
+import {LocationUtils} from "../../common/LocationUtils";
+import {PlayerUtils} from "../../common/PlayerUtils";
+import {assert} from "../../common/Assert";
+import {DateUtils} from "../../common/DateUtils";
 
 let rowIdCounter = 1;
 
