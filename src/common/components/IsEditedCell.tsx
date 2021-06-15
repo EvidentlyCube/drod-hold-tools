@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface IsEditedCellProps {
-	rowId: number;
-	resetHandler: (rowId: number) => void;
+	rowId: any;
+	resetHandler: (rowId: any) => void;
 	originalText: string;
 }
 

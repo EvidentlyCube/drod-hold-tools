@@ -23,7 +23,7 @@ const styles = (theme: Theme) => createStyles({
 const RowsPerPage = 25;
 
 interface ScrollRow {
-	id: number;
+	id: string;
 	text: string;
 	originalText: string;
 	level: string;
@@ -61,7 +61,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		};
 	}
 
-	private handleResetRow = (id: number) => {
+	private handleResetRow = (id: string) => {
 		const {hold} = this.state;
 		const scroll = hold.scrolls.get(id);
 		assert(scroll, `Failed to find scroll with ID '${id}'`);
@@ -78,7 +78,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const scroll = hold.scrolls.get(row.id as number);
+		const scroll = hold.scrolls.get(row.id as string);
 		assert(scroll, `No scroll found for id '${row.id}'`);
 
 		scroll.changes.text = newValue;
@@ -112,7 +112,7 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		return Array.from(Store.loadedHold.value.scrolls.values()).map(scroll => ScrollsTab.scrollToRow(scroll, hold));
 	};
 
-	private getRowById = (id: number) => {
+	private getRowById = (id: string) => {
 		for (const checkedRow of this.state.allRows) {
 			if (checkedRow.id === id) {
 				return checkedRow;

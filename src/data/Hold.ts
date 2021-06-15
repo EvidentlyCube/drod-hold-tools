@@ -32,7 +32,7 @@ export interface Hold {
 	levels: Map<number, Level>;
 	players: Map<number, Player>;
 	rooms: Map<number, Room>;
-	scrolls: Map<number, Scroll>;
+	scrolls: Map<string, Scroll>;
 	speeches: Map<number, Speech>;
 	worldMaps: Map<number, WorldMap>;
 	vars: Map<number, Var>;

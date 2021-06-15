@@ -184,15 +184,17 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Scrolls': {
 			const roomId = getInt(element.parentElement!, 'RoomID');
 			const room = hold.rooms.get(roomId)!;
-			const scrollId = hold.scrolls.size + 1;
+			const scrollX = getInt(element, 'X');
+			const scrollY = getInt(element, 'Y');
+			const scrollId = `${roomId}.${scrollX.toString().padStart(2, '0')}.${scrollY.toString().padStart(2, '0')}`;
 			const scroll: Scroll = {
 				modelType: ModelType.Scroll,
 				xml: element,
 				id: scrollId,
 				roomId: roomId,
 				text: decodeText(element, 'Message'),
-				x: getInt(element, 'X'),
-				y: getInt(element, 'Y'),
+				x: scrollX,
+				y: scrollY,
 				changes: {},
 			};
 

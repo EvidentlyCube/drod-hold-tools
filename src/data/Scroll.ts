@@ -4,7 +4,7 @@ export interface Scroll {
 	modelType: ModelType.Scroll;
 	xml: Element;
 
-	id: number;
+	id: string;
 	roomId: number;
 	x: number;
 	y: number;
