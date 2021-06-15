@@ -3,7 +3,7 @@ import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React from "react";
 import {HoldDecoder} from "../../holdDecoder/HoldDecoder";
 import {Alert} from "@material-ui/lab";
-import {Dropzone} from "./Dropzone";
+import {DropzoneHold} from "./DropzoneHold";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -62,7 +62,7 @@ class HoldUploader extends React.Component<HoldUploaderProps, HoldUploaderState>
 				<Typography variant="subtitle2" gutterBottom>
 					You can either drop a hold file or click the area below to select it.
 				</Typography>
-				<Dropzone onDrop={this.onDrop}/>
+				<DropzoneHold onDrop={this.onDrop}/>
 			</Box>
 			<Snackbar
 				anchorOrigin={{

@@ -27,7 +27,7 @@ interface DropzoneProps {
 	onDrop: (files: File[]) => void;
 }
 
-export const Dropzone = (props: DropzoneProps) => {
+export const DropzoneHold = (props: DropzoneProps) => {
 	const {onDrop} = props;
 	const {getRootProps, getInputProps} = useDropzone({onDrop});
 	const classes = useStyles();

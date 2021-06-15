@@ -16,6 +16,7 @@ import {LevelsTab} from './tabs/standalone/LevelsTab';
 import {SystemMessages} from './common/components/SystemMessages';
 import {LocalizationProvider} from "@material-ui/lab";
 import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
+import OperationsTab from './tabs/operations/OperationsTab';
 
 
 const theme = createTheme({
@@ -92,6 +93,7 @@ function App() {
 							<Tab label="Players" disabled={!hasLoadedHold}/>
 							<Tab label="Levels" disabled={!hasLoadedHold}/>
 							<Tab label="Misc" disabled={!hasLoadedHold}/>
+							<Tab label="Operations" disabled={!hasLoadedHold}/>
 						</Tabs>
 					</AppBar>
 					<TabPanel className={classes.tab} value={selectedTab} index={0}>
@@ -114,6 +116,9 @@ function App() {
 					</TabPanel>
 					<TabPanel className={classes.tab} value={selectedTab} index={6}>
 						<MiscTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={7}>
+						<OperationsTab />
 					</TabPanel>
 					<Divider/>
 					<Container>
