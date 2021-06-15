@@ -2,7 +2,9 @@ import { Box, Button, Paper, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useCallback } from "react";
 import { CsvExporter } from "../../common/csv/CsvExporter";
+import { CsvImporter } from "../../common/csv/CsvImporter";
 import { Hold } from "../../data/Hold";
+import { Store } from "../../data/Store";
 import { DropzoneCsv } from "./DropzoneCsv";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -31,12 +33,12 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
     const onExport = useCallback(() => {
         const csv = CsvExporter.hold(hold);
 
-        console.log(csv);
-        
-        var a = document.createElement("a");
-        a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv);
-        a.setAttribute("download", hold.name + '.csv');
-        a.click();
+        Store.isBusy.value = true;
+
+        var downloader = document.createElement("a");
+        downloader.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv);
+        downloader.setAttribute("download", hold.name + '.csv');
+        downloader.click();
     }, [hold]);
 
     return <Paper className={classes.container}>
@@ -49,7 +51,7 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
         <div style={{ flex: 1 }} />
         <Box display="flex" justifyContent="space-around" className={classes.buttons}>
             <Button variant="contained" onClick={onExport}>Export CSV</Button>
-            <DropzoneCsv onDrop={() => null}/>
+            <DropzoneCsv onDrop={files => CsvImporter.readFile(files[0], hold)}/>
         </Box>
     </Paper>;
 }

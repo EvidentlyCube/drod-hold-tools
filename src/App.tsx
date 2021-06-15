@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
-import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, Toolbar} from "@material-ui/core";
+import {AppBar, Box, Button, ButtonGroup, CircularProgress, CssBaseline, Dialog, Divider, Modal, Tab, Tabs, ThemeProvider, Toolbar} from "@material-ui/core";
 import {makeStyles} from '@material-ui/styles';
 import {createTheme} from '@material-ui/core/styles';
 import {Store} from "./data/Store";
@@ -17,6 +17,8 @@ import {SystemMessages} from './common/components/SystemMessages';
 import {LocalizationProvider} from "@material-ui/lab";
 import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 import OperationsTab from './tabs/operations/OperationsTab';
+import { useObservablePropertyState } from './common/Hooks';
+import { IsBusyModal } from './components/IsBusyModal';
 
 
 const theme = createTheme({
@@ -66,6 +68,7 @@ function App() {
 	const classes = useStyles();
 	const [hasLoadedHold, setHasLoadedHold] = useState(false);
 	const [selectedTab, setSelectedTab] = useState(0);
+	const isBusy = useObservablePropertyState(Store.isBusy, false);
 	const onHoldLoaded = useCallback(() => {
 		setHasLoadedHold(Store.loadedHold.value.isLoaded);
 	}, [setHasLoadedHold]);
@@ -131,6 +134,7 @@ function App() {
 					</Container>
 				</LocalizationProvider>
 				<SystemMessages/>
+				<IsBusyModal open={isBusy} />
 			</ThemeProvider>
 		</div>
 	);

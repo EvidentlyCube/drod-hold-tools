@@ -11,6 +11,7 @@ import {HoldEncoder} from "../holdEncoder/HoldEncoder";
 import {SystemMessage} from "./SystemMessage";
 
 interface StoreInterface {
+	isBusy: ObservableProperty<boolean>;
 	loadedHold: ObservableProperty<Hold>;
 	downloadableHold: ObservableProperty<Blob | undefined>;
 
@@ -27,6 +28,7 @@ interface StoreInterface {
 const messageQueue: SystemMessage[] = [];
 
 export const Store: StoreInterface = {
+	isBusy: new ObservableProperty<boolean>(false),
 	loadedHold: new ObservableProperty<Hold>(createNullHold()),
 	downloadableHold: new ObservableProperty<undefined | Blob>(undefined),
 
