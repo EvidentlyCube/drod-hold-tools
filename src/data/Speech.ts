@@ -21,15 +21,18 @@ export interface Speech {
 		text?: string;
 	}
 
-	command?: Command;
+	command: Command;
 	source?: Character | Monster;
 
 	location?: {
+		index: number,
 		source: 'monster' | 'character',
 		location: string,
 		characterName: string,
-		x: number,
-		y: number,
+		speechCustomX: number,
+		speechCustomY: number,
 		commandName: string,
+		levelId: number|undefined
+		roomId: number|undefined
 	}
 }

@@ -83,4 +83,32 @@ export const SortUtils = {
 
 		return stabilizedThis.map((el) => el[0]);
 	},
+
+	compareOptionalNumber(a?: number, b?: number) {
+		if (a === undefined && b === undefined) {
+			return 0;
+		} else if (a === undefined) {
+			return -1;
+		} else if (b === undefined) {
+			return 1;
+		} else {
+			return a - b;
+		}
+	},
+
+	compareOptionalString(a?: string, b?: string) {
+		if (a === undefined && b === undefined) {
+			return 0;
+		} else if (a === undefined) {
+			return -1;
+		} else if (b === undefined) {
+			return 1;
+		} else if (a < b){
+			return -1;
+		} else if (a > b){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 };

@@ -125,7 +125,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			isDeleted: !!speech.isDeleted,
 			hasData: !!speech.dataId,
 			isEdited: speech.changes.text !== undefined,
-			isDeletable: speech.command ? !CommandsUtils.doesRequireSpeech(speech.command.command) : true,
+			isDeletable: !CommandsUtils.doesRequireSpeech(speech.command.command),
 		};
 	}
 

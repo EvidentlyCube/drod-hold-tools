@@ -1,4 +1,14 @@
 export const StringUtils = {
+	sprintf(text: string, ...replacements: (string|number|undefined)[]) {
+		let index = 0;
+		return text.replace(/%s/g, () => {
+			const val = replacements[index++];
+			if (val === undefined) {
+				return '';
+			}
+			return val.toString();
+		});
+	},
 	stringToWString(str: string) {
 		const wchars = [];
 		for (let i = 0; i < str.length; i++) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ObservableProperty } from "./ObservableProperty";
 
 export const useDocumentKeydown = (callback: (e: KeyboardEvent) => void, useCapture: boolean = false) => {
@@ -21,7 +21,7 @@ export const useObservablePropertyState = <T>(
         setState(property.value);
 
         return () => property.removeListener(listener);
-    });
+    }, [property, setState]);
 
     return state;
 }

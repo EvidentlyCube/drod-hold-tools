@@ -16,6 +16,8 @@ export enum ModelType {
 }
 
 export enum CharCommand {
+	_CC_Missing = -2,
+	_CC_Invalid = -1,
 	CC_Appear = 0,
 	CC_AppearAt,
 	CC_MoveTo,
@@ -301,6 +303,8 @@ _MonsterNameMap.set(MonsterType.Gunthro, 'Gunthro');
 export const MonsterNameMap: ReadonlyMap<number, string> = _MonsterNameMap;
 
 const _CommandNameMap: Map<number, string> = new Map();
+_CommandNameMap.set(CharCommand._CC_Missing, 'Missing command');
+_CommandNameMap.set(CharCommand._CC_Invalid, 'Invalid command');
 _CommandNameMap.set(CharCommand.CC_Appear, 'Appear');
 _CommandNameMap.set(CharCommand.CC_AppearAt, 'Appear At');
 _CommandNameMap.set(CharCommand.CC_MoveTo, 'Move To');

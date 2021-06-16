@@ -31,7 +31,9 @@ export const HoldLinker = {
 			? monsterExtendedType
 			: monsterBaseType;
 
-		for (const command of commands) {
+		for (let i = 0; i < commands.length; i++) {
+			const command = commands[i];
+
 			if (command.speechId) {
 				const speech = hold.speeches.get(command.speechId);
 				assert(speech, `Failed to find speech ${command.speechId}`);
@@ -39,12 +41,15 @@ export const HoldLinker = {
 				speech.source = sourceMonster || sourceCharacter;
 				speech.command = command;
 				speech.location = {
-					x: command.x,
-					y: command.y,
+					index: i,
+					speechCustomX: command.x,
+					speechCustomY: command.y,
 					commandName: CommandNameMap.get(command.command) ?? `Unknown command #${command.command}`,
 					source: sourceMonster ? 'monster' : 'character',
 					characterName: MonsterUtils.getMonsterName(monsterType, hold),
 					location: room ? RoomUtils.getDisplayLocation(room.roomId, hold) : '',
+					levelId: room?.levelId,
+					roomId: room?.roomId
 				};
 			}
 

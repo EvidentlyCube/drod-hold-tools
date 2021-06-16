@@ -5,6 +5,7 @@ import {UINT_MINUS_1} from "../common/CommonTypes";
 import {MonsterUtils} from "../common/MonsterUtils";
 import {ModelType} from "../common/Enums";
 import {Scroll} from "../data/Scroll";
+import {createNullCommand} from "../data/Command";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
@@ -46,6 +47,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				roomId: getInt(element, 'RoomID'),
 				description: decodeText(element, 'DescriptionMessage'),
 				isMainEntrance: getInt(element, 'IsMainEntrance') === 1,
+				showDescription: getInt(element, 'ShowDescription') === 1,
+				x: getInt(element, 'X'),
+				y: getInt(element, 'Y'),
 				changes: {},
 			});
 			break;
@@ -102,6 +106,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				moodId: element.hasAttribute('Mood') ? getInt(element, 'Mood') : 0,
 				speakerId: element.hasAttribute('Character') ? getInt(element, 'Character') : 0,
 				delay: element.hasAttribute('Delay') ? getInt(element, 'Delay') : 0,
+				command: createNullCommand(),
 				changes: {},
 			});
 			break;

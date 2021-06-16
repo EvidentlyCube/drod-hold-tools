@@ -1,13 +1,13 @@
 import {useDropzone} from "react-dropzone";
-import {Button, Theme, Typography} from "@material-ui/core/";
+import {Button} from "@material-ui/core/";
 import {makeStyles} from "@material-ui/styles";
-import {Backup} from "@material-ui/icons";
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
 	button: {
-		width: '100%'
-	}
+		width: '100%',
+	},
 }));
+
 interface DropzoneProps {
 	onDrop: (files: File[]) => void;
 }

@@ -12,3 +12,17 @@ export interface Command {
 
 	changes: Partial<Omit<Command, 'changes'>>;
 }
+
+export function createNullCommand(): Command {
+	return {
+		command: CharCommand._CC_Missing,
+		x: 0,
+		y: 0,
+		w: 0,
+		h: 0,
+		flags: 0,
+		speechId: 0,
+		label: '',
+		changes: {}
+	};
+}

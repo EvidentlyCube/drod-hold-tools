@@ -1,11 +1,11 @@
 import { Snackbar } from "@material-ui/core";
-import { Alert, AlertTitle } from "@material-ui/lab";
+import { Alert, AlertTitle } from "@material-ui/core";
 import React, { useCallback, useEffect, useState } from "react"
 import { Store } from "../../data/Store"
 import { SystemMessage } from "../../data/SystemMessage";
 
 
-export const SystemMessages = (props: {}) => {
+export const SystemMessages = () => {
     const [message, setMessage] = useState(Store.systemMessage.value);
     
     const onSystemMessageChanged = useCallback((message?: SystemMessage) => {

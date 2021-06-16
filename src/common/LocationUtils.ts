@@ -5,9 +5,14 @@ import {ModelType} from "./Enums";
 import {RoomUtils} from "./RoomUtils";
 import {MonsterUtils} from "./MonsterUtils";
 import {Scroll} from "../data/Scroll";
+import {Entrance} from "../data/Entrance";
 
 export const LocationUtils = {
-	getDisplay(source: Monster | Character | Scroll, hold: Hold) {
+	getDisplay(source: Monster | Character | Scroll | Entrance | undefined, hold: Hold) {
+		if (!source) {
+			return "Unknown";
+		}
+
 		switch (source.modelType) {
 			case ModelType.Character:
 				return `Hold Character: ${source.name}`;
@@ -18,8 +23,9 @@ export const LocationUtils = {
 
 			case ModelType.Scroll:
 				return RoomUtils.getDisplayLocation(source.roomId, hold) + ` (${source.x}, ${source.y})`;
-		}
 
-		return "Unknown";
+			case ModelType.Entrance:
+				return RoomUtils.getDisplayLocation(source.roomId, hold) + ` (${source.x}, ${source.y})`;
+		}
 	},
 };

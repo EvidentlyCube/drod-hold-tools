@@ -7,6 +7,7 @@ import {Level} from "../data/Level";
 import {Character} from "../data/Character";
 import {Player} from "../data/Player";
 import { ChangeUtils } from "./ChangeUtils";
+import {DateUtils} from "./DateUtils";
 
 export const UpdateUtils = {
 	speechText(speechOrId: Speech|number, newText: string, hold: Hold) {
@@ -107,8 +108,11 @@ export const UpdateUtils = {
 			: levelOrId; 
 		
 		let wasChanged = false;
-		if (level.changes.dateCreated !== newDateCreated) {
-			if (level.dateCreated !== newDateCreated) {
+		let newDateIso = DateUtils.formatDate(newDateCreated);
+		let oldDateIso = DateUtils.formatDate(level.dateCreated);
+		let oldChangedDateIso = level.changes.dateCreated ? DateUtils.formatDate(level.changes.dateCreated) : null;
+		if (oldChangedDateIso !== newDateIso) {
+			if (oldDateIso !== newDateIso) {
 				level.changes.dateCreated = newDateCreated;
 				wasChanged = true;
 			} else if (level.changes.dateCreated !== undefined) {

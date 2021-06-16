@@ -23,7 +23,7 @@ export const ChangeUtils = {
 			changes: {delete: speech.isDeleted},
 		});
 
-		if (speech.command && speech.source) {
+		if (speech.source) {
 			speech.command.changes.speechId = speech.isDeleted ? 0 : speech.id;
 
 			HoldUtils.addChange(hold, {

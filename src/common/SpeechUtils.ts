@@ -10,19 +10,19 @@ export const SpeechUtils = {
 		}
 
 		if (speech.location.source === 'monster') {
-			return `${speech.location.location}: ${speech.location.characterName}`;
+			return `${speech.location.location}: ${speech.location.characterName} (${speech.location.speechCustomX},${speech.location.speechCustomY})`;
 		} else {
 			return `Hold character ${speech.location.characterName}`;
 		}
 	},
 	getDisplaySpeaker(speech: Speech, hold: Hold) {
-		if (speech.command && speech.command.command !== CharCommand.CC_Speech) {
+		if (speech.command.command !== CharCommand.CC_Speech) {
 			// Only Speech command uses speaker
 			return '';
 		}
 
-		const x = speech.location?.x.toString() ?? undefined;
-		const y = speech.location?.y.toString() ?? undefined;
+		const x = speech.location?.speechCustomX.toString() ?? undefined;
+		const y = speech.location?.speechCustomY.toString() ?? undefined;
 
 		const moodSuffix = speech.moodId === Mood.Normal ? '' : `, ${MoodNameMap.get(speech.moodId) ?? 'unknown mood'}`;
 		if (speech.speakerId === Speaker.Custom) {

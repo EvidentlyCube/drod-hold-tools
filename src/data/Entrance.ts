@@ -9,6 +9,9 @@ export interface Entrance {
 	roomId: number;
 	description: string;
 	isMainEntrance: boolean;
+	showDescription: boolean;
+	x: number;
+	y: number;
 
 	changes: {
 		description?: string;

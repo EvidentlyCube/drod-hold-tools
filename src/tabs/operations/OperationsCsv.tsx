@@ -31,14 +31,16 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
     const {hold} = props;
 
     const onExport = useCallback(() => {
-        const csv = CsvExporter.hold(hold);
+	    Store.isBusy.value = true;
 
-        Store.isBusy.value = true;
+        const csv = CsvExporter.hold(hold);
 
         var downloader = document.createElement("a");
         downloader.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(csv);
         downloader.setAttribute("download", hold.name + '.csv');
         downloader.click();
+
+	    Store.isBusy.value = false;
     }, [hold]);
 
     return <Paper className={classes.container}>
