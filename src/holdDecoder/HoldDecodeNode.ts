@@ -106,6 +106,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				moodId: element.hasAttribute('Mood') ? getInt(element, 'Mood') : 0,
 				speakerId: element.hasAttribute('Character') ? getInt(element, 'Character') : 0,
 				delay: element.hasAttribute('Delay') ? getInt(element, 'Delay') : 0,
+				isDeleted: false,
 				command: createNullCommand(),
 				changes: {},
 			});

@@ -3,13 +3,13 @@ import {Hold} from "../../data/Hold";
 import React from "react";
 import {Container, Paper, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
-import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {RoomUtils} from "../../common/RoomUtils";
 import {Scroll} from "../../data/Scroll";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {HoldUtils} from "../../common/HoldUtils";
+import {UpdateUtils} from "../../common/UpdateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -63,11 +63,9 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 
 	private handleResetRow = (id: string) => {
 		const {hold} = this.state;
-		const scroll = hold.scrolls.get(id);
-		assert(scroll, `Failed to find scroll with ID '${id}'`);
-		delete (scroll.changes.text);
+		const scroll = HoldUtils.getScroll(id, hold);
 
-		ChangeUtils.scrollText(scroll, hold);
+		UpdateUtils.scrollText(scroll, scroll.text, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
@@ -76,26 +74,18 @@ class ScrollsTab extends React.Component<ScrollsTabProps, ScrollsTabState> {
 		this._tableApi.current?.rerenderRow(id);
 	};
 
-	private handleCellEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: ScrollRow, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const scroll = hold.scrolls.get(row.id as string);
-		assert(scroll, `No scroll found for id '${row.id}'`);
+		const scroll = HoldUtils.getScroll(row.id, hold);
 
-		scroll.changes.text = newValue;
-		if (scroll.text === scroll.changes.text) {
-			delete (scroll.changes.text);
-		}
-
-		ChangeUtils.scrollText(scroll, hold);
+		UpdateUtils.scrollText(scroll, newValue, hold);
 
 		this.getRowById(row.id).isEdited = scroll.changes.text !== undefined;
 	};
 
 	private static scrollToRow(scroll: Scroll, hold: Hold): ScrollRow {
-		const room = hold.rooms.get(scroll.roomId);
-		assert(room, `Failed to find room with ID '${scroll.roomId}'`);
-		const level = hold.levels.get(room.levelId);
-		assert(level, `Failed to find level with ID '${room.levelId}'`);
+		const room = HoldUtils.getRoom(scroll.roomId, hold);
+		const level = HoldUtils.getLevel(room.levelId, hold);
 
 		return {
 			id: scroll.id,

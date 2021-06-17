@@ -6,15 +6,35 @@ import {Scroll} from "../data/Scroll";
 import {Level} from "../data/Level";
 import {Character} from "../data/Character";
 import {Player} from "../data/Player";
-import { ChangeUtils } from "./ChangeUtils";
+import {ChangeUtils} from "./ChangeUtils";
 import {DateUtils} from "./DateUtils";
+import {Store} from "../data/Store";
+import {PlayerUtils} from "./PlayerUtils";
+import React from "react";
 
+const handleAuthorChanged = (level: Level, hold: Hold) => {
+	const levelName = level.changes.name ?? level.name;
+	const playerId = level.changes.playerId ?? level.playerId;
+	const player = HoldUtils.getPlayer(playerId, hold);
+
+	if (player.isDeleted) {
+		player.isDeleted = false;
+		ChangeUtils.playerDeleted(player, hold);
+		Store.addSystemMessage({
+			message: <p>
+				Player&nbsp;<strong>{PlayerUtils.getName(player)}</strong>&nbsp;is no longer marked
+				for deletion, as it's now the author of level&nbsp;<strong>{levelName}</strong>.
+			</p>,
+			color: "info",
+		});
+	}
+};
 export const UpdateUtils = {
-	speechText(speechOrId: Speech|number, newText: string, hold: Hold) {
+	speechText(speechOrId: Speech | number, newText: string, hold: Hold) {
 		const speech = typeof speechOrId === 'number'
 			? HoldUtils.getSpeech(speechOrId, hold)
-			: speechOrId; 
-		
+			: speechOrId;
+
 		let wasChanged = false;
 		if (speech.changes.text !== newText) {
 			if (speech.text !== newText) {
@@ -33,11 +53,29 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	entranceDescription(entranceOrId: Entrance|number, newDescription: string, hold: Hold) {
+	speechDeleted(speechOrId: Speech | number, isDeleted: boolean, hold: Hold) {
+		const speech = typeof speechOrId === 'number'
+			? HoldUtils.getSpeech(speechOrId, hold)
+			: speechOrId;
+
+		let wasChanged = false;
+		if (speech.isDeleted !== isDeleted) {
+			speech.isDeleted = isDeleted
+			wasChanged = true;
+		}
+
+		if (wasChanged) {
+			ChangeUtils.speechDeleted(speech, hold);
+		}
+
+		return wasChanged;
+	},
+
+	entranceDescription(entranceOrId: Entrance | number, newDescription: string, hold: Hold) {
 		const entrance = typeof entranceOrId === 'number'
 			? HoldUtils.getEntrance(entranceOrId, hold)
-			: entranceOrId; 
-		
+			: entranceOrId;
+
 		let wasChanged = false;
 		if (entrance.changes.description !== newDescription) {
 			if (entrance.description !== newDescription) {
@@ -48,7 +86,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.entranceDescription(entrance, hold);
 		}
@@ -56,11 +94,11 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	scrollText(scrollOrId: Scroll|string, newText: string, hold: Hold) {
+	scrollText(scrollOrId: Scroll | string, newText: string, hold: Hold) {
 		const scroll = typeof scrollOrId === 'string'
 			? HoldUtils.getScroll(scrollOrId, hold)
-			: scrollOrId; 
-		
+			: scrollOrId;
+
 		let wasChanged = false;
 		if (scroll.changes.text !== newText) {
 			if (scroll.text !== newText) {
@@ -71,7 +109,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.scrollText(scroll, hold);
 		}
@@ -79,11 +117,11 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	levelName(levelOrId: Level|number, newName: string, hold: Hold) {
+	levelName(levelOrId: Level | number, newName: string, hold: Hold) {
 		const level = typeof levelOrId === 'number'
 			? HoldUtils.getLevel(levelOrId, hold)
-			: levelOrId; 
-		
+			: levelOrId;
+
 		let wasChanged = false;
 		if (level.changes.name !== newName) {
 			if (level.name !== newName) {
@@ -94,7 +132,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.levelName(level, hold);
 		}
@@ -102,11 +140,35 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	levelDateCreated(levelOrId: Level|number, newDateCreated: Date, hold: Hold) {
+	levelPlayerId(levelOrId: Level | number, newPlayerId: number, hold: Hold) {
 		const level = typeof levelOrId === 'number'
 			? HoldUtils.getLevel(levelOrId, hold)
-			: levelOrId; 
-		
+			: levelOrId;
+
+		let wasChanged = false;
+		if (level.changes.playerId !== newPlayerId) {
+			if (level.playerId !== newPlayerId) {
+				level.changes.playerId = newPlayerId;
+				wasChanged = true;
+			} else if (level.changes.playerId !== undefined) {
+				delete level.changes.playerId;
+				wasChanged = true;
+			}
+		}
+
+		if (wasChanged) {
+			ChangeUtils.levelPlayerId(level, hold);
+			handleAuthorChanged(level, hold);
+		}
+
+		return wasChanged;
+	},
+
+	levelDateCreated(levelOrId: Level | number, newDateCreated: Date, hold: Hold) {
+		const level = typeof levelOrId === 'number'
+			? HoldUtils.getLevel(levelOrId, hold)
+			: levelOrId;
+
 		let wasChanged = false;
 		let newDateIso = DateUtils.formatDate(newDateCreated);
 		let oldDateIso = DateUtils.formatDate(level.dateCreated);
@@ -120,7 +182,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.levelDateCreated(level, hold);
 		}
@@ -128,11 +190,11 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	characterName(characterOrId: Character|number, newName: string, hold: Hold) {
+	characterName(characterOrId: Character | number, newName: string, hold: Hold) {
 		const character = typeof characterOrId === 'number'
 			? HoldUtils.getCharacter(characterOrId, hold)
-			: characterOrId; 
-		
+			: characterOrId;
+
 		let wasChanged = false;
 		if (character.changes.name !== newName) {
 			if (character.name !== newName) {
@@ -143,7 +205,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.characterName(character, hold);
 		}
@@ -162,7 +224,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.holdName(hold);
 		}
@@ -181,7 +243,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.holdDescription(hold);
 		}
@@ -200,7 +262,7 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.holdEnding(hold);
 		}
@@ -208,11 +270,11 @@ export const UpdateUtils = {
 		return wasChanged;
 	},
 
-	playerName(playerOrId: Player|number, newName: string, hold: Hold) {
+	playerName(playerOrId: Player | number, newName: string, hold: Hold) {
 		const player = typeof playerOrId === 'number'
 			? HoldUtils.getPlayer(playerOrId, hold)
-			: playerOrId; 
-		
+			: playerOrId;
+
 		let wasChanged = false;
 		if (player.changes.name !== newName) {
 			if (player.name !== newName) {
@@ -223,9 +285,27 @@ export const UpdateUtils = {
 				wasChanged = true;
 			}
 		}
-		
+
 		if (wasChanged) {
 			ChangeUtils.playerName(player, hold);
+		}
+
+		return wasChanged;
+	},
+
+	playerDeleted(playerOrId: Player | number, isDeleted: boolean, hold: Hold) {
+		const player = typeof playerOrId === 'number'
+			? HoldUtils.getPlayer(playerOrId, hold)
+			: playerOrId;
+
+		let wasChanged = false;
+		if (player.isDeleted !== isDeleted) {
+			player.isDeleted = isDeleted
+			wasChanged = true;
+		}
+
+		if (wasChanged) {
+			ChangeUtils.playerDeleted(player, hold);
 		}
 
 		return wasChanged;

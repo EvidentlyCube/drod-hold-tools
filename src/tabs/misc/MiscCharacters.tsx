@@ -2,13 +2,13 @@ import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
 import {Accordion, AccordionDetails, AccordionSummary} from "@material-ui/core/";
-import {assert} from "../../common/Assert";
 import {ExpandMore} from "@material-ui/icons";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {Character} from "../../data/Character";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {UpdateUtils} from "../../common/UpdateUtils";
+import {HoldUtils} from "../../common/HoldUtils";
 
 const RowsPerPage = 25;
 
@@ -49,30 +49,22 @@ export class MiscCharacters extends React.Component<MiscCharactersProps, MiscCha
 
 	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
-		const character = hold.characters.get(id);
-		assert(character, `Failed to find character with ID '${id}'`);
-		delete (character.changes.name);
 
-		ChangeUtils.characterName(character, hold);
+		const character = HoldUtils.getCharacter(id, hold);
+		UpdateUtils.characterName(character, character.name, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
 		dataRow.isEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
-	}
+	};
 
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const character = hold.characters.get(row.id as number);
-		assert(character, `No character found for id '${row.id}'`);
 
-		character.changes.name = newValue;
-		if (character.name === character.changes.name) {
-			delete (character.changes.name);
-		}
-
-		ChangeUtils.characterName(character, hold);
+		const character = HoldUtils.getCharacter(row.id as number, hold);
+		UpdateUtils.characterName(character, newValue, hold);
 
 		this.getRowById(row.id).isEdited = character.changes.name !== undefined;
 	};

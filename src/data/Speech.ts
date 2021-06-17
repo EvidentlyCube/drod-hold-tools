@@ -15,7 +15,7 @@ export interface Speech {
 	speakerId: number;
 	delay: number;
 
-	isDeleted?: true;
+	isDeleted: boolean;
 
 	changes: {
 		text?: string;

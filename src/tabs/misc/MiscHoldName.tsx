@@ -5,8 +5,8 @@ import {Accordion, AccordionDetails, AccordionSummary} from "@material-ui/core/"
 import {ExpandMore} from "@material-ui/icons";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {UpdateUtils} from "../../common/UpdateUtils";
 
 const RowsPerPage = 25;
 
@@ -52,9 +52,7 @@ export class MiscHoldName extends React.Component<MiscHoldNameProps, MiscHoldNam
 	private handleResetRow = () => {
 		const {hold, allRows} = this.state;
 
-		delete (hold.changes.name);
-
-		ChangeUtils.holdName(hold);
+		UpdateUtils.holdName(hold, hold.name);
 
 		const dataRow = allRows[0];
 		dataRow.text = dataRow.originalText;
@@ -66,12 +64,7 @@ export class MiscHoldName extends React.Component<MiscHoldNameProps, MiscHoldNam
 	private handleCellEdited = (row: any, field: string, newValue: string) => {
 		const {hold, allRows} = this.state;
 
-		hold.changes.name = newValue;
-		if (hold.name === hold.changes.name) {
-			delete hold.changes.name;
-		}
-
-		ChangeUtils.holdName(hold);
+		UpdateUtils.holdName(hold, newValue);
 
 		allRows[0].isEdited = hold.changes.name !== undefined;
 	};

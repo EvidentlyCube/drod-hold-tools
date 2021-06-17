@@ -16,7 +16,7 @@ export const ChangeUtils = {
 		});
 	},
 
-	speechDelete(speech: Speech, hold: Hold) {
+	speechDeleted(speech: Speech, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Speech",
 			model: speech,
@@ -59,7 +59,7 @@ export const ChangeUtils = {
 		});
 	},
 
-	levelPlayer(level: Level, hold: Hold) {
+	levelPlayerId(level: Level, hold: Hold) {
 		HoldUtils.addChange(hold, {
 			type: "Level",
 			model: level,

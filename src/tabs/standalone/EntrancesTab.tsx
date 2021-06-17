@@ -3,13 +3,13 @@ import {Hold} from "../../data/Hold";
 import React from "react";
 import {Container, Paper, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
-import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {RoomUtils} from "../../common/RoomUtils";
 import {Entrance} from "../../data/Entrance";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {HoldUtils} from "../../common/HoldUtils";
+import {UpdateUtils} from "../../common/UpdateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -64,11 +64,9 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 
 	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
-		const entrance = hold.entrances.get(id);
-		assert(entrance, `Failed to find entrance with ID '${id}'`);
-		delete (entrance.changes.description);
 
-		ChangeUtils.entranceDescription(entrance, hold);
+		const entrance = HoldUtils.getEntrance(id, hold);
+		UpdateUtils.entranceDescription(entrance, entrance.description, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
@@ -77,26 +75,18 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 		this._tableApi.current?.rerenderRow(id);
 	};
 
-	private handleCellEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: EntranceRow, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const entrance = hold.entrances.get(row.id as number);
-		assert(entrance, `No entrance found for id '${row.id}'`);
+		const entrance = HoldUtils.getEntrance(row.id, hold);
 
-		entrance.changes.description = newValue;
-		if (entrance.description === entrance.changes.description) {
-			delete (entrance.changes.description);
-		}
-
-		ChangeUtils.entranceDescription(entrance, hold);
+		UpdateUtils.entranceDescription(entrance, newValue, hold);
 
 		this.getRowById(row.id).isEdited = entrance.changes.description !== undefined;
 	};
 
 	private static entranceToRow(entrance: Entrance, hold: Hold): EntranceRow {
-		const room = hold.rooms.get(entrance.roomId);
-		assert(room, `Failed to find room with ID '${entrance.roomId}'`);
-		const level = hold.levels.get(room.levelId);
-		assert(level, `Failed to find level with ID '${room.levelId}'`);
+		const room = HoldUtils.getRoom(entrance.roomId, hold);
+		const level = HoldUtils.getLevel(room.levelId, hold);
 
 		return {
 			id: entrance.id,

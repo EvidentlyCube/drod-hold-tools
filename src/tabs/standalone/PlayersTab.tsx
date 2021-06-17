@@ -4,13 +4,13 @@ import React from "react";
 import {Box, Button, Container, Paper, Switch, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {Player} from "../../data/Player";
-import {assert} from "../../common/Assert";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {ChangeUtils} from "../../common/ChangeUtils";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {ModelType} from "../../common/Enums";
+import {UpdateUtils} from "../../common/UpdateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -69,11 +69,9 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 
 	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
-		const player = hold.players.get(id);
-		assert(player, `Failed to find player with ID '${id}'`);
-		delete (player.changes.name);
+		const player = HoldUtils.getPlayer(id, hold);
 
-		ChangeUtils.playerName(player, hold);
+		UpdateUtils.playerName(player, player.name, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
@@ -86,8 +84,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 		const {hold} = this.state;
 
 		const row = this.getRowById(id);
-		const player = hold.players.get(id);
-		assert(player, `Marking for deletion player which does not exist #${id}`);
+		const player = HoldUtils.getPlayer(id, hold);
 
 		if (player.isNew) {
 			// remove from changes
@@ -104,25 +101,18 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 			return;
 		}
 
-		player.isDeleted = !player.isDeleted;
+		UpdateUtils.playerDeleted(player, !player.isDeleted, hold);
 
-		ChangeUtils.playerDeleted(player, hold);
 		row.isDeleted = player.isDeleted;
 
 		this._tableApi.current?.rerenderRow(id);
 	};
 
-	private handleCellEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: PlayerRow, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const player = hold.players.get(row.id as number);
-		assert(player, `No player found for id '${row.id}'`);
+		const player = HoldUtils.getPlayer(row.id, hold);
 
-		player.changes.name = newValue;
-		if (player.name === player.changes.name) {
-			delete player.changes.name;
-		}
-
-		ChangeUtils.playerName(player, hold);
+		UpdateUtils.playerName(player, newValue, hold);
 
 		this.getRowById(row.id).isEdited = player.changes.name !== undefined;
 	};

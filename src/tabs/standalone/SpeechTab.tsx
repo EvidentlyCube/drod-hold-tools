@@ -4,14 +4,13 @@ import React from "react";
 import {Container, Paper, Switch, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {Speech} from "../../data/Speech";
-import {assert} from "../../common/Assert";
 import {HoldUtils} from "../../common/HoldUtils";
 import {SpeechUtils} from "../../common/SpeechUtils";
 import {CommandsUtils} from "../../common/CommandsUtils";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
+import {UpdateUtils} from "../../common/UpdateUtils";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -68,11 +67,9 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 
 	private handleResetRow = (id: number) => {
 		const {hold} = this.state;
-		const speech = hold.speeches.get(id);
-		assert(speech, `Failed to find speech with ID '${id}'`);
-		delete (speech.changes.text);
+		const speech = HoldUtils.getSpeech(id, hold);
 
-		ChangeUtils.speechText(speech, hold);
+		UpdateUtils.speechText(speech, speech.text, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
@@ -83,33 +80,20 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 
 	private handleDeleteRowClicked = (speechId: number) => {
 		const {hold} = this.state;
+		const speech = HoldUtils.getSpeech(speechId, hold);
 
-		const speech = hold.speeches.get(speechId);
-		assert(speech, `Marking for deletion speech which does not exist #${speechId}`);
+		UpdateUtils.speechDeleted(speech, !speech.isDeleted, hold)
 
-		speech.isDeleted = speech.isDeleted ? undefined : true;
-
-		ChangeUtils.speechDelete(speech, hold);
-		this.getRowById(speechId).isDeleted = speech.isDeleted || false;
+		this.getRowById(speechId).isDeleted = speech.isDeleted;
 
 		this._tableApi.current?.rerenderRow(speechId);
 	};
 
-	private handleCellEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: SpeechRow, field: string, newValue: string) => {
 		const {hold} = this.state;
-		const speech = hold.speeches.get(row.id as number);
-		assert(speech, `No speech found for id '${row.id}'`);
+		const speech = HoldUtils.getSpeech(row.id, hold);
 
-		speech.changes.text = newValue;
-		if (speech.text === speech.changes.text) {
-			delete (speech.changes.text);
-		}
-
-		HoldUtils.addChange(hold, {
-			type: "Speech",
-			model: speech,
-			changes: {text: !!speech.changes.text},
-		});
+		UpdateUtils.speechText(speech, newValue, hold);
 
 		this.getRowById(row.id).isEdited = speech.changes.text !== undefined;
 	};
@@ -122,7 +106,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			command: speech?.location?.commandName ?? '',
 			speaker: SpeechUtils.getDisplaySpeaker(speech, hold),
 			location: SpeechUtils.getDisplayLocation(speech) ?? '',
-			isDeleted: !!speech.isDeleted,
+			isDeleted: speech.isDeleted,
 			hasData: !!speech.dataId,
 			isEdited: speech.changes.text !== undefined,
 			isDeletable: !CommandsUtils.doesRequireSpeech(speech.command.command),

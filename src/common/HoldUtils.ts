@@ -36,42 +36,49 @@ export const HoldUtils = {
 	
 	getSpeech(speechId: number, hold: Hold) {
 		const speech = hold.speeches.get(speechId);
-		assert(speech, `Speech with ID '${speechId}' does not exist`);
+		assert(speech, `Speech with Id '${speechId}' does not exist`);
 
 		return speech;
 	}, 
 	
-	getEntrance(entranceID: number, hold: Hold) {
-		const speech = hold.entrances.get(entranceID);
-		assert(speech, `Entrance with ID '${entranceID}' does not exist`);
+	getEntrance(entranceId: number, hold: Hold) {
+		const speech = hold.entrances.get(entranceId);
+		assert(speech, `Entrance with Id '${entranceId}' does not exist`);
 
 		return speech;
-	}, 
+	},
+
+	getRoom(roomId: number, hold: Hold) {
+		const room = hold.rooms.get(roomId);
+		assert(room, `Room with Id '${roomId}' does not exist`);
+
+		return room;
+	},
 	
 	getScroll(scrollId: string, hold: Hold) {
 		const scroll = hold.scrolls.get(scrollId);
-		assert(scroll, `Scroll with ID '${scrollId}' does not exist`);
+		assert(scroll, `Scroll with Id '${scrollId}' does not exist`);
 
 		return scroll;
 	}, 
 	
 	getCharacter(characterId: number, hold: Hold) {
 		const speech = hold.characters.get(characterId);
-		assert(speech, `Character with ID '${characterId}' does not exist`);
+		assert(speech, `Character with Id '${characterId}' does not exist`);
 
 		return speech;
 	}, 
 	
 	getLevel(levelId: number, hold: Hold) {
 		const speech = hold.levels.get(levelId);
-		assert(speech, `Speech with ID '${levelId}' does not exist`);
+		assert(speech, `Speech with Id '${levelId}' does not exist`);
 
 		return speech;
 	}, 
 
 	getPlayer(playerId: number, hold: Hold) {
 		const player = hold.players.get(playerId);
-		assert(player, `Player with ID '${playerId}' does not exist`);
+		assert(player, `Player with Id '${playerId}' does not exist`);
 
 		return player;
 	}, 

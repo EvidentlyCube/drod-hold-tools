@@ -1,8 +1,6 @@
 import {Container, Dialog, DialogTitle, MenuItem, Paper, Select, TextField, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React, {useCallback, useEffect, useState} from "react";
-import {assert} from "../../common/Assert";
-import {ChangeUtils} from "../../common/ChangeUtils";
 import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
 import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
@@ -15,6 +13,9 @@ import {Player} from "../../data/Player";
 import {Store} from "../../data/Store";
 import {CalendarPicker} from "@material-ui/lab";
 import {parseISO} from "date-fns";
+import {HoldUtils} from "../../common/HoldUtils";
+import {UpdateUtils} from "../../common/UpdateUtils";
+import {isDateValid} from "@material-ui/data-grid";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -84,11 +85,9 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 	private handleResetTextRow = (id: number) => {
 		const {hold} = this.state;
-		const level = hold.levels.get(id);
-		assert(level, `Failed to find level with ID '${id}'`);
-		delete (level.changes.name);
+		const level = HoldUtils.getLevel(id, hold);
 
-		ChangeUtils.levelName(level, hold);
+		UpdateUtils.levelName(level, level.name, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.text = dataRow.originalText;
@@ -99,12 +98,9 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 	private handleResetAuthorRow = (id: number) => {
 		const {hold} = this.state;
-		const level = hold.levels.get(id);
-		assert(level, `Failed to find level with ID '${id}'`);
-		delete level.changes.playerId;
+		const level = HoldUtils.getLevel(id, hold);
 
-		ChangeUtils.levelPlayer(level, hold);
-		this.handleAuthorChanged(level);
+		UpdateUtils.levelPlayerId(level, level.playerId, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.authorId = dataRow.originalAuthorId;
@@ -116,11 +112,9 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 	private handleResetDateCreatedRow = (id: number) => {
 		const {hold} = this.state;
-		const level = hold.levels.get(id);
-		assert(level, `Failed to find level with ID '${id}'`);
-		delete level.changes.dateCreated;
+		const level = HoldUtils.getLevel(id, hold);
 
-		ChangeUtils.levelDateCreated(level, hold);
+		UpdateUtils.levelDateCreated(level, level.dateCreated, hold)
 
 		const dataRow = this.getRowById(id);
 		dataRow.dateCreated = dataRow.originalDateCreated;
@@ -129,7 +123,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		this._tableApi.current?.rerenderRow(dataRow.index);
 	};
 
-	private handleCellEdited = (row: any, field: string, newValue: string) => {
+	private handleCellEdited = (row: LevelRow, field: string, newValue: string) => {
 		if (field === 'text') {
 			this.handleTextEdited(row, newValue);
 		} else if (field === 'authorName') {
@@ -141,15 +135,10 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 
 	private handleTextEdited = (row: LevelRow, newValue: string) => {
 		const {hold} = this.state;
-		const level = hold.levels.get(row.id as number);
-		assert(level, `No level found for id '${row.id}'`);
+		const level = HoldUtils.getLevel(row.id, hold);
 
-		level.changes.name = newValue;
-		if (level.name === level.changes.name) {
-			delete (level.changes.name);
-		}
 
-		ChangeUtils.levelName(level, hold);
+		UpdateUtils.levelName(level, newValue, hold);
 
 		this.getRowById(row.id).isTextEdited = level.changes.name !== undefined;
 	};
@@ -161,19 +150,10 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		}
 
 		const {hold} = this.state;
-		const level = hold.levels.get(row.id as number);
-		assert(level, `No level found for id '${row.id}'`);
+		const level = HoldUtils.getLevel(row.id, hold);
+		const player = HoldUtils.getPlayer(playerId, hold);
 
-		const player = hold.players.get(playerId);
-		assert(player, `No player found for id '${playerId}'`);
-
-		level.changes.playerId = playerId;
-		if (level.playerId === level.changes.playerId) {
-			delete level.changes.playerId;
-		}
-
-		ChangeUtils.levelPlayer(level, hold);
-		this.handleAuthorChanged(level);
+		UpdateUtils.levelPlayerId(level, playerId, hold);
 
 		row.authorId = playerId;
 		row.authorName = PlayerUtils.getName(player);
@@ -181,48 +161,29 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 	};
 
 	private handleDateCreatedEdited = (row: LevelRow, newValue: string) => {
-		const {hold} = this.state;
-		const level = hold.levels.get(row.id as number);
-		assert(level, `No level found for id '${row.id}'`);
+		const newDate = parseISO(newValue);
+		if (!isDateValid(newDate)) {
+			Store.addSystemMessage({
+				color: "error",
+				message: `'${newValue}' is not a valid date format. Please use YYYY-MM-DD format, eg 2021-12-31.`
+			});
+			return;
 
-		level.changes.dateCreated = parseISO(newValue);
-		if (DateUtils.formatDate(level.dateCreated) === DateUtils.formatDate(level.changes.dateCreated)) {
-			delete level.changes.dateCreated;
 		}
+		const {hold} = this.state;
+		const level = HoldUtils.getLevel(row.id, hold);
 
-		ChangeUtils.levelDateCreated(level, hold);
+		UpdateUtils.levelDateCreated(level, newDate, hold)
 
 		row.dateCreated = newValue;
 		row.isDateCreatedEdited = level.changes.dateCreated !== undefined;
 	};
 
-	private handleAuthorChanged = (level: Level) => {
-		const {hold} = this.state;
-		const levelName = level.changes.name ?? level.name;
-		const playerId = level.changes.playerId ?? level.playerId;
-		const player = hold.players.get(playerId);
-		assert(player, `Failed to find player with ID '${playerId}'`);
-
-		if (player.isDeleted) {
-			player.isDeleted = false;
-			ChangeUtils.playerDeleted(player, hold);
-			Store.addSystemMessage({
-				message: <p>
-					Player&nbsp;<strong>{PlayerUtils.getName(player)}</strong>&nbsp;is no longer marked
-					for deletion, as it's now the author of level&nbsp;<strong>{levelName}</strong>.
-				</p>,
-				color: "info",
-			});
-		}
-	};
-
 	private levelToRow(level: Level, hold: Hold): LevelRow {
 		const playerId = level.changes.playerId ?? level.playerId;
 		const originalPlayerId = level.playerId;
-		const player = hold.players.get(playerId);
-		const originalPlayer = hold.players.get(originalPlayerId);
-		assert(player, `Failed to find player with ID '${playerId}'`);
-		assert(originalPlayer, `Failed to find player with ID '${originalPlayerId}'`);
+		const player = HoldUtils.getPlayer(playerId, hold);
+		const originalPlayer = HoldUtils.getPlayer(originalPlayerId, hold);
 
 		const dateCreated = DateUtils.formatDate(level.changes.dateCreated ?? level.dateCreated);
 		const originalDateCreated = DateUtils.formatDate(level.dateCreated);
