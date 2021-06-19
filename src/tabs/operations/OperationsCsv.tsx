@@ -43,6 +43,10 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
 	    Store.isBusy.value = false;
     }, [hold]);
 
+    const onImport = useCallback(async (files: File[]) => {
+    	CsvImporter.readFile(files[0], hold);
+    }, [hold]);
+
     return <Paper className={classes.container}>
         <Typography variant="h5" noWrap>
             CSV Export/Import
@@ -55,5 +59,6 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
             <Button variant="contained" onClick={onExport}>Export CSV</Button>
             <DropzoneCsv onDrop={files => CsvImporter.readFile(files[0], hold)}/>
         </Box>
+	    <Dialog open={}
     </Paper>;
 }

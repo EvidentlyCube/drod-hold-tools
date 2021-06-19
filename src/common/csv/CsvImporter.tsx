@@ -7,33 +7,46 @@ import {UpdateUtils} from "../UpdateUtils";
 import {CsvRow} from "./CsvExporter";
 
 
+export interface CsvImportResult {
+	importedRows: number;
+	errors: string[];
+}
+
 export const CsvImporter = {
-	readFile(file: File, hold: Hold) {
+	readFile(file: File, hold: Hold): Promise<CsvImportResult> {
 		Store.isBusy.value = true;
 
+		let res;
 		const fileReader = new FileReader();
 		fileReader.onload = async () => {
 			const buffer = fileReader.result as ArrayBuffer;
 			const data = new Uint8Array(buffer);
 
 			try {
-				await CsvImporter.readString(StringUtils.uint8ToString(data), hold);
+				const result = await CsvImporter.readString(StringUtils.uint8ToString(data), hold);
+				res(result);
 			} catch (e) {
+
 				console.error(e);
 				// Ignore
 			}
 			Store.isBusy.value = false;
 		};
 		fileReader.readAsArrayBuffer(file);
+
+		return new Promise(resolve => {
+			res = resolve;
+		});
 	},
 
 	async readString(str: string, hold: Hold) {
 		const csv = parse(str);
 
-		console.log(csv);
 		if (Array.isArray(csv)) {
-			CsvImporter.readCsv(csv, hold);
+			return CsvImporter.readCsv(csv, hold);
 		}
+
+
 	},
 
 	readCsv(csv: any[], hold: Hold) {
