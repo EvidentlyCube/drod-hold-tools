@@ -1,10 +1,11 @@
 import { Box, Button, Paper, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { CsvExporter } from "../../common/csv/CsvExporter";
-import { CsvImporter } from "../../common/csv/CsvImporter";
+import { CsvImporter, CsvImportResult } from "../../common/csv/CsvImporter";
 import { Hold } from "../../data/Hold";
 import { Store } from "../../data/Store";
+import { CsvResultsDialog } from "./CsvResultsDialog";
 import { DropzoneCsv } from "./DropzoneCsv";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -30,6 +31,10 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
     const classes = useStyles();
     const {hold} = props;
 
+    const [results, setResults] = useState<CsvImportResult|undefined>(undefined);
+
+    const onClose = useCallback(() => setResults(undefined), [setResults]);
+
     const onExport = useCallback(() => {
 	    Store.isBusy.value = true;
 
@@ -44,8 +49,9 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
     }, [hold]);
 
     const onImport = useCallback(async (files: File[]) => {
-    	CsvImporter.readFile(files[0], hold);
-    }, [hold]);
+    	const result = await CsvImporter.readFile(files[0], hold);
+        setResults(result);
+    }, [hold, setResults]);
 
     return <Paper className={classes.container}>
         <Typography variant="h5" noWrap>
@@ -57,8 +63,8 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
         <div style={{ flex: 1 }} />
         <Box display="flex" justifyContent="space-around" className={classes.buttons}>
             <Button variant="contained" onClick={onExport}>Export CSV</Button>
-            <DropzoneCsv onDrop={files => CsvImporter.readFile(files[0], hold)}/>
+            <DropzoneCsv onDrop={onImport}/>
         </Box>
-	    <Dialog open={}
+        <CsvResultsDialog results={results} onClose={onClose} />
     </Paper>;
 }

@@ -6,17 +6,25 @@ import {StringUtils} from "../StringUtils";
 import {UpdateUtils} from "../UpdateUtils";
 import {CsvRow} from "./CsvExporter";
 
-
 export interface CsvImportResult {
 	importedRows: number;
+	skippedRows: number;
 	errors: string[];
+}
+
+function getErrorResult(error: string): CsvImportResult {
+    return {
+        importedRows: -1,
+		skippedRows: -1,
+        errors: [error]
+    };
 }
 
 export const CsvImporter = {
 	readFile(file: File, hold: Hold): Promise<CsvImportResult> {
 		Store.isBusy.value = true;
 
-		let res;
+		let res: (val: CsvImportResult) => void;
 		const fileReader = new FileReader();
 		fileReader.onload = async () => {
 			const buffer = fileReader.result as ArrayBuffer;
@@ -39,35 +47,31 @@ export const CsvImporter = {
 		});
 	},
 
-	async readString(str: string, hold: Hold) {
+	async readString(str: string, hold: Hold): Promise<CsvImportResult> {
 		const csv = parse(str);
 
 		if (Array.isArray(csv)) {
 			return CsvImporter.readCsv(csv, hold);
 		}
 
-
+        return getErrorResult("Imported file was not recognized as a valid CSV");
 	},
 
-	readCsv(csv: any[], hold: Hold) {
+	readCsv(csv: any[], hold: Hold): CsvImportResult {
 		if (csv.length === 0) {
-			Store.addSystemMessage({color: 'error', message: "No data found in the loaded file"});
-			return;
+			return getErrorResult("No data found in the loaded file");
 		}
 
 		const firstRow = csv[0];
 
-		if (firstRow.length !== 3) {
-			Store.addSystemMessage({color: 'error', message: "Incorrect number of columns"});
+		if (firstRow.length < 3) {
+			return getErrorResult("Incorrect number of columns");
 		} else if (firstRow[0] !== 'type') {
-			Store.addSystemMessage({color: 'error', message: "First column must be 'type'"});
-			return;
+			return getErrorResult("First column must be 'type'");
 		} else if (typeof firstRow.id === undefined) {
-			Store.addSystemMessage({color: 'error', message: "Second column must be 'id'"});
-			return;
+			return getErrorResult("Second column must be 'id'");
 		} else if (typeof firstRow.value === undefined) {
-			Store.addSystemMessage({color: 'error', message: "Third column must be 'value'"});
-			return;
+			return getErrorResult("Third column must be 'value'");
 		}
 
 		const rows: CsvRow[] = [];
@@ -75,45 +79,46 @@ export const CsvImporter = {
 			const [type, id, value] = csv[i]
 			rows.push({type, id, value});
 		}
-		console.log(rows);
 
-		CsvImporter.readCsvRows(rows, hold);
+		return CsvImporter.readCsvRows(rows, hold);
 	},
 
-	readCsvRows(rows: CsvRow[], hold: Hold) {
-		let changed = 0;
+	readCsvRows(rows: CsvRow[], hold: Hold): CsvImportResult {
+		let importedRows = 0;
+		let skippedRows = 0;
 		let errors: string[] = [];
 		for (const row of rows) {
 			try {
+				let wasChanged = false;
 				switch (row.type) {
 					case "HoldName":
-						changed += UpdateUtils.holdName(hold, row.value) ? 1 : 0;
+						wasChanged = UpdateUtils.holdName(hold, row.value);
 						break;
 					case "HoldDescription":
-						changed += UpdateUtils.holdDescription(hold, row.value) ? 1 : 0;
+						wasChanged = UpdateUtils.holdDescription(hold, row.value);
 						break;
 					case "HoldEnding":
-						changed += UpdateUtils.holdEnding(hold, row.value) ? 1 : 0;
+						wasChanged = UpdateUtils.holdEnding(hold, row.value);
 						break;
 					case "PlayerName":
-						changed += UpdateUtils.playerName(parseInt(row.id), row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.playerName(parseInt(row.id), row.value, hold);
 						break;
 
 					case "CharacterName":
-						changed += UpdateUtils.characterName(parseInt(row.id), row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.characterName(parseInt(row.id), row.value, hold);
 						break;
 					case "ScrollText":
-						changed += UpdateUtils.scrollText(row.id, row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.scrollText(row.id, row.value, hold);
 						break;
 
 					case "EntranceText":
-						changed += UpdateUtils.entranceDescription(parseInt(row.id), row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.entranceDescription(parseInt(row.id), row.value, hold);
 						break;
 					case "CommandText":
-						changed += UpdateUtils.speechText(parseInt(row.id), row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.speechText(parseInt(row.id), row.value, hold);
 						break;
 					case "LevelName":
-						changed += UpdateUtils.levelName(parseInt(row.id), row.value, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.levelName(parseInt(row.id), row.value, hold);
 						break;
 					case "LevelCreatedDate":
 						const date = parseISO(row.value);
@@ -121,36 +126,20 @@ export const CsvImporter = {
 							throw new Error(`Invalid date format '${row.value}'`);
 						}
 
-						changed += UpdateUtils.levelDateCreated(parseInt(row.id), date, hold) ? 1 : 0;
+						wasChanged = UpdateUtils.levelDateCreated(parseInt(row.id), date, hold);
 						break;
 				}
+				importedRows += wasChanged ? 1 : 0;
+				skippedRows += wasChanged ? 0 : 1;
 			} catch (error) {
 				errors.push(error.message ?? "Unknown error");
 			}
 		}
 
-		if (changed === 0) {
-			if (errors.length > 0) {
-				Store.addSystemMessage({
-					color: 'error',
-					message: `No data was updated and got ${errors.length} error${errors.length !== 1 ? 's' : ''}.`,
-				});
-			} else {
-				Store.addSystemMessage({
-					color: 'info',
-					message: `No data was updated.`,
-				});
-			}
-		} else {
-			Store.addSystemMessage({
-				color: 'success',
-				message: <>
-					<p>Updated {changed} row{changed !== 1 ? 's' : ''}.</p>
-					<p>got {errors.length} error{errors.length !== 1 ? 's' : ''}.</p>
-				</>,
-			});
-		}
-
-
+        return {
+            importedRows,
+			skippedRows,
+            errors
+        };
 	},
 };
