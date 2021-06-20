@@ -31,12 +31,10 @@ export const CsvImporter = {
 			const data = new Uint8Array(buffer);
 
 			try {
-				const result = await CsvImporter.readString(StringUtils.uint8ToString(data), hold);
+				const result = CsvImporter.readString(StringUtils.uint8ToString(data), hold);
 				res(result);
 			} catch (e) {
-
-				console.error(e);
-				// Ignore
+				res(getErrorResult(`Unknown error: ${e.message}`));
 			}
 			Store.isBusy.value = false;
 		};
@@ -47,8 +45,14 @@ export const CsvImporter = {
 		});
 	},
 
-	async readString(str: string, hold: Hold): Promise<CsvImportResult> {
-		const csv = parse(str);
+	readString(str: string, hold: Hold): CsvImportResult {
+		let csv;
+
+		try {
+			csv = parse(str);
+		} catch (e) {
+			return getErrorResult(`Failed to parse CSV, possibly not a valid CSV file: ${e.message}`);
+		}
 
 		if (Array.isArray(csv)) {
 			return CsvImporter.readCsv(csv, hold);
