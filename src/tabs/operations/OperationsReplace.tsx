@@ -1,14 +1,10 @@
 import { Box, Button, Paper, TextField, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useCallback, useState } from "react";
-import { CsvExporter } from "../../common/operations/CsvExporter";
-import { CsvImporter, CsvImportResult } from "../../common/operations/CsvImporter";
 import { useTextInputState } from "../../common/Hooks";
+import { SearchReplaceUtils, SearchReplaceResultRow } from "../../common/operations/SearchReplaceUtils";
 import { Hold } from "../../data/Hold";
-import { Store } from "../../data/Store";
-import { CsvResultsDialog } from "./CsvResultsDialog";
-import { DropzoneCsv } from "./DropzoneCsv";
-import { SearchReplaceUtils } from "../../common/operations/SearchReplaceUtils";
+import { SearchReplaceResultsDialog } from "./SearchReplaceResultsDialog";
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -43,9 +39,17 @@ export const OperationsReplace = (props: OperationsReplaceProps) => {
         return s;
     }, [setIsRegex])
 
+    const [results, setResults] = useState<SearchReplaceResultRow<any>[]|undefined>(undefined);
     const [search, onSearchChange] = useTextInputState("", checkIfRegex);
     const [replace, onReplaceChange] = useTextInputState("");
-    
+
+    const onPreview = useCallback(() => {
+        setResults(SearchReplaceUtils.prepare(
+            SearchReplaceUtils.toRegex(search),
+            replace, hold
+        ));
+    }, [setResults, hold, search, replace]);
+
     return <Paper className={classes.container}>
         <Typography variant="h5" noWrap>
             Search & Replace
@@ -69,5 +73,6 @@ export const OperationsReplace = (props: OperationsReplaceProps) => {
         <Box className={classes.inputs}>
             <Button variant="contained">Preview</Button>
         </Box>
+        <SearchReplaceResultsDialog results={results} onClose={() => {}} />
     </Paper>;
 }

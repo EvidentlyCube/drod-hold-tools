@@ -4,12 +4,10 @@ import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import { CsvImportResult } from "../../common/operations/CsvImporter";
+import { SearchReplaceResultRow } from "../../common/operations/SearchReplaceUtils";
 
 const useStyles = makeStyles((theme: Theme) => ({
-	error: {
-		paddingLeft: theme.spacing(6) + ' !important',
-		backgroundColor: '#FEE'
-	}
+	
 }));
 
 const Transition = React.forwardRef(function Transition(
@@ -22,12 +20,12 @@ const Transition = React.forwardRef(function Transition(
 });
 
 
-interface CsvResultsDialogProps {
-	results?: CsvImportResult;
+interface SearchReplaceResultsDialogProps {
+	results?: SearchReplaceResultRow[];
 	onClose: () => void;
 }
 
-export const CsvResultsDialog = ({ results, onClose }: CsvResultsDialogProps) => {
+export const SearchReplaceResultsDialog = ({ results, onClose }: SearchReplaceResultsDialogProps) => {
 	const classes = useStyles();
 
 	return <Dialog
@@ -47,29 +45,14 @@ export const CsvResultsDialog = ({ results, onClose }: CsvResultsDialogProps) =>
 					<CloseIcon />
 				</IconButton>
 				<Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-					Csv Import Results
+					Search replace preview
 			</Typography>
 			</Toolbar>
 		</AppBar>
 		<List>
-			{results?.importedRows !== -1 && <ListItem>
-				<ListItemText>
-					<strong>Imported rows:</strong> {results?.importedRows}
-				</ListItemText>
-			</ListItem>}
-			{results?.skippedRows !== -1 && <ListItem>
-				<ListItemText>
-					<strong>Rows without changes:</strong> {results?.skippedRows}
-				</ListItemText>
-			</ListItem>}
-			<ListItem>
-				<ListItemText>
-					<strong>Errors:</strong> {results?.errors.length}
-				</ListItemText>
-			</ListItem>
-			{results?.errors.map(error => (
-				<ListItem className={classes.error}>
-					<ListItemText>{error}</ListItemText>
+			{results?.map(row => (
+				<ListItem>
+					<ListItemText>{row.oldValue} -&gt; {row.newValue}</ListItemText>
 				</ListItem>
 			))}
 		</List>

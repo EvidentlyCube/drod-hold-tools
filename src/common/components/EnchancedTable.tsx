@@ -1,12 +1,12 @@
-import React, {useCallback, useState} from "react";
-import {EnchancedTableColumn} from "./EnchancedTableCommons";
-import {SortUtils} from "../SortUtils";
-import {Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TextField} from "@material-ui/core";
-import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
-import {EnchancedTableHead} from "./EnchancedTableHead";
-import {Create} from "@material-ui/icons";
-import {assert} from "../Assert";
+import { Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TextField } from "@material-ui/core";
+import { Create } from "@material-ui/icons";
+import { createStyles, withStyles, WithStyles } from "@material-ui/styles";
+import React, { useCallback } from "react";
+import { assert } from "../Assert";
 import { useTextInputState } from "../Hooks";
+import { SortUtils } from "../SortUtils";
+import { EnchancedTableColumn } from "./EnchancedTableCommons";
+import { EnchancedTableHead } from "./EnchancedTableHead";
 
 const DefaultRowsPerPage = 25;
 

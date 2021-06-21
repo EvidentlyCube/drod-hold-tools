@@ -46,4 +46,7 @@ export const StringUtils = {
 
 		return arr;
 	},
+	escapeRegExp(str: string) {
+		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
 };
