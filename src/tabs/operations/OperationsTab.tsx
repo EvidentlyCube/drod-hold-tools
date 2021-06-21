@@ -3,6 +3,7 @@ import React from "react";
 import {Hold} from "../../data/Hold";
 import {Store} from "../../data/Store";
 import {OperationsCsv} from "./OperationsCsv";
+import { OperationsReplace } from "./OperationsReplace";
 
 interface OperationTabProps {
 }
@@ -28,6 +29,7 @@ class OperationTab extends React.Component<OperationTabProps, OperationTabState>
 				<OperationsCsv hold={hold}/>
 			</Grid>
 			<Grid item lg={6}>
+				<OperationsReplace hold={hold}/>
 			</Grid>
 		</Grid>;
 	}

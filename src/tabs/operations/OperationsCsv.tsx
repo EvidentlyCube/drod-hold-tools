@@ -1,8 +1,8 @@
 import { Box, Button, Paper, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useCallback, useState } from "react";
-import { CsvExporter } from "../../common/csv/CsvExporter";
-import { CsvImporter, CsvImportResult } from "../../common/csv/CsvImporter";
+import { CsvExporter } from "../../common/operations/CsvExporter";
+import { CsvImporter, CsvImportResult } from "../../common/operations/CsvImporter";
 import { Hold } from "../../data/Hold";
 import { Store } from "../../data/Store";
 import { CsvResultsDialog } from "./CsvResultsDialog";
@@ -58,7 +58,20 @@ export const OperationsCsv = (props: OperationsCsvProps) => {
             CSV Export/Import
         </Typography>
         <Typography variant="body2" className={classes.subtitle}>
-            Lorem ipsum dolor
+            You can export all texts from the hold and edit and inspect them in Microsoft Excel,
+            Google Sheets, LibreOffice Calc or any other editor that supports CSV file. 
+        </Typography>
+        <Typography variant="body2" className={classes.subtitle}>
+            The export will consist of six columns. The first three are the important information:
+            type of the data, unique identifier and the value itself. The remaining three
+            columns contain additional information that will help you identify and locate
+            the text. 
+        </Typography>
+        <Typography variant="body2" className={classes.subtitle}>
+            <strong>Only ever change the third column, <code>value</code></strong>. Otherwise
+            the import may fail. Feel free to remove or reorder row. After you finish the import 
+            you'll be presented with a short report telling you the number of changes, number of 
+            rows which didn't modify anything and the list of errors. 
         </Typography>
         <div style={{ flex: 1 }} />
         <Box display="flex" justifyContent="space-around" className={classes.buttons}>

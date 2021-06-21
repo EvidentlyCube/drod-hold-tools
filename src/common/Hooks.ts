@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ObservableProperty } from "./ObservableProperty";
 
 export const useDocumentKeydown = (callback: (e: KeyboardEvent) => void, useCapture: boolean = false) => {
@@ -24,4 +24,15 @@ export const useObservablePropertyState = <T>(
     }, [property, setState]);
 
     return state;
+}
+
+export const useTextInputState = (defaultValue: string, onSetState?: (value: string) => string): [string, React.ChangeEventHandler<HTMLInputElement>] => {
+    const [value, setValue] = useState(defaultValue);
+    const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+        onSetState 
+            ? setValue(onSetState(e.target.value))
+            : setValue(e.target.value);
+    }, [setValue, onSetState]);
+
+    return [value, onChange];
 }

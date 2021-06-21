@@ -6,6 +6,7 @@ import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {EnchancedTableHead} from "./EnchancedTableHead";
 import {Create} from "@material-ui/icons";
 import {assert} from "../Assert";
+import { useTextInputState } from "../Hooks";
 
 const DefaultRowsPerPage = 25;
 
@@ -366,10 +367,7 @@ interface DefaultEditorProps {
 const DefaultEditor = (props: DefaultEditorProps) => {
 	const {onCancel, onSave, defaultValue, maxLength, multiline} = props;
 
-	const [value, setValue] = useState(defaultValue);
-	const onChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setValue(event.target.value);
-	}, [setValue]);
+	const [value, onChange] = useTextInputState(defaultValue);
 
 	const onKeyDown = useCallback((event: React.KeyboardEvent) => {
 		if (event.key === 'Enter') {

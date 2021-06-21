@@ -1,5 +1,5 @@
 import { AppBar, Dialog, IconButton, List, ListItem, ListItemText, Slide, Theme, Toolbar, Typography } from "@material-ui/core";
-import { CsvImportResult } from "../../common/csv/CsvImporter";
+import { CsvImportResult } from "../../common/operations/CsvImporter";
 import CloseIcon from '@material-ui/icons/Close';
 import React from "react";
 import { TransitionProps } from "@material-ui/core/transitions";
