@@ -301,6 +301,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	}
 
 	private renderColumnWidth(column: EnchancedTableColumn) {
+		if (column.visible === false) {
+			return;
+		}
+
 		return column.width
 			? <col key={column.id} style={{width: column.width}}/>
 			: <col key={column.id}/>;
@@ -315,6 +319,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	}
 
 	private renderCell(column: EnchancedTableColumn, row: any) {
+		if (column.visible === false) {
+			return;
+		}
+
 		const {idField} = this.props;
 		const {editedColumn, editedRowId} = this.state;
 		const align = column.type === 'numeric' ? 'right' : 'left';
@@ -330,11 +338,15 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			key={key}
 			align={align}
 			onClick={onClick}
-			className={`cell-${column.id}` + (column.editable ? ' editable' : '')}
+			className={
+				`cell-${column.id}`
+				+ (column.editable ? ' editable' : '')
+				+ (column.cellClassName ? ` ${column.cellClassName}` : '')
+			}
 			padding={column.padding ?? "normal"}
 		>
 			{column.renderCell
-				? column.renderCell(row)
+				? column.renderCell(row, column.id)
 				: row[column.id] || <span>&nbsp;</span>}
 			{column.editable && <Create className="edit-icon" fontSize="small"/>}
 		</TableCell>;

@@ -25,6 +25,10 @@ export class EnchancedTableHead extends React.Component<EnchancedTableHeadProps>
 	}
 
 	private renderHeader(column: EnchancedTableColumn) {
+		if (column.visible === false) {
+			return;
+		}
+
 		const {orderBy, orderDir, onSort} = this.props;
 		const align = column.type === 'numeric' ? 'right' : 'left';
 		const isSortingColumn = orderBy === column.id;

@@ -12,8 +12,11 @@ export interface EnchancedTableColumn {
 	editable?: boolean;
 	width?: string;
 	headerTitle?: string;
+	visible?: boolean;
 
-	renderCell?: (row: any) => React.ReactNode;
+	cellClassName?: string;
+
+	renderCell?: (row: any, field: any) => React.ReactNode;
 	renderEditor?: (row: any, onCancel: () => void, onSave: (value: string) => void) => React.ReactNode;
 
 	editMaxLength?: number;
