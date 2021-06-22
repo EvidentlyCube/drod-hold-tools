@@ -44,7 +44,7 @@ export class MiscHoldDescription extends React.Component<MiscHoldDescriptionProp
 			}],
 			columns: [
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", sortable: false},
-				{id: 'text', label: 'Name', editable: true, editMaxLength: 1350, editMultiline: true, sortable: false},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 1350, editMultiline: true, sortable: false, cellClassName: 'tommable'},
 			],
 		};
 	}

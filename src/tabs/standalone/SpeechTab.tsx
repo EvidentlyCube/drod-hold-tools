@@ -56,7 +56,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Text', editable: true, editMaxLength: 1024},
+				{id: 'text', label: 'Text', editable: true, editMaxLength: 1024, cellClassName: 'tommable'},
 				{id: 'command', label: 'Command', width: "15%"},
 				{id: 'speaker', label: 'Speaker', width: "15%"},
 				{id: 'location', label: 'Location', width: "15%"},

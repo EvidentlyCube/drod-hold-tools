@@ -1,7 +1,7 @@
 import { Box, Button, Paper, TextField, Theme, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useCallback, useState } from "react";
-import { useTextInputState } from "../../common/Hooks";
+import {useSetStateCallback, useTextInputState} from "../../common/Hooks";
 import { SearchReplaceUtils, SearchReplaceResultRow } from "../../common/operations/SearchReplaceUtils";
 import { Hold } from "../../data/Hold";
 import { SearchReplaceResultsDialog } from "./SearchReplaceResultsDialog";
@@ -29,6 +29,7 @@ interface OperationsReplaceProps {
     hold: Hold;
 }
 
+type SearchResult = SearchReplaceResultRow[]|undefined;
 export const OperationsReplace = (props: OperationsReplaceProps) => {
     const classes = useStyles();
     const { hold } = props;
@@ -39,16 +40,18 @@ export const OperationsReplace = (props: OperationsReplaceProps) => {
         return s;
     }, [setIsRegex])
 
-    const [results, setResults] = useState<SearchReplaceResultRow<any>[]|undefined>(undefined);
+    const [results, setResults] = useState<SearchResult>(undefined);
     const [search, onSearchChange] = useTextInputState("", checkIfRegex);
     const [replace, onReplaceChange] = useTextInputState("");
 
-    const onPreview = useCallback(() => {
+    const onPreviewClick = useCallback(() => {
         setResults(SearchReplaceUtils.prepare(
             SearchReplaceUtils.toRegex(search),
             replace, hold
         ));
     }, [setResults, hold, search, replace]);
+
+    const onClose = useSetStateCallback<SearchResult>(undefined, setResults);
 
     return <Paper className={classes.container}>
         <Typography variant="h5" noWrap>
@@ -71,8 +74,11 @@ export const OperationsReplace = (props: OperationsReplaceProps) => {
             <TextField variant="outlined" label="Replace" value={replace} onChange={onReplaceChange} />
         </Box>
         <Box className={classes.inputs}>
-            <Button variant="contained">Preview</Button>
+            <Button variant="contained" onClick={onPreviewClick}
+	            disabled={search.length === 0 || replace.length === 0}>
+	            Preview
+            </Button>
         </Box>
-        <SearchReplaceResultsDialog results={results} onClose={() => {}} />
+        <SearchReplaceResultsDialog results={results} onClose={onClose} hold={hold} />
     </Paper>;
 }

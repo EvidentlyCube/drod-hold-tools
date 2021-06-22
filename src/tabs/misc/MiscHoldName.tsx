@@ -44,7 +44,7 @@ export class MiscHoldName extends React.Component<MiscHoldNameProps, MiscHoldNam
 			}],
 			columns: [
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", sortable: false},
-				{id: 'text', label: 'Name', editable: true, editMaxLength: 255, sortable: false},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 255, sortable: false, cellClassName: 'tommable'},
 			],
 		};
 	}

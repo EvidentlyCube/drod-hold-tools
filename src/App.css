@@ -1,3 +1,12 @@
+
+@font-face {
+    font-family: 'tom';
+    src: url('assets/fonts/toms-new-roman.tom-webfont.woff2') format('woff2'),
+    url('assets/fonts/toms-new-roman.tom-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     overflow-y: scroll;
 }
@@ -8,4 +17,9 @@ body .MuiTableCell-body {
 
 .MuiTableCell-body.cell-text {
     white-space: pre-wrap;
+}
+
+.use-tom .tommable {
+    font-family: 'tom', 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
+    font-size: 18px !important;
 }

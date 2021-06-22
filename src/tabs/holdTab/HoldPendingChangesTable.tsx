@@ -70,8 +70,8 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 				{id: 'dataType', label: 'Data', width: "10%"},
 				{id: 'operationType', label: 'Operation', width: "15%"},
 				{id: 'location', label: 'Location', width: "20%"},
-				{id: 'oldValue', label: 'Old Value'},
-				{id: 'newValue', label: 'New Value'},
+				{id: 'oldValue', label: 'Old Value', cellClassName: 'tommable'},
+				{id: 'newValue', label: 'New Value', cellClassName: 'tommable'},
 			],
 		};
 	}

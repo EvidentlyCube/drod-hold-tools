@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { ObservableProperty } from "./ObservableProperty";
+import React, {useCallback, useEffect, useState} from "react";
+import {ObservableProperty} from "./ObservableProperty";
 
 export const useDocumentKeydown = (callback: (e: KeyboardEvent) => void, useCapture: boolean = false) => {
     useEffect(() => {
@@ -35,4 +35,10 @@ export const useTextInputState = (defaultValue: string, onSetState?: (value: str
     }, [setValue, onSetState]);
 
     return [value, onChange];
+}
+
+export const useSetStateCallback = <T>(value: T, setState: React.Dispatch<React.SetStateAction<T>>) => {
+	return useCallback(() => {
+		setState(value);
+	}, [setState, value]);
 }

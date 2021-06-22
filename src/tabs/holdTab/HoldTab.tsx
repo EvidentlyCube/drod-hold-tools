@@ -92,7 +92,7 @@ class HoldTab extends React.Component<HoldTabProps, HoldTabState> {
 
 	public render() {
 		const {holdDecoderError, holdEncoderError, decoder, hold} = this.state;
-		return <Container maxWidth="lg">
+		return <Container maxWidth="xl">
 			{this.renderContent()}
 			<Dialog open={!!holdDecoderError} onClose={this.onErrorClose}>
 				<DialogTitle>Reading file "{decoder.fileName}" failed</DialogTitle>

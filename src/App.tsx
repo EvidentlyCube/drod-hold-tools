@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import './App.css';
-import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, Toolbar} from "@material-ui/core";
+import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar} from "@material-ui/core";
 import {makeStyles} from '@material-ui/styles';
 import {createTheme} from '@material-ui/core/styles';
 import {Store} from "./data/Store";
@@ -73,6 +73,16 @@ function App() {
 		setHasLoadedHold(Store.loadedHold.value.isLoaded);
 	}, [setHasLoadedHold]);
 
+	const [options, setOptions] = useState<string[]>(() => []);
+	const onChangeOptions = useCallback((
+		event: React.MouseEvent<HTMLElement>,
+		newOptions: string[],
+	) => {
+		setOptions(newOptions);
+		document.getElementsByTagName('body')[0].className = newOptions.indexOf('use-tom') !== -1
+			? 'use-tom'
+			: '';
+	}, [setOptions]);
 	useEffect(() => {
 		Store.loadedHold.addListener(onHoldLoaded);
 		return () => Store.loadedHold.removeListener(onHoldLoaded);
@@ -83,7 +93,7 @@ function App() {
 	};
 
 	return (
-		<div>
+		<div className={options.indexOf('use-tom') !== -1 ? 'use-tom' : ''}>
 			<ThemeProvider theme={theme}>
 				<LocalizationProvider dateAdapter={AdapterDateFns}>
 					<CssBaseline/>
@@ -125,6 +135,11 @@ function App() {
 					</TabPanel>
 					<Divider/>
 					<Container>
+						<Toolbar className={classes.footer}>
+							<ToggleButtonGroup value={options} onChange={onChangeOptions}>
+								<ToggleButton value="use-tom">Use Tom's New Roman</ToggleButton>
+							</ToggleButtonGroup>
+						</Toolbar>
 						<Toolbar className={classes.footer}>
 							<ButtonGroup variant="text">
 								<Button className={classes.footerButton} href="https://www.evidentlycube.com">by Maurycy Zarzycki</Button>

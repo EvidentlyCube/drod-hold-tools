@@ -42,7 +42,7 @@ export class MiscCharacters extends React.Component<MiscCharactersProps, MiscCha
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 255, cellClassName: 'tommable'},
 			],
 		};
 	}

@@ -67,7 +67,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			columns: [
 				{id: 'index', label: 'Index', type: 'numeric', width: "5%", padding: "none"},
 				{id: 'isTextEdited', label: 'Δ', width: "5%", renderCell: this.renderIsTextEditedCell, padding: "none", headerTitle: "Is text changed?"},
-				{id: 'text', label: 'Name', editable: true, editMaxLength: 255},
+				{id: 'text', label: 'Name', editable: true, editMaxLength: 255, cellClassName: 'tommable'},
 				{id: 'isAuthorEdited', label: 'Δ', width: "5%", renderCell: this.renderIsAuthorEditedCell, padding: "none", headerTitle: "Is author changed?"},
 				{id: 'authorName', label: 'Author', editable: true, renderEditor: this.renderAuthorEditor, width: '30%'},
 				{

@@ -1,3 +1,5 @@
+const SupportedChars = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÁÂÃÄÅÆÇÉÊËÍÎÏÐÑÓÔÕÖ×ØÚÛÜÝÞßáâãäåæçéêëíîïðñóôõö÷øúûüýþÿŒœŠšŸƒˆ˜–—‘’‚“”„†‡•…‰‹›™";
+
 export const StringUtils = {
 	sprintf(text: string, ...replacements: (string|number|undefined)[]) {
 		let index = 0;
@@ -48,5 +50,17 @@ export const StringUtils = {
 	},
 	escapeRegExp(str: string) {
 		return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	},
+	htmlEntities(str: string) {
+		return str
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
+	},
+	removeUnsupportedCharacters(str: string) {
+		return str.replace(SupportedCharsRegex, '');
 	}
 };
+const SupportedCharsRegex = new RegExp("[^" + StringUtils.escapeRegExp(SupportedChars) + "]", 'g');

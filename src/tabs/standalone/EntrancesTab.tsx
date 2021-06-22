@@ -55,7 +55,7 @@ class EntrancesTab extends React.Component<EntrancesTabProps, EntrancesTabState>
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'text', label: 'Text', editable: true, editMultiline: true, editMaxLength: 1350},
+				{id: 'text', label: 'Text', editable: true, editMultiline: true, editMaxLength: 1350, cellClassName: 'tommable'},
 				{id: 'level', label: 'Level', width: "15%"},
 				{id: 'room', label: 'Room', width: "15%"},
 			],
