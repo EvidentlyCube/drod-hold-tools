@@ -23,3 +23,9 @@ body .MuiTableCell-body {
     font-family: 'tom', 'Roboto', 'Helvetica', 'Arial', sans-serif !important;
     font-size: 18px !important;
 }
+
+img.crisp {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}

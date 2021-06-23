@@ -1,15 +1,17 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Container, Paper, Theme, Typography} from "@material-ui/core/";
+import {Container, IconButton, Paper, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable} from "../../common/components/EnchancedTable";
-import {Data} from "../../data/Data";
+import {Data, DataFormat} from "../../data/Data";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
+import {Visibility} from "@material-ui/icons";
+import {DataPreviewDialog} from "./DataPreviewDialog";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -27,18 +29,20 @@ interface DataRow {
 	name: string;
 	originalName: string;
 	type: string;
+	format: DataFormat;
 	size: number;
 	isEdited: boolean;
+	data: Data;
 }
 
 interface DatasTabProps extends WithStyles<typeof styles> {
-
 }
 
 interface DatasTabState {
 	hold: Hold;
 	allRows: DataRow[];
 	columns: EnchancedTableColumn[];
+	previewData?: Data;
 }
 
 class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
@@ -50,11 +54,13 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		const allRows = this.getRows();
 		this.state = {
 			hold: Store.loadedHold.value,
+			previewData: undefined,
 			allRows: allRows,
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
 				{id: 'name', label: 'Name', editable: true, editMultiline: true, editMaxLength: 1350},
+				{id: 'preview', label: 'Preview', width: '5%', renderCell: this.renderPreviewCell, padding: "none"},
 				{id: 'type', label: 'Type', width: '15%'},
 				{id: 'size', label: 'Size', width: '8%', renderCell: row => DataUtils.formatSize(row.size), type: 'numeric'},
 			],
@@ -83,20 +89,21 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		this.getRowById(row.id).isEdited = data.changes.name !== undefined;
 	};
 
-	private static dataToRow(data: Data, hold: Hold): DataRow {
+	private static dataToRow(data: Data): DataRow {
 		return {
 			id: data.id,
 			name: data.changes.name ?? data.name,
 			originalName: data.name,
 			type: DataUtils.dataFormatToText(data.format),
+			format: data.format,
 			size: data.size,
 			isEdited: data.changes.name !== undefined,
+			data
 		};
 	}
 
 	private getRows = () => {
-		const hold = Store.loadedHold.value;
-		return Array.from(Store.loadedHold.value.datas.values()).map(data => DatasTab.dataToRow(data, hold));
+		return Array.from(Store.loadedHold.value.datas.values()).map(data => DatasTab.dataToRow(data));
 	};
 
 	private getRowById = (id: number) => {
@@ -109,9 +116,13 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		throw new Error(`Failed to find row with ID '${id}'`);
 	};
 
+	private handleClosePreviewDialog = () => {
+		this.setState({previewData: undefined});
+	}
+
 	public render() {
 		const {classes} = this.props;
-		const {allRows, columns} = this.state;
+		const {allRows, columns, previewData} = this.state;
 
 		return <Container maxWidth="xl">
 			<Paper className={classes.content}>
@@ -130,6 +141,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					apiRef={this._tableApi}
 				/>
 			</Paper>
+			<DataPreviewDialog name={previewData ? previewData.changes.name ?? previewData.name : ''} onClose={this.handleClosePreviewDialog} data={previewData} />
 		</Container>;
 	}
 
@@ -143,6 +155,14 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 		return <span/>;
 	};
+
+	private renderPreviewCell = (row: DataRow) => {
+		if (row.format === DataFormat.BMP || row.format === DataFormat.JPG || row.format === DataFormat.PNG) {
+			return <IconButton onClick={() => this.setState({previewData: row.data })}>
+				<Visibility/>
+			</IconButton>
+		}
+	}
 }
 
 export default withStyles(styles)(DatasTab);

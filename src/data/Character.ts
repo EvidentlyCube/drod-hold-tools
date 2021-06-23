@@ -14,6 +14,9 @@ export interface Character {
 	commands: Command[];
 	processingSequence: number;
 
+	tilesDataId: number;
+	faceDataId: number;
+
 	changes: {
 		name?: string
 	}

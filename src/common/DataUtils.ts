@@ -1,4 +1,4 @@
-import {DataFormat} from "../data/Data";
+import {Data, DataFormat} from "../data/Data";
 
 export const DataUtils = {
 	dataFormatToText(type: DataFormat) {
@@ -45,5 +45,21 @@ export const DataUtils = {
 		} else {
 			return bytes + ' bytes';
 		}
+	},
+
+	getImageUrl(data: Data) {
+		if (!data.dataUrlCache) {
+			const rawData = data.xml.getAttribute('RawData');
+			let type = "jpg";
+			if (data.format === DataFormat.PNG) {
+				type = 'png';
+			} else if (data.format === DataFormat.BMP) {
+				type = 'bmp';
+			}
+
+			data.dataUrlCache = `data:image/${type};base64,${rawData}`;
+
+		}
+		return data.dataUrlCache;
 	}
 }

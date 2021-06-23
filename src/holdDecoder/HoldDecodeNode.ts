@@ -70,7 +70,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 					getText(element, 'ExtraVars', true),
 				),
 			);
-
+			console.log(element);
 			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer('Commands', [])!);
 			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
 
@@ -79,6 +79,8 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				xml: element,
 				id: characterId,
 				name: decodeText(element, 'CharNameText'),
+				tilesDataId: element.hasAttribute('DataIDTiles') ? getInt(element, 'DataIDTiles') : 0,
+				faceDataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0,
 				commands, processingSequence, extraVars,
 				changes: {},
 			});

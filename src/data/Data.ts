@@ -21,5 +21,6 @@ export interface Data {
 
 	changes: {
 		name?: string
-	}
+	},
+	dataUrlCache?: string;
 }
