@@ -32,22 +32,22 @@ const DialogBody = ({children, style}: { children: React.ReactNode, style: React
 	</Box>;
 };
 
-interface PreviewImageProps {
-	name: string;
-	data: Data;
-	onClose: () => void;
-}
-
 const Backgrounds = [
 	'#000000',
 	'#C0C0C0',
 	'#FFFFFF'
 ];
 
-const PreviewImage = ({name, data, onClose}: PreviewImageProps) => {
+interface PreviewActualProps {
+	name: string;
+	data: Data;
+	onClose: () => void;
+}
+
+const PreviewImage = ({name, data, onClose}: PreviewActualProps) => {
 	const [zoom, setZoom] = useState(1);
 	const [border, setBorder] = useState(false);
-	const [background, setBackground] = useState(0);
+	const [background, setBackground] = useState(2);
 	const zoomIn = useCallback(() => {
 		setZoom(zoom * 2);
 	}, [zoom, setZoom]);
@@ -94,6 +94,15 @@ const PreviewImage = ({name, data, onClose}: PreviewImageProps) => {
 	</>;
 };
 
+const PreviewAudio = ({name, data, onClose}: PreviewActualProps) => {
+	return <>
+		<TopBar name={name} onClose={onClose} />
+		<DialogBody style={{}}>
+			<audio src={DataUtils.getAudioUrl(data)} controls/>
+		</DialogBody>
+	</>;
+};
+
 interface DataPreviewDialogProps {
 	name: string;
 	data?: Data;
@@ -105,6 +114,8 @@ const DialogContents = ({name, data, onClose}: DataPreviewDialogProps) => {
 		return <></>
 	} else if (data.format === DataFormat.BMP || data.format === DataFormat.JPG || data.format === DataFormat.PNG) {
 		return <PreviewImage name={name} data={data} onClose={onClose}/>;
+	} else if (data.format === DataFormat.WAV || data.format === DataFormat.OGG) {
+		return <PreviewAudio name={name} data={data} onClose={onClose}/>;
 	}
 
 	return <>

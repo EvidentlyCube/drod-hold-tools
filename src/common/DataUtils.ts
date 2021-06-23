@@ -47,6 +47,20 @@ export const DataUtils = {
 		}
 	},
 
+	getAudioUrl(data: Data) {
+		if (!data.dataUrlCache) {
+			const rawData = data.xml.getAttribute('RawData');
+			let type = "ogg";
+			if (data.format === DataFormat.WAV) {
+				type = 'wav';
+			}
+
+			data.dataUrlCache = `data:audio/${type};base64,${rawData}`;
+
+		}
+		return data.dataUrlCache;
+	},
+
 	getImageUrl(data: Data) {
 		if (!data.dataUrlCache) {
 			const rawData = data.xml.getAttribute('RawData');

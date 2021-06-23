@@ -10,7 +10,7 @@ import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
-import {Visibility} from "@material-ui/icons";
+import {PlayCircle, Visibility} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
 
 const styles = (theme: Theme) => createStyles({
@@ -160,6 +160,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		if (row.format === DataFormat.BMP || row.format === DataFormat.JPG || row.format === DataFormat.PNG) {
 			return <IconButton onClick={() => this.setState({previewData: row.data })}>
 				<Visibility/>
+			</IconButton>
+		} else if (row.format === DataFormat.OGG || row.format === DataFormat.WAV) {
+			return <IconButton onClick={() => this.setState({previewData: row.data })}>
+				<PlayCircle/>
 			</IconButton>
 		}
 	}
