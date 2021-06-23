@@ -1,12 +1,12 @@
-import { Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TextField } from "@material-ui/core";
-import { Create } from "@material-ui/icons";
-import { createStyles, withStyles, WithStyles } from "@material-ui/styles";
-import React, { useCallback } from "react";
-import { assert } from "../Assert";
-import { useTextInputState } from "../Hooks";
-import { SortUtils } from "../SortUtils";
-import { EnchancedTableColumn } from "./EnchancedTableCommons";
-import { EnchancedTableHead } from "./EnchancedTableHead";
+import {Table, TableBody, TableCell, TableContainer, TableFooter, TablePagination, TableRow, TextField} from "@material-ui/core";
+import {Create} from "@material-ui/icons";
+import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
+import React, {useCallback} from "react";
+import {assert} from "../Assert";
+import {useTextInputState} from "../Hooks";
+import {SortUtils} from "../SortUtils";
+import {EnchancedTableApi, EnchancedTableColumn} from "./EnchancedTableCommons";
+import {EnchancedTableHead} from "./EnchancedTableHead";
 
 const DefaultRowsPerPage = 25;
 
@@ -30,16 +30,6 @@ const styles = () => createStyles({
 	},
 });
 
-export interface EnchancedTableApi {
-	rerender(): void;
-
-	rerenderRow(id: any): void;
-
-	setDelayedClickAway(enabled: boolean): void;
-	suppressClickAwayForFrame(): void;
-	disableClickAwayClose(): void;
-}
-
 interface EnchancedTableProps extends WithStyles<typeof styles> {
 	columns: EnchancedTableColumn[];
 	rows: any[];
@@ -52,6 +42,7 @@ interface EnchancedTableProps extends WithStyles<typeof styles> {
 
 	apiRef?: React.RefObject<EnchancedTableApi>;
 	onEditedCell?: (row: any, field: string, newValue: string) => void;
+	getRowClassName?: (row: any) => string;
 }
 
 interface EnchancedTableState {
@@ -311,9 +302,10 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 	}
 
 	private renderRow(row: any) {
-		const {idField, columns} = this.props;
+		const {idField, columns, getRowClassName} = this.props;
+		const className = getRowClassName?.(row);
 
-		return <TableRow key={row[idField]}>
+		return <TableRow key={row[idField]} className={className}>
 			{columns.map(col => this.renderCell(col, row))}
 		</TableRow>;
 	}
@@ -346,7 +338,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 			padding={column.padding ?? "normal"}
 		>
 			{column.renderCell
-				? column.renderCell(row, column.id)
+				? column.renderCell(row, column.id, this)
 				: row[column.id] || <span>&nbsp;</span>}
 			{column.editable && <Create className="edit-icon" fontSize="small"/>}
 		</TableCell>;

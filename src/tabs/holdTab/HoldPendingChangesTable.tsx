@@ -1,8 +1,8 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable} from "../../common/components/EnchancedTable";
 import {Change} from "../../data/Change";
 import {RoomUtils} from "../../common/RoomUtils";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";

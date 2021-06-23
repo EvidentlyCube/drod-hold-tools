@@ -1,10 +1,10 @@
-import {AppBar, Dialog, IconButton, Slide, Toolbar, Typography} from "@material-ui/core";
+import {AppBar, Checkbox, Dialog, IconButton, Slide, Toolbar, Typography} from "@material-ui/core";
 import {TransitionProps} from "@material-ui/core/transitions";
 import CloseIcon from '@material-ui/icons/Close';
 import {makeStyles} from "@material-ui/styles";
 import React, {useCallback} from "react";
 import {SearchReplaceResultRow, SearchReplaceUtils} from "../../common/operations/SearchReplaceUtils";
-import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable} from "../../common/components/EnchancedTable";
 import {Button} from "@material-ui/core/";
 import {Hold} from "../../data/Hold";
@@ -17,6 +17,9 @@ const useStyles = makeStyles(() => ({
 			padding: '0 1px',
 			margin: '0 2px',
 			fontStyle: 'normal',
+		},
+		'& .muted .tommable': {
+			opacity: 0.5,
 		},
 	},
 }));
@@ -32,8 +35,9 @@ const Transition = React.forwardRef(function Transition(
 
 interface ResultsRow {
 	id: number;
-	oldValue: string;
-	newValue: string;
+	include: boolean;
+	newHtml: string;
+	oldHtml: string;
 }
 
 interface SearchReplaceResultsDialogProps {
@@ -42,28 +46,40 @@ interface SearchReplaceResultsDialogProps {
 	onClose: () => void;
 }
 
-const renderCell = (row: ResultsRow, field: 'oldValue' | 'newValue') => {
+const renderCell = (row: ResultsRow, field: 'newHtml' | 'oldHtml') => {
 	return <div dangerouslySetInnerHTML={{__html: row[field]}}/>;
 };
+
+const onToggleInclude = (row: ResultsRow, api: EnchancedTableApi) => {
+	row.include = !row.include;
+	api.rerenderRow(row.id);
+};
+
+const renderIncludeCell = (row: ResultsRow, field: string, api: EnchancedTableApi) => {
+	return <Checkbox
+		checked={row.include}
+		onChange={() => onToggleInclude(row, api)}
+	/>;
+};
+
+const getRowClassName = (row: ResultsRow) => {
+	return !row.include ? 'muted' : '';
+};
+
 const columns: EnchancedTableColumn[] = [
 	{id: 'id', label: 'id', visible: false},
-	{id: 'oldValue', label: 'Old Text', renderCell, cellClassName: 'tommable'},
-	{id: 'newValue', label: 'New Text', renderCell, cellClassName: 'tommable'},
+	{id: 'include', label: 'Include', renderCell: renderIncludeCell, width: '10%'},
+	{id: 'oldHtml', label: 'Old Text', renderCell, cellClassName: 'tommable', width: '40%'},
+	{id: 'newHtml', label: 'New Text', renderCell, cellClassName: 'tommable', width: '40%'},
 ];
-
 export const SearchReplaceResultsDialog = ({results, hold, onClose}: SearchReplaceResultsDialogProps) => {
 	const classes = useStyles();
-
-	const rows: ResultsRow[] = results?.map((entry, index) => ({
-		id: index,
-		oldValue: entry.oldHtml,
-		newValue: entry.newHtml,
-	})) ?? [];
 
 	const onSave = useCallback(() => {
 		SearchReplaceUtils.commit(results ?? [], hold);
 		onClose();
-	}, [results, onClose, hold])
+	}, [results, onClose, hold]);
+
 
 	return <Dialog
 		fullScreen
@@ -85,14 +101,15 @@ export const SearchReplaceResultsDialog = ({results, hold, onClose}: SearchRepla
 					Search replace preview
 				</Typography>
 				<Button autoFocus color="inherit" onClick={onSave}>
-					save
+					Do Replace
 				</Button>
 			</Toolbar>
 		</AppBar>
 		<EnchancedTable
 			className={classes.table}
 			idField="id"
-			rows={rows}
-			columns={columns}/>
+			rows={results ?? []}
+			columns={columns}
+			getRowClassName={getRowClassName}/>
 	</Dialog>;
 };

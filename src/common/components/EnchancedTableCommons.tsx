@@ -2,6 +2,18 @@ import React from "react";
 
 export type EnchancedTableColumnType = 'text' | 'numeric';
 
+export interface EnchancedTableApi {
+	rerender(): void;
+
+	rerenderRow(id: any): void;
+
+	setDelayedClickAway(enabled: boolean): void;
+
+	suppressClickAwayForFrame(): void;
+
+	disableClickAwayClose(): void;
+}
+
 export interface EnchancedTableColumn {
 	id: string;
 	label: string;
@@ -16,7 +28,7 @@ export interface EnchancedTableColumn {
 
 	cellClassName?: string;
 
-	renderCell?: (row: any, field: any) => React.ReactNode;
+	renderCell?: (row: any, field: any, api: EnchancedTableApi) => React.ReactNode;
 	renderEditor?: (row: any, onCancel: () => void, onSave: (value: string) => void) => React.ReactNode;
 
 	editMaxLength?: number;

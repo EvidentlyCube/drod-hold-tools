@@ -7,8 +7,8 @@ import {Speech} from "../../data/Speech";
 import {HoldUtils} from "../../common/HoldUtils";
 import {SpeechUtils} from "../../common/SpeechUtils";
 import {CommandsUtils} from "../../common/CommandsUtils";
-import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
-import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
+import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable} from "../../common/components/EnchancedTable";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {UpdateUtils} from "../../common/UpdateUtils";
 

@@ -1,8 +1,8 @@
 import {Container, Dialog, DialogTitle, MenuItem, Paper, Select, TextField, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import React, {useCallback, useEffect, useState} from "react";
-import {EnchancedTable, EnchancedTableApi} from "../../common/components/EnchancedTable";
-import {EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
+import {EnchancedTable} from "../../common/components/EnchancedTable";
+import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {DateUtils} from "../../common/DateUtils";
 import {useDocumentKeydown} from "../../common/Hooks";

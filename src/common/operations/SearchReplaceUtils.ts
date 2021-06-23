@@ -22,10 +22,12 @@ interface RowScroll {data: Scroll, field: keyof Scroll}
 interface RowCharacter {data: Character, field: keyof Character}
 
 export type SearchReplaceResultRow = (RowHold | RowLevel | RowSpeech|RowEntrance|RowScroll|RowCharacter) & {
+	id: number;
 	oldValue: string;
 	newValue: string;
 	oldHtml: string;
 	newHtml: string;
+	include: boolean;
 }
 
 export const SearchReplaceUtils = {
@@ -44,6 +46,7 @@ export const SearchReplaceUtils = {
 	},
 
 	prepare(from: RegExp, to: string, hold: Hold) {
+		let id = 0;
 		const records: SearchReplaceResultRow[] = [];
 		const addRecord = (data: any, field: any) => {
 			const oldValue = (data.changes[field] ?? data[field]) as string;
@@ -57,7 +60,11 @@ export const SearchReplaceUtils = {
 					.replace(OpenTagRegexp, '<em>')
 					.replace(CloseTagRegexp, '</em>');
 
-				records.push({data: data as any, field: field as any, oldValue, newValue, oldHtml, newHtml});
+				records.push({
+					id: ++id,
+					include: false,
+					data, field, oldValue, newValue, oldHtml, newHtml
+				});
 			}
 		}
 		addRecord(hold, 'name');
@@ -84,6 +91,9 @@ export const SearchReplaceUtils = {
 	},
 	commit(results: SearchReplaceResultRow[], hold: Hold) {
 		for (const row of results) {
+			if (!row.include) {
+				continue;
+			}
 			switch(row.data.modelType) {
 				case ModelType.Hold:
 					if (row.field === 'name') {
