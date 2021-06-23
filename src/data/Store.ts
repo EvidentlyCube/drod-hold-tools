@@ -2,8 +2,8 @@ import {ObservableProperty} from "../common/ObservableProperty";
 import {createNullHold, Hold} from "./Hold";
 import {HoldDecoder} from "../holdDecoder/HoldDecoder";
 
-import AutoUploadHold from '../assets/auto-upload-hold.hold';
-// import AutoUploadHold from '../test/assets/DrodTouch.hold';
+// import AutoUploadHold from '../assets/auto-upload-hold.hold';
+import AutoUploadHold from '../test/assets/DrodTouch.hold';
 // import AutoUploadHold from '../test/assets/TheSecondSkyDemo.hold';
 // import AutoUploadHold from '../test/assets/SpeechTest.hold';
 // import AutoUploadHold from '../test/assets/TestCommandReading.hold';

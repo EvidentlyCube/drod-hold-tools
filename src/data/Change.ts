@@ -7,6 +7,7 @@ import {Scroll} from "./Scroll";
 import {Level} from "./Level";
 import {Hold} from "./Hold";
 import {Player} from "./Player";
+import {Data} from "./Data";
 
 interface HoldChange {
 	type: "Hold";
@@ -80,6 +81,14 @@ interface CharacterChange {
 	}
 }
 
+interface DataChange {
+	type: "Data",
+	model: Data;
+	changes: {
+		name?: boolean
+	}
+}
+
 export type Change = HoldChange 
 	| SpeechChange 
 	| CommandChange
@@ -87,4 +96,5 @@ export type Change = HoldChange
 	| ScrollChange
 	| LevelChange 
 	| CharacterChange 
-	| PlayerChange;
+	| PlayerChange
+	| DataChange;

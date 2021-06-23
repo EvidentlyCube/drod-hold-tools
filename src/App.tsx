@@ -19,6 +19,7 @@ import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
 import OperationsTab from './tabs/operations/OperationsTab';
 import {useObservablePropertyState} from './common/Hooks';
 import {IsBusyModal} from './components/IsBusyModal';
+import DataTab from "./tabs/standalone/DataTab";
 
 
 const theme = createTheme({
@@ -105,6 +106,7 @@ function App() {
 							<Tab label="Scrolls" disabled={!hasLoadedHold}/>
 							<Tab label="Players" disabled={!hasLoadedHold}/>
 							<Tab label="Levels" disabled={!hasLoadedHold}/>
+							<Tab label="Data" disabled={!hasLoadedHold}/>
 							<Tab label="Misc" disabled={!hasLoadedHold}/>
 							<Tab label="Operations" disabled={!hasLoadedHold}/>
 						</Tabs>
@@ -128,9 +130,12 @@ function App() {
 						<LevelsTab/>
 					</TabPanel>
 					<TabPanel className={classes.tab} value={selectedTab} index={6}>
-						<MiscTab/>
+						<DataTab/>
 					</TabPanel>
 					<TabPanel className={classes.tab} value={selectedTab} index={7}>
+						<MiscTab/>
+					</TabPanel>
+					<TabPanel className={classes.tab} value={selectedTab} index={8}>
 						<OperationsTab/>
 					</TabPanel>
 					<Divider/>

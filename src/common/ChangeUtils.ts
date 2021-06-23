@@ -6,6 +6,7 @@ import {Scroll} from "../data/Scroll";
 import {Level} from "../data/Level";
 import {Character} from "../data/Character";
 import {Player} from "../data/Player";
+import {Data} from "../data/Data";
 
 export const ChangeUtils = {
 	speechText(speech: Speech, hold: Hold) {
@@ -142,6 +143,14 @@ export const ChangeUtils = {
 			type: "Player",
 			model: player,
 			changes: {delete: player.isDeleted},
+		});
+	},
+
+	dataName(data: Data, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Data",
+			model: data,
+			changes: {name: data.changes.name !== undefined},
 		});
 	},
 };

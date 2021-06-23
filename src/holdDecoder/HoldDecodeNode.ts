@@ -89,8 +89,11 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			hold.datas.set(dataId, {
 				modelType: ModelType.Data,
 				xml: element,
+				id: dataId,
 				format: getInt(element, 'DataFormat'),
 				name: decodeText(element, 'DataNameText'),
+				size: Math.ceil((element.getAttribute('RawData') || '').length * 4 / 3),
+				changes: {}
 			});
 			break;
 

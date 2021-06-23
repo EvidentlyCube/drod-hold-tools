@@ -11,6 +11,7 @@ import {DateUtils} from "./DateUtils";
 import {Store} from "../data/Store";
 import {PlayerUtils} from "./PlayerUtils";
 import React from "react";
+import {Data} from "../data/Data";
 
 const handleAuthorChanged = (level: Level, hold: Hold) => {
 	const levelName = level.changes.name ?? level.name;
@@ -310,4 +311,27 @@ export const UpdateUtils = {
 
 		return wasChanged;
 	},
+
+	dataName(dataOrId: Data | number, newName: string, hold: Hold) {
+		const data = typeof dataOrId === 'number'
+			? HoldUtils.getData(dataOrId, hold)
+			: dataOrId;
+
+		let wasChanged = false;
+		if (data.changes.name !== newName) {
+			if (data.name !== newName) {
+				data.changes.name = newName;
+				wasChanged = true;
+			} else if (data.changes.name !== undefined) {
+				delete data.changes.name;
+				wasChanged = true;
+			}
+		}
+
+		if (wasChanged) {
+			ChangeUtils.dataName(data, hold);
+		}
+
+		return wasChanged;
+	}
 };

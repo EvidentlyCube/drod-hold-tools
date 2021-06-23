@@ -81,5 +81,12 @@ export const HoldUtils = {
 		assert(player, `Player with Id '${playerId}' does not exist`);
 
 		return player;
-	}, 
+	},
+
+	getData(dataId: number, hold: Hold) {
+		const data = hold.datas.get(dataId);
+		assert(data, `Data with Id '${dataId}' does not exist`);
+
+		return data;
+	}
 };

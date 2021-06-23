@@ -14,6 +14,12 @@ export interface Data {
 	modelType: ModelType.Data;
 	xml: Element;
 
+	id: number;
 	format: DataFormat;
 	name: string;
+	size: number;
+
+	changes: {
+		name?: string
+	}
 }

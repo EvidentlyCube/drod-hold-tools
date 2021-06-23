@@ -12,7 +12,7 @@ import {getDecodeValidateXml} from "./DecodeValidateHold";
 import {HoldOperator} from "../common/CommonTypes";
 import {assert} from "../common/Assert";
 
-const MAX_TIME_PER_TICK = 8;
+const MAX_TIME_PER_TICK = 32;
 
 export class HoldDecoder implements HoldOperator {
 	private _state?: DecodeState;

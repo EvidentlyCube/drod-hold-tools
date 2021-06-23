@@ -36,7 +36,7 @@ export class EnchancedTableHead extends React.Component<EnchancedTableHeadProps>
 
 		let middle: React.ReactElement = <span>{column.label}</span>;
 
-		if (column.sortable) {
+		if (column.sortable !== false) {
 			middle = <TableSortLabel
 				active={isSortingColumn}
 				direction={isSortingColumn ? orderDir : "asc"}
