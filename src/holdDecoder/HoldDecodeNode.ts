@@ -50,6 +50,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				showDescription: getInt(element, 'ShowDescription') === 1,
 				x: getInt(element, 'X'),
 				y: getInt(element, 'Y'),
+				dataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0,
 				changes: {},
 			});
 			break;
@@ -70,7 +71,6 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 					getText(element, 'ExtraVars', true),
 				),
 			);
-			console.log(element);
 			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer('Commands', [])!);
 			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
 
@@ -95,6 +95,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				format: getInt(element, 'DataFormat'),
 				name: decodeText(element, 'DataNameText'),
 				size: Math.ceil((element.getAttribute('RawData') || '').length * 4 / 3),
+				links: [],
 				changes: {}
 			});
 			break;
@@ -143,6 +144,8 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				levelId: getInt(element, 'LevelID'),
 				roomX: getInt(element, 'RoomX'),
 				roomY: getInt(element, 'RoomY'),
+				customImageDataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0,
+				overheadImageDataId: element.hasAttribute('OverheadDataID') ? getInt(element, 'OverheadDataID') : 0,
 				checkpoints: [],
 				monsters: [],
 				scrolls: [],

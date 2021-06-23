@@ -12,6 +12,7 @@ export interface Entrance {
 	showDescription: boolean;
 	x: number;
 	y: number;
+	dataId: number;
 
 	changes: {
 		description?: string;

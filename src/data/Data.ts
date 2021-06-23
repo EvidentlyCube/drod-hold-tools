@@ -1,4 +1,9 @@
 import {ModelType} from "../common/Enums";
+import {Room} from "./Room";
+import {Command} from "./Command";
+import {Speech} from "./Speech";
+import {Character} from "./Character";
+import {Entrance} from "./Entrance";
 
 export enum DataFormat {
 	BMP = 1,
@@ -10,6 +15,11 @@ export enum DataFormat {
 	THEORA = 70
 }
 
+export interface DataLink {
+	model: Entrance|Room|Command|Speech|Character;
+	field: 'dataId' | 'tilesDataId' | 'faceDataId' | 'w' | 'h' | 'y' | 'customImageDataId' | 'overheadImageDataId';
+}
+
 export interface Data {
 	modelType: ModelType.Data;
 	xml: Element;
@@ -18,6 +28,8 @@ export interface Data {
 	format: DataFormat;
 	name: string;
 	size: number;
+
+	links: DataLink[];
 
 	changes: {
 		name?: string

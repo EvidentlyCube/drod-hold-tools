@@ -15,6 +15,7 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 			}
 
 			for (const entrance of hold.entrances.values()) {
+				HoldLinker.linkEntrance(hold, entrance);
 				HoldLinker.linkEntranceToLevel(entrance, hold);
 			}
 
@@ -24,6 +25,7 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 					HoldLinker.linkMonster(hold, monster, room);
 					HoldLinker.linkCommands(hold, monster.commands, room, monster, undefined);
 				}
+				HoldLinker.linkRoom(hold, room);
 				HoldLinker.countRoomCharacters(room);
 				hold.counts.monsters += room.monsters.length;
 				hold.counts.characters += room.characterCount;

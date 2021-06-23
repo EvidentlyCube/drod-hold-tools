@@ -13,6 +13,9 @@ export interface Room {
 	roomX: number;
 	roomY: number;
 
+	customImageDataId: number;
+	overheadImageDataId: number;
+
 	checkpoints: Point[];
 	monsters: Monster[];
 	scrolls: Scroll[];

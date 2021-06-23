@@ -1,6 +1,6 @@
 import {Hold} from "../data/Hold";
 import {Character} from "../data/Character";
-import {CommandNameMap, MonsterType} from "../common/Enums";
+import {CharCommand, CommandNameMap, MonsterType} from "../common/Enums";
 import {assert} from "../common/Assert";
 import {Monster} from "../data/Monster";
 import {Room} from "../data/Room";
@@ -8,6 +8,18 @@ import {MonsterUtils} from "../common/MonsterUtils";
 import {RoomUtils} from "../common/RoomUtils";
 import {Entrance} from "../data/Entrance";
 import {Command} from "../data/Command";
+import {DataLink} from "../data/Data";
+import {HoldUtils} from "../common/HoldUtils";
+import {Speech} from "../data/Speech";
+
+function linkData(hold: Hold, dataId: number, model: DataLink['model'], field: DataLink['field']) {
+	if (!dataId) {
+		return;
+	}
+
+	const data = HoldUtils.getData(dataId, hold);
+	data.links.push({model, field});
+}
 
 export const HoldLinker = {
 	linkHold(hold: Hold) {
@@ -16,7 +28,16 @@ export const HoldLinker = {
 
 		hold.author = author;
 	},
+	linkRoom(hold: Hold, room: Room) {
+		linkData(hold, room.customImageDataId, room, 'customImageDataId');
+		linkData(hold, room.overheadImageDataId, room, 'overheadImageDataId');
+	},
 	linkCharacter(hold: Hold, character: Character) {
+		linkData(hold, character.tilesDataId, character, 'tilesDataId');
+		linkData(hold, character.faceDataId, character, 'faceDataId');
+	},
+	linkSpeech(hold: Hold, speech: Speech) {
+		linkData(hold, speech.dataId, speech, 'dataId');
 	},
 	linkCommands(hold: Hold, commands: Command[], room: Room | undefined, sourceMonster?: Monster, sourceCharacter?: Character) {
 		if (!sourceMonster && !sourceCharacter) {
@@ -54,12 +75,27 @@ export const HoldLinker = {
 			}
 
 			switch (command.command) {
+				case CharCommand.CC_SetMusic:
+				case CharCommand.CC_WorldMapMusic:
+					linkData(hold, command.y, command, 'y');
+					break;
+
+				case CharCommand.CC_WorldMapImage:
+					linkData(hold, command.h, command, 'h');
+					break;
+
 				default:
+					if (hold.datas.has(command.w)) {
+						linkData(hold, command.w, command, 'w');
+					}
 					break;
 			}
 		}
 	},
 	linkMonster(hold: Hold, monster: Monster, room: Room) {
+	},
+	linkEntrance(hold: Hold, entrance: Entrance) {
+		linkData(hold, entrance.dataId, entrance, 'dataId');
 	},
 
 	linkEntranceToLevel(entrance: Entrance, hold: Hold) {
