@@ -1,17 +1,16 @@
-import {Entrance} from "../data/Entrance";
-import {Hold} from "../data/Hold";
-import {HoldUtils} from "./HoldUtils";
-import {Speech} from "../data/Speech";
-import {Scroll} from "../data/Scroll";
-import {Level} from "../data/Level";
-import {Character} from "../data/Character";
-import {Player} from "../data/Player";
-import {ChangeUtils} from "./ChangeUtils";
-import {DateUtils} from "./DateUtils";
-import {Store} from "../data/Store";
-import {PlayerUtils} from "./PlayerUtils";
-import React from "react";
-import {Data} from "../data/Data";
+import { Character } from "../data/Character";
+import { Data } from "../data/Data";
+import { Entrance } from "../data/Entrance";
+import { Hold } from "../data/Hold";
+import { Level } from "../data/Level";
+import { Player } from "../data/Player";
+import { Scroll } from "../data/Scroll";
+import { Speech } from "../data/Speech";
+import { Store } from "../data/Store";
+import { ChangeUtils } from "./ChangeUtils";
+import { DateUtils } from "./DateUtils";
+import { HoldUtils } from "./HoldUtils";
+import { PlayerUtils } from "./PlayerUtils";
 
 const handleAuthorChanged = (level: Level, hold: Hold) => {
 	const levelName = level.changes.name ?? level.name;
@@ -330,6 +329,29 @@ export const UpdateUtils = {
 
 		if (wasChanged) {
 			ChangeUtils.dataName(data, hold);
+		}
+
+		return wasChanged;
+	},
+
+	dataData(dataOrId: Data | number, newData: string, hold: Hold) {
+		const data = typeof dataOrId === 'number'
+			? HoldUtils.getData(dataOrId, hold)
+			: dataOrId;
+
+		let wasChanged = false;
+		if (data.changes.data !== newData) {
+			if (data.data !== newData) {
+				data.changes.data = newData;
+				wasChanged = true;
+			} else if (data.changes.data !== undefined) {
+				delete data.changes.data;
+				wasChanged = true;
+			}
+		}
+
+		if (wasChanged) {
+			ChangeUtils.dataData(data, hold);
 		}
 
 		return wasChanged;

@@ -7,9 +7,6 @@ export const getEncodeToArray = (): EncodeStep => {
 		run(state: EncodeState): boolean {
 			const serializer = new XMLSerializer();
 			const xmlString = serializer.serializeToString(state.holdXml);
-			console.log(state.hold);
-			console.log(state.holdXml);
-			console.log(xmlString);
 
 			state.holdBytes = StringUtils.stringToUint8(xmlString);
 

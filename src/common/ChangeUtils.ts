@@ -153,4 +153,12 @@ export const ChangeUtils = {
 			changes: {name: data.changes.name !== undefined},
 		});
 	},
+
+	dataData(data: Data, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Data",
+			model: data,
+			changes: {data: data.changes.data !== undefined},
+		});
+	},
 };

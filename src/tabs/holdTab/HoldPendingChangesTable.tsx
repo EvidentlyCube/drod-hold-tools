@@ -79,8 +79,6 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 	private static changeToRow(change: Change, hold: Hold): ChangeRow[] {
 		const rows: ChangeRow[] = [];
 
-		console.log(change);
-
 		switch (change.type) {
 			case "Speech": {
 				const row = newRow(change.type);
@@ -231,6 +229,27 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					row.operationType = "Rename";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
+				}
+				break;
+			case "Data":
+				if (change.changes.name) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.location = change.model.changes.name ?? change.model.name; 
+					row.operationType = "Rename";
+					row.oldValue = change.model.name;
+					row.newValue = change.model.changes.name;
+				}
+
+				if (change.changes.data) {
+					const row = newRow(change.type);
+					rows.push(row);
+
+					row.location = change.model.changes.name ?? change.model.name; 
+					row.operationType = "Change Data";
+					row.oldValue = '';
+					row.newValue = '';
 				}
 				break;
 		}

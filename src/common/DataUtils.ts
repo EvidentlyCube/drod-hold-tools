@@ -47,33 +47,25 @@ export const DataUtils = {
 		}
 	},
 
-	getAudioUrl(data: Data) {
-		if (!data.dataUrlCache) {
-			const rawData = data.xml.getAttribute('RawData');
-			let type = "ogg";
-			if (data.format === DataFormat.WAV) {
-				type = 'wav';
-			}
-
-			data.dataUrlCache = `data:audio/${type};base64,${rawData}`;
-
+	getAudioUrl(data: Data, forceOld: boolean) {
+		const rawData = (forceOld ? undefined : data.changes.data) ?? data.data;
+		let type = "ogg";
+		if (data.format === DataFormat.WAV) {
+			type = 'wav';
 		}
-		return data.dataUrlCache;
+
+		return `data:audio/${type};base64,${rawData}`;
 	},
 
-	getImageUrl(data: Data) {
-		if (!data.dataUrlCache) {
-			const rawData = data.xml.getAttribute('RawData');
-			let type = "jpg";
-			if (data.format === DataFormat.PNG) {
-				type = 'png';
-			} else if (data.format === DataFormat.BMP) {
-				type = 'bmp';
-			}
-
-			data.dataUrlCache = `data:image/${type};base64,${rawData}`;
-
+	getImageUrl(data: Data, forceOld: boolean) {
+		const rawData = (forceOld ? undefined : data.changes.data) ?? data.data;
+		let type = "jpg";
+		if (data.format === DataFormat.PNG) {
+			type = 'png';
+		} else if (data.format === DataFormat.BMP) {
+			type = 'bmp';
 		}
-		return data.dataUrlCache;
+
+		return `data:image/${type};base64,${rawData}`;
 	}
 }

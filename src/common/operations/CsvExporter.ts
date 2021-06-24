@@ -129,8 +129,6 @@ export const CsvExporter = {
 			csv.push({type: 'CommandText', id: speech.id.toString(), value: speech.text, location, speaker, comment});
 		}
 
-		console.log(csv);
-
 		return "type,id,value,location,speaker,comment\r\n"
 			+ csv.map(row => encodeRow(row)).join("\r\n");
 	},

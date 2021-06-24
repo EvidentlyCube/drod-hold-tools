@@ -12,6 +12,7 @@ import {Entrance} from "../data/Entrance";
 import {Scroll} from "../data/Scroll";
 import {Level} from "../data/Level";
 import { Player } from "../data/Player";
+import { Data } from "../data/Data";
 
 
 export const HoldEncodeChanges = {
@@ -177,4 +178,19 @@ export const HoldEncodeChanges = {
 			scroll.xml.setAttribute('Message', StringUtils.stringToHoldString(scroll.text, 1350));
 		}
 	},
+
+	data(data: Data, hold: Hold) {
+		if (data.changes.name !== undefined) {
+			data.name = data.changes.name;
+			delete data.changes.name;
+
+			data.xml.setAttribute('DataNameText', StringUtils.stringToHoldString(data.name, 128));
+		}
+		if (data.changes.data !== undefined) {
+			data.data = data.changes.data;
+			delete data.changes.data;
+
+			data.xml.setAttribute('RawData', data.data);
+		}
+	}
 };

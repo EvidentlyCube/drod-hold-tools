@@ -1,1 +1,11 @@
- - Data locating - handle entrance audio clip
+Data tab:
+ - File upload should fix format if it changes
+ - Toast on error
+ 
+ - Audio upload
+
+Analyses:
+ - Rooms with no checkpoints
+ - Entrances that are not linked to from anywhere
+ - Entrances that have default text and are set to display text
+ - Staircases that lead to end of hold

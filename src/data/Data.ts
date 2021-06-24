@@ -28,11 +28,13 @@ export interface Data {
 	format: DataFormat;
 	name: string;
 	size: number;
+	data: string;
 
 	links: DataLink[];
 
 	changes: {
-		name?: string
+		name?: string,
+		data?: string
 	},
 	dataUrlCache?: string;
 }

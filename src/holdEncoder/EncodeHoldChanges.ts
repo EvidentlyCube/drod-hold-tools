@@ -36,6 +36,10 @@ export const getEncodeHoldChanges = (): EncodeStep => {
 				HoldEncodeChanges.character(character, hold);
 			}
 
+			for (const data of hold.datas.values()) {
+				HoldEncodeChanges.data(data, hold);
+			}
+
 			state.holdXml = hold.xmlDocument;
 			state.progressFactor = 1;
 			return true;

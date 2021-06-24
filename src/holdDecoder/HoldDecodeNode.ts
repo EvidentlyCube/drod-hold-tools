@@ -88,13 +88,15 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 
 		case 'Data':
 			const dataId = getInt(element, 'DataID');
+			const rawData = element.getAttribute('RawData') || '';
 			hold.datas.set(dataId, {
 				modelType: ModelType.Data,
 				xml: element,
 				id: dataId,
 				format: getInt(element, 'DataFormat'),
 				name: decodeText(element, 'DataNameText'),
-				size: Math.ceil((element.getAttribute('RawData') || '').length * 4 / 3),
+				size: Math.ceil(rawData.length * 4 / 3),
+				data: rawData,
 				links: [],
 				changes: {}
 			});

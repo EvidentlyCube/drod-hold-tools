@@ -85,7 +85,8 @@ interface DataChange {
 	type: "Data",
 	model: Data;
 	changes: {
-		name?: boolean
+		name?: boolean,
+		data?: boolean
 	}
 }
 

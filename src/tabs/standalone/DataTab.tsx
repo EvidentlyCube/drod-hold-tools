@@ -10,7 +10,7 @@ import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
-import {PlayCircle, Visibility} from "@material-ui/icons";
+import {Edit, FindReplace, PlayCircle, Visibility} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
 
 const styles = (theme: Theme) => createStyles({
@@ -43,6 +43,7 @@ interface DatasTabState {
 	allRows: DataRow[];
 	columns: EnchancedTableColumn[];
 	previewData?: Data;
+	replaceData?: Data;
 }
 
 class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
@@ -55,12 +56,13 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		this.state = {
 			hold: Store.loadedHold.value,
 			previewData: undefined,
+			replaceData: undefined,
 			allRows: allRows,
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
-				{id: 'name', label: 'Name', editable: true, editMultiline: true, editMaxLength: 1350},
-				{id: 'preview', label: 'Preview', width: '5%', renderCell: this.renderPreviewCell, padding: "none"},
+				{id: 'name', label: 'Name', editable: true, editMaxLength: 1350},
+				{id: 'edit', label: 'Edit', width: '5%', renderCell: this.renderEditCell, padding: "none", sortable: false},
 				{id: 'type', label: 'Type', width: '15%'},
 				{id: 'size', label: 'Size', width: '8%', renderCell: row => DataUtils.formatSize(row.size), type: 'numeric'},
 			],
@@ -122,7 +124,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 	public render() {
 		const {classes} = this.props;
-		const {allRows, columns, previewData} = this.state;
+		const {allRows, columns, previewData, hold} = this.state;
 
 		return <Container maxWidth="xl">
 			<Paper className={classes.content}>
@@ -141,7 +143,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					apiRef={this._tableApi}
 				/>
 			</Paper>
-			<DataPreviewDialog name={previewData ? previewData.changes.name ?? previewData.name : ''} onClose={this.handleClosePreviewDialog} data={previewData} />
+			<DataPreviewDialog 
+				hold={hold} 
+				onClose={this.handleClosePreviewDialog} 
+				data={previewData} />
 		</Container>;
 	}
 
@@ -156,16 +161,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		return <span/>;
 	};
 
-	private renderPreviewCell = (row: DataRow) => {
-		if (row.format === DataFormat.BMP || row.format === DataFormat.JPG || row.format === DataFormat.PNG) {
-			return <IconButton onClick={() => this.setState({previewData: row.data })}>
-				<Visibility/>
-			</IconButton>
-		} else if (row.format === DataFormat.OGG || row.format === DataFormat.WAV) {
-			return <IconButton onClick={() => this.setState({previewData: row.data })}>
-				<PlayCircle/>
-			</IconButton>
-		}
+	private renderEditCell = (row: DataRow) => {
+		return <IconButton onClick={() => this.setState({previewData: row.data })}>
+			<Edit/>
+		</IconButton>;
 	}
 }
 
