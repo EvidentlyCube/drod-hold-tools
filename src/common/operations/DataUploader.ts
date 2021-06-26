@@ -26,9 +26,9 @@ export const DataUploader = {
 
 			const [, extension] = fileNameMatches;
 			const newFileFormat = DataUtils.extensionToFormat(extension);
-			if (!DataUtils.isAudio(data.format) && !DataUtils.isAudio(newFileFormat)) {
+			if (DataUtils.isAudio(data.format) && !DataUtils.isAudio(newFileFormat)) {
 				return resolve({error: 'Audio can only be replaced with another audio (either OGG or WAV)'});
-			} else if (!DataUtils.isImage(data.format) && !DataUtils.isImage(newFileFormat)) {
+			} else if (DataUtils.isImage(data.format) && !DataUtils.isImage(newFileFormat)) {
 				return resolve({error: 'Image can only be replaced with another image (PNG, BMP or JPG)'});
 			}
 

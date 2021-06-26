@@ -31,7 +31,8 @@ interface DataRow {
 	type: string;
 	format: DataFormat;
 	size: number;
-	isEdited: boolean;
+	isNameEdited: boolean;
+	isDataEdited: boolean;
 	data: Data;
 }
 
@@ -60,16 +61,17 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			allRows: allRows,
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
-				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
+				{id: 'isNameEdited', label: 'Δ', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", headerTitle: "Is name changed?"},
 				{id: 'name', label: 'Name', editable: true, editMaxLength: 1350},
-				{id: 'edit', label: 'Edit', width: '5%', renderCell: this.renderEditCell, padding: "none", sortable: false},
+				{id: 'isDataEdited', label: 'Δ', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", headerTitle: "Is data changed?"},
+				{id: 'edit', label: 'View', width: '5%', renderCell: this.renderEditCell, padding: "none", sortable: false},
 				{id: 'type', label: 'Type', width: '15%'},
 				{id: 'size', label: 'Size', width: '8%', renderCell: row => DataUtils.formatSize(row.size), type: 'numeric'},
 			],
 		};
 	}
 
-	private handleResetRow = (id: number) => {
+	private handleResetName = (id: number) => {
 		const {hold} = this.state;
 		const data = HoldUtils.getData(id, hold);
 
@@ -77,7 +79,19 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 		const dataRow = this.getRowById(id);
 		dataRow.name = dataRow.originalName;
-		dataRow.isEdited = false;
+		dataRow.isNameEdited = false;
+
+		this._tableApi.current?.rerenderRow(id);
+	};
+
+	private handleResetData = (id: number) => {
+		const {hold} = this.state;
+		const data = HoldUtils.getData(id, hold);
+
+		UpdateUtils.dataData(data, data.data, hold);
+
+		const dataRow = this.getRowById(id);
+		dataRow.isDataEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
 	};
@@ -88,7 +102,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 		UpdateUtils.dataName(data, newValue, hold);
 
-		this.getRowById(row.id).isEdited = data.changes.name !== undefined;
+		this.getRowById(row.id).isNameEdited = data.changes.name !== undefined;
 	};
 
 	private static dataToRow(data: Data): DataRow {
@@ -99,7 +113,8 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			type: DataUtils.dataFormatToText(data.format),
 			format: data.format,
 			size: data.size,
-			isEdited: data.changes.name !== undefined,
+			isNameEdited: data.changes.name !== undefined,
+			isDataEdited: data.changes.data !== undefined,
 			data,
 		};
 	}
@@ -120,6 +135,13 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 	private handleClosePreviewDialog = () => {
 		this.setState({previewData: undefined});
+	};
+
+	private handlePreviewDialogDataChange = (data: Data) => {
+		const row = this.getRowById(data.id);
+		row.isDataEdited = data.changes.data !== undefined;
+		
+		this._tableApi.current?.rerender();
 	};
 
 	public render() {
@@ -146,16 +168,23 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			<DataPreviewDialog
 				hold={hold}
 				onClose={this.handleClosePreviewDialog}
+				onDataChange={this.handlePreviewDialogDataChange}
 				data={previewData}/>
 		</Container>;
 	}
 
-	private renderIsEditedCell = (row: DataRow) => {
-		if (row.isEdited) {
+	private renderIsEditedCell = (row: DataRow, field: string) => {
+		if (field === 'isNameEdited' && row.isNameEdited) {
 			return <IsEditedCell
 				rowId={row.id}
-				resetHandler={this.handleResetRow}
+				resetHandler={this.handleResetName}
 				originalText={row.originalName}/>;
+		} else if (field === 'isDataEdited' && row.isDataEdited) {
+			return <IsEditedCell
+				rowId={row.id}
+				resetHandler={this.handleResetData}
+				label="Click to reset data"/>;
+			
 		}
 
 		return <span/>;
