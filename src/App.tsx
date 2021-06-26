@@ -20,6 +20,11 @@ import OperationsTab from './tabs/operations/OperationsTab';
 import {useObservablePropertyState} from './common/Hooks';
 import {IsBusyModal} from './components/IsBusyModal';
 import DataTab from "./tabs/standalone/DataTab";
+import { TabContainer } from './common/components/TabContainer';
+import { CoreMasterTab } from './tabs/core/CoreMasterTab';
+import { TextMasterTab } from './tabs/core/TextMasterTab';
+import { DataMasterTab } from './tabs/core/DataMasterTab';
+import { LightTooltip } from './common/components/LightTooltip';
 
 
 const theme = createTheme({
@@ -33,8 +38,7 @@ const theme = createTheme({
 const useStyles = makeStyles(() => ({
 	tab: {
 		...theme.mixins.toolbar,
-		paddingTop: theme.spacing(4),
-		paddingBottom: theme.spacing(4),
+		padding: theme.spacing(0, 0, 4) + " !important",
 	},
 	footer: {
 		alignItems: 'center',
@@ -44,26 +48,6 @@ const useStyles = makeStyles(() => ({
 		textTransform: 'none',
 	},
 }));
-
-function TabPanel(props: React.PropsWithChildren<{ value: any, index: any, className: string }>) {
-	const {children, value, index, className} = props;
-
-	if (value !== index) {
-		return null;
-	}
-
-	return (
-		<Container
-			className={className}
-			role="tabpanel"
-			id={`simple-tabpanel-${index}`}
-			aria-labelledby={`simple-tab-${index}`}
-			maxWidth="xl"
-		>
-			<Box>{children}</Box>
-		</Container>
-	);
-}
 
 function App() {
 	const classes = useStyles();
@@ -98,46 +82,27 @@ function App() {
 			<ThemeProvider theme={theme}>
 				<LocalizationProvider dateAdapter={AdapterDateFns}>
 					<CssBaseline/>
-					<AppBar position="static">
+					<AppBar position="relative">
 						<Tabs value={selectedTab} onChange={handleChange} textColor="inherit" variant="fullWidth">
-							<Tab label="Hold"/>
-							<Tab label="Commands Text" disabled={!hasLoadedHold}/>
-							<Tab label="Entrances" disabled={!hasLoadedHold}/>
-							<Tab label="Scrolls" disabled={!hasLoadedHold}/>
-							<Tab label="Players" disabled={!hasLoadedHold}/>
-							<Tab label="Levels" disabled={!hasLoadedHold}/>
+							<Tab label="Main"/>
+							<Tab label="Texts" disabled={!hasLoadedHold}/>
 							<Tab label="Data" disabled={!hasLoadedHold}/>
-							<Tab label="Misc" disabled={!hasLoadedHold}/>
-							<Tab label="Operations" disabled={!hasLoadedHold}/>
+							<Tab
+								label={<LightTooltip title="Not yet available"><div>Analysis</div></LightTooltip>}
+								disabled={true}
+								style={{ pointerEvents: 'auto', flexGrow: 1 }}
+							/>
 						</Tabs>
 					</AppBar>
-					<TabPanel className={classes.tab} value={selectedTab} index={0}>
-						<HoldTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={1}>
-						<SpeechTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={2}>
-						<EntrancesTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={3}>
-						<ScrollsTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={4}>
-						<AuthorsTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={5}>
-						<LevelsTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={6}>
-						<DataTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={7}>
-						<MiscTab/>
-					</TabPanel>
-					<TabPanel className={classes.tab} value={selectedTab} index={8}>
-						<OperationsTab/>
-					</TabPanel>
+					<TabContainer className={classes.tab} value={selectedTab} index={0}>
+						<CoreMasterTab hasLoadedHold={hasLoadedHold} />
+					</TabContainer>
+					<TabContainer className={classes.tab} value={selectedTab} index={1}>
+						<TextMasterTab hasLoadedHold={hasLoadedHold} />
+					</TabContainer>
+					<TabContainer className={classes.tab} value={selectedTab} index={2}>
+						<DataMasterTab hasLoadedHold={hasLoadedHold} />
+					</TabContainer>
 					<Divider/>
 					<Container>
 						<Toolbar className={classes.footer}>
