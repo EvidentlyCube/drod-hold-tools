@@ -161,4 +161,12 @@ export const ChangeUtils = {
 			changes: {data: data.changes.data !== undefined},
 		});
 	},
+
+	dataFormat(data: Data, hold: Hold) {
+		HoldUtils.addChange(hold, {
+			type: "Data",
+			model: data,
+			changes: {format: data.changes.format !== undefined},
+		});
+	},
 };

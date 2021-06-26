@@ -1,13 +1,14 @@
 import {Data, DataFormat} from "../../data/Data";
 import {AppBar, Button, Dialog, Toolbar} from "@material-ui/core";
-import {Backup, BorderStyle, ChangeHistory, Close, FormatColorFill, History, ZoomIn, ZoomOut} from "@material-ui/icons";
+import {BorderStyle, Close, FormatColorFill, ZoomIn, ZoomOut} from "@material-ui/icons";
 import {Box, IconButton, Typography} from "@material-ui/core/";
 import {DataUtils} from "../../common/DataUtils";
 import React, {useCallback, useEffect, useState} from "react";
-import { LightTooltip } from "../../common/components/LightTooltip";
-import { Hold } from "../../data/Hold";
-import { DataUploader } from "../../common/operations/DataUploader";
-import { UpdateUtils } from "../../common/UpdateUtils";
+import {LightTooltip} from "../../common/components/LightTooltip";
+import {Hold} from "../../data/Hold";
+import {DataUploader} from "../../common/operations/DataUploader";
+import {UpdateUtils} from "../../common/UpdateUtils";
+import {Store} from "../../data/Store";
 
 interface TopBarProps {
 	data: Data;
@@ -23,25 +24,29 @@ interface TopBarProps {
 const TopBar = ({data, hold, onClose, children, showOld, setShowOld, setDataUrl}: TopBarProps) => {
 	const onToggle = useCallback(() => {
 		setShowOld?.(!showOld);
-		setDataUrl?.(DataUtils.getImageUrl(data, !showOld));
-	}, [setShowOld, showOld]);
+		setDataUrl?.(DataUtils.getDataUrl(data, !showOld));
+	}, [setShowOld, showOld, data, setDataUrl]);
 
 	const onUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files && e.target.files.length > 0) {
 			const result = await DataUploader.uploadFile(
 				e.target.files[0]!,
-				data, hold, /\.(png|jpe?g|bmp)$/i
+				data, hold,
 			);
 
+			if (result.error) {
+				Store.addSystemMessage({color: 'error', message: result.error});
+			}
+
 			setShowOld?.(false);
-			setDataUrl?.(DataUtils.getImageUrl(data, false));
+			setDataUrl?.(DataUtils.getDataUrl(data, false));
 		}
-	}, [setShowOld, hold, setDataUrl, data]); 
+	}, [setShowOld, hold, setDataUrl, data]);
 
 	const onUndo = useCallback(() => {
 		UpdateUtils.dataData(data, data.data, hold);
 		setShowOld?.(false);
-		setDataUrl?.(DataUtils.getImageUrl(data, true));
+		setDataUrl?.(DataUtils.getDataUrl(data, true));
 	}, [data, hold, setShowOld, setDataUrl]);
 
 	return <AppBar>
@@ -53,10 +58,10 @@ const TopBar = ({data, hold, onClose, children, showOld, setShowOld, setDataUrl}
 				{data.name} {data.changes.data !== undefined ? (showOld ? '(old)' : '(new)') : ''}
 			</Typography>
 
-			{data.changes.data !== undefined && 
-			<LightTooltip title="Click to reset changes">
-				<Button color="inherit" onClick={onUndo}>Undo</Button>
-			</LightTooltip>}
+			{data.changes.data !== undefined &&
+            <LightTooltip title="Click to reset changes">
+                <Button color="inherit" onClick={onUndo}>Undo</Button>
+            </LightTooltip>}
 			<LightTooltip title="Click to upload a new version">
 				<Button color="inherit" component="label">
 					Replace
@@ -64,10 +69,10 @@ const TopBar = ({data, hold, onClose, children, showOld, setShowOld, setDataUrl}
 				</Button>
 			</LightTooltip>
 
-			{data.changes.data !== undefined && 
-			<LightTooltip title="Click to toggle the display between the new and the old version">
-				<Button color="inherit" onClick={onToggle}>Toggle</Button>
-			</LightTooltip>}
+			{data.changes.data !== undefined &&
+            <LightTooltip title="Click to toggle the display between the new and the old version">
+                <Button color="inherit" onClick={onToggle}>Toggle</Button>
+            </LightTooltip>}
 
 			{children}
 		</Toolbar>
@@ -81,8 +86,8 @@ const DialogBody = ({children, style}: { children: React.ReactNode, style: React
 		flex: '1',
 		justifyContent: 'center',
 		alignItems: 'center',
-		paddingTop: '64px'
-	}
+		paddingTop: '64px',
+	};
 	return <Box style={totalStyle}>
 		{children}
 	</Box>;
@@ -91,7 +96,7 @@ const DialogBody = ({children, style}: { children: React.ReactNode, style: React
 const Backgrounds = [
 	'#000000',
 	'#C0C0C0',
-	'#FFFFFF'
+	'#FFFFFF',
 ];
 
 interface PreviewActualProps {
@@ -104,7 +109,7 @@ const PreviewImage = ({hold, data, onClose}: PreviewActualProps) => {
 	const [showOld, setShowOld] = useState(false);
 	const [dataUrl, setDataUrl] = useState('');
 	useEffect(() => {
-		setDataUrl(DataUtils.getImageUrl(data, false));
+		setDataUrl(DataUtils.getDataUrl(data, false));
 	}, [setDataUrl, data]);
 
 	const [zoom, setZoom] = useState(1);
@@ -158,9 +163,9 @@ const PreviewImage = ({hold, data, onClose}: PreviewActualProps) => {
 
 const PreviewAudio = ({hold, data, onClose}: PreviewActualProps) => {
 	return <>
-		<TopBar hold={hold} data={data} onClose={onClose} />
+		<TopBar hold={hold} data={data} onClose={onClose}/>
 		<DialogBody style={{}}>
-			<audio src={DataUtils.getAudioUrl(data, true)} controls/>
+			<audio src={DataUtils.getDataUrl(data, true)} controls/>
 		</DialogBody>
 	</>;
 };
@@ -173,7 +178,7 @@ interface DataPreviewDialogProps {
 
 const DialogContents = ({hold, data, onClose}: DataPreviewDialogProps) => {
 	if (!data) {
-		return <></>
+		return <></>;
 	} else if (data.format === DataFormat.BMP || data.format === DataFormat.JPG || data.format === DataFormat.PNG) {
 		return <PreviewImage hold={hold} data={data} onClose={onClose}/>;
 	} else if (data.format === DataFormat.WAV || data.format === DataFormat.OGG) {
@@ -185,7 +190,7 @@ const DialogContents = ({hold, data, onClose}: DataPreviewDialogProps) => {
 		<DialogBody style={{}}>
 			Unknown format '{data.format}'
 		</DialogBody>
-	</>
+	</>;
 };
 export const DataPreviewDialog = (props: DataPreviewDialogProps) => {
 	const {data, onClose} = props;

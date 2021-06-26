@@ -1,5 +1,5 @@
 import { Character } from "../data/Character";
-import { Data } from "../data/Data";
+import {Data, DataFormat} from "../data/Data";
 import { Entrance } from "../data/Entrance";
 import { Hold } from "../data/Hold";
 import { Level } from "../data/Level";
@@ -352,6 +352,29 @@ export const UpdateUtils = {
 
 		if (wasChanged) {
 			ChangeUtils.dataData(data, hold);
+		}
+
+		return wasChanged;
+	},
+
+	dataFormat(dataOrId: Data | number, newFormat: DataFormat, hold: Hold) {
+		const data = typeof dataOrId === 'number'
+			? HoldUtils.getData(dataOrId, hold)
+			: dataOrId;
+
+		let wasChanged = false;
+		if (data.changes.format !== newFormat) {
+			if (data.format !== newFormat) {
+				data.changes.format = newFormat;
+				wasChanged = true;
+			} else if (data.changes.format !== undefined) {
+				delete data.changes.format;
+				wasChanged = true;
+			}
+		}
+
+		if (wasChanged) {
+			ChangeUtils.dataFormat(data, hold);
 		}
 
 		return wasChanged;

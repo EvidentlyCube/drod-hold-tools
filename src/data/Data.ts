@@ -34,7 +34,8 @@ export interface Data {
 
 	changes: {
 		name?: string,
-		data?: string
+		data?: string,
+		format?: DataFormat,
 	},
 	dataUrlCache?: string;
 }

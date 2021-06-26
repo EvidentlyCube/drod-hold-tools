@@ -10,7 +10,7 @@ import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
-import {Edit, FindReplace, PlayCircle, Visibility} from "@material-ui/icons";
+import {Edit} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
 
 const styles = (theme: Theme) => createStyles({
@@ -100,7 +100,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			format: data.format,
 			size: data.size,
 			isEdited: data.changes.name !== undefined,
-			data
+			data,
 		};
 	}
 
@@ -120,7 +120,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 	private handleClosePreviewDialog = () => {
 		this.setState({previewData: undefined});
-	}
+	};
 
 	public render() {
 		const {classes} = this.props;
@@ -143,10 +143,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					apiRef={this._tableApi}
 				/>
 			</Paper>
-			<DataPreviewDialog 
-				hold={hold} 
-				onClose={this.handleClosePreviewDialog} 
-				data={previewData} />
+			<DataPreviewDialog
+				hold={hold}
+				onClose={this.handleClosePreviewDialog}
+				data={previewData}/>
 		</Container>;
 	}
 
@@ -162,10 +162,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 	};
 
 	private renderEditCell = (row: DataRow) => {
-		return <IconButton onClick={() => this.setState({previewData: row.data })}>
+		return <IconButton onClick={() => this.setState({previewData: row.data})}>
 			<Edit/>
 		</IconButton>;
-	}
+	};
 }
 
 export default withStyles(styles)(DatasTab);

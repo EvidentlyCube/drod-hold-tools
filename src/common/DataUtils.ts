@@ -47,25 +47,46 @@ export const DataUtils = {
 		}
 	},
 
-	getAudioUrl(data: Data, forceOld: boolean) {
+	getDataUrl(data: Data, forceOld: boolean) {
 		const rawData = (forceOld ? undefined : data.changes.data) ?? data.data;
-		let type = "ogg";
+		let type = "audio/ogg";
 		if (data.format === DataFormat.WAV) {
-			type = 'wav';
+			type = 'audio/wav';
+		} else if (data.format === DataFormat.BMP) {
+			type = 'image/bmp';
+		} else if (data.format === DataFormat.PNG) {
+			type = 'image/png';
+		} else if (data.format === DataFormat.JPG) {
+			type = 'image/jpg';
 		}
 
-		return `data:audio/${type};base64,${rawData}`;
+		return `data:${type};base64,${rawData}`;
 	},
 
-	getImageUrl(data: Data, forceOld: boolean) {
-		const rawData = (forceOld ? undefined : data.changes.data) ?? data.data;
-		let type = "jpg";
-		if (data.format === DataFormat.PNG) {
-			type = 'png';
-		} else if (data.format === DataFormat.BMP) {
-			type = 'bmp';
-		}
+	isAudio(dataFormat: DataFormat) {
+		return dataFormat === DataFormat.OGG || dataFormat === DataFormat.WAV;
+	},
 
-		return `data:image/${type};base64,${rawData}`;
-	}
-}
+	isImage(dataFormat: DataFormat) {
+		return dataFormat === DataFormat.JPG || dataFormat === DataFormat.PNG || dataFormat === DataFormat.BMP;
+	},
+
+	extensionToFormat(extension: string) {
+		switch (extension.toLowerCase()) {
+			case 'jpg':
+			case 'jpeg':
+				return DataFormat.JPG;
+
+			case 'png':
+				return DataFormat.PNG;
+			case 'bmp':
+				return DataFormat.BMP;
+			case 'ogg':
+				return DataFormat.OGG;
+			case 'wav':
+				return DataFormat.WAV;
+			default:
+				throw new Error(`Unsupported file extension ${extension}`);
+		}
+	},
+};
