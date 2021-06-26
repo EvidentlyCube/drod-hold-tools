@@ -1,7 +1,4 @@
 Data tab:
- - File upload should fix format if it changes
- - Toast on error
- 
  - Audio upload
 
 Analyses:
