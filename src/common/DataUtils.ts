@@ -1,4 +1,4 @@
-import {Data, DataFormat} from "../data/Data";
+import {Data, DataFormat, DataLink} from "../data/Data";
 
 export const DataUtils = {
 	dataFormatToText(type: DataFormat) {
@@ -89,4 +89,8 @@ export const DataUtils = {
 				throw new Error(`Unsupported file extension ${extension}`);
 		}
 	},
+
+	describeDataLink(link: DataLink) {
+		
+	}
 };

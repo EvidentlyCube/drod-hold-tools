@@ -6,6 +6,7 @@ import {MonsterUtils} from "../common/MonsterUtils";
 import {ModelType} from "../common/Enums";
 import {Scroll} from "../data/Scroll";
 import {createNullCommand} from "../data/Command";
+import { createNullCharacter } from "../data/Character";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
@@ -65,25 +66,23 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			break;
 
 		case 'Characters':
-			const characterId = getInt(element, 'CharID');
-			const extraVars = PackedVarsUtils.readBuffer(
+			const character = createNullCharacter();
+			character.id = getInt(element, 'CharID');
+			
+			character.extraVars = PackedVarsUtils.readBuffer(
 				PackedVarsUtils.base64ToArray(
 					getText(element, 'ExtraVars', true),
 				),
 			);
-			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer('Commands', [])!);
-			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
+			character.commands = CommandsUtils.readCommandsBuffer(character.extraVars.readByteBuffer('Commands', [])!, character);
+			character.processingSequence = character.extraVars.readUint('ProcessSequenceParam', 9999);
+			character.xml = element;
+			character.name: decodeText(element, 'CharNameText');
+			character.tilesDataId: element.hasAttribute('DataIDTiles') ? getInt(element, 'DataIDTiles') : 0;
+			character.faceDataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0;
 
-			hold.characters.set(characterId, {
-				modelType: ModelType.Character,
-				xml: element,
-				id: characterId,
-				name: decodeText(element, 'CharNameText'),
-				tilesDataId: element.hasAttribute('DataIDTiles') ? getInt(element, 'DataIDTiles') : 0,
-				faceDataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0,
-				commands, processingSequence, extraVars,
-				changes: {},
-			});
+
+			hold.characters.set(character.id, character);
 			break;
 
 		case 'Data':

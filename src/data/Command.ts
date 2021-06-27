@@ -1,4 +1,6 @@
 import {CharCommand} from "../common/Enums";
+import { Character, createNullCharacter } from "./Character";
+import { Monster } from "./Monster";
 
 export interface Command {
 	command: CharCommand;
@@ -11,6 +13,8 @@ export interface Command {
 	label: string;
 
 	changes: Partial<Omit<Command, 'changes'>>;
+
+	source: Monster|Character;
 }
 
 export function createNullCommand(): Command {
@@ -23,6 +27,7 @@ export function createNullCommand(): Command {
 		flags: 0,
 		speechId: 0,
 		label: '',
+		source: createNullCharacter(),
 		changes: {}
 	};
 }

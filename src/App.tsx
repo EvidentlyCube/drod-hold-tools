@@ -1,30 +1,21 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import './App.css';
-import {AppBar, Box, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar} from "@material-ui/core";
-import {makeStyles} from '@material-ui/styles';
-import {createTheme} from '@material-ui/core/styles';
-import {Store} from "./data/Store";
-import HoldTab from "./tabs/holdTab/HoldTab";
-import SpeechTab from "./tabs/standalone/SpeechTab";
-import {Container} from "@material-ui/core/";
-import "./common.d.ts";
-import EntrancesTab from "./tabs/standalone/EntrancesTab";
-import ScrollsTab from "./tabs/standalone/ScrollsTab";
-import MiscTab from "./tabs/misc/MiscTab";
-import AuthorsTab from './tabs/standalone/PlayersTab';
-import {LevelsTab} from './tabs/standalone/LevelsTab';
-import {SystemMessages} from './common/components/SystemMessages';
-import {LocalizationProvider} from "@material-ui/lab";
+import { AppBar, Button, ButtonGroup, CssBaseline, Divider, Tab, Tabs, ThemeProvider, ToggleButton, ToggleButtonGroup, Toolbar } from "@material-ui/core";
+import { Container } from "@material-ui/core/";
+import { createTheme } from '@material-ui/core/styles';
+import { LocalizationProvider } from "@material-ui/lab";
 import AdapterDateFns from "@material-ui/lab/AdapterDateFns";
-import OperationsTab from './tabs/operations/OperationsTab';
-import {useObservablePropertyState} from './common/Hooks';
-import {IsBusyModal} from './components/IsBusyModal';
-import DataTab from "./tabs/standalone/DataTab";
-import { TabContainer } from './common/components/TabContainer';
-import { CoreMasterTab } from './tabs/core/CoreMasterTab';
-import { TextMasterTab } from './tabs/core/TextMasterTab';
-import { DataMasterTab } from './tabs/core/DataMasterTab';
+import { makeStyles } from '@material-ui/styles';
+import React, { useCallback, useEffect, useState } from 'react';
+import './App.css';
+import "./common.d.ts";
 import { LightTooltip } from './common/components/LightTooltip';
+import { SystemMessages } from './common/components/SystemMessages';
+import { TabContainer } from './common/components/TabContainer';
+import { useObservablePropertyState } from './common/Hooks';
+import { IsBusyModal } from './components/IsBusyModal';
+import { Store } from "./data/Store";
+import { CoreMasterTab } from './tabs/core/CoreMasterTab';
+import { DataMasterTab } from './tabs/core/DataMasterTab';
+import { TextMasterTab } from './tabs/core/TextMasterTab';
 
 
 const theme = createTheme({
@@ -81,12 +72,12 @@ function App() {
 		<div className={options.indexOf('use-tom') !== -1 ? 'use-tom' : ''}>
 			<ThemeProvider theme={theme}>
 				<LocalizationProvider dateAdapter={AdapterDateFns}>
-					<CssBaseline/>
+					<CssBaseline />
 					<AppBar position="relative">
 						<Tabs value={selectedTab} onChange={handleChange} textColor="inherit" variant="fullWidth">
-							<Tab label="Main"/>
-							<Tab label="Texts" disabled={!hasLoadedHold}/>
-							<Tab label="Data" disabled={!hasLoadedHold}/>
+							<Tab label="Main" />
+							<Tab label="Texts" disabled={!hasLoadedHold} />
+							<Tab label="Data" disabled={!hasLoadedHold} />
 							<Tab
 								label={<LightTooltip title="Not yet available"><div>Analysis</div></LightTooltip>}
 								disabled={true}
@@ -103,7 +94,7 @@ function App() {
 					<TabContainer className={classes.tab} value={selectedTab} index={2}>
 						<DataMasterTab hasLoadedHold={hasLoadedHold} />
 					</TabContainer>
-					<Divider/>
+					<Divider />
 					<Container>
 						<Toolbar className={classes.footer}>
 							<ToggleButtonGroup value={options} onChange={onChangeOptions}>
@@ -118,8 +109,8 @@ function App() {
 						</Toolbar>
 					</Container>
 				</LocalizationProvider>
-				<SystemMessages/>
-				<IsBusyModal open={isBusy}/>
+				<SystemMessages />
+				<IsBusyModal open={isBusy} />
 			</ThemeProvider>
 		</div>
 	);

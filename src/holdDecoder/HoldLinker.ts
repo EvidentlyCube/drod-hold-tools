@@ -11,6 +11,7 @@ import {Command} from "../data/Command";
 import {DataLink} from "../data/Data";
 import {HoldUtils} from "../common/HoldUtils";
 import {Speech} from "../data/Speech";
+import { DataUtils } from "../common/DataUtils";
 
 function linkData(hold: Hold, dataId: number, model: DataLink['model'], field: DataLink['field']) {
 	if (!dataId) {
@@ -18,7 +19,9 @@ function linkData(hold: Hold, dataId: number, model: DataLink['model'], field: D
 	}
 
 	const data = HoldUtils.getData(dataId, hold);
-	data.links.push({model, field});
+	const dataLink = {model, field};
+	DataUtils.describeDataLink(dataLink);
+	data.links.push(dataLink);
 }
 
 export const HoldLinker = {
