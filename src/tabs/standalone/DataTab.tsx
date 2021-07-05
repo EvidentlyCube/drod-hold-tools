@@ -1,7 +1,7 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Container, IconButton, Paper, Theme, Typography} from "@material-ui/core/";
+import {Button, Container, IconButton, Paper, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable} from "../../common/components/EnchancedTable";
@@ -12,6 +12,7 @@ import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
 import {Edit} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
+import { DataUsageDialog } from "./DataUsageDialog";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -31,8 +32,10 @@ interface DataRow {
 	type: string;
 	format: DataFormat;
 	size: number;
-	isEdited: boolean;
+	isNameEdited: boolean;
+	isDataEdited: boolean;
 	data: Data;
+	usageCount: number;
 }
 
 interface DatasTabProps extends WithStyles<typeof styles> {
@@ -43,7 +46,7 @@ interface DatasTabState {
 	allRows: DataRow[];
 	columns: EnchancedTableColumn[];
 	previewData?: Data;
-	replaceData?: Data;
+	showUsageData?: Data;
 }
 
 class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
@@ -56,20 +59,22 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		this.state = {
 			hold: Store.loadedHold.value,
 			previewData: undefined,
-			replaceData: undefined,
+			showUsageData: undefined,
 			allRows: allRows,
 			columns: [
 				{id: 'id', label: 'ID', width: "5%", padding: "none"},
-				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
+				{id: 'isNameEdited', label: 'Δ', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", headerTitle: "Is name changed?"},
 				{id: 'name', label: 'Name', editable: true, editMaxLength: 1350},
-				{id: 'edit', label: 'Edit', width: '5%', renderCell: this.renderEditCell, padding: "none", sortable: false},
+				{id: 'isDataEdited', label: 'Δ', width: "5%", renderCell: this.renderIsEditedCell, padding: "none", headerTitle: "Is data changed?"},
+				{id: 'edit', label: 'View', width: '5%', renderCell: this.renderEditCell, padding: "none", sortable: false},
+				{id: 'usageCount', label: 'Uses', width: '5%', renderCell: this.renderUsesCell, type: 'numeric'},
 				{id: 'type', label: 'Type', width: '15%'},
 				{id: 'size', label: 'Size', width: '8%', renderCell: row => DataUtils.formatSize(row.size), type: 'numeric'},
 			],
 		};
 	}
 
-	private handleResetRow = (id: number) => {
+	private handleResetName = (id: number) => {
 		const {hold} = this.state;
 		const data = HoldUtils.getData(id, hold);
 
@@ -77,7 +82,19 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 		const dataRow = this.getRowById(id);
 		dataRow.name = dataRow.originalName;
-		dataRow.isEdited = false;
+		dataRow.isNameEdited = false;
+
+		this._tableApi.current?.rerenderRow(id);
+	};
+
+	private handleResetData = (id: number) => {
+		const {hold} = this.state;
+		const data = HoldUtils.getData(id, hold);
+
+		UpdateUtils.dataData(data, data.data, hold);
+
+		const dataRow = this.getRowById(id);
+		dataRow.isDataEdited = false;
 
 		this._tableApi.current?.rerenderRow(id);
 	};
@@ -88,7 +105,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 
 		UpdateUtils.dataName(data, newValue, hold);
 
-		this.getRowById(row.id).isEdited = data.changes.name !== undefined;
+		this.getRowById(row.id).isNameEdited = data.changes.name !== undefined;
 	};
 
 	private static dataToRow(data: Data): DataRow {
@@ -99,8 +116,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			type: DataUtils.dataFormatToText(data.format),
 			format: data.format,
 			size: data.size,
-			isEdited: data.changes.name !== undefined,
+			isNameEdited: data.changes.name !== undefined,
+			isDataEdited: data.changes.data !== undefined,
 			data,
+			usageCount: data.links.length
 		};
 	}
 
@@ -122,9 +141,20 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		this.setState({previewData: undefined});
 	};
 
+	private handlePreviewDialogDataChange = (data: Data) => {
+		const row = this.getRowById(data.id);
+		row.isDataEdited = data.changes.data !== undefined;
+		
+		this._tableApi.current?.rerender();
+	};
+
+	private handleShowUsageDialog = () => {
+		this.setState({showUsageData: undefined});
+	}
+
 	public render() {
 		const {classes} = this.props;
-		const {allRows, columns, previewData, hold} = this.state;
+		const {allRows, columns, previewData, showUsageData, hold} = this.state;
 
 		return <Container maxWidth="xl">
 			<Paper className={classes.content}>
@@ -146,16 +176,24 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			<DataPreviewDialog
 				hold={hold}
 				onClose={this.handleClosePreviewDialog}
+				onDataChange={this.handlePreviewDialogDataChange}
 				data={previewData}/>
+			<DataUsageDialog data={showUsageData} onClose={this.handleShowUsageDialog} />
 		</Container>;
 	}
 
-	private renderIsEditedCell = (row: DataRow) => {
-		if (row.isEdited) {
+	private renderIsEditedCell = (row: DataRow, field: string) => {
+		if (field === 'isNameEdited' && row.isNameEdited) {
 			return <IsEditedCell
 				rowId={row.id}
-				resetHandler={this.handleResetRow}
+				resetHandler={this.handleResetName}
 				originalText={row.originalName}/>;
+		} else if (field === 'isDataEdited' && row.isDataEdited) {
+			return <IsEditedCell
+				rowId={row.id}
+				resetHandler={this.handleResetData}
+				label="Click to reset data"/>;
+			
 		}
 
 		return <span/>;
@@ -166,6 +204,11 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			<Edit/>
 		</IconButton>;
 	};
+
+	private renderUsesCell = (row: DataRow) => {
+		const onClick = () => this.setState({showUsageData: row.data});
+		return <Button variant="text" onClick={onClick}>{row.usageCount}</Button>;
+	}
 }
 
 export default withStyles(styles)(DatasTab);

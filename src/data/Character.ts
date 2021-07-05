@@ -21,3 +21,21 @@ export interface Character {
 		name?: string
 	}
 }
+
+export function createNullCharacter(): Character {
+	return {
+		modelType: ModelType.Character,
+		xml: document.createElement('Characters'),
+
+		id: 0,
+		name: '',
+		extraVars: new PackedVars(),
+		commands: [],
+		processingSequence: 9999,
+
+		tilesDataId: 0,
+		faceDataId: 0,
+
+		changes: {}
+	}
+}

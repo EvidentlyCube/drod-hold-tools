@@ -14,6 +14,7 @@ interface TopBarProps {
 	data: Data;
 	hold: Hold;
 	onClose: () => void;
+	onDataChange?: (data: Data) => void;
 	children?: React.ReactNode;
 	showOld?: boolean;
 	setShowOld?: (value: boolean) => void;
@@ -21,7 +22,7 @@ interface TopBarProps {
 }
 
 
-const TopBar = ({data, hold, onClose, children, showOld, setShowOld, setDataUrl}: TopBarProps) => {
+const TopBar = ({data, hold, onClose, onDataChange, children, showOld, setShowOld, setDataUrl}: TopBarProps) => {
 	const onToggle = useCallback(() => {
 		setShowOld?.(!showOld);
 		setDataUrl?.(DataUtils.getDataUrl(data, !showOld));
@@ -36,17 +37,20 @@ const TopBar = ({data, hold, onClose, children, showOld, setShowOld, setDataUrl}
 
 			if (result.error) {
 				Store.addSystemMessage({color: 'error', message: result.error});
+			} else {
+				onDataChange?.(data);
 			}
 
 			setShowOld?.(false);
 			setDataUrl?.(DataUtils.getDataUrl(data, false));
 		}
-	}, [setShowOld, hold, setDataUrl, data]);
+	}, [setShowOld, hold, setDataUrl, data, onDataChange]);
 
 	const onUndo = useCallback(() => {
 		UpdateUtils.dataData(data, data.data, hold);
 		setShowOld?.(false);
 		setDataUrl?.(DataUtils.getDataUrl(data, true));
+		onDataChange?.(data);
 	}, [data, hold, setShowOld, setDataUrl]);
 
 	return <AppBar>
@@ -103,9 +107,10 @@ interface PreviewActualProps {
 	hold: Hold;
 	data: Data;
 	onClose: () => void;
+	onDataChange?: (data: Data) => void;
 }
 
-const PreviewImage = ({hold, data, onClose}: PreviewActualProps) => {
+const PreviewImage = ({hold, data, onClose, onDataChange}: PreviewActualProps) => {
 	const [showOld, setShowOld] = useState(false);
 	const [dataUrl, setDataUrl] = useState('');
 	useEffect(() => {
@@ -131,7 +136,7 @@ const PreviewImage = ({hold, data, onClose}: PreviewActualProps) => {
 	const borderColor = background === 0 ? 'white' : 'black';
 
 	return <>
-		<TopBar hold={hold} data={data} showOld={showOld} onClose={onClose} setShowOld={setShowOld} setDataUrl={setDataUrl}>
+		<TopBar hold={hold} data={data} showOld={showOld} onClose={onClose} onDataChange={onDataChange} setShowOld={setShowOld} setDataUrl={setDataUrl}>
 			<IconButton onClick={zoomOut} disabled={zoom <= 0.125} color="inherit">
 				<ZoomOut/>
 			</IconButton>
@@ -161,11 +166,17 @@ const PreviewImage = ({hold, data, onClose}: PreviewActualProps) => {
 	</>;
 };
 
-const PreviewAudio = ({hold, data, onClose}: PreviewActualProps) => {
+const PreviewAudio = ({hold, data, onClose, onDataChange}: PreviewActualProps) => {
+	const [showOld, setShowOld] = useState(false);
+	const [dataUrl, setDataUrl] = useState('');
+	useEffect(() => {
+		setDataUrl(DataUtils.getDataUrl(data, false));
+	}, [setDataUrl, data]);
+
 	return <>
-		<TopBar hold={hold} data={data} onClose={onClose}/>
+		<TopBar hold={hold} data={data} showOld={showOld} onClose={onClose} onDataChange={onDataChange} setShowOld={setShowOld} setDataUrl={setDataUrl}/>
 		<DialogBody style={{}}>
-			<audio src={DataUtils.getDataUrl(data, true)} controls/>
+			<audio src={dataUrl} controls/>
 		</DialogBody>
 	</>;
 };
@@ -174,19 +185,21 @@ interface DataPreviewDialogProps {
 	data?: Data;
 	hold: Hold;
 	onClose: () => void;
+	onDataChange?: (data: Data) => void;
 }
 
-const DialogContents = ({hold, data, onClose}: DataPreviewDialogProps) => {
+const DialogContents = (props: DataPreviewDialogProps) => {
+	const {data} = props;
 	if (!data) {
 		return <></>;
 	} else if (data.format === DataFormat.BMP || data.format === DataFormat.JPG || data.format === DataFormat.PNG) {
-		return <PreviewImage hold={hold} data={data} onClose={onClose}/>;
+		return <PreviewImage data={data} {...props}/>;
 	} else if (data.format === DataFormat.WAV || data.format === DataFormat.OGG) {
-		return <PreviewAudio hold={hold} data={data} onClose={onClose}/>;
+		return <PreviewAudio data={data} {...props}/>;
 	}
 
 	return <>
-		<TopBar hold={hold} data={data} onClose={onClose}/>
+		<TopBar data={data} {...props}/>
 		<DialogBody style={{}}>
 			Unknown format '{data.format}'
 		</DialogBody>

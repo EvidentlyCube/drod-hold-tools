@@ -19,17 +19,18 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface IsEditedCellProps {
 	rowId: any;
 	resetHandler: (rowId: any) => void;
-	originalText: string;
+	originalText?: string;
+	label?: string;
 }
 
 interface TooltipContentsProps {
-	originalText: string;
+	originalText?: string;
 }
 
 const TooltipContents = (props: TooltipContentsProps) => {
 	const {originalText} = props;
 	const classes = useStyles();
-
+	
 	return <React.Fragment>
 		<Typography component="p" variant="overline" className={classes.undo}><strong>Click to undo</strong></Typography>
 		<Divider variant="middle" className={classes.divider}/>
@@ -40,7 +41,7 @@ const TooltipContents = (props: TooltipContentsProps) => {
 };
 
 export const IsEditedCell = (props: IsEditedCellProps) => {
-	const {originalText, rowId, resetHandler} = props;
+	const {originalText, label, rowId, resetHandler} = props;
 
 	const onReset = useCallback((e: React.MouseEvent) => {
 		e.preventDefault();
@@ -50,7 +51,11 @@ export const IsEditedCell = (props: IsEditedCellProps) => {
 
 	}, [rowId, resetHandler]);
 
-	return <LightTooltip title={<TooltipContents originalText={originalText}/>}>
+	const title = label
+		? label 
+		: <TooltipContents originalText={originalText}/>;
+
+	return <LightTooltip title={title}>
 		<IconButton onClick={onReset}>
 			<History color="primary"/>
 		</IconButton>
