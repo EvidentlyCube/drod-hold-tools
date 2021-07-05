@@ -5,10 +5,10 @@ export const getDecodeValidateXml = (): DecodeStep => {
 		name: 'Validate Xml',
 		run(decoder: DecodeState): boolean {
 			const {holdXml} = decoder;
-			const holdsCount = holdXml.evaluate("count(//Holds)", holdXml).numberValue;
-			const levelsCount = holdXml.evaluate("count(//Levels)", holdXml).numberValue;
-			const roomsCount = holdXml.evaluate("count(//Rooms)", holdXml).numberValue;
-			const entrancesCount = holdXml.evaluate("count(//Entrances)", holdXml).numberValue;
+			const holdsCount = holdXml.evaluate("count(//Holds)", holdXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			const levelsCount = holdXml.evaluate("count(//Levels)", holdXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			const roomsCount = holdXml.evaluate("count(//Rooms)", holdXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
+			const entrancesCount = holdXml.evaluate("count(//Entrances)", holdXml, null, XPathResult.NUMBER_TYPE, null).numberValue;
 
 			if (holdsCount === 0) {
 				throw new Error("No hold information found in the file - are you sure this is not a player profile?");
