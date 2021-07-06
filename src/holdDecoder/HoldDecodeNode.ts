@@ -7,6 +7,8 @@ import {ModelType} from "../common/Enums";
 import {Scroll} from "../data/Scroll";
 import {createNullCommand} from "../data/Command";
 import { createNullCharacter } from "../data/Character";
+import {createNullMonster} from "../data/Monster";
+import {HoldUtils} from "../common/HoldUtils";
 
 export function decodeHoldNode(element: Element, hold: Hold) {
 	switch (element.nodeName) {
@@ -77,9 +79,9 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 			character.commands = CommandsUtils.readCommandsBuffer(character.extraVars.readByteBuffer('Commands', [])!, character);
 			character.processingSequence = character.extraVars.readUint('ProcessSequenceParam', 9999);
 			character.xml = element;
-			character.name: decodeText(element, 'CharNameText');
-			character.tilesDataId: element.hasAttribute('DataIDTiles') ? getInt(element, 'DataIDTiles') : 0;
-			character.faceDataId: element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0;
+			character.name = decodeText(element, 'CharNameText');
+			character.tilesDataId = element.hasAttribute('DataIDTiles') ? getInt(element, 'DataIDTiles') : 0;
+			character.faceDataId = element.hasAttribute('DataID') ? getInt(element, 'DataID') : 0;
 
 
 			hold.characters.set(character.id, character);
@@ -160,28 +162,26 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 
 		case 'Monsters': {
 			const roomId = getInt(element.parentElement!, 'RoomID');
-			const room = hold.rooms.get(roomId)!;
-			const extraVars = PackedVarsUtils.readBuffer(
+			const room = HoldUtils.getRoom(roomId, hold);
+
+			const monster = createNullMonster();
+			monster.xml = element;
+			monster.extraVars = PackedVarsUtils.readBuffer(
 				PackedVarsUtils.base64ToArray(
 					getText(element, 'ExtraVars', true),
 				),
 			);
+			monster.roomId = roomId;
+			monster.x = getInt(element, 'X');
+			monster.y = getInt(element, 'Y');
+			monster.o = getInt(element, 'O');
+			monster.type = getInt(element, 'Type');
+			monster.commands = CommandsUtils.readCommandsBuffer(monster.extraVars.readByteBuffer("Commands", []), monster);
+			monster.processingSequence = monster.extraVars.readUint('ProcessSequenceParam', 9999);
+			monster.isVisible = monster.extraVars.readBool('visible', false);
+			monster.characterType = MonsterUtils.fixCharacterType(monster.extraVars.readUint('id', UINT_MINUS_1), hold);
 
-			const commands = CommandsUtils.readCommandsBuffer(extraVars.readByteBuffer("Commands", []));
-			const processingSequence = extraVars.readUint('ProcessSequenceParam', 9999);
-			const isVisible = extraVars.readBool('visible', false);
-			const characterType = MonsterUtils.fixCharacterType(extraVars.readUint('id', UINT_MINUS_1), hold);
-
-			room.monsters.push({
-				modelType: ModelType.Monster,
-				xml: element,
-				roomId: roomId,
-				x: getInt(element, 'X'),
-				y: getInt(element, 'Y'),
-				o: getInt(element, 'O'),
-				type: getInt(element, 'Type'),
-				extraVars, commands, processingSequence, isVisible, characterType,
-			});
+			room.monsters.push(monster);
 		}
 			break;
 

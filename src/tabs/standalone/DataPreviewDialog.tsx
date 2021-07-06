@@ -51,7 +51,7 @@ const TopBar = ({data, hold, onClose, onDataChange, children, showOld, setShowOl
 		setShowOld?.(false);
 		setDataUrl?.(DataUtils.getDataUrl(data, true));
 		onDataChange?.(data);
-	}, [data, hold, setShowOld, setDataUrl]);
+	}, [data, hold, setShowOld, setDataUrl, onDataChange]);
 
 	return <AppBar>
 		<Toolbar>

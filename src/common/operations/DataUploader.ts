@@ -1,9 +1,7 @@
 import {Data, DataFormat} from "../../data/Data";
-import { Hold } from "../../data/Hold";
-import { Store } from "../../data/Store";
-import HoldUploader from "../../tabs/holdTab/HoldUploader";
-import { HoldUtils } from "../HoldUtils";
-import { UpdateUtils } from "../UpdateUtils";
+import {Hold} from "../../data/Hold";
+import {Store} from "../../data/Store";
+import {UpdateUtils} from "../UpdateUtils";
 import {DataUtils} from "../DataUtils";
 
 interface DataUploadResult {
@@ -12,7 +10,7 @@ interface DataUploadResult {
 	error: string;
 }
 
-const MatchFileName = /^.+\.(ogg|wav|png|jpe?g|bmp)$/i
+const MatchFileName = /^.+\.(ogg|wav|png|jpe?g|bmp)$/i;
 
 export const DataUploader = {
 	async uploadFile(file: File, data: Data, hold: Hold): Promise<DataUploadResult> {
@@ -47,10 +45,10 @@ export const DataUploader = {
 				resolve({
 					data: fileData,
 					format: newFileFormat,
-					error: ''
+					error: '',
 				});
 			};
 			fileReader.readAsDataURL(file);
 		});
-	}
-}
+	},
+};
