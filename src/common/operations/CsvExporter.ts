@@ -24,7 +24,7 @@ export interface CsvRow {
 	comment?: string;
 }
 
-function encodeCell(cell: string|undefined) {
+function encodeCell(cell: string | undefined) {
 	if (cell === undefined) {
 		return '';
 	}
@@ -55,12 +55,12 @@ function getSortedSpeeches(hold: Hold) {
 			return -1;
 		} else if (!bLoc) {
 			return 1;
-		} else if (!aLoc || !bLoc){
+		} else if (!aLoc || !bLoc) {
 			return 0;
 		}
 
-		const aSrc = a.source as Monster|undefined;
-		const bSrc = b.source as Monster|undefined;
+		const aSrc = a.source as Monster | undefined;
+		const bSrc = b.source as Monster | undefined;
 
 		return [
 			SortUtils.compareOptionalNumber(aLoc.levelId, bLoc.levelId),
@@ -69,7 +69,7 @@ function getSortedSpeeches(hold: Hold) {
 			SortUtils.compareOptionalNumber(aSrc?.y, bSrc?.y),
 			SortUtils.compareOptionalNumber(aLoc.speechCustomY, bLoc.speechCustomY),
 			SortUtils.compareOptionalString(aLoc.characterName, bLoc.characterName),
-			SortUtils.compareOptionalNumber(aLoc.index, bLoc.index)
+			SortUtils.compareOptionalNumber(aLoc.index, bLoc.index),
 		].find(x => x !== 0) || (a.id - b.id);
 	});
 
@@ -100,7 +100,7 @@ export const CsvExporter = {
 				commentBits.push("Main Entrance");
 			}
 			if (!entrance.showDescription) {
-				commentBits.push("Description Not Displayed")
+				commentBits.push("Description Not Displayed");
 			}
 
 			csv.push({type: 'EntranceText', id: entrance.id.toString(), value: entrance.description, location, comment: commentBits.join(',')});

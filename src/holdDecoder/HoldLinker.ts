@@ -11,7 +11,7 @@ import {Command} from "../data/Command";
 import {DataLink} from "../data/Data";
 import {HoldUtils} from "../common/HoldUtils";
 import {Speech} from "../data/Speech";
-import { DataUtils } from "../common/DataUtils";
+import {DataUtils} from "../common/DataUtils";
 
 function linkData(hold: Hold, dataId: number, model: DataLink['model'], field: DataLink['field']) {
 	if (!dataId) {
@@ -73,7 +73,7 @@ export const HoldLinker = {
 					characterName: MonsterUtils.getMonsterName(monsterType, hold),
 					location: room ? RoomUtils.getDisplayLocation(room.roomId, hold) : '',
 					levelId: room?.levelId,
-					roomId: room?.roomId
+					roomId: room?.roomId,
 				};
 			}
 

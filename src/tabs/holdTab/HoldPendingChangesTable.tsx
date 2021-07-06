@@ -236,7 +236,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					const row = newRow(change.type);
 					rows.push(row);
 
-					row.location = change.model.changes.name ?? change.model.name; 
+					row.location = change.model.changes.name ?? change.model.name;
 					row.operationType = "Rename";
 					row.oldValue = change.model.name;
 					row.newValue = change.model.changes.name;
@@ -246,7 +246,7 @@ class _HoldPendingChangesTable extends React.Component<HoldPendingChangesTablePr
 					const row = newRow(change.type);
 					rows.push(row);
 
-					row.location = change.model.changes.name ?? change.model.name; 
+					row.location = change.model.changes.name ?? change.model.name;
 					row.operationType = "Change Data";
 					row.oldValue = '';
 					row.newValue = '';

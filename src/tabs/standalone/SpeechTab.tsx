@@ -82,7 +82,7 @@ class SpeechTab extends React.Component<SpeechTabProps, SpeechTabState> {
 		const {hold} = this.state;
 		const speech = HoldUtils.getSpeech(speechId, hold);
 
-		UpdateUtils.speechDeleted(speech, !speech.isDeleted, hold)
+		UpdateUtils.speechDeleted(speech, !speech.isDeleted, hold);
 
 		this.getRowById(speechId).isDeleted = speech.isDeleted;
 

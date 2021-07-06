@@ -66,11 +66,11 @@ export class PackedVars {
 		return this.readVar(name, PackedVarType.ByteBuffer, def) as number[];
 	}
 
-	readBool(name: string, def: boolean|undefined) {
+	readBool(name: string, def: boolean | undefined) {
 		return this.readVar(name, PackedVarType.Bool, def) as boolean;
 	}
 
-	readUint(name: string, def: number|undefined) {
+	readUint(name: string, def: number | undefined) {
 		return this.readVar(name, PackedVarType.Uint, def) as number;
 	}
 

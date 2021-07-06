@@ -1,4 +1,4 @@
-import { Box, Container } from "@material-ui/core";
+import {Box, Container} from "@material-ui/core";
 import React from "react";
 
 type TabContainerProps = React.PropsWithChildren<{
@@ -23,4 +23,4 @@ export const TabContainer = (props: TabContainerProps) => {
 			<Box>{children}</Box>
 		</Container>
 	);
-}
+};

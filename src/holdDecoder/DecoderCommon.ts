@@ -10,6 +10,8 @@ export interface DecodeState {
 
 export interface DecodeStep {
 	name: string;
+
 	run(decoder: DecodeState): boolean;
+
 	after?: (decoder: DecodeState) => void;
 }

@@ -30,7 +30,7 @@ interface TooltipContentsProps {
 const TooltipContents = (props: TooltipContentsProps) => {
 	const {originalText} = props;
 	const classes = useStyles();
-	
+
 	return <React.Fragment>
 		<Typography component="p" variant="overline" className={classes.undo}><strong>Click to undo</strong></Typography>
 		<Divider variant="middle" className={classes.divider}/>
@@ -52,7 +52,7 @@ export const IsEditedCell = (props: IsEditedCellProps) => {
 	}, [rowId, resetHandler]);
 
 	const title = label
-		? label 
+		? label
 		: <TooltipContents originalText={originalText}/>;
 
 	return <LightTooltip title={title}>

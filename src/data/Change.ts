@@ -91,12 +91,12 @@ interface DataChange {
 	}
 }
 
-export type Change = HoldChange 
-	| SpeechChange 
+export type Change = HoldChange
+	| SpeechChange
 	| CommandChange
 	| EntranceChange
 	| ScrollChange
-	| LevelChange 
-	| CharacterChange 
+	| LevelChange
+	| CharacterChange
 	| PlayerChange
 	| DataChange;

@@ -3,7 +3,7 @@ import React from "react";
 import {Hold} from "../../data/Hold";
 import {Store} from "../../data/Store";
 import {OperationsCsv} from "./OperationsCsv";
-import { OperationsReplace } from "./OperationsReplace";
+import {OperationsReplace} from "./OperationsReplace";
 
 interface OperationTabProps {
 }

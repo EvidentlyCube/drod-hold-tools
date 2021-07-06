@@ -13,9 +13,9 @@ export const getDecodeToHold = (): DecodeStep => {
 				if (!drodElement) {
 					throw new Error("No hold data found");
 				} else if (drodElement.tagName !== 'drod') {
-					throw new Error(`Root node must be <drod> but got <${drodElement.tagName}> instead.`)
+					throw new Error(`Root node must be <drod> but got <${drodElement.tagName}> instead.`);
 				}
-				
+
 				decoder.hold.xmlDrod = drodElement;
 				decoder.hold.xmlDocument = decoder.holdXml;
 				children = drodElement.children;

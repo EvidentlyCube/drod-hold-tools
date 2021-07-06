@@ -133,7 +133,7 @@ export const ChangeUtils = {
 				// Setting these to false so that the whole change record is 
 				// removed when a newly created player is deleted
 				delete: false,
-				name: false
+				name: false,
 			},
 		});
 	},

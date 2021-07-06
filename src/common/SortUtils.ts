@@ -57,7 +57,7 @@ export const SortUtils = {
 	getComparator<T, >(
 		order: 'asc' | 'desc',
 		orderBy: keyof T,
-		fieldType?: EnchancedTableColumnType
+		fieldType?: EnchancedTableColumnType,
 	): (a: T, b: T) => number {
 		if (fieldType === 'numeric') {
 			return order === "desc"
@@ -103,12 +103,12 @@ export const SortUtils = {
 			return -1;
 		} else if (b === undefined) {
 			return 1;
-		} else if (a < b){
+		} else if (a < b) {
 			return -1;
-		} else if (a > b){
+		} else if (a > b) {
 			return 1;
 		} else {
 			return 0;
 		}
-	}
+	},
 };

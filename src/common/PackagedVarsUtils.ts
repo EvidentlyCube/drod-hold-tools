@@ -8,7 +8,7 @@ class WrappedArray {
 		return this._array;
 	}
 
-	constructor(array: Uint8Array |  number[]) {
+	constructor(array: Uint8Array | number[]) {
 		this._array = Array.from(array);
 		this._pos = 0;
 	}

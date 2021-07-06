@@ -1,5 +1,5 @@
-import { Hold } from "../../data/Hold";
-import { StringUtils } from "../StringUtils";
+import {Hold} from "../../data/Hold";
+import {StringUtils} from "../StringUtils";
 import {Level} from "../../data/Level";
 import {Speech} from "../../data/Speech";
 import {Entrance} from "../../data/Entrance";
@@ -14,14 +14,37 @@ const CloseTag = "\x03";
 const OpenTagRegexp = new RegExp(OpenTag, 'g');
 const CloseTagRegexp = new RegExp(CloseTag, 'g');
 
-interface RowHold {data: Hold, field: keyof Hold}
-interface RowLevel {data: Level, field: keyof Level}
-interface RowSpeech {data: Speech, field: keyof Speech}
-interface RowEntrance {data: Entrance, field: keyof Entrance}
-interface RowScroll {data: Scroll, field: keyof Scroll}
-interface RowCharacter {data: Character, field: keyof Character}
+interface RowHold {
+	data: Hold,
+	field: keyof Hold
+}
 
-export type SearchReplaceResultRow = (RowHold | RowLevel | RowSpeech|RowEntrance|RowScroll|RowCharacter) & {
+interface RowLevel {
+	data: Level,
+	field: keyof Level
+}
+
+interface RowSpeech {
+	data: Speech,
+	field: keyof Speech
+}
+
+interface RowEntrance {
+	data: Entrance,
+	field: keyof Entrance
+}
+
+interface RowScroll {
+	data: Scroll,
+	field: keyof Scroll
+}
+
+interface RowCharacter {
+	data: Character,
+	field: keyof Character
+}
+
+export type SearchReplaceResultRow = (RowHold | RowLevel | RowSpeech | RowEntrance | RowScroll | RowCharacter) & {
 	id: number;
 	oldValue: string;
 	newValue: string;
@@ -32,7 +55,7 @@ export type SearchReplaceResultRow = (RowHold | RowLevel | RowSpeech|RowEntrance
 
 export const SearchReplaceUtils = {
 	isRegex(str: string) {
-		return IsRegexRegex.test(str)
+		return IsRegexRegex.test(str);
 	},
 	toRegex(str: string) {
 		if (SearchReplaceUtils.isRegex(str)) {
@@ -63,14 +86,14 @@ export const SearchReplaceUtils = {
 				records.push({
 					id: ++id,
 					include: false,
-					data, field, oldValue, newValue, oldHtml, newHtml
+					data, field, oldValue, newValue, oldHtml, newHtml,
 				});
 			}
-		}
+		};
 		addRecord(hold, 'name');
 		addRecord(hold, 'description');
 		addRecord(hold, 'ending');
-		
+
 		for (const speech of hold.speeches.values()) {
 			addRecord(speech, 'text');
 		}
@@ -94,7 +117,7 @@ export const SearchReplaceUtils = {
 			if (!row.include) {
 				continue;
 			}
-			switch(row.data.modelType) {
+			switch (row.data.modelType) {
 				case ModelType.Hold:
 					if (row.field === 'name') {
 						UpdateUtils.holdName(row.data, row.newValue);
@@ -131,5 +154,5 @@ export const SearchReplaceUtils = {
 					break;
 			}
 		}
-	}
-}
+	},
+};

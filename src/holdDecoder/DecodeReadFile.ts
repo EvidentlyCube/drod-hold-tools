@@ -1,13 +1,13 @@
 import {DecodeState, DecodeStep} from "./DecoderCommon";
 
-export const getDecoderReadFile = ():DecodeStep => {
+export const getDecoderReadFile = (): DecodeStep => {
 	const fileReader = new FileReader();
 	let data: Uint8Array | undefined;
 	let isLoading = false;
 	fileReader.onload = () => {
 		const buffer = fileReader.result as ArrayBuffer;
 		data = new Uint8Array(buffer);
-	}
+	};
 
 	return {
 		name: 'Read File',
@@ -29,6 +29,6 @@ export const getDecoderReadFile = ():DecodeStep => {
 			}
 
 			return false;
-		}
+		},
 	};
-}
+};

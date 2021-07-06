@@ -1,6 +1,6 @@
-import { AppBar, Box, Dialog, IconButton, List, ListItem, ListItemText, Toolbar } from "@material-ui/core";
-import { Close } from "@material-ui/icons";
-import { Data } from "../../data/Data";
+import {AppBar, Box, Dialog, IconButton, List, ListItem, ListItemText, Toolbar} from "@material-ui/core";
+import {Close} from "@material-ui/icons";
+import {Data} from "../../data/Data";
 
 interface DataUsageDialogProps {
 	data?: Data;
@@ -32,6 +32,6 @@ export const DataUsageDialog = ({data, onClose}: DataUsageDialogProps) => {
 				</ListItem>)}
 			</List>
 		</Box>;
-	</Dialog>
+	</Dialog>;
 
-}
+};

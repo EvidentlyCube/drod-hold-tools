@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 			left: 'calc(50% - 35px)',
 			top: 'calc(50% - 35px)',
 		},
-	}
+	},
 }));
+
 interface DropzoneProps {
 	onDrop: (files: File[]) => void;
 }
@@ -35,6 +36,6 @@ export const DropzoneHold = (props: DropzoneProps) => {
 	return <div {...getRootProps({className: classes.container})}>
 		<input {...getInputProps()} />
 		<Typography variant="h4" align="center">Drag and drop a hold here or click</Typography>
-		<Backup fontSize="large" className="icon" />
+		<Backup fontSize="large" className="icon"/>
 	</div>;
 };

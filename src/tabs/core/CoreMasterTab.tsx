@@ -1,7 +1,7 @@
-import { AppBar, Tab, Tabs, Theme } from "@material-ui/core"
-import { makeStyles } from "@material-ui/styles";
-import { useCallback, useState } from "react";
-import { TabContainer } from "../../common/components/TabContainer";
+import {AppBar, Tab, Tabs, Theme} from "@material-ui/core";
+import {makeStyles} from "@material-ui/styles";
+import {useCallback, useState} from "react";
+import {TabContainer} from "../../common/components/TabContainer";
 import HoldTab from "../holdTab/HoldTab";
 import OperationTab from "../operations/OperationsTab";
 
@@ -11,8 +11,8 @@ const useStyles = makeStyles((theme: Theme) => ({
 		paddingTop: theme.spacing(4),
 	},
 	bar: {
-		opacity: 0.8
-	}
+		opacity: 0.8,
+	},
 }));
 
 
@@ -30,17 +30,17 @@ export const CoreMasterTab = (props: CoreMasterTabProps) => {
 	}, [setSelectedTab]);
 
 	return <>
-	<AppBar position="relative" className={classes.bar}>
-		<Tabs value={selectedTab} onChange={handleChange} textColor="inherit" variant="fullWidth">
-			<Tab label="Hold"/>
-			<Tab label="Operations" disabled={!hasLoadedHold}/>
-		</Tabs>
-	</AppBar>
-	<TabContainer className={classes.tab} value={selectedTab} index={0}>
-		<HoldTab/>
-	</TabContainer>
-	<TabContainer className={classes.tab} value={selectedTab} index={1}>
-		<OperationTab/>
-	</TabContainer>
-	</>
-}
+		<AppBar position="relative" className={classes.bar}>
+			<Tabs value={selectedTab} onChange={handleChange} textColor="inherit" variant="fullWidth">
+				<Tab label="Hold"/>
+				<Tab label="Operations" disabled={!hasLoadedHold}/>
+			</Tabs>
+		</AppBar>
+		<TabContainer className={classes.tab} value={selectedTab} index={0}>
+			<HoldTab/>
+		</TabContainer>
+		<TabContainer className={classes.tab} value={selectedTab} index={1}>
+			<OperationTab/>
+		</TabContainer>
+	</>;
+};

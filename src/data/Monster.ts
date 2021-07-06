@@ -36,5 +36,5 @@ export function createNullMonster(): Monster {
 
 		isVisible: true,
 		characterType: 0,
-	}
+	};
 }

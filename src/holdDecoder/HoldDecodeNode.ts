@@ -6,7 +6,7 @@ import {MonsterUtils} from "../common/MonsterUtils";
 import {ModelType} from "../common/Enums";
 import {Scroll} from "../data/Scroll";
 import {createNullCommand} from "../data/Command";
-import { createNullCharacter } from "../data/Character";
+import {createNullCharacter} from "../data/Character";
 import {createNullMonster} from "../data/Monster";
 import {HoldUtils} from "../common/HoldUtils";
 
@@ -70,7 +70,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 		case 'Characters':
 			const character = createNullCharacter();
 			character.id = getInt(element, 'CharID');
-			
+
 			character.extraVars = PackedVarsUtils.readBuffer(
 				PackedVarsUtils.base64ToArray(
 					getText(element, 'ExtraVars', true),
@@ -99,7 +99,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				size: Math.ceil(rawData.length * 4 / 3),
 				data: rawData,
 				links: [],
-				changes: {}
+				changes: {},
 			});
 			break;
 

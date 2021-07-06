@@ -36,6 +36,6 @@ export function createNullCharacter(): Character {
 		tilesDataId: 0,
 		faceDataId: 0,
 
-		changes: {}
-	}
+		changes: {},
+	};
 }

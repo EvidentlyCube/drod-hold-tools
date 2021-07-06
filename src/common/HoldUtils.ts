@@ -1,6 +1,6 @@
 import {Hold} from "../data/Hold";
 import {Change} from "../data/Change";
-import { assert } from "./Assert";
+import {assert} from "./Assert";
 
 export const HoldUtils = {
 	addChange(hold: Hold, change: Change) {
@@ -25,22 +25,22 @@ export const HoldUtils = {
 			hold.dataChanges.add(change);
 		}
 	},
-	getNextPlayerId(hold: Hold){
+	getNextPlayerId(hold: Hold) {
 		let maxId = 0;
 		for (const player of hold.players.values()) {
 			maxId = Math.max(maxId, player.id);
 		}
 
-		return maxId+1;
+		return maxId + 1;
 	},
-	
+
 	getSpeech(speechId: number, hold: Hold) {
 		const speech = hold.speeches.get(speechId);
 		assert(speech, `Speech with Id '${speechId}' does not exist`);
 
 		return speech;
-	}, 
-	
+	},
+
 	getEntrance(entranceId: number, hold: Hold) {
 		const speech = hold.entrances.get(entranceId);
 		assert(speech, `Entrance with Id '${entranceId}' does not exist`);
@@ -54,27 +54,27 @@ export const HoldUtils = {
 
 		return room;
 	},
-	
+
 	getScroll(scrollId: string, hold: Hold) {
 		const scroll = hold.scrolls.get(scrollId);
 		assert(scroll, `Scroll with Id '${scrollId}' does not exist`);
 
 		return scroll;
-	}, 
-	
+	},
+
 	getCharacter(characterId: number, hold: Hold) {
 		const speech = hold.characters.get(characterId);
 		assert(speech, `Character with Id '${characterId}' does not exist`);
 
 		return speech;
-	}, 
-	
+	},
+
 	getLevel(levelId: number, hold: Hold) {
 		const speech = hold.levels.get(levelId);
 		assert(speech, `Speech with Id '${levelId}' does not exist`);
 
 		return speech;
-	}, 
+	},
 
 	getPlayer(playerId: number, hold: Hold) {
 		const player = hold.players.get(playerId);
@@ -88,5 +88,5 @@ export const HoldUtils = {
 		assert(data, `Data with Id '${dataId}' does not exist`);
 
 		return data;
-	}
+	},
 };

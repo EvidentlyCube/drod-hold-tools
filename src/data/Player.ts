@@ -26,6 +26,6 @@ export function createNullPlayer(): Player {
 		isNew: true,
 		isDeleted: false,
 
-		changes: {}
+		changes: {},
 	};
 }

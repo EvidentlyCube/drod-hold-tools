@@ -32,7 +32,7 @@ export interface Speech {
 		speechCustomX: number,
 		speechCustomY: number,
 		commandName: string,
-		levelId: number|undefined
-		roomId: number|undefined
+		levelId: number | undefined
+		roomId: number | undefined
 	}
 }

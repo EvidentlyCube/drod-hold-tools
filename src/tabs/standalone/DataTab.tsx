@@ -12,7 +12,7 @@ import {UpdateUtils} from "../../common/UpdateUtils";
 import {DataUtils} from "../../common/DataUtils";
 import {Edit} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
-import { DataUsageDialog } from "./DataUsageDialog";
+import {DataUsageDialog} from "./DataUsageDialog";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -119,7 +119,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			isNameEdited: data.changes.name !== undefined,
 			isDataEdited: data.changes.data !== undefined,
 			data,
-			usageCount: data.links.length
+			usageCount: data.links.length,
 		};
 	}
 
@@ -144,13 +144,13 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 	private handlePreviewDialogDataChange = (data: Data) => {
 		const row = this.getRowById(data.id);
 		row.isDataEdited = data.changes.data !== undefined;
-		
+
 		this._tableApi.current?.rerender();
 	};
 
 	private handleShowUsageDialog = () => {
 		this.setState({showUsageData: undefined});
-	}
+	};
 
 	public render() {
 		const {classes} = this.props;
@@ -178,7 +178,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 				onClose={this.handleClosePreviewDialog}
 				onDataChange={this.handlePreviewDialogDataChange}
 				data={previewData}/>
-			<DataUsageDialog data={showUsageData} onClose={this.handleShowUsageDialog} />
+			<DataUsageDialog data={showUsageData} onClose={this.handleShowUsageDialog}/>
 		</Container>;
 	}
 
@@ -193,7 +193,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 				rowId={row.id}
 				resetHandler={this.handleResetData}
 				label="Click to reset data"/>;
-			
+
 		}
 
 		return <span/>;
@@ -208,7 +208,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 	private renderUsesCell = (row: DataRow) => {
 		const onClick = () => this.setState({showUsageData: row.data});
 		return <Button variant="text" onClick={onClick}>{row.usageCount}</Button>;
-	}
+	};
 }
 
 export default withStyles(styles)(DatasTab);

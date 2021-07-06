@@ -11,8 +11,8 @@ import {Character} from "../data/Character";
 import {Entrance} from "../data/Entrance";
 import {Scroll} from "../data/Scroll";
 import {Level} from "../data/Level";
-import { Player } from "../data/Player";
-import { Data } from "../data/Data";
+import {Player} from "../data/Player";
+import {Data} from "../data/Data";
 
 
 export const HoldEncodeChanges = {
@@ -85,7 +85,7 @@ export const HoldEncodeChanges = {
 		if (level.changes.playerId !== undefined) {
 			level.playerId = level.changes.playerId;
 			delete level.changes.playerId;
-		
+
 			level.xml.setAttribute('PlayerID', level.playerId.toString());
 		}
 
@@ -192,5 +192,5 @@ export const HoldEncodeChanges = {
 
 			data.xml.setAttribute('RawData', data.data);
 		}
-	}
+	},
 };

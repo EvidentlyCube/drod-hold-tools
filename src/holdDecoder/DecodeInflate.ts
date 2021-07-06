@@ -2,7 +2,7 @@ import {DecodeState, DecodeStep} from "./DecoderCommon";
 import {Inflate} from "pako";
 
 export const getDecodeInflate = (): DecodeStep => {
-	const BATCH_SIZE = 1024*1024;
+	const BATCH_SIZE = 1024 * 1024;
 	const inflater = new Inflate({});
 	let pointer = 0;
 

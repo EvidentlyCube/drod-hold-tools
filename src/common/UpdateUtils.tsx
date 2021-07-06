@@ -1,16 +1,16 @@
-import { Character } from "../data/Character";
+import {Character} from "../data/Character";
 import {Data, DataFormat} from "../data/Data";
-import { Entrance } from "../data/Entrance";
-import { Hold } from "../data/Hold";
-import { Level } from "../data/Level";
-import { Player } from "../data/Player";
-import { Scroll } from "../data/Scroll";
-import { Speech } from "../data/Speech";
-import { Store } from "../data/Store";
-import { ChangeUtils } from "./ChangeUtils";
-import { DateUtils } from "./DateUtils";
-import { HoldUtils } from "./HoldUtils";
-import { PlayerUtils } from "./PlayerUtils";
+import {Entrance} from "../data/Entrance";
+import {Hold} from "../data/Hold";
+import {Level} from "../data/Level";
+import {Player} from "../data/Player";
+import {Scroll} from "../data/Scroll";
+import {Speech} from "../data/Speech";
+import {Store} from "../data/Store";
+import {ChangeUtils} from "./ChangeUtils";
+import {DateUtils} from "./DateUtils";
+import {HoldUtils} from "./HoldUtils";
+import {PlayerUtils} from "./PlayerUtils";
 
 const handleAuthorChanged = (level: Level, hold: Hold) => {
 	const levelName = level.changes.name ?? level.name;
@@ -60,7 +60,7 @@ export const UpdateUtils = {
 
 		let wasChanged = false;
 		if (speech.isDeleted !== isDeleted) {
-			speech.isDeleted = isDeleted
+			speech.isDeleted = isDeleted;
 			wasChanged = true;
 		}
 
@@ -300,7 +300,7 @@ export const UpdateUtils = {
 
 		let wasChanged = false;
 		if (player.isDeleted !== isDeleted) {
-			player.isDeleted = isDeleted
+			player.isDeleted = isDeleted;
 			wasChanged = true;
 		}
 
@@ -378,5 +378,5 @@ export const UpdateUtils = {
 		}
 
 		return wasChanged;
-	}
+	},
 };

@@ -1,6 +1,6 @@
-import { Character } from "../data/Character";
+import {Character} from "../data/Character";
 import {Command} from "../data/Command";
-import { Monster } from "../data/Monster";
+import {Monster} from "../data/Monster";
 import {UINT_MINUS_1} from "./CommonTypes";
 import {CharCommand} from "./Enums";
 
@@ -60,8 +60,7 @@ class WrappedCommandBuffer {
 		while ((n >> s) && s < 32)
 			s += 7;
 
-		while (s)
-		{
+		while (s) {
 			s -= 7;
 			let divider = Math.pow(2, s);
 			let b = (n / divider) & 0x7f;
@@ -90,7 +89,7 @@ class WrappedCommandBuffer {
 }
 
 export const CommandsUtils = {
-	readCommandsBuffer(buffer: number[], source: Monster|Character) {
+	readCommandsBuffer(buffer: number[], source: Monster | Character) {
 		const commands: Command[] = [];
 		if (buffer.length === 0) {
 			return commands;
@@ -117,10 +116,10 @@ export const CommandsUtils = {
 
 
 	writeCommandsBuffer(commands: Command[]) {
-		const buffer:number[] = [];
+		const buffer: number[] = [];
 
 		const arr = new WrappedCommandBuffer(buffer);
-		for(const command of commands) {
+		for (const command of commands) {
 			arr.writeBpUint(command.command);
 			arr.writeBpUint(command.x);
 			arr.writeBpUint(command.y);
@@ -128,7 +127,7 @@ export const CommandsUtils = {
 			arr.writeBpUint(command.h);
 			arr.writeBpUint(command.flags);
 			arr.writeBpUint(command.speechId);
-			arr.writeBpUint(command.label.length ? command.label.length * 2  : 0);
+			arr.writeBpUint(command.label.length ? command.label.length * 2 : 0);
 			arr.writeWChar(command.label);
 		}
 
@@ -141,5 +140,5 @@ export const CommandsUtils = {
 			|| command === CharCommand.CC_AnswerOption
 			|| command === CharCommand.CC_Question
 			|| command === CharCommand.CC_RoomLocationText;
-	}
+	},
 };

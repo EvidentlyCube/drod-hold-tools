@@ -91,6 +91,6 @@ export const DataUtils = {
 	},
 
 	describeDataLink(link: DataLink) {
-		
-	}
+
+	},
 };

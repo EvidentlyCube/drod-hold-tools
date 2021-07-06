@@ -114,7 +114,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		const {hold} = this.state;
 		const level = HoldUtils.getLevel(id, hold);
 
-		UpdateUtils.levelDateCreated(level, level.dateCreated, hold)
+		UpdateUtils.levelDateCreated(level, level.dateCreated, hold);
 
 		const dataRow = this.getRowById(id);
 		dataRow.dateCreated = dataRow.originalDateCreated;
@@ -128,7 +128,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 			this.handleTextEdited(row, newValue);
 		} else if (field === 'authorName') {
 			this.handleAuthorEdited(row, newValue);
-		}else if (field === 'dateCreated') {
+		} else if (field === 'dateCreated') {
 			this.handleDateCreatedEdited(row, newValue);
 		}
 	};
@@ -165,7 +165,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		if (!isDateValid(newDate)) {
 			Store.addSystemMessage({
 				color: "error",
-				message: `'${newValue}' is not a valid date format. Please use YYYY-MM-DD format, eg 2021-12-31.`
+				message: `'${newValue}' is not a valid date format. Please use YYYY-MM-DD format, eg 2021-12-31.`,
 			});
 			return;
 
@@ -173,7 +173,7 @@ class _LevelsTab extends React.Component<LevelsTabProps, LevelsTabState> {
 		const {hold} = this.state;
 		const level = HoldUtils.getLevel(row.id, hold);
 
-		UpdateUtils.levelDateCreated(level, newDate, hold)
+		UpdateUtils.levelDateCreated(level, newDate, hold);
 
 		row.dateCreated = newValue;
 		row.isDateCreatedEdited = level.changes.dateCreated !== undefined;

@@ -13,11 +13,11 @@ export interface CsvImportResult {
 }
 
 function getErrorResult(error: string): CsvImportResult {
-    return {
-        importedRows: -1,
+	return {
+		importedRows: -1,
 		skippedRows: -1,
-        errors: [error]
-    };
+		errors: [error],
+	};
 }
 
 export const CsvImporter = {
@@ -58,7 +58,7 @@ export const CsvImporter = {
 			return CsvImporter.readCsv(csv, hold);
 		}
 
-        return getErrorResult("Imported file was not recognized as a valid CSV");
+		return getErrorResult("Imported file was not recognized as a valid CSV");
 	},
 
 	readCsv(csv: any[], hold: Hold): CsvImportResult {
@@ -80,7 +80,7 @@ export const CsvImporter = {
 
 		const rows: CsvRow[] = [];
 		for (let i = 1; i < csv.length; i++) {
-			const [type, id, value] = csv[i]
+			const [type, id, value] = csv[i];
 			rows.push({type, id, value});
 		}
 
@@ -140,10 +140,10 @@ export const CsvImporter = {
 			}
 		}
 
-        return {
-            importedRows,
+		return {
+			importedRows,
 			skippedRows,
-            errors
-        };
+			errors,
+		};
 	},
 };
