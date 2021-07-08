@@ -1,6 +1,8 @@
 import {AppBar, Box, Dialog, IconButton, List, ListItem, ListItemText, Toolbar} from "@material-ui/core";
 import {Close} from "@material-ui/icons";
 import {Data} from "../../data/Data";
+import {useEffect, useState} from "react";
+import {SortUtils} from "../../common/SortUtils";
 
 interface DataUsageDialogProps {
 	data?: Data;
@@ -16,6 +18,15 @@ const totalStyle = {
 };
 
 export const DataUsageDialog = ({data, onClose}: DataUsageDialogProps) => {
+	const [links, setLinks] = useState<string[]>([]);
+
+	useEffect(() => {
+		const sortedLinks = data?.links.map(x => x.description) || [];
+		sortedLinks.sort(SortUtils.naturalSort);
+		setLinks(sortedLinks)
+
+	}, [setLinks, data]);
+
 	return <Dialog open={!!data} fullScreen onClose={onClose}>
 		<AppBar>
 			<Toolbar>
@@ -27,8 +38,8 @@ export const DataUsageDialog = ({data, onClose}: DataUsageDialogProps) => {
 		</AppBar>
 		<Box style={totalStyle}>
 			<List>
-				{(data?.links ?? []).map(link => <ListItem>
-					<ListItemText>{link.field}</ListItemText>
+				{links.map((link, index) => <ListItem key={index}>
+					<ListItemText>{link}</ListItemText>
 				</ListItem>)}
 			</List>
 		</Box>;

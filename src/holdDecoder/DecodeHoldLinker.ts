@@ -32,6 +32,10 @@ export const getDecodeHoldLinker = (): DecodeStep => {
 				hold.counts.scrolls += room.scrolls.length;
 			}
 
+			for (const speech of hold.speeches.values()) {
+				HoldLinker.linkSpeech(hold, speech);
+			}
+
 			return true;
 		},
 	};

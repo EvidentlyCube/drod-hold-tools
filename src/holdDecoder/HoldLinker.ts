@@ -19,8 +19,8 @@ function linkData(hold: Hold, dataId: number, model: DataLink['model'], field: D
 	}
 
 	const data = HoldUtils.getData(dataId, hold);
-	const dataLink = {model, field};
-	DataUtils.describeDataLink(dataLink);
+	const dataLink: DataLink = {model, field, description: ''};
+	dataLink.description = DataUtils.describeDataLink(dataLink, hold);
 	data.links.push(dataLink);
 }
 
@@ -59,8 +59,7 @@ export const HoldLinker = {
 			const command = commands[i];
 
 			if (command.speechId) {
-				const speech = hold.speeches.get(command.speechId);
-				assert(speech, `Failed to find speech ${command.speechId}`);
+				const speech = HoldUtils.getSpeech(command.speechId, hold);
 
 				speech.source = sourceMonster || sourceCharacter;
 				speech.command = command;
@@ -77,6 +76,7 @@ export const HoldLinker = {
 				};
 			}
 
+			console.log(CommandNameMap.get(command.command), command);
 			switch (command.command) {
 				case CharCommand.CC_SetMusic:
 				case CharCommand.CC_WorldMapMusic:
@@ -87,7 +87,9 @@ export const HoldLinker = {
 					linkData(hold, command.h, command, 'h');
 					break;
 
-				default:
+				case CharCommand.CC_AmbientSound:
+				case CharCommand.CC_AmbientSoundAt:
+				case CharCommand.CC_ImageOverlay:
 					if (hold.datas.has(command.w)) {
 						linkData(hold, command.w, command, 'w');
 					}

@@ -184,7 +184,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 
 		assert(column, `No column with id '${orderBy}' found`);
 
-		return SortUtils.stableSort<any>(rows, idField, SortUtils.getComparator<any>(orderDir, orderBy, column.type));
+		return SortUtils.stableSort<any>(rows, idField, SortUtils.getComparator<any>(orderDir, orderBy));
 	}
 
 	private onSort = (newOrderBy: string) => {

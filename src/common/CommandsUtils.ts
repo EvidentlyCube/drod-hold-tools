@@ -2,7 +2,7 @@ import {Character} from "../data/Character";
 import {Command} from "../data/Command";
 import {Monster} from "../data/Monster";
 import {UINT_MINUS_1} from "./CommonTypes";
-import {CharCommand} from "./Enums";
+import {CharCommand, ModelType} from "./Enums";
 
 class WrappedCommandBuffer {
 	private _buffer: number[];
@@ -95,6 +95,7 @@ export const CommandsUtils = {
 			return commands;
 		}
 
+		const modelType = ModelType.Command;
 		const arr = new WrappedCommandBuffer(buffer);
 
 		while (!arr.isEnd) {
@@ -108,7 +109,8 @@ export const CommandsUtils = {
 			const labelSize = arr.readBpUint();
 			const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
-			commands.push({command, x, y, w, h, flags, speechId, label, source, changes: {}});
+			const index = commands.length + 1;
+			commands.push({modelType, index, command, x, y, w, h, flags, speechId, label, source, changes: {}});
 		}
 
 		return commands;

@@ -18,6 +18,7 @@ export enum DataFormat {
 export interface DataLink {
 	model: Entrance | Room | Command | Speech | Character;
 	field: 'dataId' | 'tilesDataId' | 'faceDataId' | 'w' | 'h' | 'y' | 'customImageDataId' | 'overheadImageDataId';
+	description: string;
 }
 
 export interface Data {

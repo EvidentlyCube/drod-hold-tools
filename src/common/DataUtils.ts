@@ -1,4 +1,7 @@
 import {Data, DataFormat, DataLink} from "../data/Data";
+import {CharCommand, CommandNameMap, ModelType} from "./Enums";
+import {LocationUtils} from "./LocationUtils";
+import {Hold} from "../data/Hold";
 
 export const DataUtils = {
 	dataFormatToText(type: DataFormat) {
@@ -90,7 +93,67 @@ export const DataUtils = {
 		}
 	},
 
-	describeDataLink(link: DataLink) {
+	describeDataLink(link: DataLink, hold: Hold) {
+		switch (link.model.modelType) {
+			case ModelType.Character:
+				if (link.field === 'faceDataId') {
+					return `${LocationUtils.getDisplay(link.model, hold)} - Face Image`;
+				} else if (link.field === 'tilesDataId') {
+					return `${LocationUtils.getDisplay(link.model, hold)} - Sprite Image`;
+				}
+				break;
+			case ModelType.Entrance:
+				if (link.field === 'dataId') {
+					return `Entrance, ${LocationUtils.getDisplay(link.model, hold)} - Audio`
+				}
+				break;
+			case ModelType.Room:
+				if (link.field === 'customImageDataId') {
+					return `Room, ${LocationUtils.getDisplay(link.model, hold)} - Room Image`
+				} else if (link.field === 'overheadImageDataId') {
+					return `Room, ${LocationUtils.getDisplay(link.model, hold)} - Overhead Image`
+				}
+				break;
+			case ModelType.Speech:
+				console.log(link.model.command.command);
+				switch(link.model.command.command) {
+					case CharCommand.CC_Speech:
+						return `Speech, ${LocationUtils.getDisplay(link.model.command.source, hold)} ("${link.model.text}")`;
+				}
+				break;
+			case ModelType.Command:
+				const commandName = CommandNameMap.get(link.model.command);
 
+				switch(link.model.command) {
+					case CharCommand.CC_ImageOverlay:
+						if (link.field === 'w') {
+							return `Command #${link.model.index} ${commandName}, ${LocationUtils.getDisplay(link.model.source, hold)}`;
+						}
+						break;
+					case CharCommand.CC_AmbientSound:
+					case CharCommand.CC_AmbientSoundAt:
+						if (link.field === 'w') {
+							return `Command #${link.model.index} ${commandName}, ${LocationUtils.getDisplay(link.model.source, hold)}`;
+						}
+						break;
+					case CharCommand.CC_SetMusic:
+					case CharCommand.CC_WorldMapMusic:
+						if (link.field === 'y') {
+							return `Command #${link.model.index} ${commandName}, ${LocationUtils.getDisplay(link.model.source, hold)}`;
+						}
+						break;
+					case CharCommand.CC_WorldMapImage:
+						if (link.field === 'h') {
+							return `Command #${link.model.index} ${commandName}, ${LocationUtils.getDisplay(link.model.source, hold)}`;
+						}
+						break;
+
+				}
+
+				return `Unknown command #${link.model.index} ${CommandNameMap.get(link.model.command)}, field ${link.field}, ${LocationUtils.getDisplay(link.model.source, hold)}.`
+		}
+
+		const modelName = ModelType[link.model.modelType];
+		return `Unknown location, model ${modelName}, field ${link.field}`;
 	},
 };

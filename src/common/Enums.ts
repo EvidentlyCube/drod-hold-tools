@@ -2,6 +2,7 @@ import {UINT_MINUS_1} from "./CommonTypes";
 
 export enum ModelType {
 	Character,
+	Command,
 	Data,
 	Entrance,
 	Hold,
@@ -334,7 +335,7 @@ _CommandNameMap.set(CharCommand.CC_WaitForCharacter, 'CC_WaitForCharacter');
 _CommandNameMap.set(CharCommand.CC_WaitForNotCharacter, 'CC_WaitForNotCharacter');
 _CommandNameMap.set(CharCommand.CC_FlushSpeech, 'CC_FlushSpeech');
 _CommandNameMap.set(CharCommand.CC_Question, 'CC_Question');
-_CommandNameMap.set(CharCommand.CC_SetMusic, 'CC_SetMusic');
+_CommandNameMap.set(CharCommand.CC_SetMusic, 'Set Music');
 _CommandNameMap.set(CharCommand.CC_EndScriptOnExit, 'CC_EndScriptOnExit');
 _CommandNameMap.set(CharCommand.CC_If, 'CC_If');
 _CommandNameMap.set(CharCommand.CC_IfElse, 'CC_IfElse');
@@ -348,8 +349,8 @@ _CommandNameMap.set(CharCommand.CC_MoveRel, 'CC_MoveRel');
 _CommandNameMap.set(CharCommand.CC_PlayerEquipsWeapon, 'CC_PlayerEquipsWeapon');
 _CommandNameMap.set(CharCommand.CC_AnswerOption, 'CC_AnswerOption');
 _CommandNameMap.set(CharCommand.CC_BuildMarker, 'CC_BuildMarker');
-_CommandNameMap.set(CharCommand.CC_AmbientSound, 'CC_AmbientSound');
-_CommandNameMap.set(CharCommand.CC_AmbientSoundAt, 'CC_AmbientSoundAt');
+_CommandNameMap.set(CharCommand.CC_AmbientSound, 'Ambient Sound');
+_CommandNameMap.set(CharCommand.CC_AmbientSoundAt, 'Ambient Sound At');
 _CommandNameMap.set(CharCommand.CC_WaitForNoBuilding, 'CC_WaitForNoBuilding');
 _CommandNameMap.set(CharCommand.CC_PlayVideo, 'CC_PlayVideo');
 _CommandNameMap.set(CharCommand.CC_WaitForPlayerToMove, 'CC_WaitForPlayerToMove');
@@ -364,21 +365,21 @@ _CommandNameMap.set(CharCommand.CC_RoomLocationText, 'CC_RoomLocationText');
 _CommandNameMap.set(CharCommand.CC_FlashingText, 'CC_FlashingText');
 _CommandNameMap.set(CharCommand.CC_DisplayFilter, 'CC_DisplayFilter');
 _CommandNameMap.set(CharCommand.CC_Build, 'CC_Build');
-_CommandNameMap.set(CharCommand.CC_WorldMapMusic, 'CC_WorldMapMusic');
-_CommandNameMap.set(CharCommand.CC_WorldMapIcon, 'CC_WorldMapIcon');
-_CommandNameMap.set(CharCommand.CC_WorldMapSelect, 'CC_WorldMapSelect');
-_CommandNameMap.set(CharCommand.CC_SetPlayerWeapon, 'CC_SetPlayerWeapon');
-_CommandNameMap.set(CharCommand.CC_WaitForSomeoneToPushMe, 'CC_WaitForSomeoneToPushMe');
-_CommandNameMap.set(CharCommand.CC_WaitForOpenMove, 'CC_WaitForOpenMove');
-_CommandNameMap.set(CharCommand.CC_WaitForCleanLevel, 'CC_WaitForCleanLevel');
-_CommandNameMap.set(CharCommand.CC_ChallengeCompleted, 'CC_ChallengeCompleted');
+_CommandNameMap.set(CharCommand.CC_WorldMapMusic, 'World Map Music');
+_CommandNameMap.set(CharCommand.CC_WorldMapIcon, 'World Map Icon');
+_CommandNameMap.set(CharCommand.CC_WorldMapSelect, 'World Map Select');
+_CommandNameMap.set(CharCommand.CC_SetPlayerWeapon, 'Set Player Weapon');
+_CommandNameMap.set(CharCommand.CC_WaitForSomeoneToPushMe, 'Wait for Someone to Push Me');
+_CommandNameMap.set(CharCommand.CC_WaitForOpenMove, 'Wait For Open Move');
+_CommandNameMap.set(CharCommand.CC_WaitForCleanLevel, 'Wait For Clean Level');
+_CommandNameMap.set(CharCommand.CC_ChallengeCompleted, 'Challenge completed');
 _CommandNameMap.set(CharCommand.CC_AttackTile, 'CC_AttackTile');
 _CommandNameMap.set(CharCommand.CC_SetPlayerStealth, 'CC_SetPlayerStealth');
 _CommandNameMap.set(CharCommand.CC_WaitForPlayerInput, 'CC_WaitForPlayerInput');
 _CommandNameMap.set(CharCommand.CC_Return, 'CC_Return');
 _CommandNameMap.set(CharCommand.CC_GoSub, 'CC_GoSub');
-_CommandNameMap.set(CharCommand.CC_ImageOverlay, 'CC_ImageOverlay');
-_CommandNameMap.set(CharCommand.CC_WorldMapImage, 'CC_WorldMapImage');
+_CommandNameMap.set(CharCommand.CC_ImageOverlay, 'Image Overlay');
+_CommandNameMap.set(CharCommand.CC_WorldMapImage, 'World Map Image');
 _CommandNameMap.set(CharCommand.CC_WaitForEntityType, 'CC_WaitForEntityType');
 _CommandNameMap.set(CharCommand.CC_WaitForNotEntityType, 'CC_WaitForNotEntityType');
 _CommandNameMap.set(CharCommand.CC_TeleportTo, 'CC_TeleportTo');
