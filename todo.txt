@@ -1,16 +1,11 @@
 Data tab:
- - Show usage. Show it as number, clicking will open dialog with list of locations
  - Upload new data 
 
 Other:
  - Speech Tab - add option to swap audio to a different Data
  - Speech Tab - add option to upload a new audio to Speech
  - Challenge Tab - create it
- - Two-layer of tabs. First layer will be:
-   - "Main" (Hold & Operations)
-   - "Texts" (all text tables)
-   - "Data" (data table, tables for speech, for image overlays, for characters, for whatever else)
-
+ 
 Analyses:
  - Rooms with no checkpoints
  - Entrances that are not linked to from anywhere

@@ -1,8 +1,7 @@
-import {AppBar, Box, Dialog, IconButton, List, ListItem, ListItemText, Toolbar} from "@material-ui/core";
-import {Close} from "@material-ui/icons";
-import {Data} from "../../data/Data";
-import {useEffect, useState} from "react";
-import {SortUtils} from "../../common/SortUtils";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemText } from "@material-ui/core";
+import { useEffect, useState } from "react";
+import { SortUtils } from "../../common/SortUtils";
+import { Data } from "../../data/Data";
 
 interface DataUsageDialogProps {
 	data?: Data;
@@ -17,7 +16,7 @@ const totalStyle = {
 	paddingTop: '64px',
 };
 
-export const DataUsageDialog = ({data, onClose}: DataUsageDialogProps) => {
+export const DataUsageDialog = ({ data, onClose }: DataUsageDialogProps) => {
 	const [links, setLinks] = useState<string[]>([]);
 
 	useEffect(() => {
@@ -27,22 +26,22 @@ export const DataUsageDialog = ({data, onClose}: DataUsageDialogProps) => {
 
 	}, [setLinks, data]);
 
-	return <Dialog open={!!data} fullScreen onClose={onClose}>
-		<AppBar>
-			<Toolbar>
-				<IconButton edge="start" color="inherit" onClick={onClose}>
-					<Close/>
-				</IconButton>
-				Usage of: {data?.changes.name ?? data?.name}
-			</Toolbar>
-		</AppBar>
-		<Box style={totalStyle}>
+	return <Dialog open={!!data} onClose={onClose} maxWidth="lg">
+		<DialogTitle>
+			Usage of: {data?.changes.name ?? data?.name}
+		</DialogTitle>
+		<DialogContent dividers>
 			<List>
 				{links.map((link, index) => <ListItem key={index}>
 					<ListItemText>{link}</ListItemText>
 				</ListItem>)}
 			</List>
-		</Box>;
+		</DialogContent>
+		<DialogActions>
+			<Button onClick={onClose} color="primary" autoFocus>
+				Close
+			</Button>
+		</DialogActions>
 	</Dialog>;
 
 };
