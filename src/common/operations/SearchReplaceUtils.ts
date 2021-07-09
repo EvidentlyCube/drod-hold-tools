@@ -8,7 +8,7 @@ import {Character} from "../../data/Character";
 import {ModelType} from "../Enums";
 import {UpdateUtils} from "../UpdateUtils";
 
-const IsRegexRegex = /^\/(.+?)\/((?!.*(.).*\1)[imsu]*)$/;
+const IsRegexRegex = /^\/(.+?)\/((?!.*(.).*\1)[imsu]{0,4})$/;
 const OpenTag = "\x02";
 const CloseTag = "\x03";
 const OpenTagRegexp = new RegExp(OpenTag, 'g');
@@ -55,6 +55,17 @@ export type SearchReplaceResultRow = (RowHold | RowLevel | RowSpeech | RowEntran
 
 export const SearchReplaceUtils = {
 	isRegex(str: string) {
+		const matches = str.match(IsRegexRegex);
+
+		if (matches) {
+			const characters = matches[2].split("");
+
+			// Ensure flag is not duplicated
+			return !characters.some((char, index) => {
+				return characters.lastIndexOf(char) != index;
+			});
+		}
+
 		return IsRegexRegex.test(str);
 	},
 	toRegex(str: string) {
