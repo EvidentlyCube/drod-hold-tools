@@ -31,22 +31,22 @@ export const DataUtils = {
 		const mbytes = bytes / 1024 / 1024;
 		if (mbytes >= 1) {
 			if (mbytes >= 100) {
-				return mbytes.toFixed(0) + ' mbytes';
+				return mbytes.toFixed(0) + ' MiB';
 			} else if (mbytes >= 10) {
-				return mbytes.toFixed(1) + ' mbytes';
+				return mbytes.toFixed(1) + ' MiB';
 			} else {
-				return mbytes.toFixed(2) + ' mbytes';
+				return mbytes.toFixed(2) + ' MiB';
 			}
 		} else if (kbytes >= 1) {
 			if (kbytes >= 100) {
-				return kbytes.toFixed(0) + ' kbytes';
+				return kbytes.toFixed(0) + ' KiB';
 			} else if (kbytes >= 10) {
-				return kbytes.toFixed(1) + ' kbytes';
+				return kbytes.toFixed(1) + ' KiB';
 			} else {
-				return kbytes.toFixed(2) + ' kbytes';
+				return kbytes.toFixed(2) + ' KiB';
 			}
 		} else {
-			return bytes + ' bytes';
+			return bytes + ' B';
 		}
 	},
 
