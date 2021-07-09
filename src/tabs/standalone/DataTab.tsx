@@ -23,6 +23,9 @@ const styles = (theme: Theme) => createStyles({
 			whiteSpace: 'pre-wrap',
 		},
 	},
+	table: {
+		marginBottom: theme.spacing(1),
+	},
 });
 
 const RowsPerPage = 25;
@@ -38,6 +41,7 @@ interface DataRow {
 	isDataEdited: boolean;
 	data: Data;
 	usageCount: number;
+	isNew: boolean;
 }
 
 interface DatasTabProps extends WithStyles<typeof styles> {
@@ -122,6 +126,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			isDataEdited: data.changes.data !== undefined,
 			data,
 			usageCount: data.links.length,
+			isNew: data.isNew,
 		};
 	}
 
@@ -157,6 +162,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		Store.isBusy.value = true;
 
 		const data: Data = createNullData();
+		data.id = HoldUtils.getNextDataId(hold);
 		data.name = file.name;
 		data.isNew = true;
 
@@ -165,9 +171,19 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 			Store.addSystemMessage({color: "error", message: `Upload error: ${uploadResult.error}`});
 			Store.isBusy.value = false;
 			return;
+		} else if (!uploadResult.format) {
+			Store.addSystemMessage({color: "error", message: `Failed to determine file format.`});
+			Store.isBusy.value = false;
+			return;	
 		}
 
+		data.format = uploadResult.format;
 		hold.datas.set(data.id, data);
+
+		this.setState({
+			allRows: this.getRows(),
+			previewData: data
+		});
 
 		Store.isBusy.value = false;
 	};
@@ -189,6 +205,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					This table contains all the datas and their name. Click on the name to edit it, press ctrl+enter to save changes.
 				</Typography>
 				<EnchancedTable
+					className={classes.table}
 					columns={columns}
 					rows={allRows}
 					idField="id"
@@ -196,10 +213,10 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					onEditedCell={this.handleCellEdited}
 					apiRef={this._tableApi}
 				/>
+				<Box display="flex" justifyContent="flex-end">
+					<DropzoneButton label="Add new data (click or drop)" onDrop={this.onDropNewData}/>
+				</Box>
 			</Paper>
-			<Box display="flex" justifyContent="flex-end">
-				<DropzoneButton label="Add new data (click or drop)" onDrop={this.onDropNewData}/>
-			</Box>
 			<DataPreviewDialog
 				hold={hold}
 				onClose={this.handleClosePreviewDialog}
@@ -215,7 +232,7 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 				rowId={row.id}
 				resetHandler={this.handleResetName}
 				originalText={row.originalName}/>;
-		} else if (field === 'isDataEdited' && row.isDataEdited) {
+		} else if (field === 'isDataEdited' && row.isDataEdited && !row.isNew) {
 			return <IsEditedCell
 				rowId={row.id}
 				resetHandler={this.handleResetData}
