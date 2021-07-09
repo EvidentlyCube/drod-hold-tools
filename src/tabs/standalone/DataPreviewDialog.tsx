@@ -3,7 +3,7 @@ import {AppBar, Button, Dialog, Toolbar} from "@material-ui/core";
 import {BorderStyle, Close, FormatColorFill, ZoomIn, ZoomOut} from "@material-ui/icons";
 import {Box, IconButton, Typography} from "@material-ui/core/";
 import {DataUtils} from "../../common/DataUtils";
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {LightTooltip} from "../../common/components/LightTooltip";
 import {Hold} from "../../data/Hold";
 import {DataUploader} from "../../common/operations/DataUploader";
@@ -52,6 +52,7 @@ const TopBar = ({data, hold, onClose, onDataChange, children, showOld, setShowOl
 		setDataUrl?.(DataUtils.getDataUrl(data, true));
 		onDataChange?.(data);
 	}, [data, hold, setShowOld, setDataUrl, onDataChange]);
+
 
 	return <AppBar>
 		<Toolbar>
@@ -111,6 +112,8 @@ interface PreviewActualProps {
 }
 
 const PreviewImage = ({hold, data, onClose, onDataChange}: PreviewActualProps) => {
+	const imageRef = useRef<HTMLImageElement|null>(null);
+	const [dimensions, setDimensions] = useState({w: 0, h: 0});
 	const [showOld, setShowOld] = useState(false);
 	const [dataUrl, setDataUrl] = useState('');
 	useEffect(() => {
@@ -134,6 +137,16 @@ const PreviewImage = ({hold, data, onClose, onDataChange}: PreviewActualProps) =
 	}, [background, setBackground]);
 
 	const borderColor = background === 0 ? 'white' : 'black';
+	const updateDimensions = useCallback(() => {
+		if (imageRef.current) {
+			setDimensions({
+				w: imageRef.current.naturalWidth,
+				h: imageRef.current.naturalHeight
+			});
+		}
+	}, [imageRef, setDimensions]);
+
+	useEffect(updateDimensions, [updateDimensions]);
 
 	return <>
 		<TopBar hold={hold} data={data} showOld={showOld} onClose={onClose} onDataChange={onDataChange} setShowOld={setShowOld} setDataUrl={setDataUrl}>
@@ -155,12 +168,15 @@ const PreviewImage = ({hold, data, onClose, onDataChange}: PreviewActualProps) =
 		</TopBar>
 		<DialogBody style={{background: Backgrounds[background]}}>
 			<img
+				ref={imageRef}
 				alt={`${data.name} preview`}
 				className="crisp"
 				style={{
-					transform: `scale(${zoom})`,
+					width: `${(dimensions.w * zoom).toFixed(5)}px`,
+					height: `${(dimensions.h * zoom).toFixed(5)}px`,
 					border: border ? `2px dashed ${borderColor}` : 'none',
 				}}
+				onLoad={updateDimensions}
 				src={dataUrl}/>
 		</DialogBody>
 	</>;
