@@ -62,7 +62,7 @@ class PlayersTab extends React.Component<PlayersTabProps, PlayersTabState> {
 				{id: 'isEdited', label: 'Edited', width: "5%", renderCell: this.renderIsEditedCell, padding: "none"},
 				{id: 'text', label: 'Text', editable: true, editMaxLength: 1024, cellClassName: 'tommable'},
 				{id: 'levelCount', label: 'Used in Levels', width: '10%'},
-				{id: 'isDeleted', label: 'Delete', width: "5%", sortable: false, padding: "none", renderCell: this.renderDeleteRow},
+				{id: 'isDeleted', label: 'Delete', width: "90px", sortable: false, padding: "none", renderCell: this.renderDeleteRow},
 			],
 		};
 	}
