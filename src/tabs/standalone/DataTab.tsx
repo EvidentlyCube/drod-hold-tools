@@ -1,11 +1,11 @@
 import {Store} from "../../data/Store";
 import {Hold} from "../../data/Hold";
 import React from "react";
-import {Button, Container, IconButton, Paper, Theme, Typography} from "@material-ui/core/";
+import {Box, Button, Container, IconButton, Paper, Theme, Typography} from "@material-ui/core/";
 import {createStyles, withStyles, WithStyles} from "@material-ui/styles";
 import {EnchancedTableApi, EnchancedTableColumn} from "../../common/components/EnchancedTableCommons";
 import {EnchancedTable} from "../../common/components/EnchancedTable";
-import {Data, DataFormat} from "../../data/Data";
+import {createNullData, Data, DataFormat} from "../../data/Data";
 import {IsEditedCell} from "../../common/components/IsEditedCell";
 import {HoldUtils} from "../../common/HoldUtils";
 import {UpdateUtils} from "../../common/UpdateUtils";
@@ -13,6 +13,8 @@ import {DataUtils} from "../../common/DataUtils";
 import {Edit} from "@material-ui/icons";
 import {DataPreviewDialog} from "./DataPreviewDialog";
 import {DataUsageDialog} from "./DataUsageDialog";
+import { DropzoneButton } from "../../common/components/DropzoneButton";
+import { DataUploader } from "../../common/operations/DataUploader";
 
 const styles = (theme: Theme) => createStyles({
 	content: {
@@ -148,6 +150,28 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 		this._tableApi.current?.rerender();
 	};
 
+	private onDropNewData = async (files: File[]) => {
+		const {hold} = this.state;
+		const file = files[0];
+
+		Store.isBusy.value = true;
+
+		const data: Data = createNullData();
+		data.name = file.name;
+		data.isNew = true;
+
+		const uploadResult = await DataUploader.uploadFile(file, data, hold);
+		if (uploadResult.error) {
+			Store.addSystemMessage({color: "error", message: `Upload error: ${uploadResult.error}`});
+			Store.isBusy.value = false;
+			return;
+		}
+
+		hold.datas.set(data.id, data);
+
+		Store.isBusy.value = false;
+	};
+
 	private handleShowUsageDialog = () => {
 		this.setState({showUsageData: undefined});
 	};
@@ -173,6 +197,9 @@ class DatasTab extends React.Component<DatasTabProps, DatasTabState> {
 					apiRef={this._tableApi}
 				/>
 			</Paper>
+			<Box display="flex" justifyContent="flex-end">
+				<DropzoneButton label="Add new data (click or drop)" onDrop={this.onDropNewData}/>
+			</Box>
 			<DataPreviewDialog
 				hold={hold}
 				onClose={this.handleClosePreviewDialog}

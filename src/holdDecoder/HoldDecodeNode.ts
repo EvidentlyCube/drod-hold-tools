@@ -98,6 +98,7 @@ export function decodeHoldNode(element: Element, hold: Hold) {
 				name: decodeText(element, 'DataNameText'),
 				size: Math.ceil(rawData.length * 4 / 3),
 				data: rawData,
+				isNew: false,
 				links: [],
 				changes: {},
 			});

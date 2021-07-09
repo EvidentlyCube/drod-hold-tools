@@ -12,7 +12,8 @@ export enum DataFormat {
 	S3M = 20,
 	WAV = 40,
 	OGG = 41,
-	THEORA = 70
+	THEORA = 70,
+	Unknown = -1
 }
 
 export interface DataLink {
@@ -31,12 +32,31 @@ export interface Data {
 	size: number;
 	data: string;
 
+	isNew: boolean;
 	links: DataLink[];
 
 	changes: {
 		name?: string,
 		data?: string,
 		format?: DataFormat,
-	},
-	dataUrlCache?: string;
+	}
+}
+
+
+export function createNullData(): Data {
+	return {
+		modelType: ModelType.Data,
+		xml: document.createElement('Data'),
+
+		id: 0,
+		format: DataFormat.Unknown,
+		name: '',
+		size: 0,
+		data: '',
+
+		isNew: true,
+		links: [],
+		
+		changes: {},
+	};
 }

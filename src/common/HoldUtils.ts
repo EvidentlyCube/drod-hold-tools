@@ -33,6 +33,14 @@ export const HoldUtils = {
 
 		return maxId + 1;
 	},
+	getNextDataId(hold: Hold) {
+		let maxId = 0;
+		for (const data of hold.datas.values()) {
+			maxId = Math.max(maxId, data.id);
+		}
+
+		return maxId + 1;
+	},
 
 	getSpeech(speechId: number, hold: Hold) {
 		const speech = hold.speeches.get(speechId);
