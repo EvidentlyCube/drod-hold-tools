@@ -339,7 +339,7 @@ class _EnchancedTable extends React.Component<EnchancedTableProps, EnchancedTabl
 		>
 			{column.renderCell
 				? column.renderCell(row, column.id, this)
-				: row[column.id] || <span>&nbsp;</span>}
+				: row[column.id] ?? <span>&nbsp;</span>}
 			{column.editable && <Create className="edit-icon" fontSize="small"/>}
 		</TableCell>;
 	}
