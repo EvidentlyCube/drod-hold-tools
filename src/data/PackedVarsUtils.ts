@@ -80,6 +80,20 @@ class WrappedArray {
 		this._array[this._pos++] = 0;
 	}
 
+	public writeWCharString(str: string) {
+		for (let i = 0; i < str.length; i++) {
+			const charCode = str.charCodeAt(i);
+			if (charCode > 128) {
+				throw new Error(`Trying to write char code ${charCode}`);
+			}
+			this._array[this._pos++] = charCode;
+			this._array[this._pos++] = 0;
+		}
+
+		this._array[this._pos++] = 0;
+		this._array[this._pos++] = 0;
+	}
+
 	public readRaw(bytes: number): number[] {
 		const readBytes: number[] = [];
 
@@ -174,32 +188,32 @@ const PackedVarsUtils = {
 		const buf = new WrappedArray(new Uint8Array());
 
 		for (const packedVar of packedVars.vars) {
-			const {name} = packedVar;
+			const {name, type, value} = packedVar;
 
 			buf.writeUint(name.length + 1);
 			buf.writeString(name);
-			buf.writeInt(packedVar.type);
+			buf.writeInt(type);
 
-			switch (packedVar.type) {
+			switch (type) {
 				case PackedVarType.ByteBuffer:
-					buf.writeUint(packedVar.value.length);
-					buf.writeRaw(packedVar.value);
+					buf.writeUint(value.length);
+					buf.writeRaw(value);
 					break;
 				case PackedVarType.Uint:
 					buf.writeUint(4);
-					buf.writeUint(packedVar.value);
+					buf.writeUint(value);
 					break;
 				case PackedVarType.Bool:
 					buf.writeUint(1);
-					buf.writeBool(packedVar.value);
+					buf.writeBool(value);
 					break;
 				case PackedVarType.WcharString:
-					buf.writeUint(packedVar.value.length * 2);
-					buf.writeString(packedVar.value);
+					buf.writeUint(value.length * 2 + 2);
+					buf.writeWCharString(value);
 					break;
 				default:
-					console.error(name, packedVar.type, packedVar.value);
-					throw new Error(`Unknown packed var type ${packedVar.type}`);
+					console.error(name, type, value);
+					throw new Error(`Unknown packed var type ${type}`);
 			}
 		}
 

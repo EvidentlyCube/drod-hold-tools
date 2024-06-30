@@ -38,10 +38,10 @@ export function holdToXml(hold: Hold) {
 	writer.write(`<?xml version="1.0" encoding="ISO-8859-1" ?>\n`);
 
 	writer.tag('drod')
-		.attr('version', 508)
+		.attr('Version', 508)
 		.nest();
 
-	for (const player of Object.values(hold.players)) {
+	for (const player of hold.players.values()) {
 		writePlayer(writer, refs, player)
 	}
 
@@ -63,15 +63,15 @@ export function holdToXml(hold: Hold) {
 		.attr('HoldID', hold.id)
 		.nest();
 
-	for (const entrance of Object.values(hold.entrances)) {
+	for (const entrance of hold.entrances.values()) {
 		writeEntrance(writer, refs, entrance)
 	}
 
-	for (const variable of Object.values(hold.variables)) {
+	for (const variable of hold.variables.values()) {
 		writeVariable(writer, refs, variable)
 	}
 
-	for (const character of Object.values(hold.characters)) {
+	for (const character of hold.characters.values()) {
 		writeCharacter(writer, refs, character)
 	}
 
@@ -79,11 +79,11 @@ export function holdToXml(hold: Hold) {
 
 	writer.end('Holds');
 
-	for (const data of Object.values(hold.data)) {
+	for (const data of hold.data.values()) {
 		writeData(writer, refs, data)
 	}
 
-	for (const level of Object.values(hold.levels)) {
+	for (const level of hold.levels.values()) {
 		writeLevel(writer, refs, level)
 	}
 
@@ -120,7 +120,7 @@ function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: HoldEntran
 
 	if (entrance.dataId) {
 		// @FIXME handle null data
-		writeData(writer, refs, entrance.hold.data[entrance.dataId]);
+		writeData(writer, refs, entrance.hold.data.get(entrance.dataId)!);
 	}
 
 	writer.tag('Entrances')
@@ -164,7 +164,7 @@ function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpeech) {
 
 	if (speech.dataId) {
 		// @FIXME null data check
-		writeData(writer, refs, speech.hold.data[speech.dataId]);
+		writeData(writer, refs, speech.hold.data.get(speech.dataId)!);
 	}
 
 	writer.tag('Speech')
@@ -201,7 +201,7 @@ function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel) {
 
 	refs.levelIds.add(level.id);
 
-	writer.tag('Level')
+	writer.tag('Levels')
 		.attr('HoldID', level.hold.id)
 		.attr('GID_LevelIndex', level.gidLevelIndex)
 		.attr('OrderIndex', level.orderIndex)
@@ -213,7 +213,7 @@ function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel) {
 		.attr('LevelID', level.id)
 		.end();
 
-	const rooms = Object.values(level.hold.rooms).filter(room => room.levelId === level.id);
+	const rooms = level.hold.rooms.values().filter(room => room.levelId === level.id);
 
 	for (const room of rooms) {
 		writeRoom(writer, refs, room);
@@ -229,12 +229,12 @@ function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 
 	if (room.dataId) {
 		// @FIXME - Null Data handler
-		writeData(writer, refs, room.hold.data[room.dataId])
+		writeData(writer, refs, room.hold.data.get(room.dataId)!)
 	}
 
 	if (room.overheadDataId) {
 		// @FIXME - Null Data handler
-		writeData(writer, refs, room.hold.data[room.overheadDataId])
+		writeData(writer, refs, room.hold.data.get(room.overheadDataId)!)
 	}
 
 	for (const monster of room.monsters) {
@@ -243,14 +243,7 @@ function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 		}
 	}
 
-	/*
-	<Rooms LevelID='19993' RoomX='49' RoomY='1999347' RoomID='121689' RoomCols='38' RoomRows='32'
-		StyleName='' IsRequired='1' IsSecret='0'
-		Squares=''
-		TileLights=''
-		ExtraVars=''>
-		*/
-	writer.tag('Room')
+	writer.tag('Rooms')
 		.attr('LevelID', room.levelId)
 		.attr('RoomX', room.roomX)
 		.attr('RoomY', room.roomY)
@@ -304,16 +297,16 @@ function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			.attr('Type', monster.type)
 			.attr('X', monster.x)
 			.attr('Y', monster.y)
-			.attr('O', monster.y);
+			.attr('O', monster.o);
 
 		if (monster.processSequence !== DEFAULT_PROCESSING_SEQUENCE) {
-			writer.attr('Type', monster.type);
+			writer.attr('ProcessSequence', monster.processSequence);
 		}
 		if (monster.extraVars && monster.extraVars.hasAnyVar()) {
 			writer.attr('ExtraVars', monster.extraVars);
 		}
 
-		if (monster.pieces.length === 0) {
+		if (monster.pieces.length > 0) {
 			writer.nest();
 
 			for (const piece of monster.pieces) {
@@ -355,7 +348,7 @@ function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			.end();
 	}
 
-	writer.end('Room')
+	writer.end('Rooms')
 }
 
 function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: HoldCharacter) {
@@ -367,24 +360,17 @@ function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: HoldChar
 
 	if (character.avatarDataId) {
 		// @FIXME handle null data
-		writeData(writer, refs, character.hold.data[character.avatarDataId])
+		writeData(writer, refs, character.hold.data.get(character.avatarDataId)!)
 	}
 	if (character.tilesDataId) {
 		// @FIXME handle null data
-		writeData(writer, refs, character.hold.data[character.tilesDataId])
+		writeData(writer, refs, character.hold.data.get(character.tilesDataId)!)
 	}
 
 	if (character.$commandList) {
 		writeCommandData(writer, refs, character.$commandList);
 	}
 
-	/*
-			<Characters CharID='20006'
-			CharNameText='' Type='15'
-			AnimationSpeed='0'
-			ExtraVars=''
-			DataIDTiles='49279' />
-	*/
 	writer.tag('Characters')
 		.attr('CharID', character.id)
 		.attr('CharNameText', character.name)
@@ -409,14 +395,14 @@ function writeCommandData(writer: XMLWriter, refs: OutputRefs, commandList: Comm
 	for (const command of commandList.commands) {
 		if (command.speechId) {
 			// @FIXME null data
-			writeSpeech(writer, refs, commandList.hold.speeches[command.speechId]);
+			writeSpeech(writer, refs, commandList.hold.speeches.get(command.speechId)!);
 		}
 
 		const dataId = getCommandDataId(command);
 
 		if (dataId) {
 			// @FIXME null data
-			writeData(writer, refs, commandList.hold.data[dataId]);
+			writeData(writer, refs, commandList.hold.data.get(dataId)!);
 		}
 	}
 }

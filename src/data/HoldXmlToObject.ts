@@ -1,4 +1,5 @@
 import { assertNotNull } from "../utils/Asserts";
+import { diffXml } from "../utils/DiffXml";
 import { holdToXml } from "./HoldToXml";
 import { DrodText } from "./datatypes/DrodText";
 import { Hold } from "./datatypes/Hold";
@@ -53,7 +54,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			gidCreated: int(playerXml, 'GID_Created')
 		});
 
-		hold.players[playerData.id] = playerData;
+		hold.players.set(playerData.id, playerData);
 		await sleep();
 	}
 
@@ -69,7 +70,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			encRawData: str(dataXml, 'RawData')
 		});
 
-		hold.data[holdData.id] = holdData;
+		hold.data.set(holdData.id, holdData);
 		await sleep();
 	}
 
@@ -90,7 +91,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			showDescription: int(entranceXml, 'ShowDescription') === 1
 		});
 
-		hold.entrances[entranceData.id] = entranceData;
+		hold.entrances.set(entranceData.id, entranceData);
 		await sleep();
 	}
 
@@ -103,7 +104,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			encName: str(varXml, 'VarNameText'),
 		});
 
-		hold.variables[holdVar.id] = holdVar;
+		hold.variables.set(holdVar.id, holdVar);
 		await sleep();
 	}
 
@@ -120,7 +121,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			encMessage: str(speechXml, 'Message'),
 		});
 
-		hold.speeches[holdSpeech.id] = holdSpeech;
+		hold.speeches.set(holdSpeech.id, holdSpeech);
 		await sleep();
 	}
 
@@ -138,7 +139,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			tilesDataId: intU(characterXml, 'DataIDTiles'),
 		});
 
-		hold.characters[holdCharacter.id] = holdCharacter;
+		hold.characters.set(holdCharacter.id, holdCharacter);
 		await sleep();
 	}
 
@@ -158,7 +159,7 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			playerId: int(levelXml, 'PlayerID'),
 		});
 
-		hold.levels[holdLevel.id] = holdLevel;
+		hold.levels.set(holdLevel.id, holdLevel);
 		await sleep();
 	}
 
@@ -179,8 +180,8 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 			roomRows: int(roomXml, 'RoomRows'),
 			imageStartX: intU(roomXml, 'ImageStartX'),
 			imageStartY: intU(roomXml, 'ImageStartY'),
-			overheadImageStartX: intU(roomXml, 'OverheadImageX'),
-			overheadImageStartY: intU(roomXml, 'OverheadImageY'),
+			overheadImageStartX: intU(roomXml, 'OverheadImageStartX'),
+			overheadImageStartY: intU(roomXml, 'OverheadImageStartY'),
 			encSquares: str(roomXml, 'Squares'),
 			encStyleName: str(roomXml, 'StyleName'),
 			encTileLights: str(roomXml, 'TileLights'),
@@ -265,15 +266,15 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 		}
 
 
-		hold.rooms[holdRoom.id] = holdRoom;
+		hold.rooms.set(holdRoom.id, holdRoom);
 		await sleep();
 	}
 
-	const newXml = holdToXml(hold);
-	console.log(newXml);
-
-
-
+	try {
+		diffXml(xml, holdToXml(hold));
+	} catch (e) {
+		console.log(e);
+	}
 
 	return hold;
 }

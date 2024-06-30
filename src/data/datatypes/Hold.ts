@@ -1,3 +1,4 @@
+import { OrderedMap } from "../../utils/OrderedMap";
 import { DrodText } from "./DrodText";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
@@ -49,14 +50,14 @@ export class Hold {
 	public readonly lastWorldMapId: number;
 	public readonly startingLevelId: number;
 
-	public readonly players: Record<number, HoldPlayer> = {};
-	public readonly variables: Record<number, HoldVariable> = {};
-	public readonly speeches: Record<number, HoldSpeech> = {};
-	public readonly entrances: Record<number, HoldEntrance> = {};
-	public readonly data: Record<number, HoldData> = {};
-	public readonly characters: Record<number, HoldCharacter> = {};
-	public readonly levels: Record<number, HoldLevel> = {};
-	public readonly rooms: Record<number, HoldRoom> = {};
+	public readonly players = new OrderedMap<number, HoldPlayer>();
+	public readonly variables = new OrderedMap<number, HoldVariable>();
+	public readonly speeches = new OrderedMap<number, HoldSpeech>();
+	public readonly entrances = new OrderedMap<number, HoldEntrance>();
+	public readonly data = new OrderedMap<number, HoldData>();
+	public readonly characters = new OrderedMap<number, HoldCharacter>();
+	public readonly levels = new OrderedMap<number, HoldLevel>();
+	public readonly rooms = new OrderedMap<number, HoldRoom>();
 
 	public constructor(options: HoldConstructor) {
 		this.id = options.id;
