@@ -1,0 +1,52 @@
+#route-drop-hold {
+    background: #DDD;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+#route-drop-hold header {
+    font-size: 32px;
+}
+
+#route-drop-hold aside {
+    font-size: 22px;
+
+    margin-bottom: 20px;
+}
+
+#route-drop-hold .logs {
+	padding-left: 0;
+}
+
+#route-drop-hold .logs li {
+	list-style: none;
+	padding-left: 0;
+	text-align: center;
+}
+
+#route-drop-hold .logs li.log-0 {
+	font-size: 24px;
+}
+#route-drop-hold .logs li.log-1 {
+	font-size: 22px;
+	opacity: 0.8;
+}
+#route-drop-hold .logs li.log-2 {
+	font-size: 20px;
+	opacity: 0.6;
+}
+#route-drop-hold .logs li.log-3 {
+	font-size: 18px;
+	opacity: 0.4;
+}
+#route-drop-hold .logs li.log-4 {
+	font-size: 16px;
+	opacity: 0.2;
+}
