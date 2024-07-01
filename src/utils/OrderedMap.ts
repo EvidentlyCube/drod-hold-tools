@@ -2,6 +2,10 @@ export class OrderedMap<TKey, TValue> {
 	private readonly _map = new Map<TKey, TValue>();
 	private readonly _orderedKeys: TKey[] = [];
 
+	public get size() {
+		return this._map.size;
+	}
+
 	public has(key: TKey) {
 		return this._map.has(key);
 	}

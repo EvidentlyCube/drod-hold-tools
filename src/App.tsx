@@ -1,5 +1,4 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
-import AddHoldNavButton from "./components/common/AddHoldNavButton";
 import NavHoldsList from "./components/common/NavHoldsList";
 import RouteHome from "./routes/RouteHome";
 import RouteViewHold from "./routes/RouteViewHold";

@@ -7,10 +7,10 @@ type GetData = (hold: Hold) => string|number;
 const DataPoints: Record<string, GetData> = {
 	"Name": hold => hold.name.text,
 	"Description": hold => hold.descriptionMessage.text,
-	"Levels No.": hold => Object.keys(hold.levels).length,
-	"Rooms No.": hold => Object.keys(hold.rooms).length,
-	"Datas No.": hold => Object.keys(hold.data).length,
-	"Character No.": hold => Object.keys(hold.characters).length
+	"Levels No.": hold => hold.levels.size,
+	"Rooms No.": hold => hold.rooms.size,
+	"Datas No.": hold => hold.data.size,
+	"Character No.": hold => hold.characters.size,
 }
 
 export default function RouteViewHoldSummary() {
@@ -34,6 +34,6 @@ interface Props {
 function DataRow({name, getData, hold}: Props) {
 	return <tr>
 		<th>{name}</th>
-		<td>{getData(hold)}</td>
+		<td>{getData(hold).toString()}</td>
 	</tr>
 }

@@ -1,10 +1,6 @@
-import { ChangeEvent, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SortableTable, { Column } from "../../components/common/SortableTable";
-import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
-import { useSignalDrodText } from "../../hooks/useSignalDrodText";
 import { HoldReaders } from "../../processor/HoldReaderManager";
-import { HoldChange } from "../../data/datatypes/HoldChange";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
 
 
