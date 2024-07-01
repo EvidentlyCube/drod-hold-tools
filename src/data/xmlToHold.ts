@@ -14,7 +14,7 @@ import { HoldOrb, HoldRoom } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 
-export async function xmlToHold(xml: Document, log: (log: string) => void): Promise<Hold> {
+export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: string) => void): Promise<Hold> {
 	const drodXml = xml.querySelector('drod');
 	const holdXml = xml.querySelector('Holds');
 
@@ -24,6 +24,7 @@ export async function xmlToHold(xml: Document, log: (log: string) => void): Prom
 	log("Parsing Hold");
 
 	const hold = new Hold({
+		$holdReaderId: holdReaderId,
 		id: int(holdXml, 'HoldID'),
 		version: int(drodXml, 'Version'),
 		gidCreated: int(holdXml, 'GID_Created'),
@@ -71,7 +72,7 @@ export async function xmlToHold(xml: Document, log: (log: string) => void): Prom
 			encRawData: str(dataXml, 'RawData')
 		});
 
-		hold.data.set(holdData.id, holdData);
+		hold.datas.set(holdData.id, holdData);
 		await sleep();
 	}
 
@@ -271,13 +272,52 @@ export async function xmlToHold(xml: Document, log: (log: string) => void): Prom
 		await sleep();
 	}
 
-	// @FIXME - Load stored changes
+	for (const character of hold.characters.values()) {
+		if (!character.$commandList) {
+			continue;
+		}
 
+		const { commands } = character.$commandList;
+		for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
+			const {speechId} = commands[commandIndex];
+			if (speechId) {
+				hold.speeches.getOrError(speechId).$location = {
+					source: 'character',
+					characterId: character.id,
+					commandIndex
+				}
+			}
+		}
+	}
+
+	for (const room of hold.rooms.values()) {
+		for (let monsterIndex = 0; monsterIndex < room.monsters.length; monsterIndex++) {
+			const monster = room.monsters[monsterIndex];
+			if (!monster.$commandList) {
+				continue;
+			}
+
+			const { commands } = monster.$commandList;
+			for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
+				const {speechId} = commands[commandIndex];
+				if (speechId) {
+					hold.speeches.getOrError(speechId).$location = {
+						source: 'monster',
+						roomId: room.id,
+						monsterIndex,
+						commandIndex
+					}
+				}
+			}
+		}
+	}
+
+	// Wait for store to be ready
 	while (HoldIndexedStorage.isInitializing.value) {
 		await sleep(true);
 	}
 
-	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.id));
+	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
 	applyHoldChanges(hold);
 
 	new HoldChangeListener().register(hold);
@@ -321,5 +361,4 @@ async function sleep(forced = false) {
 			resolve();
 		}
 	})
-
 }

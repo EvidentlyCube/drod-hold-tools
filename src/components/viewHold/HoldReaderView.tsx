@@ -1,11 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { useSignalArray } from "../../hooks/useSignalArray";
 import { HoldReader } from "../../processor/HoldReader";
 import FullPageMessage from "../common/FullPageMessage";
-import { useCallback } from "react";
-import { HoldReaders } from "../../processor/HoldReaderManager";
-import { useSignalArray } from "../../hooks/useSignalArray";
-import HoldViewTemplate from "./HoldViewTemplate";
 import HoldReaderErrorPage from "./HoldReaderErrorPage";
+import HoldViewTemplate from "./HoldViewTemplate";
 
 interface Props {
 	holdReader: HoldReader;

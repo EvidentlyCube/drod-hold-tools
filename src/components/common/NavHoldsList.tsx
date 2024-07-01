@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { useSignalArray } from "../../hooks/useSignalArray";
 import { HoldReader } from "../../processor/HoldReader";
-import { HoldReaders } from "../../processor/HoldReaderManager";
+import { HoldReaders } from "../../processor/HoldReaders";
 import { useSignalValue } from "../../hooks/useSignalValue";
 import { HoldIndexedStorage } from "../../processor/HoldIndexedStorage";
 

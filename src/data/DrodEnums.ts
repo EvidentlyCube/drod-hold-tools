@@ -239,6 +239,7 @@ export enum Mood {
 }
 
 export const MonsterIdToName: ReadonlyMap<number, string> = new Map([
+	[UINT_MINUS_1, 'None'],
 	[MonsterType.Roach, 'Roach'],
 	[MonsterType.RoachQueen, 'Roach Queen'],
 	[MonsterType.RoachEgg, 'Roach Egg'],

@@ -3,14 +3,15 @@ import { useParams } from "react-router-dom";
 import SortableTable, { Column } from "../../components/common/SortableTable";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { useSignalDrodText } from "../../hooks/useSignalDrodText";
-import { HoldReaders } from "../../processor/HoldReaderManager";
+import { HoldReaders } from "../../processor/HoldReaders";
+import { sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
 
 function EditCell({speech}: {speech: HoldSpeech}) {
 	const newText = useSignalDrodText(speech.message);
 
 	const toggleText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		if (newText === undefined) {
-			speech.message.newText = speech.message.text;
+			speech.message.newText = speech.message.oldText;
 		} else {
 			speech.message.newText = undefined;
 		}
@@ -39,26 +40,26 @@ const Columns: Column<HoldSpeech>[] = [
 	{
 		id: 'location',
 		displayName: 'Location',
-		widthPercent: 5,
+		widthPercent: 15,
 
-		render: speech => "<unknown>",
+		render: speech => speech.$locationName,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$locationName, r.$locationName)
 	},
 	{
 		id: 'mood',
 		displayName: 'Mood',
 		widthPercent: 5,
 
-		render: speech => speech.mood,
+		render: speech => speech.$mood,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood)
 	},
 	{
-		id: 'character',
-		displayName: 'Character',
+		id: 'speaker',
+		displayName: 'Speaker',
 		widthPercent: 5,
 
-		render: speech => speech.character,
-		sort: (isAsc, l, r) => isAsc
-			? l.character - r.character
-			: r.character - l.character
+		render: speech => speech.$speaker,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$speaker, r.$speaker)
 	},
 	{
 		id: 'data',
@@ -66,18 +67,14 @@ const Columns: Column<HoldSpeech>[] = [
 		widthPercent: 5,
 
 		render: speech => speech.dataId ?? "<none>",
-		sort: (isAsc, l, r) => isAsc
-			? (l.dataId ?? 0) - (r.dataId ?? 0)
-			: (r.dataId ?? 0) - (l.dataId ?? 0)
+		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.dataId ?? 0, r.dataId ?? 0)
 	},
 	{
 		id: 'text',
 		displayName: 'Text',
-		widthPercent: 35,
-		render: speech => speech.message.text,
-		sort: (isAsc, l, r) => isAsc
-			? l.message.text.localeCompare(r.message.text)
-			: r.message.text.localeCompare(l.message.text)
+		widthPercent: 30,
+		render: speech => speech.message.oldText,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.oldText, r.message.oldText)
 	},
 	{
 		id: 'edit',
@@ -88,7 +85,7 @@ const Columns: Column<HoldSpeech>[] = [
 	{
 		id: 'new-text',
 		displayName: 'New Text',
-		widthPercent: 35,
+		widthPercent: 30,
 		render: speech => <NewTextCell speech={speech} />,
 		sort: (isAsc, l, r) => {
 			if (l.message.newText && r.message.newText) {

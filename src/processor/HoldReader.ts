@@ -62,6 +62,7 @@ export class HoldReader {
 			];
 
 			this.name.value = `${truncate(source.file.name, 32)} (1 / ${this._steps.length})`;
+
 		} else {
 			this.sharedState.holdXmlText = source.xmlString;
 
@@ -91,7 +92,7 @@ export class HoldReader {
 
 				if (this._currentStepIndex === this._steps.length) {
 					if (this.sharedState.hold) {
-						this.name.value = truncate(this.sharedState.hold.name.text, 32);
+						this.name.value = truncate(this.sharedState.hold.name.oldText, 32);
 						this.onParsed.dispatch(this);
 
 					} else {
@@ -340,7 +341,7 @@ function getXmlToData(reader: HoldReader) {
 
 			reader.logs.push('Parsing XML');
 
-			xmlToHold(holdXml, log => reader.logs.push(log))
+			xmlToHold(reader.id, holdXml, log => reader.logs.push(log))
 				.then(hold => {
 					reader.sharedState.hold = hold;
 					isFinished = true;

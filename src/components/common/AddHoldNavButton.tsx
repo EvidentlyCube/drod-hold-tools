@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { HoldReaders } from "../../processor/HoldReaderManager";
+import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeEvent, useCallback } from "react";
 
 export default function AddHoldNavButton() {

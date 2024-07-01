@@ -13,7 +13,7 @@ interface EntranceConstructor {
 	encDescription: string;
 }
 export class HoldEntrance {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
 	public readonly roomId: number;
@@ -25,8 +25,16 @@ export class HoldEntrance {
 	public readonly showDescription: boolean;
 	public readonly description: DrodText;
 
+	public get $room() {
+		return this.$hold.rooms.getOrError(this.roomId);
+	}
+
+	public get $data() {
+		return this.dataId ? this.$hold.datas.get(this.dataId) : undefined;
+	}
+
 	public constructor(hold: Hold, opts: EntranceConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = opts.id;
 		this.roomId = opts.roomId;

@@ -1,6 +1,6 @@
 import { CommandsList } from "../CommandList";
 import { readCommandsBuffer } from "../CommandUtils";
-import { DEFAULT_PROCESSING_SEQUENCE } from "../DrodCommonTypes";
+import { DEFAULT_PROCESSING_SEQUENCE, UINT_MINUS_1 } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
 import type { HoldRoom } from "./HoldRoom";
@@ -19,7 +19,7 @@ interface MonsterPiece {
 	y: number;
 }
 export class HoldMonster {
-	public readonly room: HoldRoom;
+	public readonly $room: HoldRoom;
 
 	public readonly type: number;
 	public readonly x: number;
@@ -32,8 +32,15 @@ export class HoldMonster {
 
 	public readonly $commandList?: CommandsList;
 
+	/**
+	 * ID of the selected character typ if this is a character, 0 otherwise
+	 */
+	public get $characterTypeId(): number {
+		return this.extraVars?.readUint('id', UINT_MINUS_1) ?? UINT_MINUS_1;
+	}
+
 	public constructor(room: HoldRoom, opts: MonsterConstructor) {
-		this.room = room;
+		this.$room = room;
 
 		this.type = opts.type;
 		this.x = opts.x;

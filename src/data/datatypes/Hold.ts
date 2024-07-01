@@ -11,6 +11,8 @@ import { HoldSpeech } from "./HoldSpeech";
 import { HoldVariable } from "./HoldVariable";
 
 interface HoldConstructor {
+	$holdReaderId: number;
+
 	id: number;
 	version: number;
 
@@ -56,14 +58,17 @@ export class Hold {
 	public readonly variables = new OrderedMap<number, HoldVariable>();
 	public readonly speeches = new OrderedMap<number, HoldSpeech>();
 	public readonly entrances = new OrderedMap<number, HoldEntrance>();
-	public readonly data = new OrderedMap<number, HoldData>();
+	public readonly datas = new OrderedMap<number, HoldData>();
 	public readonly characters = new OrderedMap<number, HoldCharacter>();
 	public readonly levels = new OrderedMap<number, HoldLevel>();
 	public readonly rooms = new OrderedMap<number, HoldRoom>();
 
+	public readonly $holdReaderId: number;
 	public readonly $changes = new HoldChangeList();
 
 	public constructor(options: HoldConstructor) {
+		this.$holdReaderId = options.$holdReaderId;
+
 		this.id = options.id;
 		this.version = options.version;
 		this.gidCreated = options.gidCreated;

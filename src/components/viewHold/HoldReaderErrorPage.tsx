@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import FullPageMessage from "../common/FullPageMessage";
 import { useCallback } from "react";
-import { HoldReaders } from "../../processor/HoldReaderManager";
+import { HoldReaders } from "../../processor/HoldReaders";
 
 interface Props {
 	id: number;

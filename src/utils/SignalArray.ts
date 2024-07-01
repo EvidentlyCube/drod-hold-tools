@@ -32,6 +32,10 @@ export class SignalArray<TElement> {
 		}
 	}
 
+	public contains(element: TElement) {
+		return this._array.indexOf(element) !== -1;
+	}
+
 	public push(element: TElement) {
 		this._array.push(element);
 		this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Add, elements: [element] });
@@ -54,7 +58,7 @@ export class SignalArray<TElement> {
 
 			if (predicate(element)) {
 				filteredOut.push(...this._array.splice(i, 1));
-				i--
+				i--;
 			}
 		}
 

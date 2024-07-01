@@ -1,3 +1,4 @@
+import { getMainEntranceId } from "../HoldUtils";
 import { DrodText } from "./DrodText";
 import type { Hold } from "./Hold";
 
@@ -24,6 +25,16 @@ export class HoldLevel {
 	public readonly created: number;
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean;
+
+	public get $primaryEntranceId() {
+		return getMainEntranceId(this.hold, this.id) ?? 0;
+	}
+
+	public get $entranceCoords() {
+		const { roomX, roomY } = this.hold.entrances.getOrError(this.$primaryEntranceId).$room;
+
+		return { x: roomX, y: roomY };
+	}
 
 	public constructor(hold: Hold, opts: LevelConstructor) {
 		this.hold = hold;

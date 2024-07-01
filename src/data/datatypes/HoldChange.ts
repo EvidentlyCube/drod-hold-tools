@@ -24,9 +24,6 @@ export class HoldChangeList {
 	public readonly onChange = new Signal<HoldChange>();
 
 	public loadStored(changes: HoldChange[]) {
-		console.log("Loaded changes");
-		console.log(changes);
-
 		changes.forEach(change => this.list.add(change));
 	}
 

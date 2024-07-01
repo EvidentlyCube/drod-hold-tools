@@ -8,6 +8,10 @@ class HoldReaderManager {
 
 	public holdReaders: SignalArray<HoldReader>
 
+	public get isParsing() {
+		return this._unfinishedReaders.length > 0;
+	}
+
 	public constructor() {
 		this.holdReaders = new SignalArray();
 		this._unfinishedReaders = [];

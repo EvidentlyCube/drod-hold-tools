@@ -1,5 +1,7 @@
+import { Point } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
+import { getCoordinateName } from "../Utils";
 import { DrodText } from "./DrodText";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
@@ -78,6 +80,25 @@ export class HoldRoom {
 	public readonly scrolls: HoldScroll[] = [];
 	public readonly orbs: HoldOrb[] = [];
 	public readonly exits: HoldExit[] = [];
+
+	public get $level() {
+		return this.hold.levels.getOrError(this.levelId);
+	}
+
+	public get $coordsInLevel(): Point {
+		const { x, y } = this.$level.$entranceCoords;
+
+		return {
+			x: this.roomX - x,
+			y: this.roomY - y,
+		}
+	}
+
+	public get $coordsName(): string {
+		const { x, y } = this.$coordsInLevel;
+
+		return getCoordinateName(x, y);
+	}
 
 	public constructor(hold: Hold, opts: RoomConstructor) {
 		this.hold = hold;

@@ -1,15 +1,15 @@
 import { useParams } from "react-router-dom";
-import { HoldReaders } from "../../processor/HoldReaderManager";
+import { HoldReaders } from "../../processor/HoldReaders";
 import { Hold } from "../../data/datatypes/Hold";
 
 type GetData = (hold: Hold) => string|number;
 
 const DataPoints: Record<string, GetData> = {
-	"Name": hold => hold.name.text,
-	"Description": hold => hold.descriptionMessage.text,
+	"Name": hold => hold.name.oldText,
+	"Description": hold => hold.descriptionMessage.oldText,
 	"Levels No.": hold => hold.levels.size,
 	"Rooms No.": hold => hold.rooms.size,
-	"Datas No.": hold => hold.data.size,
+	"Datas No.": hold => hold.datas.size,
 	"Character No.": hold => hold.characters.size,
 }
 

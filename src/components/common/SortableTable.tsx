@@ -188,7 +188,7 @@ function PaginationLink({selected, linkingPage: current, setPage}: PaginationLin
 			className={ selected === current ? "is-current pagination-link" : 'pagination-link' }
 			onClick={() => setPage(current)}
 		>
-			{current}
+			{current + 1}
 		</button>
 	}
 }
@@ -196,7 +196,7 @@ function PaginationLink({selected, linkingPage: current, setPage}: PaginationLin
 function paginate(page: number, total: number) {
 	const lastPage = total - 1;
 	const items: (number|string)[] = [0];
-	if (total === 1) {
+	if (total <= 1) {
 		return items;
 	}
 

@@ -25,7 +25,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Speech Message',
 				location: "<@fixme>",
-				before: speech.message.text,
+				before: speech.message.oldText,
 				after: speech.message.newText ?? ''
 			};
 		default:

@@ -10,7 +10,7 @@ export class HoldChangeListener {
 	}
 
 	private registerSpeechMessageChange(speech: HoldSpeech) {
-		const { hold, id, message } = speech;
+		const { $hold: hold, id, message } = speech;
 
 		const change = hold.$changes.create({
 			type: HoldChangeType.SpeechMessage,
@@ -22,7 +22,7 @@ export class HoldChangeListener {
 		message.onNewTextChange.add(newText => {
 			change.value = newText;
 
-			if (newText === undefined || newText === message.text) {
+			if (newText === undefined || newText === message.oldText) {
 				hold.$changes.del(change)
 			} else {
 				hold.$changes.add(change)

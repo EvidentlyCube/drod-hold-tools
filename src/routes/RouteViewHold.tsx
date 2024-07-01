@@ -1,6 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 import HoldReaderView from "../components/viewHold/HoldReaderView";
-import { HoldReaders } from "../processor/HoldReaderManager";
+import { HoldReaders } from "../processor/HoldReaders";
 
 
 export default function RouteViewHold() {

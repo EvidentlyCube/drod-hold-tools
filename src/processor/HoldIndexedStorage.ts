@@ -4,7 +4,7 @@ import { assertNotNull } from "../utils/Asserts";
 import { SignalArrayOperation, SignalArrayOperator } from "../utils/SignalArray";
 import { SignalValue } from "../utils/SignalValue";
 import { HoldReader } from "./HoldReader";
-import { HoldReaders } from "./HoldReaderManager";
+import { HoldReaders } from "./HoldReaders";
 
 const DEBOUNCE_DURATION = 2000;
 
@@ -15,7 +15,7 @@ class HoldIndexedStorageClass {
 	private _dbOpenRequest: IDBOpenDBRequest;
 	private _db?: IDBDatabase;
 
-	private _storedHoldIds = new Set<number>();
+	private _storedHoldReaderIds = new Set<number>();
 	private _loadedHoldToChanges = new Map<number, HoldChange[]>();
 
 	private _holdChangesSaveQueue = new Set<Hold>();
@@ -29,7 +29,9 @@ class HoldIndexedStorageClass {
 	public isInitializing = new SignalValue(true);
 	public isBusy = new SignalValue(false);
 
-	private _saveLock = false;
+	private _changesSaveLock = false;
+	private _saveHoldCounter = 0;
+	private _deleteCounter = 0;
 
 	public constructor() {
 		this._dbOpenRequest = window.indexedDB.open('holds', 3);
@@ -44,17 +46,21 @@ class HoldIndexedStorageClass {
 		HoldReaders.holdReaders.onChange.add(this.onHoldListChange.bind(this));
 	}
 
-	public getChangesForHold(holdId: number): HoldChange[] {
-		return this._loadedHoldToChanges.get(holdId) ?? [];
+	public getChangesForHold(holdReaderId: number): HoldChange[] {
+		return this._loadedHoldToChanges.get(holdReaderId) ?? [];
 	}
 
 	private update() {
-		this.isBusy.value = this._saveLock || this._holdChangesSaveQueue.size > 0;
+		this.isBusy.value = this._deleteCounter > 0
+			|| this._saveHoldCounter > 0
+			|| HoldReaders.isParsing
+			|| this._changesSaveLock
+			|| this._holdChangesSaveQueue.size > 0;
 
 		if (
 			this._holdChangesSaveQueue.size > 0
 			&& Date.now() > this._saveAfterTimestamp
-			&& !this._saveLock
+			&& !this._changesSaveLock
 		) {
 			this.storeHoldChanges(Array.from(this._holdChangesSaveQueue.values()));
 		}
@@ -65,11 +71,45 @@ class HoldIndexedStorageClass {
 			for (const holdReader of op.elements) {
 				holdReader.onParsed.add(this.registerHoldForChanges.bind(this));
 
-				if (this._storedHoldIds.has(holdReader.id)) {
+				if (this._storedHoldReaderIds.has(holdReader.id)) {
 					continue;
 				}
 
 				holdReader.onParsed.add(this.storeHoldXml.bind(this));
+			}
+		} else if (op.operator === SignalArrayOperator.Remove) {
+			for (const holdReader of op.elements) {
+				this._deleteCounter += 2;
+
+				const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
+				const holdsStoreRequest = holdsStore.delete(holdReader.id);
+
+				holdsStoreRequest.onsuccess = e => {
+					this._deleteCounter--;
+				}
+				holdsStoreRequest.onerror = e => {
+					this._deleteCounter--;
+					console.log(e);
+					console.log(holdsStoreRequest.error);
+				}
+
+				const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
+				const changesStoreRequest = changesStore.delete(holdReader.id);
+
+				changesStoreRequest.onsuccess = e => {
+					this._deleteCounter--;
+				}
+				changesStoreRequest.onerror = e => {
+					this._deleteCounter--;
+					console.log(e);
+					console.log(changesStoreRequest.error);
+				}
+
+				this._storedHoldReaderIds.delete(holdReader.id);
+				this._loadedHoldToChanges.delete(holdReader.id);
+				if (holdReader.sharedState.hold) {
+					this._holdChangesSaveQueue.delete(holdReader.sharedState.hold);
+				}
 			}
 		}
 	}
@@ -96,35 +136,45 @@ class HoldIndexedStorageClass {
 			return;
 		}
 
-		const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
-		const holdsStoreRequest = holdsStore.add({ holdId: holdReader.id, xmlText });
+		this._saveHoldCounter += 2;
 
+		const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
+		const holdsStoreRequest = holdsStore.put({ holdId: holdReader.id, xmlText });
+
+		holdsStoreRequest.onsuccess = e => {
+			this._saveHoldCounter--;
+		}
 		holdsStoreRequest.onerror = e => {
+			this._saveHoldCounter--;
 			console.log(e);
 			console.log(holdsStoreRequest.error);
 		}
 
 		const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
-		const changesStoreRequest = changesStore.add({ holdId: holdReader.id, changes: [] });
+		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changes: [] });
 
+		changesStoreRequest.onsuccess = e => {
+			this._saveHoldCounter--;
+		}
 		changesStoreRequest.onerror = e => {
+			this._saveHoldCounter--;
 			console.log(e);
 			console.log(changesStoreRequest.error);
 		}
 	}
 
 	private storeHoldChanges(holds: Hold[]) {
-		this._saveLock = true;
+		this._changesSaveLock = true;
 		this._holdChangesSaveQueue.clear();
 
-		const rows = holds.map(hold => ({holdId: hold.id, changes: hold.$changes.list.values() }));
+		const rows = holds.map(hold => ({ holdId: hold.$holdReaderId, changes: hold.$changes.list.values() }));
 
 		let remaining = rows.length;
 		const popRemaining = () => {
 			remaining--;
 
 			if (remaining <= 0) {
-				this._saveLock = false;
+				this._changesSaveLock = false;
 			}
 		}
 		for (const row of rows) {
@@ -183,7 +233,7 @@ class HoldIndexedStorageClass {
 			}
 
 			const { holdId, xmlText } = cursor.value;
-			this._storedHoldIds.add(holdId);
+			this._storedHoldReaderIds.add(holdId);
 			HoldReaders.readHoldXmlString(xmlText, holdId);
 
 			cursor.continue();
