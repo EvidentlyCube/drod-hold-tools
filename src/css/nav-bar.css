@@ -3,7 +3,7 @@
 	cursor: pointer;
 
 	transition-duration: var(--bulma-duration);
-  	transition-property: background-color, border-color, color;
+	transition-property: background-color, border-color, color;
 	background-color: hsla(var(--bulma-navbar-h), var(--bulma-navbar-s), calc(var(--bulma-navbar-item-background-l) + var(--bulma-navbar-item-background-l-delta)), var(--bulma-navbar-item-background-a));
 }
 
@@ -25,4 +25,35 @@
 
 .navbar .navbar-item.active {
 	background: hsl(198, 100%, 60%);
+}
+
+@keyframes save-swing {
+	25% {
+		transform: rotate3d(0, 0, 1, 15deg);
+	}
+
+	50% {
+		transform: rotate3d(0, 0, 1, 0);
+	}
+
+	75% {
+		transform: rotate3d(0, 0, 1, -15deg);
+	}
+
+	to {
+		transform: rotate3d(0, 0, 1, 0);
+	}
+}
+
+.save-icon.busy {
+	transform-origin: center center;
+	animation-name: save-swing;
+	animation-iteration-count: infinite;
+	animation-duration: 1s;
+	opacity: 1;
+}
+
+.save-icon {
+	transition: opacity 1s;
+	opacity: 0;
 }

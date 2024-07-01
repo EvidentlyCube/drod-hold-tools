@@ -1,8 +1,9 @@
+import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
-import { diffXml } from "../utils/DiffXml";
-import { holdToXml } from "./HoldToXml";
+import { applyHoldChanges } from "./applyHoldChanges";
 import { DrodText } from "./datatypes/DrodText";
 import { Hold } from "./datatypes/Hold";
+import { HoldChangeListener } from "./datatypes/HoldChangeListener";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldData } from "./datatypes/HoldData";
 import { HoldEntrance } from "./datatypes/HoldEntrance";
@@ -13,7 +14,7 @@ import { HoldOrb, HoldRoom } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 
-export async function holdXmlToObject(xml: Document, log: (log: string) => void): Promise<Hold> {
+export async function xmlToHold(xml: Document, log: (log: string) => void): Promise<Hold> {
 	const drodXml = xml.querySelector('drod');
 	const holdXml = xml.querySelector('Holds');
 
@@ -270,11 +271,16 @@ export async function holdXmlToObject(xml: Document, log: (log: string) => void)
 		await sleep();
 	}
 
-	try {
-		diffXml(xml, holdToXml(hold));
-	} catch (e) {
-		console.log(e);
+	// @FIXME - Load stored changes
+
+	while (HoldIndexedStorage.isInitializing.value) {
+		await sleep(true);
 	}
+
+	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.id));
+	applyHoldChanges(hold);
+
+	new HoldChangeListener().register(hold);
 
 	return hold;
 }
@@ -304,11 +310,16 @@ function intU(node: Element, attribute: string) {
 }
 
 let lastSleep = 0;
-async function sleep() {
-	if (Date.now() > lastSleep + 30) {
-		return new Promise<void>(resolve => setTimeout(() => {
-			lastSleep = Date.now();
+async function sleep(forced = false) {
+	return new Promise<void>(resolve => {
+		if (Date.now() > lastSleep + 16 || forced) {
+			setTimeout(() => {
+				lastSleep = Date.now();
+				resolve();
+			}, 100)
+		} else {
 			resolve();
-		}, 30));
-	}
+		}
+	})
+
 }

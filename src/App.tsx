@@ -5,6 +5,8 @@ import RouteHome from "./routes/RouteHome";
 import RouteViewHold from "./routes/RouteViewHold";
 import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
 import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeech";
+import RouteViewHoldChanges from "./routes/viewHold/RouteViewHoldChanges";
+import NavBarEnd from "./components/common/NavBarEnd";
 
 function App() {
 	return (
@@ -22,15 +24,14 @@ function App() {
 						</NavLink>
 						<NavHoldsList />
 					</div>
-					<div className="navbar-end">
-						<AddHoldNavButton />
-					</div>
+					<NavBarEnd />
 				</div>
 				<Routes>
 					<Route path="/" element={<RouteHome />} />
 					<Route path="/hold/:holdReaderId" element={<RouteViewHold />}>
 						<Route path="" element={<RouteViewHoldSummary />} />
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
+						<Route path="changes" element={<RouteViewHoldChanges />} />
 					</Route>
 				</Routes>
 			</BrowserRouter>

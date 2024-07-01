@@ -1,11 +1,12 @@
 import { assertNotNull } from "../utils/Asserts";
-import { SignalString } from "../utils/SignalString";
 import { AsyncUnzlib, FlateError } from 'fflate';
 import { truncate } from "../utils/StringUtils";
 import { SignalArray } from "../utils/SignalArray";
-import { holdXmlToObject } from "../data/HoldXmlToObject";
+import { xmlToHold } from "../data/xmlToHold";
 import { Signal } from "../utils/Signals";
 import { Hold } from "../data/datatypes/Hold";
+import { parseXml } from "../utils/XmlParser";
+import { SignalValue } from "../utils/SignalValue";
 
 interface HoldReaderState {
 	file?: File;
@@ -32,7 +33,7 @@ export class HoldReader {
 	private _currentStepIndex = 0;
 
 	public logs = new SignalArray<string>();
-	public name = new SignalString();
+	public name = new SignalValue<string>("");
 
 	public onParsed = new Signal<HoldReader>();
 
@@ -297,16 +298,32 @@ function getHoldBinaryToTextStep(reader: HoldReader) {
 }
 
 function getStringXmlToObjectStep(reader: HoldReader) {
+	let isFinished = false;
+	let error: Error | undefined;
+
 	return [
 		() => {
 			const { holdXmlText } = reader.sharedState;
 
 			assertNotNull(holdXmlText, "String to XML error - missing text data");
 
-			reader.logs.push('Reading XML');
 
-			const parser = new DOMParser();
-			reader.sharedState.holdXml = parser.parseFromString(holdXmlText, "text/xml");
+			reader.logs.push('Parsing XML');
+			parseXml(holdXmlText)
+				.then(xml => {
+					reader.sharedState.holdXml = xml;
+					isFinished = true;
+				})
+				.catch(e => {
+					error = e;
+					console.error(e);
+				});
+		},
+		() => isFinished,
+		() => {
+			if (error) {
+				throw error;
+			}
 		}
 	]
 }
@@ -323,7 +340,7 @@ function getXmlToData(reader: HoldReader) {
 
 			reader.logs.push('Parsing XML');
 
-			holdXmlToObject(holdXml, log => reader.logs.push(log))
+			xmlToHold(holdXml, log => reader.logs.push(log))
 				.then(hold => {
 					reader.sharedState.hold = hold;
 					isFinished = true;

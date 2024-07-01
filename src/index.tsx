@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { IndexedDbStore } from './processor/IndexedDbStore';
+import { HoldIndexedStorage } from './processor/HoldIndexedStorage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -14,6 +14,6 @@ root.render(
   </React.StrictMode>
 );
 
-IndexedDbStore.register();
+HoldIndexedStorage.register();
 
 reportWebVitals();

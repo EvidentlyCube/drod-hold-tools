@@ -1,5 +1,3 @@
-import { Signal } from "./Signals";
-
 export class OrderedMap<TKey, TValue> {
 	private readonly _map = new Map<TKey, TValue>();
 	private readonly _orderedKeys: TKey[] = [];
@@ -21,5 +19,11 @@ export class OrderedMap<TKey, TValue> {
 
 	public values(): TValue[] {
 		return this._orderedKeys.map(key => this._map.get(key)!);
+	}
+
+	public forEach(predicate: (value: TValue) => void) {
+		for (const item of this._map.values()) {
+			predicate(item);
+		}
 	}
 }

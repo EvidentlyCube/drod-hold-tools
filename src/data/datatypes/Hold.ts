@@ -1,5 +1,7 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { DrodText } from "./DrodText";
+import { HoldChangeList } from "./HoldChange";
+import { HoldChangeListener } from "./HoldChangeListener";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -32,6 +34,7 @@ interface HoldConstructor {
 	lastWorldMapId: number;
 	startingLevelId: number;
 }
+
 export class Hold {
 	public readonly id: number;
 	public readonly version: number;
@@ -59,6 +62,8 @@ export class Hold {
 	public readonly levels = new OrderedMap<number, HoldLevel>();
 	public readonly rooms = new OrderedMap<number, HoldRoom>();
 
+	public readonly $changes = new HoldChangeList();
+
 	public constructor(options: HoldConstructor) {
 		this.id = options.id;
 		this.version = options.version;
@@ -77,6 +82,5 @@ export class Hold {
 		this.lastWorldMapId = options.lastWorldMapId;
 		this.startingLevelId = options.startingLevelId;
 	}
-
 }
 

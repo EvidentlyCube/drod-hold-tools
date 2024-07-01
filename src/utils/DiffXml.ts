@@ -7,8 +7,8 @@ export function diffXml(left: string|XMLDocument, right: string|XMLDocument) {
 
 	compareNode(left, right, "ROOT");
 
-	const leftString = new XMLSerializer().serializeToString(left);
-	const rightString = new XMLSerializer().serializeToString(right);
+	const leftString = new XMLSerializer().serializeToString(left).replace(/<\?.+?\?>/, '').replace(/\r|\n/g, "");
+	const rightString = new XMLSerializer().serializeToString(right).replace(/<\?.+?\?>/, '').replace(/\r|\n/g, "");
 
 	for (let i = 0; i < Math.max(leftString.length, rightString.length); i++) {
 		if (leftString.charAt(i) !== rightString.charAt(i)) {

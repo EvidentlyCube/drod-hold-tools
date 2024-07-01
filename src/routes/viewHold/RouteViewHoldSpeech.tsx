@@ -1,28 +1,28 @@
 import { ChangeEvent, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SortableTable, { Column } from "../../components/common/SortableTable";
-import { useSignalNullable } from "../../hooks/useSignalNullable";
-import { HoldReaders } from "../../processor/HoldReaderManager";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
+import { useSignalDrodText } from "../../hooks/useSignalDrodText";
+import { HoldReaders } from "../../processor/HoldReaderManager";
 
 function EditCell({speech}: {speech: HoldSpeech}) {
-	const newText = useSignalNullable(speech.message.newText);
+	const newText = useSignalDrodText(speech.message);
 
 	const toggleText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		if (newText === undefined) {
-			speech.message.newText.value = speech.message.text;
+			speech.message.newText = speech.message.text;
 		} else {
-			speech.message.newText.value = undefined;
+			speech.message.newText = undefined;
 		}
 	}, [speech, newText]);
 
 	return <input type="checkbox" checked={newText !== undefined} onChange={toggleText} />;
 }
 function NewTextCell({speech}: {speech: HoldSpeech}) {
-	const newText = useSignalNullable(speech.message.newText);
+	const newText = useSignalDrodText(speech.message);
 
 	const typeText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		speech.message.newText.value = e.target.value;
+		speech.message.newText = e.target.value;
 	}, [speech]);
 
 	return <input className="input" type="text" value={newText ?? ""} onInput={typeText} disabled={newText === undefined} />;
@@ -91,13 +91,13 @@ const Columns: Column<HoldSpeech>[] = [
 		widthPercent: 35,
 		render: speech => <NewTextCell speech={speech} />,
 		sort: (isAsc, l, r) => {
-			if (l.message.newText.value && r.message.newText.value) {
+			if (l.message.newText && r.message.newText) {
 				return isAsc
-					? l.message.newText.value.localeCompare(r.message.newText.value)
-					: r.message.newText.value.localeCompare(l.message.newText.value)
-			} else if (l.message.newText.value) {
+					? l.message.newText.localeCompare(r.message.newText)
+					: r.message.newText.localeCompare(l.message.newText)
+			} else if (l.message.newText) {
 				return isAsc ? 1 : -1;
-			} else if (r.message.newText.value) {
+			} else if (r.message.newText) {
 				return isAsc ? -1 : 1;
 			} else {
 				return 0;
@@ -106,12 +106,11 @@ const Columns: Column<HoldSpeech>[] = [
 	}
 ];
 
-
 export default function RouteViewHoldSpeeches() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 
-	const speeches = Object.values(hold.speeches);
+	const speeches = hold.speeches.values();
 
 	return <SortableTable
 		className="table is-fullwidth is-hoverable is-striped is-middle"
