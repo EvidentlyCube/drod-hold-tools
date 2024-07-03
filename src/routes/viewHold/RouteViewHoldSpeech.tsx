@@ -1,10 +1,12 @@
 import { ChangeEvent, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import SortableTable, { Column } from "../../components/common/SortableTable";
+import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { useSignalDrodText } from "../../hooks/useSignalDrodText";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
+import { sortCompareNumber, sortCompareRefs, sortCompareString } from "../../utils/SortUtils";
+import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
 
 function EditCell({speech}: {speech: HoldSpeech}) {
 	const newText = useSignalDrodText(speech.message);
@@ -29,11 +31,13 @@ function NewTextCell({speech}: {speech: HoldSpeech}) {
 	return <input className="input" type="text" value={newText ?? ""} onInput={typeText} disabled={newText === undefined} />;
 }
 
-const Columns: Column<HoldSpeech>[] = [
+const Columns: SortableTableColumn<HoldSpeech>[] = [
 	{
 		id: 'id',
 		displayName: 'ID',
 		widthPercent: 5,
+		canHide: true,
+
 		render: speech => speech.id.toString(),
 		sort: (isAsc, left, right) => isAsc ? left.id - right.id : right.id - left.id
 	},
@@ -41,14 +45,16 @@ const Columns: Column<HoldSpeech>[] = [
 		id: 'location',
 		displayName: 'Location',
 		widthPercent: 15,
+		canHide: true,
 
-		render: speech => speech.$locationName,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$locationName, r.$locationName)
+		render: speech => <HoldRefView holdRef={speech.$location} /> ,
+		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.$location, r.$location)
 	},
 	{
 		id: 'mood',
 		displayName: 'Mood',
 		widthPercent: 5,
+		canHide: true,
 
 		render: speech => speech.$mood,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood)
@@ -57,6 +63,7 @@ const Columns: Column<HoldSpeech>[] = [
 		id: 'speaker',
 		displayName: 'Speaker',
 		widthPercent: 5,
+		canHide: true,
 
 		render: speech => speech.$speaker,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$speaker, r.$speaker)
@@ -65,6 +72,7 @@ const Columns: Column<HoldSpeech>[] = [
 		id: 'data',
 		displayName: 'Data',
 		widthPercent: 5,
+		canHide: true,
 
 		render: speech => speech.dataId ?? "<none>",
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.dataId ?? 0, r.dataId ?? 0)
@@ -109,9 +117,11 @@ export default function RouteViewHoldSpeeches() {
 
 	const speeches = hold.speeches.values();
 
-	return <SortableTable
-		className="table is-fullwidth is-hoverable is-striped is-middle"
-		columns={Columns}
-		rows={speeches}
-		pageSize={25} />
+	return <>
+		<SortableTable
+			className="table is-fullwidth is-hoverable is-striped is-middle"
+			columns={Columns}
+			rows={speeches}
+			pageSize={25} />
+	</>
 }

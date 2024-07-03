@@ -282,7 +282,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			const {speechId} = commands[commandIndex];
 			if (speechId) {
 				hold.speeches.getOrError(speechId).$location = {
-					source: 'character',
+					hold,
+					model: 'charCommand',
 					characterId: character.id,
 					commandIndex
 				}
@@ -302,7 +303,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 				const {speechId} = commands[commandIndex];
 				if (speechId) {
 					hold.speeches.getOrError(speechId).$location = {
-						source: 'monster',
+						hold,
+						model: 'monsterCommand',
 						roomId: room.id,
 						monsterIndex,
 						commandIndex

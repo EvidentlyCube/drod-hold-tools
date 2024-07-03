@@ -22,3 +22,7 @@ export function diffArrays<T extends (string|number)>(left: T[], right: T[]): T[
 
 	return Array.from(diff);
 }
+
+export function copyWithout<T>(arr: T[], ...elements:T[]): T[] {
+	return arr.filter(item => elements.includes(item));
+}

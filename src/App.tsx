@@ -11,7 +11,7 @@ function App() {
 	return (
 		<>
 			<BrowserRouter>
-				<div className="navbar is-info" role="navigation">
+				<div className="navbar is-info primary-navbar" role="navigation">
 					<div className="navbar-brand">
 						<div className="navbar-item">
 							<strong>DROD Hold Tools</strong>

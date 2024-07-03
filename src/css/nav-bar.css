@@ -23,8 +23,12 @@
 	opacity: 0;
 }
 
-.navbar .navbar-item.active {
+.navbar.is-info .navbar-item.active {
 	background: hsl(198, 100%, 60%);
+}
+
+.navbar.is-success .navbar-item.active {
+	background: hsl(153, 53%, 43%)
 }
 
 @keyframes save-swing {

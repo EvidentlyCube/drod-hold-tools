@@ -1,5 +1,4 @@
 import { bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
-import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
 import { Hold } from "./datatypes/Hold";
 

@@ -1,0 +1,15 @@
+i.fa-icon {
+	font-style: normal;
+}
+
+.icon-unknown-ref {
+	color: orange;
+	border-radius: 20px;
+	font-style: normal;
+	font-weight: bold;
+	border: 3px solid orange;
+}
+
+.icon-monster-ref {
+	color: gray;
+}

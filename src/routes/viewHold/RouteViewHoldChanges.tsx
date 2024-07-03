@@ -1,13 +1,14 @@
 import { useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import SortableTable, { Column } from "../../components/common/SortableTable";
+import SortableTable from "../../components/common/sortableTable/SortableTable";
+import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
 import { useSignalArray } from "../../hooks/useSignalArray";
 import { HoldExporter } from "../../processor/HoldExporter";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
 
 
-const Columns: Column<ChangeViewItem>[] = [
+const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
 		id: 'type',
 		displayName: 'Type',
@@ -18,18 +19,21 @@ const Columns: Column<ChangeViewItem>[] = [
 		id: 'location',
 		displayName: 'Location',
 		widthPercent: 10,
+		canHide: true,
 		render: change => change.location
 	},
 	{
 		id: 'before',
 		displayName: 'Before',
 		widthPercent: 10,
+		canHide: true,
 		render: change => change.before
 	},
 	{
 		id: 'after',
 		displayName: 'After',
 		widthPercent: 10,
+		canHide: true,
 		render: change => change.after
 	},
 ];
