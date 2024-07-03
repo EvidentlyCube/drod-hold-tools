@@ -73,14 +73,6 @@ class XmlBufferReader {
 		this._pos = 0;
 	}
 
-	public log() {
-		console.log(this._pos);
-		console.log(this._xml.substring(
-			Math.max(0, this._pos - 40),
-			Math.min(this._xml.length, this._pos + 40),
-		));
-	}
-
 	public consumeHeader() {
 		const match = this._xml.substring(this._pos).match(/^<\?(.+?)\s+(.+?)\s*\?>/);
 

@@ -7,9 +7,23 @@ export function sortCompareString(isAsc: boolean, left: string, right: string) {
 		: right.localeCompare(left);
 }
 
+export function sortCompareStringOptional(isAsc: boolean, left: string | undefined, right: string | undefined) {
+	if (!left || !right) {
+		return sortCompareWithUndefined(isAsc, left, right);
+	}
+
+	return isAsc
+		? left.localeCompare(right)
+		: right.localeCompare(left);
+}
+
 export function sortCompareWithUndefined<T>(isAsc: boolean, left: T|undefined, right: T|undefined) {
-	if (!left && !right) {
+	if (left && right) {
 		return 0;
+
+	} else if (!left && !right) {
+		return 0;
+
 	} else if (!left) {
 		return isAsc ? 1 : -1;
 	} else {

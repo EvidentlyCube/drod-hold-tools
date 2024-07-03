@@ -28,7 +28,7 @@ export default function SortableTableColumnOptions(props: Props) {
 				</button>
 			</div>
 			<div className="dropdown-menu" id="dropdown-menu4" role="menu">
-				<div className="dropdown-content">
+				<div className="dropdown-content has-text-left">
 					<div className="dropdown-item">
 						<strong>Visible columns:</strong>
 					</div>
@@ -40,9 +40,6 @@ export default function SortableTableColumnOptions(props: Props) {
 							toggleHiddenColumn={toggleHiddenColumn}
 						/>
 					))}
-					<label className="checkbox dropdown-item">
-						<input type="checkbox" /> Remember me
-					</label>
 				</div>
 			</div>
 		</div>
@@ -64,7 +61,7 @@ function HideColumn(props: HideColumnProps) {
 			<input
 				type="checkbox"
 				checked={!isHidden}
-				onClick={() => toggleHiddenColumn(column.id)}
+				onChange={() => toggleHiddenColumn(column.id)}
 			/>{" "}
 			{column.displayName}
 		</label>

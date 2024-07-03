@@ -1,11 +1,12 @@
 import { ReactElement } from "react";
 import { HoldChange, HoldChangeType } from "../../data/datatypes/HoldChange";
 import { Hold } from "../../data/datatypes/Hold";
+import { HoldRef } from "../../data/references/HoldReference";
 
 export interface ChangeViewItem {
 	id: string;
 	type: string;
-	location: string;
+	location?: HoldRef;
 	before: ReactElement[] | ReactElement | string | number;
 	after: ReactElement[] | ReactElement | string | number;
 }
@@ -24,7 +25,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Speech Message',
-				location: "<@fixme>",
+				location: speech.$location,
 				before: speech.message.oldText,
 				after: speech.message.newText ?? ''
 			};
@@ -38,7 +39,6 @@ function invalid(id: string, type: string, error: string): ChangeViewItem {
 	return {
 		id,
 		type,
-		location: "# ERROR #",
 		before: "# ERROR #",
 		after: error
 	}

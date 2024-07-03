@@ -6,12 +6,14 @@ import { useSignalArray } from "../../hooks/useSignalArray";
 import { HoldExporter } from "../../processor/HoldExporter";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
+import HoldRefView from "../../components/viewHold/HoldRefVIew";
 
 const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
 		id: 'type',
 		displayName: 'Type',
 		widthPercent: 10,
+		canHide: true,
 		render: change => change.type
 	},
 	{
@@ -19,7 +21,7 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 		displayName: 'Location',
 		widthPercent: 10,
 		canHide: true,
-		render: change => change.location
+		render: change => <HoldRefView holdRef={change.location} />
 	},
 	{
 		id: 'before',
@@ -57,13 +59,11 @@ export default function RouteViewHoldChanges() {
 
 	}, [hold, navigate]);
 
-	console.log(isExporting);
-
 	const changes = hold.$changes.list.values().map(change => changeToViewItem(change, hold));
 
 	return <>
-	<div className="columns">
-		<div className="column has-text-centered is-flex is-justify-content-space-around">
+		<div className="buttons section p-4 mb-0">
+			<strong>Actions:</strong>
 			<button
 				className={isExporting ? "button is-primary is-loading" : "button is-primary"}
 				onClick={doExport}
@@ -73,7 +73,6 @@ export default function RouteViewHoldChanges() {
 				onClick={doDelete}
 			>Delete</button>
 		</div>
-	</div>
 		<SortableTable
 			tableId="review-hold-changes"
 			className="table is-fullwidth is-hoverable is-striped is-middle"

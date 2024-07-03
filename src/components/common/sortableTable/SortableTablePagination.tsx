@@ -29,7 +29,7 @@ export function SortableTablePagination(props: PaginationProps) {
 	const pageNumbers = getPaginationPageNumbers(currentPage, pages);
 
 	return (
-		<nav className="pagination is-centered">
+		<nav className="pagination">
 			<SortableTableColumnOptions
 				columns={columns}
 				hiddenColumns={hiddenColumns}
