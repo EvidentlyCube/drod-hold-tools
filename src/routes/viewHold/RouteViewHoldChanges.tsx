@@ -7,7 +7,6 @@ import { HoldExporter } from "../../processor/HoldExporter";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
 
-
 const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
 		id: 'type',
@@ -76,6 +75,7 @@ export default function RouteViewHoldChanges() {
 		</div>
 	</div>
 		<SortableTable
+			tableId="review-hold-changes"
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={changes}

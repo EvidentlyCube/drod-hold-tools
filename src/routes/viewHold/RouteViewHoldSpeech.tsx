@@ -119,6 +119,7 @@ export default function RouteViewHoldSpeeches() {
 
 	return <>
 		<SortableTable
+			tableId="speeches"
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={speeches}

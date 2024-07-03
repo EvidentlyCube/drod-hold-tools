@@ -7,16 +7,17 @@ import useSortableTableHiddenColumns from "./useSortableTableHiddenColumns";
 
 
 interface Props<TData extends SortableTableDataWithId> {
+	tableId: string;
 	columns: SortableTableColumn<TData>[];
 	className?: string;
 	rows: TData[];
 	pageSize: number;
 }
 export default function SortableTable<TData extends SortableTableDataWithId>(props: Props<TData>) {
-	const { columns, rows, className, pageSize } = props;
+	const { tableId, columns, rows, className, pageSize } = props;
 
 	const { sortBy, sortAsc, onSort } = useSortableTableSort(columns[0].id ?? "id");
-	const { filteredColumns, hiddenColumns, toggleHiddenColumn } = useSortableTableHiddenColumns(columns);
+	const { filteredColumns, hiddenColumns, toggleHiddenColumn } = useSortableTableHiddenColumns(columns, tableId);
 	const [page, setPage] = useState(0);
 
 	const sortedRows = useMemo(() => {
