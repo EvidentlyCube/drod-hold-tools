@@ -15,6 +15,7 @@ export default function HoldRefView({ holdRef }: Props) {
 	switch (holdRef.model) {
 		case "charCommand":
 			return <CharacterCommand r={ holdRef } />;
+
 		case "monsterCommand":
 			return <MonsterCommand r={ holdRef } />;
 

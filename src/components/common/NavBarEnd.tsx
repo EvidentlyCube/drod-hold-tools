@@ -8,8 +8,15 @@ export default function NavBarEnd() {
 	return (
 		<div className="navbar-end">
 			<div className="navbar-item">
-				<i className={isBusy ? "fa-solid fa-floppy-disk save-icon busy" : "fa-solid fa-floppy-disk save-icon"}/>
+				<i
+					className={
+						isBusy
+							? "fa-solid fa-floppy-disk save-icon busy"
+							: "fa-solid fa-floppy-disk save-icon"
+					}
+				/>
 			</div>
+
 			<AddHoldNavButton />
 		</div>
 	);

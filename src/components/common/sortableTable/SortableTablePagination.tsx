@@ -15,7 +15,7 @@ interface PaginationProps {
 export function SortableTablePagination(props: PaginationProps) {
 	const { totalRecords, pageSize, currentPage, setPage, columns, hiddenColumns, toggleHiddenColumn } = props;
 
-	const pages = Math.ceil(totalRecords / pageSize);
+	const pages = Math.max(1, Math.ceil(totalRecords / pageSize));
 	const isFirst = currentPage === 0;
 	const isLast = currentPage === pages - 1;
 

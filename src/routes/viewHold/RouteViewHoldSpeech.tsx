@@ -1,12 +1,15 @@
 import { ChangeEvent, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
+import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import DataRefView from "../../components/viewHold/DataRefView";
+import HoldRefView from "../../components/viewHold/HoldRefVIew";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
+import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
 import { useSignalDrodText } from "../../hooks/useSignalDrodText";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { sortCompareNumber, sortCompareRefs, sortCompareString, sortCompareWithUndefined } from "../../utils/SortUtils";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
-import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import { filterString, sortCompareRefs, sortCompareString, sortCompareWithUndefined, sortData } from "../../utils/SortUtils";
+import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 
 function EditCell({speech}: {speech: HoldSpeech}) {
 	const [, newText] = useSignalDrodText(speech.message);
@@ -47,7 +50,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		canHide: true,
 
 		render: speech => speech.id.toString(),
-		sort: (isAsc, left, right) => isAsc ? left.id - right.id : right.id - left.id
+		sort: (isAsc, left, right) => isAsc ? left.id - right.id : right.id - left.id,
+		filter: (speech, filter) => filterString(speech.id.toString(), filter),
 	},
 	{
 		id: 'location',
@@ -56,7 +60,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		canHide: true,
 
 		render: speech => <HoldRefView holdRef={speech.$location} /> ,
-		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.$location, r.$location)
+		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.$location, r.$location),
+		filter: (speech, filter) => filterString(holdRefToSortableString(speech.$location), filter),
 	},
 	{
 		id: 'mood',
@@ -65,7 +70,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		canHide: true,
 
 		render: speech => speech.$mood,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood),
+		filter: (speech, filter) => filterString(speech.$mood, filter),
 	},
 	{
 		id: 'speaker',
@@ -74,7 +80,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		canHide: true,
 
 		render: speech => speech.$speaker,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$speaker, r.$speaker)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$speaker, r.$speaker),
+		filter: (speech, filter) => filterString(speech.$speaker, filter),
 	},
 	{
 		id: 'data',
@@ -82,8 +89,11 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		widthPercent: 5,
 		canHide: true,
 
-		render: speech => speech.dataId ?? "<none>",
-		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.dataId ?? 0, r.dataId ?? 0)
+		filterOptions: { optgroups: getDataFormatFilterOptions() },
+
+		render: speech => <DataRefView hold={speech.$hold} dataId={speech.dataId} />,
+		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
+		filter: (speech, filter) => filterDataFormat(speech.$data?.format, filter)
 	},
 	{
 		id: 'edit',
@@ -97,7 +107,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		displayName: 'Text',
 		widthPercent: 30,
 		render: speech => <NewTextCell speech={speech} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalText, r.message.finalText)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalText, r.message.finalText),
+		filter: (speech, filter) => filterString(speech.message.finalText, filter),
 	}
 ];
 

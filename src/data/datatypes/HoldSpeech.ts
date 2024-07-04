@@ -2,6 +2,7 @@ import { HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/Ho
 import { getCharacterName, getSpeakerMood } from "../Utils";
 import { DrodText } from "./DrodText";
 import type { Hold } from "./Hold";
+import { HoldData } from "./HoldData";
 
 interface SpeechConstructor {
 	id: number;
@@ -29,6 +30,10 @@ export class HoldSpeech {
 
 	public get $mood() :string {
 		return getSpeakerMood(this.mood);
+	}
+
+	public get $data(): HoldData | undefined {
+		return this.dataId ? this.$hold.datas.get(this.dataId) : undefined;
 	}
 
 	public constructor(hold: Hold, opts: SpeechConstructor) {

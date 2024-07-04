@@ -1,5 +1,8 @@
+import { getFormatName } from "../data/Utils";
+import { HoldData } from "../data/datatypes/HoldData";
 import { HoldRef } from "../data/references/HoldReference";
 import { holdRefToSortableString } from "../data/references/holdRefToSortableString";
+import { escapeFilterToRegex } from "./StringUtils";
 
 export function sortCompareString(isAsc: boolean, left: string, right: string) {
 	return isAsc
@@ -47,4 +50,35 @@ export function sortCompareRefs(isAsc: boolean, left?: HoldRef, right?: HoldRef)
 	}
 
 	return sortCompareString(isAsc, holdRefToSortableString(left), holdRefToSortableString(right));
+}
+
+export function sortData(isAsc: boolean, left?: HoldData, right?: HoldData) {
+	if (!left || !right) {
+		return sortCompareWithUndefined(isAsc, left, right);
+	}
+
+	return sortCompareString(isAsc, getFormatName(left.format), getFormatName(right.format))
+		|| sortCompareString(isAsc, left.name.finalText, right.name.finalText);
+}
+
+
+let cacheClearTimeout: undefined | number;
+const filterStringCache = new Map<string, RegExp>();
+
+export function filterString(toFilter: string, filter: string): boolean {
+	let regex = filterStringCache.get(filter);
+	if (!regex) {
+		regex = new RegExp(escapeFilterToRegex(filter), 'i');
+		filterStringCache.set(filter, regex);
+
+
+		if (!cacheClearTimeout) {
+			cacheClearTimeout = window.setTimeout(() => {
+				filterStringCache.clear();
+				cacheClearTimeout = undefined;
+			}, 60000);
+		}
+	}
+
+	return regex.test(toFilter);
 }

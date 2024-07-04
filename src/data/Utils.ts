@@ -1,5 +1,6 @@
+import { OptGroup } from "../components/common/Select";
 import { bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
-import { MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
+import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
 import { Hold } from "./datatypes/Hold";
 
 export function wcharBase64ToString(encodedText: string) {
@@ -102,6 +103,70 @@ export function getCommandName(type: ScriptCommandType): string {
 		?? `Unknown Command[${type}]`;
 }
 
+export function getFormatName(type: DataFormat): string {
+	return DataFormatToName.get(type)
+		?? `Wrong Format[${type}]`;
+}
+
 export function getSpeakerMood(mood: number): string {
 	return MoodIdToName.get(mood) ?? 'Unknown';
+}
+
+export function filterDataFormat(format: DataFormat | undefined, filter: string): boolean {
+	switch (filter) {
+		case 'none':
+			return format === undefined;
+		case 'unknown':
+			return format === DataFormat.Unknown || (!!format && !DataFormatToName.has(format))
+		case 'img':
+			return format === DataFormat.BMP
+				|| format === DataFormat.JPG
+				|| format === DataFormat.PNG;
+		case 'sfx':
+			return format === DataFormat.S3M
+				|| format === DataFormat.WAV
+				|| format === DataFormat.OGG;
+		case 'other':
+			return !!format
+				&& format !== DataFormat.BMP
+				&& format !== DataFormat.JPG
+				&& format !== DataFormat.PNG
+				&& format !== DataFormat.S3M
+				&& format !== DataFormat.WAV
+				&& format !== DataFormat.OGG;
+		case '':
+			return true;
+
+		default:
+			return !!format && format.toString() === filter;
+	}
+}
+
+export function getDataFormatFilterOptions(): OptGroup[] {
+	return [
+		{
+			label: 'Separate',
+			options: [
+				{ id: 'none', value: 'none', label: "None" },
+				{ id: 'bmp', value: DataFormat.BMP.toString(), label: "BMP" },
+				{ id: 'jpg', value: DataFormat.JPG.toString(), label: "JPG" },
+				{ id: 'png', value: DataFormat.PNG.toString(), label: "PNG" },
+				{ id: 's3m', value: DataFormat.S3M.toString(), label: 'S3M' },
+				{ id: 'wav', value: DataFormat.WAV.toString(), label: 'WAV' },
+				{ id: 'ogg', value: DataFormat.OGG.toString(), label: 'OGG' },
+				{ id: 'ttf', value: DataFormat.TTF.toString(), label: 'TTF' },
+				{ id: 'theora', value: DataFormat.THEORA.toString(), label: 'THEORA' },
+				{ id: 'unknown', value: 'unknown', label: 'Unknown' },
+			]
+		},
+		{
+			label: 'Grouped',
+			options: [
+				{ id: 'img', label: "Image", value: 'img' },
+				{ id: 'sound', label: "Sound", value: `sfx` },
+				{ id: 'other', label: "Other", value: `other` },
+			]
+
+		},
+	]
 }

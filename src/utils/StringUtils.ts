@@ -19,3 +19,26 @@ export function formatString(base: string, ...args: (string | number)[]) {
 		return args[counter++].toString();
 	})
 }
+
+export function escapeRegex(str: string) {
+    return str.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+export function escapeRegexToGlob(str: string) {
+    return str.replace(/[/\-\\^$+.()|[\]{}]/g, '\\$&')
+		.replace(/\?/g, '.')
+		.replace(/\*/g, '.*?');
+}
+
+export function escapeFilterToRegex(str: string) {
+	switch (str.charAt(0)) {
+		case '~':
+			return str.substring(1);
+		case '$':
+			return '^' + escapeRegexToGlob(str.substring(1)) + '$';
+		case '\\':
+			return escapeRegexToGlob(str.substring(1));
+		default:
+			return escapeRegexToGlob(str);
+	}
+}

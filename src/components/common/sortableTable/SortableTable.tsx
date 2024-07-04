@@ -4,6 +4,8 @@ import SortableTableHeaderCell from "./SortableTableHeader";
 import { SortableTablePagination } from "./SortableTablePagination";
 import useSortableTableSort from "./useSortableTableSort";
 import useSortableTableHiddenColumns from "./useSortableTableHiddenColumns";
+import useSortableTableFilterColumns from "./useSortableTableFilterColumns";
+import { SortableTableFilters } from "./SortableTableFilters";
 
 
 interface Props<TData extends SortableTableDataWithId> {
@@ -17,17 +19,33 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 	const { tableId, columns, rows, className, pageSize } = props;
 
 	const { sortBy, sortAsc, onSort } = useSortableTableSort(columns[0].id ?? "id");
-	const { filteredColumns, hiddenColumns, toggleHiddenColumn } = useSortableTableHiddenColumns(columns, tableId);
+	const { visibleColumns, hiddenColumns, toggleHiddenColumn } = useSortableTableHiddenColumns(columns, tableId);
+	const { filterableColumns, columnFilters, setColumnFilter } = useSortableTableFilterColumns(columns, tableId)
 	const [page, setPage] = useState(0);
+
+	const filteredRows = useMemo(() => {
+		return rows.filter(row => {
+			for (const column of filterableColumns) {
+				const filter = columnFilters.get(column.id);
+
+				if (filter && column.filter && !column.filter(row, filter)) {
+					return false;
+				}
+			}
+
+			return true;
+		});
+
+	}, [rows, filterableColumns, columnFilters])
 
 	const sortedRows = useMemo(() => {
 		const sortColumn = columns.find(column => column.id === sortBy);
 
 		return sortColumn && sortColumn.sort
-			? rows.concat().sort(sortColumn.sort.bind(undefined, sortAsc))
-			: rows;
+			? filteredRows.concat().sort(sortColumn.sort.bind(undefined, sortAsc))
+			: filteredRows;
 
-	}, [rows, columns, sortBy, sortAsc]);
+	}, [filteredRows, columns, sortBy, sortAsc]);
 	const paginatedRows = useMemo(() => {
 		return sortedRows.slice(page * pageSize, page * pageSize + pageSize - 1)
 	}, [page, sortedRows, pageSize]);
@@ -35,12 +53,12 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 	return <table className={className}>
 		<thead>
 			<tr>
-				<td colSpan={filteredColumns.length}>
+				<td colSpan={visibleColumns.length}>
 					<SortableTablePagination
 						currentPage={page}
 						pageSize={pageSize}
 						setPage={setPage}
-						totalRecords={rows.length}
+						totalRecords={filteredRows.length}
 						columns={columns}
 						hiddenColumns={hiddenColumns}
 						toggleHiddenColumn={toggleHiddenColumn}
@@ -48,16 +66,28 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 				</td>
 			</tr>
 			<tr>
-				{filteredColumns.map(column => <SortableTableHeaderCell
+				{visibleColumns.map(column => <SortableTableHeaderCell
 					key={column.id}
 					column={column}
 					onSort={onSort}
 					sortBy={sortBy}
 					sortAsc={sortAsc} /> )}
 			</tr>
+			<SortableTableFilters
+				columns={columns}
+				columnFilters={columnFilters}
+				setColumnFilter={setColumnFilter}
+			/>
 		</thead>
 		<tbody>
-			{paginatedRows.map((row, index) => <Row key={row.id} columns={filteredColumns} data={row} />)}
+			{paginatedRows.map((row, index) => <Row key={row.id} columns={visibleColumns} data={row} />)}
+			{paginatedRows.length === 0 && <tr>
+				<td colSpan={visibleColumns.length}>
+					<div className="container has-text-centered">
+						Empty Table
+					</div>
+				</td>
+			</tr>}
 		</tbody>
 		<tfoot>
 			<tr>
@@ -66,7 +96,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 						currentPage={page}
 						pageSize={pageSize}
 						setPage={setPage}
-						totalRecords={rows.length}
+						totalRecords={filteredRows.length}
 						columns={columns}
 						hiddenColumns={hiddenColumns}
 						toggleHiddenColumn={toggleHiddenColumn}

@@ -7,7 +7,7 @@ export default function useSortableTableHiddenColumns<T extends SortableTableDat
 	columns: SortableTableColumn<T>[],
 	localStorageKey: string
 ) {
-	const [hiddenColumns, setHiddenColumns] = useLocalStorageState(localStorageKey, {
+	const [hiddenColumns, setHiddenColumns] = useLocalStorageState(`${localStorageKey}-hidden`, {
 		defaultValue: new Set<string>(),
 		serializer: SuperJSON
 	});
@@ -24,7 +24,7 @@ export default function useSortableTableHiddenColumns<T extends SortableTableDat
 		setHiddenColumns(newHiddenColumns);
 	}, [ hiddenColumns, setHiddenColumns ]);
 
-	const filteredColumns = columns.filter(column => !hiddenColumns.has(column.id));
+	const visibleColumns = columns.filter(column => !hiddenColumns.has(column.id));
 
-	return { filteredColumns, hiddenColumns, toggleHiddenColumn };
+	return { visibleColumns, hiddenColumns, toggleHiddenColumn };
 }
