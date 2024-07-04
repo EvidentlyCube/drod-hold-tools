@@ -12,11 +12,11 @@ export interface ChangeViewItem {
 }
 
 export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem {
-	const id = `${change.type}-${change.id}-${change.index}`;
+	const id = `${change.type}-${JSON.stringify(change.location)}`;
 
 	switch (change.type) {
 		case HoldChangeType.SpeechMessage:
-			const speech = hold.speeches.get(change.id);
+			const speech = hold.speeches.get(change.location.speechId);
 
 			if (!speech) {
 				return invalid(id, "Speech Message", "Cannot find speech");
@@ -29,6 +29,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				before: speech.message.oldText,
 				after: speech.message.newText ?? ''
 			};
+
+		case HoldChangeType.DataName:
+			const data = hold.datas.get(change.location.dataId);
+
+			if (!data) {
+				return invalid(id, "Data Name", "Cannot find data");
+			}
+
+			return {
+				id,
+				type: 'Data Name',
+				location: { hold, model: "notApplicable" },
+				before: data.name.oldText,
+				after: data.name.newText ?? ''
+			};
+
 		default:
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));
 	}

@@ -1,46 +1,14 @@
-import { ChangeEvent, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
 import DataRefView from "../../components/viewHold/DataRefView";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
+import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
-import { useSignalDrodText } from "../../hooks/useSignalDrodText";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareRefs, sortCompareString, sortCompareWithUndefined, sortData } from "../../utils/SortUtils";
-import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
-
-function EditCell({speech}: {speech: HoldSpeech}) {
-	const [, newText] = useSignalDrodText(speech.message);
-
-	const toggleText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		if (newText === undefined) {
-			speech.message.newText = speech.message.oldText;
-		} else {
-			speech.message.newText = undefined;
-		}
-	}, [speech, newText]);
-
-	return <input type="checkbox" checked={newText !== undefined} onChange={toggleText} />;
-}
-function NewTextCell({speech}: {speech: HoldSpeech}) {
-	const [oldText, newText] = useSignalDrodText(speech.message);
-
-	const typeText = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		speech.message.newText = e.target.value;
-	}, [speech]);
-
-	if (newText === undefined) {
-		return <>{oldText}</>;
-	}
-
-	return <input
-		className="input"
-		type="text"
-		value={newText}
-		onInput={typeText} />;
-}
+import { filterString, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
 
 const Columns: SortableTableColumn<HoldSpeech>[] = [
 	{
@@ -100,17 +68,10 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		filter: (speech, filter) => filterDataFormat(speech.$data?.format, filter)
 	},
 	{
-		id: 'edit',
-		displayName: 'Edit',
-		widthPercent: 5,
-		render: speech => <EditCell speech={speech} />,
-		sort: (isAsc, l, r) => sortCompareWithUndefined(isAsc, l.message.newText, r.message.newText)
-	},
-	{
 		id: 'text',
 		displayName: 'Text',
 		widthPercent: 30,
-		render: speech => <NewTextCell speech={speech} />,
+		render: speech => <DrodTextEditor text={speech.message} />,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalText, r.message.finalText),
 		filter: (speech, filter) => filterString(speech.message.finalText, filter),
 		filterDebounce: 500,

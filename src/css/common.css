@@ -1,20 +1,11 @@
-.modal {
-	--bulma-modal-content-width: auto;
+.modal-card.is-max-size {
+	height: calc(100vh - var(--bulma-modal-card-spacing));
+	width: calc(100vw - var(--bulma-modal-card-spacing));
 }
 
-.modal-top {
-	position: fixed;
-	inset-inline-end: var(--bulma-modal-close-right);
-	top: var(--bulma-modal-close-top);
-}
-
-.modal-top button {
-	color: var(--bulma-white);
-	opacity: 0.5;
-}
-
-.modal-top button:hover {
-	opacity: 0.8;
+.modal-card-body.no-footer {
+	border-end-start-radius: var(--bulma-modal-card-foot-radius);
+	border-end-end-radius: var(--bulma-modal-card-foot-radius);
 }
 
 .modal img {
@@ -36,4 +27,31 @@
 
 .select.is-empty select {
 	color: #CCC;
+}
+
+.has-background-drod-transparent-gray {
+	background-color: rgb(192, 192, 192);
+}
+
+.has-background-chessboard {
+	background: repeating-conic-gradient(#BABABA 0% 25%, white 0% 50%) 50% / 20px 20px;
+}
+
+.control.has-icons-left .icon.is-interactive,
+.control.has-icons-right .icon.is-interactive {
+	color: var(--bulma-text);
+	pointer-events: all;
+	cursor: pointer;
+}
+
+.control.has-icons-left .icon.is-interactive:hover,
+.control.has-icons-right .icon.is-interactive:hover {
+	color: #888;
+	pointer-events: all;
+	cursor: pointer;
+}
+
+.input.is-read-only-hidden:read-only {
+	border: none;
+	background: transparent;
 }

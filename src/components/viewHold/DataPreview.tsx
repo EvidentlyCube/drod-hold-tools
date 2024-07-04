@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { HoldData } from "../../data/datatypes/HoldData";
 import { DataFormat } from "../../data/DrodEnums";
 import { base64ToUint8 } from "../../data/Utils";
+import { HoldData } from "../../data/datatypes/HoldData";
+import ImagePreview from "./preview/ImagePreview";
+import Modal from "../common/Modal";
+import AudioPreview from "./preview/AudioPreview";
 
 interface Props {
 	data: HoldData;
+	onClose: () => void
 }
-export default function DataPreview({ data }: Props) {
+export default function DataPreview({ data, onClose }: Props) {
 	const [dataUri, setDataUri] = useState("");
 
 	useEffect(() => {
@@ -28,12 +32,27 @@ export default function DataPreview({ data }: Props) {
 		case DataFormat.BMP:
 		case DataFormat.PNG:
 		case DataFormat.JPG:
-			return <img src={dataUri} alt={data.name.finalText} />
+			return <ImagePreview
+				dataUri={dataUri}
+				name={data.name.finalText}
+				onClose={onClose}
+			/>
+
 		case DataFormat.OGG:
 		case DataFormat.WAV:
-			return <audio src={dataUri} controls={true} autoPlay/>
+			return <AudioPreview
+				dataUri={dataUri}
+				name={data.name.finalText}
+				onClose={onClose}
+				/>;
+
 		default:
-			return <strong>No preview available</strong>
+			return <Modal onClose={onClose}>
+				<div className="container has-text-centered has-background-white p-4">
+					<h2 className="is-size-2">{data.name.finalText}</h2>
+					<p>No preview for format {data.format}</p>
+				</div>
+			</Modal>;
 	}
 }
 

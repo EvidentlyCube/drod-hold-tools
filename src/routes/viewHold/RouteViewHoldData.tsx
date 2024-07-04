@@ -1,16 +1,16 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import DataPreview from "../../components/viewHold/DataPreview";
 import DataRefView from "../../components/viewHold/DataRefView";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldData } from "../../data/datatypes/HoldData";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
 import { formatBytes } from "../../utils/Language";
-import { createPortal } from "react-dom";
-import { useState } from "react";
-import DataPreview from "../../components/viewHold/DataPreview";
-import Modal from "../../components/common/Modal";
+import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
+import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 
 interface PreviewProps {
 	data: HoldData;
@@ -19,10 +19,8 @@ function PreviewCell({data}: PreviewProps) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const modal = !isOpen
-	? null
-	: <Modal onClose={() => setIsOpen(false)}>
-		<DataPreview data={data} />
-	</Modal>
+		? null
+		: <DataPreview data={data} onClose={() => setIsOpen(false)} />;
 
 	return <>
 		<button className="button" onClick={() => setIsOpen(!isOpen)}>Preview</button>
@@ -69,7 +67,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		widthPercent: 15,
 		canHide: true,
 
-		render: data => data.name.finalText,
+		render: data => <DrodTextEditor text={data.name} />,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalText, r.name.finalText),
 		filter: (data, filter) => filterString(data.name.finalText, filter)
 	},

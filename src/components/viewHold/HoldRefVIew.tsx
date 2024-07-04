@@ -19,6 +19,9 @@ export default function HoldRefView({ holdRef }: Props) {
 		case "monsterCommand":
 			return <MonsterCommand r={ holdRef } />;
 
+		case "notApplicable":
+			return <span className="is-muted">Not Applicable</span>
+
 		default:
 			return <>
 				<span className="icon icon-unknown-ref">

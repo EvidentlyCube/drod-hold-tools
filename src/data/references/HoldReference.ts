@@ -1,6 +1,6 @@
 import type { Hold } from "../datatypes/Hold";
 
-export interface HoldReferenceToSpeech {
+export interface HoldRefSpeech {
 	hold: Hold;
 	model: 'speech',
 	speechId: number;
@@ -21,6 +21,12 @@ export interface HoldRefMonsterCommand {
 	commandIndex: number;
 };
 
-export type HoldRef = HoldReferenceToSpeech
+export interface HoldRefNotApplicable {
+	hold: Hold;
+	model: 'notApplicable',
+};
+
+export type HoldRef = HoldRefSpeech
 	| HoldRefCharacterCommand
-	| HoldRefMonsterCommand;
+	| HoldRefMonsterCommand
+	| HoldRefNotApplicable;
