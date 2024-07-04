@@ -10,7 +10,7 @@ interface DataConstructor {
 	encRawData: string;
 }
 export class HoldData {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
 	public readonly holdId: number;
@@ -18,8 +18,12 @@ export class HoldData {
 	public readonly format: DataFormat;
 	public readonly rawEncodedData: string;
 
+	public get $size() {
+		return this.rawEncodedData.length * 3 / 4;
+	}
+
 	public constructor(hold: Hold, opts: DataConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = opts.id;
 		this.holdId = opts.holdId;

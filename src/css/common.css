@@ -1,3 +1,26 @@
+.modal {
+	--bulma-modal-content-width: auto;
+}
+
+.modal-top {
+	position: fixed;
+	inset-inline-end: var(--bulma-modal-close-right);
+	top: var(--bulma-modal-close-top);
+}
+
+.modal-top button {
+	color: var(--bulma-white);
+	opacity: 0.5;
+}
+
+.modal-top button:hover {
+	opacity: 0.8;
+}
+
+.modal img {
+	image-rendering: pixelated;
+}
+
 .table.is-middle td {
 	vertical-align: middle;
 }

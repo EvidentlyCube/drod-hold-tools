@@ -11,6 +11,7 @@ export interface SortableTableColumnSansData {
 
 	widthPercent: number;
 	canHide?: boolean;
+	className?: string;
 	filterOptions?: { options?: Option[], optgroups?: OptGroup[] };
 	filterDebounce?: number;
 }

@@ -58,6 +58,9 @@ export function SortableTablePagination(props: PaginationProps) {
 						/>
 					</li>)
 				}
+				{currentPage >= pages && <div className="pagination-link has-background-danger-light">
+					{currentPage + 1}&nbsp;<em>(wrong page)</em>
+				</div>}
 			</ul>
 		</nav>
 	);

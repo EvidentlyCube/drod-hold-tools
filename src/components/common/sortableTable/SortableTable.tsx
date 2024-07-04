@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import useLocalStorageState from "use-local-storage-state";
 import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCommons";
+import { SortableTableFilters } from "./SortableTableFilters";
 import SortableTableHeaderCell from "./SortableTableHeader";
 import { SortableTablePagination } from "./SortableTablePagination";
-import useSortableTableSort from "./useSortableTableSort";
-import useSortableTableHiddenColumns from "./useSortableTableHiddenColumns";
 import useSortableTableFilterColumns from "./useSortableTableFilterColumns";
-import { SortableTableFilters } from "./SortableTableFilters";
+import useSortableTableHiddenColumns from "./useSortableTableHiddenColumns";
+import useSortableTableSort from "./useSortableTableSort";
 
 
 interface Props<TData extends SortableTableDataWithId> {
@@ -21,7 +22,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 	const { sortBy, sortAsc, onSort } = useSortableTableSort(columns[0].id ?? "id");
 	const { visibleColumns, hiddenColumns, toggleHiddenColumn } = useSortableTableHiddenColumns(columns, tableId);
 	const { filterableColumns, columnFilters, setColumnFilter } = useSortableTableFilterColumns(columns, tableId)
-	const [page, setPage] = useState(0);
+	const [page, setPage] = useLocalStorageState(`${tableId}-page`, { defaultValue: 0 });
 
 	const filteredRows = useMemo(() => {
 		return rows.filter(row => {
@@ -114,6 +115,11 @@ interface RowProps<TData extends SortableTableDataWithId> {
 }
 function Row<TData extends SortableTableDataWithId>({columns, data}: RowProps<TData>) {
 	return <tr>
-			{columns.map(column => <td key={column.id}>{column.render(data)}</td>)}
+			{columns.map(column => <td
+				key={column.id}
+				className={column.className}
+			>
+				{column.render(data)}
+			</td>)}
 	</tr>
 }

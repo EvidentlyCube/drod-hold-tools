@@ -6,6 +6,7 @@ import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
 import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeech";
 import RouteViewHoldChanges from "./routes/viewHold/RouteViewHoldChanges";
 import NavBarEnd from "./components/common/NavBarEnd";
+import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
 
 function App() {
 	return (
@@ -29,6 +30,7 @@ function App() {
 					<Route path="/" element={<RouteHome />} />
 					<Route path="/hold/:holdReaderId" element={<RouteViewHold />}>
 						<Route path="" element={<RouteViewHoldSummary />} />
+						<Route path="datas" element={<RouteViewHoldData />} />
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
 						<Route path="changes" element={<RouteViewHoldChanges />} />
 					</Route>
