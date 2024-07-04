@@ -1,3 +1,4 @@
+import { useDebouncedCallback } from "use-debounce";
 import Select from "../Select";
 import {
 	SortableTableColumn,
@@ -45,13 +46,19 @@ export function FilterInput<T extends SortableTableDataWithId>(
 ) {
 	const { column, columnFilters, setColumnFilter } = props;
 
+	const setFilter = useDebouncedCallback((column: string, filter: string) => {
+		setColumnFilter(column, filter)
+	}, column.filterDebounce ?? 0)
+
 	if (column.filterOptions) {
 		return (
 			<div className="control has-icons-left">
 				<Select
+					className="is-small is-rounded"
+					emptyOption="Filter..."
 					options={column.filterOptions.options}
 					optgroups={column.filterOptions.optgroups}
-					onChange={value => setColumnFilter(column.id, value)}
+					onChange={value => setFilter(column.id, value)}
 					value={columnFilters.get(column.id)}
 				/>
 				<span className="icon is-small is-left">
@@ -68,7 +75,7 @@ export function FilterInput<T extends SortableTableDataWithId>(
 					defaultValue={columnFilters.get(column.id) ?? ""}
 					placeholder="Filter..."
 					onInput={(e) =>
-						setColumnFilter(column.id, e.currentTarget.value)
+						setFilter(column.id, e.currentTarget.value)
 					}
 				/>
 				<span className="icon is-small is-left">

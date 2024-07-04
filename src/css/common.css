@@ -10,3 +10,7 @@
 .is-select-separator {
 	font-size: 30%;
 }
+
+.select.is-empty select {
+	color: #CCC;
+}

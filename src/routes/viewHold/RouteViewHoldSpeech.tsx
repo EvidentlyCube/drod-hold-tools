@@ -52,6 +52,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		render: speech => speech.id.toString(),
 		sort: (isAsc, left, right) => isAsc ? left.id - right.id : right.id - left.id,
 		filter: (speech, filter) => filterString(speech.id.toString(), filter),
+		filterDebounce: 500,
 	},
 	{
 		id: 'location',
@@ -62,6 +63,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		render: speech => <HoldRefView holdRef={speech.$location} /> ,
 		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.$location, r.$location),
 		filter: (speech, filter) => filterString(holdRefToSortableString(speech.$location), filter),
+		filterDebounce: 500,
 	},
 	{
 		id: 'mood',
@@ -72,6 +74,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		render: speech => speech.$mood,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood),
 		filter: (speech, filter) => filterString(speech.$mood, filter),
+		filterDebounce: 500,
 	},
 	{
 		id: 'speaker',
@@ -82,6 +85,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		render: speech => speech.$speaker,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$speaker, r.$speaker),
 		filter: (speech, filter) => filterString(speech.$speaker, filter),
+		filterDebounce: 500,
 	},
 	{
 		id: 'data',
@@ -109,6 +113,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		render: speech => <NewTextCell speech={speech} />,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalText, r.message.finalText),
 		filter: (speech, filter) => filterString(speech.message.finalText, filter),
+		filterDebounce: 500,
 	}
 ];
 

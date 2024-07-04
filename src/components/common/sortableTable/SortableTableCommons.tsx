@@ -12,6 +12,7 @@ export interface SortableTableColumnSansData {
 	widthPercent: number;
 	canHide?: boolean;
 	filterOptions?: { options?: Option[], optgroups?: OptGroup[] };
+	filterDebounce?: number;
 }
 
 export interface SortableTableColumn<TData extends SortableTableDataWithId>
