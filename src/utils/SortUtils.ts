@@ -57,7 +57,7 @@ export function sortData(isAsc: boolean, left?: HoldData, right?: HoldData) {
 		return sortCompareWithUndefined(isAsc, left, right);
 	}
 
-	return sortCompareString(isAsc, getFormatName(left.format), getFormatName(right.format))
+	return sortCompareString(isAsc, getFormatName(left.details.finalValue.format), getFormatName(right.details.finalValue.format))
 		|| sortCompareString(isAsc, left.name.finalText, right.name.finalText);
 }
 

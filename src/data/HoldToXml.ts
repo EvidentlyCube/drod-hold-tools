@@ -151,9 +151,9 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
 	refs.dataIds.add(data.id);
 
 	writer.tag('Data')
-		.attr('DataFormat', data.format)
+		.attr('DataFormat', data.details.finalValue.format)
 		.attr('DataNameText', data.name)
-		.attr('RawData', data.rawEncodedData)
+		.attr('RawData', data.details.finalValue.format)
 		.attr('HoldID', data.holdId)
 		.attr('DataID', data.id)
 		.end();

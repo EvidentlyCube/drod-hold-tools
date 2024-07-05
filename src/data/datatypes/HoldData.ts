@@ -1,7 +1,12 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { DataFormat } from "../DrodEnums";
 import { DrodText } from "./DrodText";
 import type { Hold } from "./Hold";
 
+export interface HoldDataDetails {
+	format: DataFormat;
+	rawEncodedData: string;
+}
 interface DataConstructor {
 	id: number;
 	holdId: number;
@@ -15,11 +20,11 @@ export class HoldData {
 	public readonly id: number;
 	public readonly holdId: number;
 	public readonly name: DrodText;
-	public readonly format: DataFormat;
-	public readonly rawEncodedData: string;
+
+	public readonly details: SignalUpdatableValue<HoldDataDetails>;
 
 	public get $size() {
-		return this.rawEncodedData.length * 3 / 4;
+		return this.details.finalValue.rawEncodedData.length * 3 / 4;
 	}
 
 	public constructor(hold: Hold, opts: DataConstructor) {
@@ -28,7 +33,9 @@ export class HoldData {
 		this.id = opts.id;
 		this.holdId = opts.holdId;
 		this.name = new DrodText(opts.encName);
-		this.format = opts.format;
-		this.rawEncodedData = opts.encRawData;
+		this.details = new SignalUpdatableValue({
+			format: opts.format,
+			rawEncodedData: opts.encRawData
+		});
 	}
 }

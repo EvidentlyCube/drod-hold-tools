@@ -1,32 +1,15 @@
-import { useState } from "react";
-import { createPortal } from "react-dom";
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import DataPreview from "../../components/viewHold/DataPreview";
 import DataRefView from "../../components/viewHold/DataRefView";
-import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
+import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
+import PreviewButton from "../../components/viewHold/preview/PreviewButton";
+import { canPreviewData, filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldData } from "../../data/datatypes/HoldData";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { formatBytes } from "../../utils/Language";
 import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
-import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 
-interface PreviewProps {
-	data: HoldData;
-}
-function PreviewCell({data}: PreviewProps) {
-	const [isOpen, setIsOpen] = useState(false);
-
-	const modal = !isOpen
-		? null
-		: <DataPreview data={data} onClose={() => setIsOpen(false)} />;
-
-	return <>
-		<button className="button" onClick={() => setIsOpen(!isOpen)}>Preview</button>
-		{createPortal(modal, document.body)}
-	</>;
-}
 const Columns: SortableTableColumn<HoldData>[] = [
 	{
 		id: 'id',
@@ -49,7 +32,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 
 		render: data => <DataRefView hold={data.$hold} dataId={data.id} />,
 		sort: (isAsc, l, r) => sortData(isAsc, l, r),
-		filter: (data, filter) => filterDataFormat(data.format, filter)
+		filter: (data, filter) => filterDataFormat(data.details.finalValue.format, filter)
 	},
 	{
 		id: 'size',
@@ -76,7 +59,13 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		displayName: 'Preview',
 		widthPercent: 10,
 
-		render: data => <PreviewCell data={data} />,
+		render: data => {
+			if (!canPreviewData(data.details.finalValue)) {
+				return <span className="is-muted">Cannot preview </span>
+			} else {
+				return <PreviewButton data={data} details={data.details.finalValue} />;
+			}
+		}
 	},
 ];
 

@@ -2,6 +2,7 @@ import { OptGroup } from "../components/common/Select";
 import { bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
 import { Hold } from "./datatypes/Hold";
+import { HoldDataDetails } from "./datatypes/HoldData";
 
 export function wcharBase64ToString(encodedText: string) {
 	const decodedData = base64ToUint8(encodedText);
@@ -169,4 +170,12 @@ export function getDataFormatFilterOptions(): OptGroup[] {
 
 		},
 	]
+}
+
+export function canPreviewData(details: HoldDataDetails) {
+	return details.format === DataFormat.BMP
+		|| details.format === DataFormat.PNG
+		|| details.format === DataFormat.JPG
+		|| details.format === DataFormat.OGG
+		|| details.format === DataFormat.WAV;
 }

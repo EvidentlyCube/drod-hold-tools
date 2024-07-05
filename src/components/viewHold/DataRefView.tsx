@@ -19,9 +19,9 @@ export default function DataRefView({ hold, dataId }: Props) {
 	return (
 		<div title={`${data.id}: ${data.name.finalText}`}>
 			<span className="icon">
-				<i className={`fas ${getDataIconClass(data.format)}`}></i>
+				<i className={`fas ${getDataIconClass(data.details.finalValue.format)}`}></i>
 			</span>{" "}
-			{getFormatName(data.format)}
+			{getFormatName(data.details.finalValue.format)}
 		</div>
 	);
 }

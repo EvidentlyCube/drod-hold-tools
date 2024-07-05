@@ -65,7 +65,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 
 		render: speech => <DataRefView hold={speech.$hold} dataId={speech.dataId} />,
 		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
-		filter: (speech, filter) => filterDataFormat(speech.$data?.format, filter)
+		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
 	},
 	{
 		id: 'text',
