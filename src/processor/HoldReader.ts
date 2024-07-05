@@ -91,7 +91,7 @@ export class HoldReader {
 
 				if (this._currentStepIndex === this._steps.length) {
 					if (this.sharedState.hold) {
-						this.name.value = truncate(this.sharedState.hold.name.oldText, 32);
+						this.name.value = truncate(this.sharedState.hold.name.oldValue, 32);
 						this.onParsed.dispatch(this);
 
 					} else {

@@ -51,8 +51,8 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		canHide: true,
 
 		render: data => <DrodTextEditor text={data.name} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalText, r.name.finalText),
-		filter: (data, filter) => filterString(data.name.finalText, filter)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalValue, r.name.finalValue),
+		filter: (data, filter) => filterString(data.name.finalValue, filter)
 	},
 	{
 		id: 'preview',

@@ -58,7 +58,7 @@ export function sortData(isAsc: boolean, left?: HoldData, right?: HoldData) {
 	}
 
 	return sortCompareString(isAsc, getFormatName(left.details.finalValue.format), getFormatName(right.details.finalValue.format))
-		|| sortCompareString(isAsc, left.name.finalText, right.name.finalText);
+		|| sortCompareString(isAsc, left.name.finalValue, right.name.finalValue);
 }
 
 

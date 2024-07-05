@@ -1,4 +1,5 @@
-import { DrodText } from "./DrodText";
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 interface EntranceConstructor {
@@ -23,7 +24,7 @@ export class HoldEntrance {
 	public readonly o: number;
 	public readonly isMainEntrance: boolean;
 	public readonly showDescription: boolean;
-	public readonly description: DrodText;
+	public readonly description: SignalUpdatableValue<string>;
 
 	public get $room() {
 		return this.$hold.rooms.getOrError(this.roomId);
@@ -44,6 +45,6 @@ export class HoldEntrance {
 		this.o = opts.o;
 		this.isMainEntrance = opts.isMainEntrance;
 		this.showDescription = opts.showDescription;
-		this.description = new DrodText(opts.encDescription);
+		this.description = new SignalUpdatableValue(wcharBase64ToString(opts.encDescription));
 	}
 }

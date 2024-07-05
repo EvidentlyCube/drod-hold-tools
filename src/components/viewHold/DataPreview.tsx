@@ -35,7 +35,7 @@ export default function DataPreview({ data, details, onClose }: Props) {
 		case DataFormat.JPG:
 			return <ImagePreview
 				dataUri={dataUri}
-				name={data.name.finalText}
+				name={data.name.finalValue}
 				onClose={onClose}
 			/>
 
@@ -43,14 +43,14 @@ export default function DataPreview({ data, details, onClose }: Props) {
 		case DataFormat.WAV:
 			return <AudioPreview
 				dataUri={dataUri}
-				name={data.name.finalText}
+				name={data.name.finalValue}
 				onClose={onClose}
 				/>;
 
 		default:
 			return <Modal onClose={onClose}>
 				<div className="container has-text-centered has-background-white p-4">
-					<h2 className="is-size-2">{data.name.finalText}</h2>
+					<h2 className="is-size-2">{data.name.finalValue}</h2>
 					<p>No preview for format {details.format}</p>
 				</div>
 			</Modal>;

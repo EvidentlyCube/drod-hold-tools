@@ -278,8 +278,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			.attr('OverheadImageStartY', room.overheadImageStartY ?? 0)
 	}
 
-	writer.attr('Squares', room.encSquares)
-		.attr('TileLights', room.encTileLights);
+	writer.attr('Squares', { _safeString: room.encSquares })
+		.attr('TileLights', { _safeString: room.encTileLights });
 
 	if (room.extraVars) {
 		writer.attr('ExtraVars', room.extraVars)
@@ -336,7 +336,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			writer.end();
 
 
-		await sleep();}
+			await sleep();
+		}
 	}
 
 	for (const scroll of room.scrolls) {

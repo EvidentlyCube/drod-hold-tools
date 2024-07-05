@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { DataFormat } from "../DrodEnums";
-import { DrodText } from "./DrodText";
+import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 export interface HoldDataDetails {
@@ -19,7 +19,7 @@ export class HoldData {
 
 	public readonly id: number;
 	public readonly holdId: number;
-	public readonly name: DrodText;
+	public readonly name: SignalUpdatableValue<string>;
 
 	public readonly details: SignalUpdatableValue<HoldDataDetails>;
 
@@ -32,7 +32,7 @@ export class HoldData {
 
 		this.id = opts.id;
 		this.holdId = opts.holdId;
-		this.name = new DrodText(opts.encName);
+		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
 		this.details = new SignalUpdatableValue({
 			format: opts.format,
 			rawEncodedData: opts.encRawData

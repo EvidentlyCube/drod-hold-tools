@@ -1,7 +1,8 @@
 import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
+import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
+import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
-import { DrodText } from "./datatypes/DrodText";
 import { Hold } from "./datatypes/Hold";
 import { HoldChangeListener } from "./datatypes/HoldChangeListener";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
@@ -240,7 +241,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			holdRoom.scrolls.push({
 				x: int(scrollXml, 'X'),
 				y: int(scrollXml, 'Y'),
-				message: new DrodText(str(scrollXml, 'Message'))
+				message: new SignalUpdatableValue(wcharBase64ToString(str(scrollXml, 'Message')))
 			});
 
 			await sleep();

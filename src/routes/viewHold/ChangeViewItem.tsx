@@ -26,8 +26,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Speech Message',
 				location: speech.$location,
-				before: speech.message.oldText,
-				after: speech.message.newText ?? ''
+				before: speech.message.oldValue,
+				after: speech.message.finalValue ?? ''
 			};
 
 		case HoldChangeType.DataName:
@@ -41,8 +41,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Data Name',
 				location: { hold, model: "notApplicable" },
-				before: data.name.oldText,
-				after: data.name.newText ?? ''
+				before: data.name.oldValue,
+				after: data.name.finalValue ?? ''
 			};
 
 		default:

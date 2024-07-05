@@ -1,4 +1,4 @@
-import { DrodText } from "./DrodText";
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
 import { HoldChange, HoldChangeDataName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
 import { HoldData } from "./HoldData";
@@ -20,7 +20,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeSpeechMessage>({
 			type: HoldChangeType.SpeechMessage,
 			location: { speechId: id },
-			value: message.newText
+			value: message.newValue
 		});
 
 		registerTextChange($hold, change, message);
@@ -32,18 +32,18 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeDataName>({
 			type: HoldChangeType.DataName,
 			location: { dataId: id },
-			value: name.newText
+			value: name.newValue
 		});
 
 		registerTextChange($hold, change, name);
 	}
 }
 
-function registerTextChange(hold: Hold, change: HoldChange, drodText: DrodText) {
-	drodText.onNewTextChange.add(newText => {
-		change.value = newText;
+function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {
+	updatableValue.onChange.add(newValue => {
+		change.value = newValue;
 
-		if (newText === undefined || newText === drodText.oldText) {
+		if (newValue === undefined || newValue === updatableValue.oldValue) {
 			hold.$changes.del(change)
 		} else {
 			hold.$changes.add(change)

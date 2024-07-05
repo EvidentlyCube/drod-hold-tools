@@ -1,5 +1,6 @@
 import { OrderedMap } from "../../utils/OrderedMap";
-import { DrodText } from "./DrodText";
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { wcharBase64ToString } from "../Utils";
 import { HoldChangeList } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
@@ -45,9 +46,9 @@ export class Hold {
 	public readonly playerId: number;
 	public readonly lastUpdated: number;
 	public readonly status: number;
-	public readonly name: DrodText;
-	public readonly descriptionMessage: DrodText;
-	public readonly endHoldMessage: DrodText;
+	public readonly name: SignalUpdatableValue<string>;
+	public readonly descriptionMessage: SignalUpdatableValue<string>;
+	public readonly endHoldMessage: SignalUpdatableValue<string>;
 	public readonly lastScriptId: number;
 	public readonly lastVarId: number;
 	public readonly lastCharId: number;
@@ -77,9 +78,9 @@ export class Hold {
 		this.playerId = options.playerId;
 		this.lastUpdated = options.lastUpdated;
 		this.status = options.status;
-		this.name = new DrodText(options.encName);
-		this.descriptionMessage = new DrodText(options.encDescriptionMessage);
-		this.endHoldMessage = new DrodText(options.encEndHoldMessage);
+		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));
+		this.descriptionMessage = new SignalUpdatableValue(wcharBase64ToString(options.encDescriptionMessage));
+		this.endHoldMessage = new SignalUpdatableValue(wcharBase64ToString(options.encEndHoldMessage));
 		this.lastScriptId = options.lastScriptId;
 		this.lastVarId = options.lastVarId;
 		this.lastCharId = options.lastCharId;

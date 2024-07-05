@@ -1,34 +1,34 @@
 import { ChangeEvent, useCallback, useRef } from "react";
-import { DrodText } from "../../../data/datatypes/DrodText";
-import { useSignalDrodText } from "../../../hooks/useSignalDrodText";
+import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
+import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 
 interface Props {
-	text: DrodText;
+	text: SignalUpdatableValue<string>;
 }
 export default function DrodTextEditor({text}: Props) {
-	const [oldText, newText] = useSignalDrodText(text);
+	const [oldValue, newValue] = useSignalUpdatableValue(text);
 	const inputRef = useRef<HTMLInputElement>(null);
-	const isEdited = newText !== undefined;
+	const isEdited = newValue !== undefined;
 
 	const onToggle = useCallback(() => {
-		if (newText === undefined) {
-			text.newText = text.oldText;
+		if (newValue === undefined) {
+			text.newValue = text.oldValue;
 			if (inputRef.current) {
 				inputRef.current.focus()
 			}
 		} else {
-			text.newText = undefined;
+			text.newValue = undefined;
 		}
-	}, [text, newText]);
+	}, [text, newValue]);
 
 	const onBlur = useCallback(() => {
-		if (isEdited && text.newText === text.oldText) {
-			text.newText = undefined;
+		if (isEdited && text.newValue === text.oldValue) {
+			text.newValue = undefined;
 		}
 	}, [text, isEdited])
 
 	const onType = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		text.newText = e.target.value;
+		text.newValue = e.target.value;
 	}, [text]);
 
 	const title = isEdited
@@ -38,17 +38,17 @@ export default function DrodTextEditor({text}: Props) {
 	return <div className="control has-icons-left">
 		<input
 			className="input is-read-only-hidden"
-			value={newText ?? oldText}
-			readOnly={newText === undefined}
+			value={newValue ?? oldValue}
+			readOnly={newValue === undefined}
 			onInput={onType}
 			ref={inputRef}
 			onClick={!isEdited ? onToggle : undefined}
 			onBlur={onBlur}
-			title={oldText}
+			title={oldValue}
 			/>
 		<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-			{newText === undefined && <i className="fas fa-pen-to-square" />}
-			{newText !== undefined && <i className="fas fa-xmark" />}
+			{newValue === undefined && <i className="fas fa-pen-to-square" />}
+			{newValue !== undefined && <i className="fas fa-xmark" />}
 		</div>
 	</div>
 }

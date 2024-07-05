@@ -72,8 +72,8 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		displayName: 'Text',
 		widthPercent: 30,
 		render: speech => <DrodTextEditor text={speech.message} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalText, r.message.finalText),
-		filter: (speech, filter) => filterString(speech.message.finalText, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalValue, r.message.finalValue),
+		filter: (speech, filter) => filterString(speech.message.finalValue, filter),
 		filterDebounce: 500,
 	}
 ];

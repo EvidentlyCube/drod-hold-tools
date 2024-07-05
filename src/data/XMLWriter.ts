@@ -1,6 +1,7 @@
+import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { PackedVars } from "./PackedVars";
 import { writePackedVars } from "./PackedVarsUtils";
-import { DrodText } from "./datatypes/DrodText";
+import { stringToWCharBase64 } from "./Utils";
 
 export class XMLWriter {
 	private _xml = "";
@@ -19,23 +20,22 @@ export class XMLWriter {
 		return this;
 	}
 
-	public attr(name: string, value: string|number|DrodText|boolean|PackedVars) {
+	public attr(name: string, value: number|SignalUpdatableValue<string>|boolean|PackedVars|{_safeString: string}) {
 		this._xml += ` ${name}="`;
 
 		if (value instanceof PackedVars) {
 			this._xml += writePackedVars(value);
 
-		} else if (value instanceof DrodText) {
-			this._xml += value.encoded;
+		} else if (value instanceof SignalUpdatableValue) {
+			this._xml += stringToWCharBase64(value.finalValue);
 
 		} else if (typeof value === 'boolean') {
 			this._xml += value ? '1' : '0';
 
 		} else if (typeof value === 'number') {
 			this._xml += value.toString();
-
-		} else {
-			this._xml += value.replace(/"/g, "&quote;");
+		} else if (typeof value === 'object' && '_safeString' in value) {
+			this._xml += value._safeString;
 		}
 		this._xml += '"';
 

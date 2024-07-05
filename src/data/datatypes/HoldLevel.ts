@@ -1,5 +1,6 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { getMainEntranceId } from "../HoldUtils";
-import { DrodText } from "./DrodText";
+import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 interface LevelConstructor {
@@ -21,7 +22,7 @@ export class HoldLevel {
 	public readonly playerId: number;
 	public readonly gidLevelIndex: number;
 	public readonly orderIndex: number;
-	public readonly name: DrodText;
+	public readonly name: SignalUpdatableValue<string>;
 	public readonly created: number;
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean;
@@ -44,7 +45,7 @@ export class HoldLevel {
 		this.playerId = opts.playerId;
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
-		this.name = new DrodText(opts.encName);
+		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
 		this.created = opts.created;
 		this.lastUpdated = opts.lastUpdated;
 		this.isRequired = opts.isRequired;

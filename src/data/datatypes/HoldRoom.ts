@@ -1,8 +1,8 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Point } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
-import { getCoordinateName } from "../Utils";
-import { DrodText } from "./DrodText";
+import { getCoordinateName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
 
@@ -33,7 +33,7 @@ interface Checkpoint {
 export interface HoldScroll {
 	x: number;
 	y: number;
-	message: DrodText;
+	message: SignalUpdatableValue<string>;
 }
 export interface HoldOrbAgent {
 	type: number;
@@ -71,7 +71,7 @@ export class HoldRoom {
 	public readonly overheadImageStartX?: number;
 	public readonly overheadImageStartY?: number;
 	public readonly encSquares: string;
-	public readonly styleName: DrodText;
+	public readonly styleName: SignalUpdatableValue<string>;
 	public readonly encTileLights: string;
 	public readonly extraVars?: PackedVars;
 
@@ -118,7 +118,7 @@ export class HoldRoom {
 		this.overheadImageStartX = opts.overheadImageStartX;
 		this.overheadImageStartY = opts.overheadImageStartY;
 		this.encSquares = opts.encSquares
-		this.styleName = new DrodText(opts.encStyleName)
+		this.styleName = new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName));
 		this.encTileLights = opts.encTileLights
 		this.extraVars = readPackedVars(opts.encExtraVars);
 	}

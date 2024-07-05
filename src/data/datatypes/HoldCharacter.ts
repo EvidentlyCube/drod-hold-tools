@@ -1,8 +1,9 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { CommandsList } from "../CommandList";
 import { readCommandsBuffer } from "../CommandUtils";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
-import { DrodText } from "./DrodText";
+import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 interface CharacterConstructor {
@@ -18,7 +19,7 @@ export class HoldCharacter {
 	public readonly hold: Hold;
 
 	public readonly id: number;
-	public readonly name: DrodText;
+	public readonly name: SignalUpdatableValue<string>;
 	public readonly type: number;
 	public readonly animationSpeed: number;
 	public readonly extraVars?: PackedVars;
@@ -31,7 +32,7 @@ export class HoldCharacter {
 		this.hold = hold;
 
 		this.id = options.id;
-		this.name = new DrodText(options.encName);
+		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));
 		this.type = options.type;
 		this.animationSpeed = options.animationSpeed;
 		this.extraVars = readPackedVars(options.encExtraVars);

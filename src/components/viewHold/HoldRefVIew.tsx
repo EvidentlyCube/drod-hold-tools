@@ -60,7 +60,7 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 		<span className="icon icon-monster-ref" title="Monster">
 			<i className="fas fa-bug"></i>
 		</span>
-		{" "}<strong>{level.name.finalText}{": "}{room.$coordsName}</strong>
+		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
 		{", "}{getCharacterName(hold, monster.$characterTypeId)}
 		{" "}({monster.x},{monster.y})
 		{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>

@@ -5,8 +5,8 @@ import { Hold } from "../../data/datatypes/Hold";
 type GetData = (hold: Hold) => string|number;
 
 const DataPoints: Record<string, GetData> = {
-	"Name": hold => hold.name.oldText,
-	"Description": hold => hold.descriptionMessage.oldText,
+	"Name": hold => hold.name.oldValue,
+	"Description": hold => hold.descriptionMessage.oldValue,
 	"Levels No.": hold => hold.levels.size,
 	"Rooms No.": hold => hold.rooms.size,
 	"Datas No.": hold => hold.datas.size,

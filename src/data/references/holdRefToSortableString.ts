@@ -58,7 +58,7 @@ function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {
 
 	return formatString(
 		'%: %, % (%,%) #%::%',
-		level.name.finalText,
+		level.name.finalValue,
 		room.$coordsName,
 		getCharacterName(hold, monster.$characterTypeId),
 		monster.x, monster.y,

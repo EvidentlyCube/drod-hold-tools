@@ -1,6 +1,6 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/HoldReference";
-import { getCharacterName, getSpeakerMood } from "../Utils";
-import { DrodText } from "./DrodText";
+import { getCharacterName, getSpeakerMood, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldData } from "./HoldData";
 
@@ -20,7 +20,7 @@ export class HoldSpeech {
 	public readonly character: number;
 	public readonly mood: number;
 	public readonly delay: number;
-	public readonly message: DrodText;
+	public readonly message: SignalUpdatableValue<string>;
 
 	public $location?: HoldRefCharacterCommand | HoldRefMonsterCommand;
 
@@ -44,6 +44,6 @@ export class HoldSpeech {
 		this.character = opts.character
 		this.mood = opts.mood
 		this.delay = opts.delay
-		this.message = new DrodText(opts.encMessage);
+		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
 	}
 }
