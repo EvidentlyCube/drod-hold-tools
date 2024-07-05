@@ -43,6 +43,11 @@ class HoldIndexedStorageClass {
 	}
 
 	public register() {
+		window.onbeforeunload = () => {
+			if (this.isBusy.value) {
+				return "Changes are still saving, are you sure you want to continue?";
+			}
+		}
 		HoldReaders.holdReaders.onChange.add(this.onHoldListChange.bind(this));
 	}
 
