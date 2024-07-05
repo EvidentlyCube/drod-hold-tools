@@ -25,8 +25,6 @@ type HoldFileSource = { file: File }
 export class HoldReader {
 	public readonly id: number;
 
-	public error?: string;
-
 	public readonly sharedState: HoldReaderState;
 	private readonly _steps: HoldReaderStep[];
 
@@ -34,11 +32,12 @@ export class HoldReader {
 
 	public logs = new SignalArray<string>();
 	public name = new SignalValue<string>("");
+	public error = new SignalValue<string>("");
 
 	public onParsed = new Signal<HoldReader>();
 
 	public get isFinished() {
-		return !!this.error || this._currentStepIndex === this._steps.length;
+		return !!this.error.value || this._currentStepIndex === this._steps.length;
 	}
 
 	public constructor(id: number, source: HoldFileSource) {
@@ -104,7 +103,7 @@ export class HoldReader {
 				}
 			}
 		} catch (e) {
-			this.error = e instanceof Error ? e.message : String(e);
+			this.error.value = e instanceof Error ? e.message : String(e);
 			this._currentStepIndex = this._steps.length;
 
 			this.name.value = `${truncate(baseName, 26)} Error!`;
@@ -308,17 +307,11 @@ function getStringXmlToObjectStep(reader: HoldReader) {
 
 			assertNotNull(holdXmlText, "String to XML error - missing text data");
 
-
 			reader.logs.push('Parsing XML');
-			parseXml(holdXmlText)
-				.then(xml => {
-					reader.sharedState.holdXml = xml;
-					isFinished = true;
-				})
-				.catch(e => {
-					error = e;
-					console.error(e);
-				});
+			parseXml(holdXmlText, log => reader.logs.push(log))
+				.then(xml =>  reader.sharedState.holdXml = xml)
+				.catch(e => error = e)
+				.finally(() => isFinished = true)
 		},
 		() => isFinished,
 		() => {
@@ -344,13 +337,10 @@ function getXmlToData(reader: HoldReader) {
 			xmlToHold(reader.id, holdXml, log => reader.logs.push(log))
 				.then(hold => {
 					reader.sharedState.hold = hold;
-					isFinished = true;
 					reader.logs.push("FINISHED");
 				})
-				.catch(e => {
-					error = e;
-					console.error(e);
-				});
+				.catch(e => error = e )
+				.finally(() => isFinished = true)
 		},
 		() => isFinished,
 		() => {

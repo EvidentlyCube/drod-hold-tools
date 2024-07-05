@@ -1,7 +1,6 @@
 
-
-export async function parseXml(xmlString: string): Promise<XMLDocument> {
-	const reader = new XmlBufferReader(xmlString);
+export async function parseXml(xmlString: string, updateCallback?: (log: string) => void): Promise<XMLDocument> {
+	const reader = new XmlBufferReader(xmlString, updateCallback);
 	const xmlDoc = document.implementation.createDocument(null, null, null);
 
 	const [headerType, headerData] = reader.consumeHeader();
@@ -18,18 +17,21 @@ export async function parseXml(xmlString: string): Promise<XMLDocument> {
 }
 
 async function readElement(parent: Element|XMLDocument, reader: XmlBufferReader) {
-	await sleep();
+	if (reader.isSleepTime) {
+		await reader.sleep();
+	}
 
 	const document = 'createElement' in parent ? parent : parent.ownerDocument;
 
 	if (!reader.consumeTagOpen()) {
 		return false;
 	}
-
 	const element = document.createElement(reader.consumeTagName());
+
 	for (const attr of reader.consumeAttrs()) {
 		element.setAttribute(attr[0], attr[1]);
 	}
+
 	parent.appendChild(element);
 
 	// Self closing tag
@@ -38,7 +40,10 @@ async function readElement(parent: Element|XMLDocument, reader: XmlBufferReader)
 		return true;
 	}
 
-	reader.consumeTagClose();
+	if (!reader.consumeTagClose()) {
+		reader.throwError("Parse failure - expected tag close because not self-closing but it wasn't found");
+	}
+
 	element.appendChild(document.createTextNode("\n"));
 
 	while (!reader.isFinished) {
@@ -59,18 +64,50 @@ async function readElement(parent: Element|XMLDocument, reader: XmlBufferReader)
 }
 
 type Attr = [string, string];
+const Whitespace = new Set([' ', "\n", "\r", "\t"]);
+const CharCode_a = 'a'.charCodeAt(0);
+const CharCode_z = 'z'.charCodeAt(0);
+const CharCode_A = 'A'.charCodeAt(0);
+const CharCode_Z = 'Z'.charCodeAt(0);
+const CharCode_0 = '0'.charCodeAt(0);
+const CharCode_9 = '9'.charCodeAt(0);
+const CharCode_Dash = '-'.charCodeAt(0);
+const CharCode_Underscore = '_'.charCodeAt(0);
+const CharCode_Colon = ':'.charCodeAt(0);
 
 class XmlBufferReader {
 	private _xml: string;
+	private _length: number;
 	private _pos: number;
+	private _updateCallback?: (log: string) => void;
+	private _lastSleep: number = Date.now();
+
+	public get isSleepTime() {
+		return Date.now() > this._lastSleep + 100;
+	}
+
+	public async sleep() {
+		return new Promise<void>(resolve => {
+			if (this.isSleepTime) {
+				setTimeout(() => {
+		this._lastSleep = Date.now();
+		resolve();
+				}, 1)
+			} else {
+				resolve();
+			}
+		})
+	}
 
 	public get isFinished() {
 		return this._pos >= this._xml.length;
 	}
 
-	public constructor(xml: string) {
-		this._xml = xml;
+	public constructor(xml: string, updateCallback?: (log: string) => void) {
+		this._xml = xml.replace(/\r|\n/g, '');
+		this._length = xml.length;
 		this._pos = 0;
+		this._updateCallback = updateCallback;
 	}
 
 	public consumeHeader() {
@@ -78,7 +115,7 @@ class XmlBufferReader {
 
 		if (match) {
 			this._pos += match[0].length;
-			this.consumeWhitespace();
+			this._pos = this.getWhitespaceEnd(this._pos);
 			return [match[1], match[2]];
 		}
 
@@ -86,9 +123,11 @@ class XmlBufferReader {
 	}
 
 	public consumeTagOpen() {
+		this._log();
+
 		if (this._xml.charAt(this._pos) === '<') {
 			this._pos++;
-			this.consumeWhitespace();
+			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
 		}
 
@@ -96,9 +135,11 @@ class XmlBufferReader {
 	}
 
 	public consumeTagClose() {
-		if (this._xml.charAt(this._pos) === '>') {
+		this._log();
+
+		if (this._xml[this._pos] === '>') {
 			this._pos++;
-			this.consumeWhitespace();
+			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
 		}
 
@@ -106,9 +147,11 @@ class XmlBufferReader {
 	}
 
 	public consumeSlash() {
-		if (this._xml.charAt(this._pos) === '/') {
+		this._log();
+
+		if (this._xml[this._pos] === '/') {
 			this._pos++;
-			this.consumeWhitespace();
+			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
 		}
 
@@ -116,55 +159,98 @@ class XmlBufferReader {
 	}
 
 	public consumeTagName() {
-		const match = this._xml.substring(this._pos).match(/^([a-zA-Z0-9_-]+)/);
+		this._log();
 
-		if (match) {
-			this._pos += match[0].length;
-			this.consumeWhitespace();
-			return match[1];
+		let i = this._pos;
+		for (; i < this._length; i++) {
+			const code = this._xml.charCodeAt(i);
+
+			if (
+				(code >= CharCode_a && code <= CharCode_z)
+				|| (code >= CharCode_A && code <= CharCode_Z)
+				|| (code >= CharCode_0 && code <= CharCode_9)
+				|| code === CharCode_Dash
+				|| code === CharCode_Underscore
+			) {
+				continue;
+			}
+
+			break;
+		}
+
+		if (i > this._pos) {
+			const tagName = this._xml.substring(this._pos, i);
+			this._pos = this.getWhitespaceEnd(i);
+			return tagName;
 		}
 
 		return "";
 	}
 
-	public consumeWhitespace() {
-		const match = this._xml.substring(this._pos).match(/^\s*/);
+	private getWhitespaceEnd(from: number) {
+		this._log();
 
-		if (match) {
-			this._pos += match[0].length;
+		while (Whitespace.has(this._xml[from])) {
+			from++;
 		}
+
+		return from;
 	}
 
 	public consumeAttr(): Attr | undefined {
-		const nameMatch = this._xml.substring(this._pos).match(/^([a-zA-Z_:][-a-zA-Z0-9_:.]*)/);
-
-		if (!nameMatch) {
-			return undefined;
+		let i = this._pos;
+		{
+			const code = this._xml.charCodeAt(i);
+			if (
+				(code < CharCode_a || code > CharCode_z)
+				&& (code < CharCode_A || code > CharCode_Z)
+			) {
+				return undefined;
+			}
 		}
 
-		const attributeName = nameMatch[1];
-		this._pos += nameMatch[0].length;
-		this.consumeWhitespace();
+		i++;
+		for (; i < this._length; i++) {
+			const code = this._xml.charCodeAt(i);
 
-		if (this._xml.charAt(this._pos) !== '=') {
-			return [attributeName, ''];
+			if (
+				(code >= CharCode_a && code <= CharCode_z)
+				|| (code >= CharCode_A && code <= CharCode_Z)
+				|| (code >= CharCode_0 && code <= CharCode_9)
+				|| code === CharCode_Dash
+				|| code === CharCode_Colon
+				|| code === CharCode_Underscore
+			) {
+				continue;
+			}
+
+			break;
 		}
 
-		this._pos++;
-		this.consumeWhitespace();
+		const attributeName = this._xml.substring(this._pos, i);
+		this._pos = this.getWhitespaceEnd(i);
 
-		const valueMatch = this._xml.substring(this._pos).match(/^'([^']*)'|^"([^"]*)"/);
-
-		if (!valueMatch) {
-			return [attributeName, ''];
+		if (this._xml[this._pos++] !== '=') {
+			this.throwError("Invalid XML - Expected an equality sign after attribute name");
 		}
 
-		this._pos += valueMatch[0].length;
-		this.consumeWhitespace();
-		return [attributeName, valueMatch[1] ?? valueMatch[2]];
+		this._pos = this.getWhitespaceEnd(this._pos);
+
+		const quoteChar = this._xml[this._pos++];
+
+		i = this._pos
+		while (i < this._length && this._xml[i] !== quoteChar) {
+			i++;
+		}
+
+		const value = this._xml.substring(this._pos, i);
+		this._pos = this.getWhitespaceEnd(i + 1); // +1 to skip the quote character
+		return [attributeName, value];
 	}
 
 	public consumeAttrs(): Attr[] {
+		this._log();
+
 		const attrs: Attr[] = [];
 
 		let attr = this.consumeAttr();
@@ -177,21 +263,48 @@ class XmlBufferReader {
 	}
 
 	public lookaheadTagClose() {
-		return !!this._xml.substring(this._pos).match(/^<\/\s*([a-zA-Z0-9_-]+)\s*>/);
-	}
-}
+		this._log();
 
-let lastSleep = 0;
-async function sleep() {
-	return new Promise<void>(resolve => {
-		if (Date.now() > lastSleep + 16) {
-			setTimeout(() => {
-				lastSleep = Date.now();
-				resolve();
-			}, 100)
-		} else {
-			resolve();
+		let i = this._pos;
+		if (this._xml[i++] !== '<') {
+			return false;
 		}
-	})
 
+		i = this.getWhitespaceEnd(i);
+		if (this._xml[i] !== '/') {
+			return false;
+		}
+
+		return true;
+	}
+
+	public throwError(message: string) {
+		throw new Error(message + ":" + this.context());
+	}
+
+	public context(pos?: number) {
+		pos = pos ?? this._pos;
+		return this._xml.substring(pos - 20, pos)
+			+ " -->"
+			+ this._xml[pos]
+			+ "<-- "
+			+ this._xml.substring(pos + 1, pos + 20);
+	}
+
+	private _log() {
+		if (!this._updateCallback) {
+			return;
+		}
+
+		const lines = [
+			this._xml.substring(
+				this._pos - 20,
+				this._pos + 20,
+			),
+			"^",
+			`${(this._pos * 100 / this._xml.length).toFixed(2)}% (${this._pos}/${this._xml.length})`
+		].join("\n");
+
+		this._updateCallback(lines);
+	}
 }
