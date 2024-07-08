@@ -20,6 +20,9 @@ export default function ReplaceButton({ data }: Props) {
 
 		parseFileToDataDetail(data, file)
 			.then(detail => {
+				if (!data.name.isChanged) {
+					data.name.newValue = file.name;
+				}
 				data.$replacingFile.unset();
 				data.$lastReplaceError.unset();
 				data.details.newValue = detail;

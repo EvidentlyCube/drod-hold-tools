@@ -5,6 +5,10 @@ export class SignalUpdatableValue<T> {
 	private _newValue: T | undefined;
 	public onChange = new Signal<T | undefined>();
 
+	public get isChanged() {
+		return this._newValue !== undefined;
+	}
+
 	public get finalValue(): T {
 		return this._newValue ?? this.oldValue;
 	}
