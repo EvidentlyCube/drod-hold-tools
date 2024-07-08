@@ -1,7 +1,8 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeDataFile, HoldChangeDataName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeDataFile, HoldChangeDataName, HoldChangeLevelName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
 import { HoldData } from "./HoldData";
+import { HoldLevel } from "./HoldLevel";
 import { HoldSpeech } from "./HoldSpeech";
 
 export class HoldChangeListener {
@@ -13,6 +14,9 @@ export class HoldChangeListener {
 			this.registerDataNameChange(data);
 			this.registerDataFileChange(data);
 		});
+		hold.levels.forEach(level => {
+			this.registerLevelNameChange(level);
+		})
 	}
 
 	private registerSpeechMessageChange(speech: HoldSpeech) {
@@ -49,6 +53,18 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, details);
+	}
+
+	private registerLevelNameChange(level: HoldLevel) {
+		const { $hold, id, name } = level;
+
+		const change = $hold.$changes.create<HoldChangeLevelName>({
+			type: HoldChangeType.LevelName,
+			location: { levelId: id },
+			value: name.newValue
+		});
+
+		registerTextChange($hold, change, name);
 	}
 }
 

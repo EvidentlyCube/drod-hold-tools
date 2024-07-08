@@ -2,6 +2,7 @@ import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { getMainEntranceId } from "../HoldUtils";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
+import { HoldRoom } from "./HoldRoom";
 
 interface LevelConstructor {
 	id: number;
@@ -15,7 +16,7 @@ interface LevelConstructor {
 	isRequired: boolean;
 }
 export class HoldLevel {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
 	public readonly holdId: number;
@@ -27,18 +28,28 @@ export class HoldLevel {
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean;
 
+	private $_roomsCache?: readonly HoldRoom[];
+
 	public get $primaryEntranceId() {
-		return getMainEntranceId(this.hold, this.id) ?? 0;
+		return getMainEntranceId(this.$hold, this.id) ?? 0;
 	}
 
 	public get $entranceCoords() {
-		const { roomX, roomY } = this.hold.entrances.getOrError(this.$primaryEntranceId).$room;
+		const { roomX, roomY } = this.$hold.entrances.getOrError(this.$primaryEntranceId).$room;
 
 		return { x: roomX, y: roomY };
 	}
 
+	public get $rooms() {
+		if (!this.$_roomsCache) {
+			this.$_roomsCache = this.$hold.rooms.filterToArray(room => room.levelId === this.id);
+		}
+
+		return this.$_roomsCache;
+	}
+
 	public constructor(hold: Hold, opts: LevelConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = opts.id;
 		this.holdId = opts.holdId;

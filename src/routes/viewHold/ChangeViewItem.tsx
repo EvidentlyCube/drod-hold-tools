@@ -66,6 +66,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				};
 			}
 
+		case HoldChangeType.LevelName: {
+			const level = hold.levels.get(change.location.levelId);
+
+			if (!level) {
+				return invalid(id, "Level Name", "Cannot find level");
+			}
+
+			return {
+				id,
+				type: 'Level Name',
+				location: { hold, model: 'notApplicable' },
+				before: level.name.oldValue,
+				after: level.name.finalValue
+			};
+		}
+
 		default:
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));
 	}

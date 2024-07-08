@@ -212,7 +212,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 	refs.levelIds.add(level.id);
 
 	writer.tag('Levels')
-		.attr('HoldID', level.hold.id)
+		.attr('HoldID', level.$hold.id)
 		.attr('GID_LevelIndex', level.gidLevelIndex)
 		.attr('OrderIndex', level.orderIndex)
 		.attr('PlayerID', level.playerId)
@@ -223,7 +223,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 		.attr('LevelID', level.id)
 		.end();
 
-	const rooms = level.hold.rooms.values().filter(room => room.levelId === level.id);
+	const rooms = level.$hold.rooms.values().filter(room => room.levelId === level.id);
 
 	for (const room of rooms) {
 		await writeRoom(writer, refs, room);
