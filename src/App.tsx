@@ -10,9 +10,12 @@ import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
 import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 
 function App() {
+	const href = window.location.href.toLocaleLowerCase();
+	const isLocalhost = !!['localhost', '127.0.0.1'].find(str => href.includes(str));
+
 	return (
 		<>
-			<BrowserRouter>
+			<BrowserRouter basename={isLocalhost ? '/' : '/drod-hold-tools'}>
 				<div className="navbar is-info primary-navbar" role="navigation">
 					<div className="navbar-brand">
 						<div className="navbar-item">
