@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { CSSProperties, useCallback } from "react";
 import { useImageSize } from "react-image-size";
 import useLocalStorageState from "use-local-storage-state";
 import { useKeyDownCallback } from "../../../hooks/useKeyboardCallback";
@@ -62,17 +62,18 @@ export default function ImagePreview(props: Props) {
 	}, [zoomLevel, setZoomLevel]);
 
 	const backgroundClass = Backgrounds[background % Backgrounds.length];
-	const style = !dimensions
-		? {}
-		: {
-		width: `${dimensions.width * ZoomLevels[zoomLevel]}px`,
-		height: `${dimensions.height * ZoomLevels[zoomLevel]}px`,
-	};
+	const style: CSSProperties = {
+		maxWidth: 'none'
+	}
+	if (dimensions) {
+		style.width = `${dimensions.width * ZoomLevels[zoomLevel]}px`;
+		style.height = `${dimensions.height * ZoomLevels[zoomLevel]}px`;
+	}
 
 	return (
 		<div className="modal is-active">
 			<div className="modal-background" onClick={onClose}></div>
-			<div className="modal-card">
+			<div className="modal-card image-preview">
 				<header className="modal-card-head">
 					<p className="modal-card-title">{name}</p>
 					<button className="delete" onClick={onClose}></button>

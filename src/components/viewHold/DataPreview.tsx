@@ -67,6 +67,8 @@ function formatToMimetype(format: DataFormat): string | undefined {
 			return 'image/jpeg';
 		case DataFormat.OGG:
 			return 'audio/ogg';
+		case DataFormat.WAV:
+			return 'audio/wav';
 		default:
 			return undefined;
 	}

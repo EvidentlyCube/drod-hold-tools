@@ -13,6 +13,17 @@ export function bytesArrToBase64(bytes: number[]) {
 	return btoa(String.fromCharCode.apply(null, bytes));
 }
 
+export function base64ToUint8(base64: string) {
+	const binString = atob(base64);
+	return Uint8Array.from(binString, m => m.codePointAt(0) ?? 0);
+}
+
+export function uint8ToBase64(bytes: Uint8Array) {
+	const binString = Array.from(bytes, byte => String.fromCodePoint(byte)).join("");
+
+	return btoa(binString);
+}
+
 export function formatString(base: string, ...args: (string | number)[]) {
 	let counter = 0;
 	return base.replace(/%/g, () => {
@@ -21,11 +32,11 @@ export function formatString(base: string, ...args: (string | number)[]) {
 }
 
 export function escapeRegex(str: string) {
-    return str.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+	return str.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 export function escapeRegexToGlob(str: string) {
-    return str.replace(/[/\-\\^$+.()|[\]{}]/g, '\\$&')
+	return str.replace(/[/\-\\^$+.()|[\]{}]/g, '\\$&')
 		.replace(/\?/g, '.')
 		.replace(/\*/g, '.*?');
 }

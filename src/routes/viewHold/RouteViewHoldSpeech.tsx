@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import DataRefView from "../../components/viewHold/DataRefView";
+import DataRefView, { DataRefViewById } from "../../components/viewHold/DataRefView";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
@@ -63,7 +63,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 
 		filterOptions: { optgroups: getDataFormatFilterOptions() },
 
-		render: speech => <DataRefView hold={speech.$hold} dataId={speech.dataId} />,
+		render: speech => <DataRefViewById hold={speech.$hold} dataId={speech.dataId} />,
 		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
 		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
 	},

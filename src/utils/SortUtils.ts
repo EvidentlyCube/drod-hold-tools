@@ -29,6 +29,7 @@ export function sortCompareWithUndefined<T>(isAsc: boolean, left: T|undefined, r
 
 	} else if (!left) {
 		return isAsc ? 1 : -1;
+
 	} else {
 		return isAsc ? -1 : 1;
 	}

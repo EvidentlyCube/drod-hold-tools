@@ -19,4 +19,8 @@ export class SignalNullable<T> {
 	public constructor(value?: T) {
 		this._value = value;
 	}
+
+	public unset() {
+		this.value = undefined;
+	}
 }

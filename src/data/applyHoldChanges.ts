@@ -11,6 +11,10 @@ export function applyHoldChanges(hold: Hold) {
 			case HoldChangeType.DataName:
 				hold.datas.get(change.location.dataId)!.name.newValue = change.value;
 				break;
+
+			case HoldChangeType.DataFile:
+				hold.datas.get(change.location.dataId)!.details.newValue = change.value;
+				break;
 		}
 	}
 }

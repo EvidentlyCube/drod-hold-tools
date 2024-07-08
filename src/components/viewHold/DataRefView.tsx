@@ -3,25 +3,39 @@ import {
 	getFormatName
 } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
+import { HoldData } from "../../data/datatypes/HoldData";
+import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 
-interface Props {
+interface PropsById {
 	hold: Hold;
 	dataId?: number;
 }
 
-export default function DataRefView({ hold, dataId }: Props) {
+interface Props {
+	data: HoldData;
+}
+
+export function DataRefViewById({ hold, dataId }: PropsById) {
 	const data = hold.datas.get(dataId ?? -1);
 
 	if (!data) {
 		return <span className="is-muted">None</span>;
 	}
 
+	return <DataRefView data={ data } />
+
+}
+
+export default function DataRefView({data}: Props) {
+	const name = useSignalUpdatableValue(data.name, true);
+	const { format } = useSignalUpdatableValue(data.details, true);
+
 	return (
-		<div title={`${data.id}: ${data.name.finalValue}`}>
+		<div title={`${data.id}: ${name}`}>
 			<span className="icon">
-				<i className={`fas ${getDataIconClass(data.details.finalValue.format)}`}></i>
+				<i className={`fas ${getDataIconClass(format)}`}></i>
 			</span>{" "}
-			{getFormatName(data.details.finalValue.format)}
+			{getFormatName(format)}
 		</div>
 	);
 }

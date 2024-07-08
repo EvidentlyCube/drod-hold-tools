@@ -4,11 +4,36 @@ import { SortableTableColumn } from "../../components/common/sortableTable/Sorta
 import DataRefView from "../../components/viewHold/DataRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import PreviewButton from "../../components/viewHold/preview/PreviewButton";
-import { canPreviewData, filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
+import { canPreviewData, filterDataFormat, getBase64DecodedLength, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldData } from "../../data/datatypes/HoldData";
+import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { formatBytes } from "../../utils/Language";
-import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
+import { filterString, sortCompareNumber, sortCompareString, sortCompareWithUndefined, sortData } from "../../utils/SortUtils";
+import ReplaceButton from "../../components/viewHold/preview/ReplaceButton";
+
+function HoldDataSize({ data }: { data: HoldData }) {
+	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
+
+	return <span>
+		{formatBytes(getBase64DecodedLength(rawEncodedData))}
+	</span>;
+}
+
+function PreviewCell({ data }: { data: HoldData}) {
+	const [oldDetails, newDetails] = useSignalUpdatableValue(data.details);
+
+	if (!canPreviewData(data.details.finalValue)) {
+		return <span className="is-muted">Cannot preview </span>
+	} else if (newDetails) {
+		return <>
+			<PreviewButton data={data} details={oldDetails} text="Original" />
+			{" "}<PreviewButton data={data} details={newDetails} text="Updated" />
+		</>
+	} else {
+		return <PreviewButton data={data} details={oldDetails} text="Preview" />;
+	}
+}
 
 const Columns: SortableTableColumn<HoldData>[] = [
 	{
@@ -30,7 +55,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 
 		filterOptions: { optgroups: getDataFormatFilterOptions() },
 
-		render: data => <DataRefView hold={data.$hold} dataId={data.id} />,
+		render: data => <DataRefView data={data} />,
 		sort: (isAsc, l, r) => sortData(isAsc, l, r),
 		filter: (data, filter) => filterDataFormat(data.details.finalValue.format, filter)
 	},
@@ -41,7 +66,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		canHide: true,
 		className: 'has-text-right is-family-monospace',
 
-		render: data => formatBytes(data.$size),
+		render: data => <HoldDataSize data={ data } />,
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$size, r.$size)
 	},
 	{
@@ -59,11 +84,19 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		displayName: 'Preview',
 		widthPercent: 10,
 
+		render: data => <PreviewCell data={ data } />,
+		sort: (isAsc, l, r) => sortCompareWithUndefined(isAsc, l.details.newValue, r.details.newValue),
+	},
+	{
+		id: 'replace',
+		displayName: 'Replace',
+		widthPercent: 10,
+
 		render: data => {
 			if (!canPreviewData(data.details.finalValue)) {
-				return <span className="is-muted">Cannot preview </span>
+				return <span className="is-muted">Cannot replace</span>
 			} else {
-				return <PreviewButton data={data} details={data.details.finalValue} />;
+				return <ReplaceButton data={data} />;
 			}
 		}
 	},

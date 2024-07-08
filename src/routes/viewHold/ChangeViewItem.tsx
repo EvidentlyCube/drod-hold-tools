@@ -2,6 +2,8 @@ import { ReactElement } from "react";
 import { HoldChange, HoldChangeType } from "../../data/datatypes/HoldChange";
 import { Hold } from "../../data/datatypes/Hold";
 import { HoldRef } from "../../data/references/HoldReference";
+import { getBase64DecodedLength, getFormatName } from "../../data/Utils";
+import { formatBytes } from "../../utils/Language";
 
 export interface ChangeViewItem {
 	id: string;
@@ -27,23 +29,42 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Speech Message',
 				location: speech.$location,
 				before: speech.message.oldValue,
-				after: speech.message.finalValue ?? ''
+				after: speech.message.finalValue
 			};
 
 		case HoldChangeType.DataName:
-			const data = hold.datas.get(change.location.dataId);
+			{
+				const data = hold.datas.get(change.location.dataId);
 
-			if (!data) {
-				return invalid(id, "Data Name", "Cannot find data");
+				if (!data) {
+					return invalid(id, "Data Name", "Cannot find data");
+				}
+
+				return {
+					id,
+					type: 'Data Name',
+					location: { hold, model: "notApplicable" },
+					before: data.name.oldValue,
+					after: data.name.finalValue
+				};
 			}
 
-			return {
-				id,
-				type: 'Data Name',
-				location: { hold, model: "notApplicable" },
-				before: data.name.oldValue,
-				after: data.name.finalValue ?? ''
-			};
+		case HoldChangeType.DataFile:
+			{
+				const data = hold.datas.get(change.location.dataId);
+
+				if (!data) {
+					return invalid(id, "Data File", "Cannot find data");
+				}
+
+				return {
+					id,
+					type: 'Data File',
+					location: { hold, model: "notApplicable" },
+					before: `${getFormatName(data.details.oldValue.format)} (${formatBytes(getBase64DecodedLength(data.details.oldValue.rawEncodedData))})`,
+					after: `${getFormatName(data.details.finalValue.format)} (${formatBytes(getBase64DecodedLength(data.details.finalValue.rawEncodedData))})`,
+				};
+			}
 
 		default:
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));

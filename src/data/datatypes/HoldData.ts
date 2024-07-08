@@ -1,3 +1,4 @@
+import { SignalNullable } from "../../utils/SignalNullable";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { DataFormat } from "../DrodEnums";
 import { wcharBase64ToString } from "../Utils";
@@ -22,6 +23,9 @@ export class HoldData {
 	public readonly name: SignalUpdatableValue<string>;
 
 	public readonly details: SignalUpdatableValue<HoldDataDetails>;
+
+	public readonly $replacingFile = new SignalNullable<File>();
+	public readonly $lastReplaceError = new SignalNullable<string>();
 
 	public get $size() {
 		return this.details.finalValue.rawEncodedData.length * 3 / 4;

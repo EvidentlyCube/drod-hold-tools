@@ -1,10 +1,12 @@
 import { areObjectsSame } from "../../utils/ObjectUtils";
 import { SignalSet } from "../../utils/SignalSet";
 import { Signal } from "../../utils/Signals";
+import { HoldDataDetails } from "./HoldData";
 
 export enum HoldChangeType {
 	SpeechMessage = 0,
 	DataName = 1,
+	DataFile = 2,
 }
 
 export interface HoldChangeSpeechMessage {
@@ -21,8 +23,16 @@ export type HoldChangeDataName = {
 	value?: string;
 }
 
+export type HoldChangeDataFile = {
+	type: HoldChangeType.DataFile,
+	location: { dataId: number };
+
+	value?: HoldDataDetails;
+}
+
 export type HoldChange = HoldChangeSpeechMessage
-	| HoldChangeDataName;
+	| HoldChangeDataName
+	| HoldChangeDataFile;
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

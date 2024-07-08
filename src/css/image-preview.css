@@ -1,0 +1,4 @@
+.modal-card.image-preview {
+	width: auto;
+	max-width: calc(100vw - var(--bulma-modal-card-spacing));
+}

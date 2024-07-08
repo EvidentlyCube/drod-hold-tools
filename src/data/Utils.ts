@@ -179,3 +179,27 @@ export function canPreviewData(details: HoldDataDetails) {
 		|| details.format === DataFormat.OGG
 		|| details.format === DataFormat.WAV;
 }
+
+export function getBase64DecodedLength(data: string) {
+	if (data.length === 0) {
+		return 0;
+	}
+
+	let padding = data.endsWith('==') ? 2
+		: data.endsWith('=') ? 1
+		: 0;
+
+	return (3 * data.length - 4 * padding) / 4;
+}
+
+export function isImageFormat(format: DataFormat) {
+	return format === DataFormat.BMP
+		|| format === DataFormat.JPG
+		|| format === DataFormat.PNG;
+}
+
+export function isAudioFormat(format: DataFormat) {
+	return format === DataFormat.S3M
+		|| format === DataFormat.OGG
+		|| format === DataFormat.WAV;
+}

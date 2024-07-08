@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeDataName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeDataFile, HoldChangeDataName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
 import { HoldData } from "./HoldData";
 import { HoldSpeech } from "./HoldSpeech";
 
@@ -11,6 +11,7 @@ export class HoldChangeListener {
 		});
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
+			this.registerDataFileChange(data);
 		});
 	}
 
@@ -36,6 +37,18 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, name);
+	}
+
+	private registerDataFileChange(data: HoldData) {
+		const { $hold, id, details } = data;
+
+		const change = $hold.$changes.create<HoldChangeDataFile>({
+			type: HoldChangeType.DataFile,
+			location: { dataId: id },
+			value: details.newValue
+		});
+
+		registerTextChange($hold, change, details);
 	}
 }
 
