@@ -2,6 +2,7 @@ import { SignalNullable } from "../../utils/SignalNullable";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { DataFormat } from "../DrodEnums";
 import { wcharBase64ToString } from "../Utils";
+import { HoldRef } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 export interface HoldDataDetails {
@@ -26,6 +27,8 @@ export class HoldData {
 
 	public readonly $replacingFile = new SignalNullable<File>();
 	public readonly $lastReplaceError = new SignalNullable<string>();
+
+	public readonly $uses: HoldRef[] = [];
 
 	public get $size() {
 		return this.details.finalValue.rawEncodedData.length * 3 / 4;

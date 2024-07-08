@@ -11,6 +11,7 @@ import { HoldReaders } from "../../processor/HoldReaders";
 import { formatBytes } from "../../utils/Language";
 import { filterString, sortCompareNumber, sortCompareString, sortCompareWithUndefined, sortData } from "../../utils/SortUtils";
 import ReplaceButton from "../../components/viewHold/preview/ReplaceButton";
+import DataUsesPreviewButton from "../../components/viewHold/preview/DataUsesPreviewButton";
 
 function HoldDataSize({ data }: { data: HoldData }) {
 	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
@@ -99,6 +100,14 @@ const Columns: SortableTableColumn<HoldData>[] = [
 				return <ReplaceButton data={data} />;
 			}
 		}
+	},
+	{
+		id: 'uses',
+		displayName: 'Uses',
+		widthPercent: 5,
+
+		render: data => <DataUsesPreviewButton data={data} />,
+		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
 	},
 ];
 

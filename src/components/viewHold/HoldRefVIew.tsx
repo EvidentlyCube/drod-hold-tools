@@ -1,5 +1,5 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
-import { HoldRef, HoldRefCharacterCommand, HoldRefMonsterCommand } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefMonsterCommand, HoldRefRoomImage, HoldRefRoomOverheadImage } from "../../data/references/HoldReference";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -13,11 +13,14 @@ export default function HoldRefView({ holdRef }: Props) {
 		</>;
 	}
 	switch (holdRef.model) {
-		case "charCommand":
-			return <CharacterCommand r={ holdRef } />;
+		case "charAvatar": return <CharacterAvatar r={ holdRef } />;
+		case "charCommand": return <CharacterCommand r={ holdRef } />;
+		case "charTiles": return <CharacterTiles r={ holdRef } />;
 
-		case "monsterCommand":
-			return <MonsterCommand r={ holdRef } />;
+		case "monsterCommand": return <MonsterCommand r={ holdRef } />;
+
+		case "roomImage": return <RoomImage r={ holdRef } />;
+		case "roomOverheadImage": return <RoomOverheadImage r={ holdRef } />;
 
 		case "notApplicable":
 			return <span className="is-muted">Not Applicable</span>
@@ -43,8 +46,36 @@ function CharacterCommand({ r }: {r: HoldRefCharacterCommand}) {
 		<span className="icon icon-monster-ref" title="Character">
 			<i className="fas fa-user"></i>
 		</span>
-		{" "}<strong>{getCharacterName(hold, character.type)}</strong>
-		{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
+		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
+	</>
+}
+
+function CharacterAvatar({ r }: {r: HoldRefCharacterAvatar}) {
+	const { hold, characterId } = r;
+
+	const character = hold.characters.getOrError(characterId);
+
+	return <>
+		<span className="icon icon-monster-ref" title="Character">
+			<i className="fas fa-user"></i>
+		</span>
+		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}&rarr;{" "}<em>Avatar</em>
+	</>
+}
+
+function CharacterTiles({ r }: {r: HoldRefCharacterTiles}) {
+	const { hold, characterId } = r;
+
+	const character = hold.characters.getOrError(characterId);
+
+	return <>
+		<span className="icon icon-monster-ref" title="Character">
+			<i className="fas fa-user"></i>
+		</span>
+		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}&rarr;{" "}<em>Tiles</em>
 	</>
 }
 
@@ -63,7 +94,36 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
 		{", "}{getCharacterName(hold, monster.$characterTypeId)}
 		{" "}({monster.x},{monster.y})
-		{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
-
+		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
 	</>
+}
+
+function RoomImage({ r }: {r: HoldRefRoomImage}) {
+	const { hold, roomId } = r;
+
+	const room = hold.rooms.getOrError(roomId);
+	const level = room.$level;
+
+	return <>
+		<span className="icon icon-monster-ref" title="Monster">
+			<i className="fas fa-bug"></i>
+		</span>
+		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}&rarr;{" "}<em>Room Image</em>
+	</>
+}
+
+function RoomOverheadImage({ r }: {r: HoldRefRoomOverheadImage}) {
+	const { hold, roomId } = r;
+
+	const room = hold.rooms.getOrError(roomId);
+	const level = room.$level;
+
+	return <>
+		<span className="icon icon-monster-ref" title="Monster">
+			<i className="fas fa-bug"></i>
+		</span>
+		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}&rarr;{" "}<em>Overhead Image</em>
+	</>;
 }

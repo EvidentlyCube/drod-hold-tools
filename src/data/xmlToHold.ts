@@ -1,6 +1,7 @@
 import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
+import { getCommandDataId } from "./CommandUtils";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
@@ -273,7 +274,38 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		await sleep();
 	}
 
+	/** Init dynamic data */
+	loadDynamicData(hold);
+
+	// Wait for store to be ready
+	while (HoldIndexedStorage.isInitializing.value) {
+		await sleep(true);
+	}
+
+	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
+	applyHoldChanges(hold);
+
+	new HoldChangeListener().register(hold);
+
+	return hold;
+}
+
+function loadDynamicData(hold: Hold) {
 	for (const character of hold.characters.values()) {
+		if (character.tilesDataId) {
+			hold.datas.getOrError(character.tilesDataId).$uses.push({
+				hold,
+				model: 'charAvatar',
+				characterId: character.id
+			});
+		}
+		if (character.tilesDataId) {
+			hold.datas.getOrError(character.tilesDataId).$uses.push({
+				hold,
+				model: 'charTiles',
+				characterId: character.id
+			});
+		}
 		if (!character.$commandList) {
 			continue;
 		}
@@ -289,10 +321,36 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 					commandIndex
 				}
 			}
+
+			const dataId = getCommandDataId(commands[commandIndex]);
+			if (dataId) {
+				hold.datas.getOrError(dataId).$uses.push({
+					hold,
+					model: 'charCommand',
+					characterId: character.id,
+					commandIndex
+				});
+			}
 		}
 	}
 
 	for (const room of hold.rooms.values()) {
+		if (room.dataId) {
+			hold.datas.getOrError(room.dataId).$uses.push({
+				hold,
+				model: 'roomImage',
+				roomId: room.id
+			});
+		}
+
+		if (room.overheadDataId) {
+			hold.datas.getOrError(room.overheadDataId).$uses.push({
+				hold,
+				model: 'roomOverheadImage',
+				roomId: room.id
+			});
+		}
+
 		for (let monsterIndex = 0; monsterIndex < room.monsters.length; monsterIndex++) {
 			const monster = room.monsters[monsterIndex];
 			if (!monster.$commandList) {
@@ -311,21 +369,30 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 						commandIndex
 					}
 				}
+
+				const dataId = getCommandDataId(commands[commandIndex]);
+				if (dataId) {
+					hold.datas.getOrError(dataId).$uses.push({
+						hold,
+						model: 'monsterCommand',
+						roomId: room.id,
+						monsterIndex,
+						commandIndex
+					});
+				}
 			}
 		}
 	}
 
-	// Wait for store to be ready
-	while (HoldIndexedStorage.isInitializing.value) {
-		await sleep(true);
+	for (const entrance of hold.entrances.values()) {
+		if (entrance.dataId) {
+			hold.datas.getOrError(entrance.dataId).$uses.push({
+				hold,
+				model: 'entranceVoiceOver',
+				entranceId: entrance.id
+			});
+		}
 	}
-
-	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
-	applyHoldChanges(hold);
-
-	new HoldChangeListener().register(hold);
-
-	return hold;
 }
 
 function str(node: Element, attribute: string) {

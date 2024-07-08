@@ -13,6 +13,18 @@ export interface HoldRefCharacterCommand {
 	commandIndex: number;
 };
 
+export interface HoldRefCharacterAvatar {
+	hold: Hold;
+	model: 'charAvatar',
+	characterId: number;
+};
+
+export interface HoldRefCharacterTiles {
+	hold: Hold;
+	model: 'charTiles',
+	characterId: number;
+};
+
 export interface HoldRefMonsterCommand {
 	hold: Hold;
 	model: 'monsterCommand',
@@ -21,6 +33,24 @@ export interface HoldRefMonsterCommand {
 	commandIndex: number;
 };
 
+export interface HoldRefRoomImage {
+	hold: Hold;
+	model: 'roomImage';
+	roomId: number;
+}
+
+export interface HoldRefRoomOverheadImage {
+	hold: Hold;
+	model: 'roomOverheadImage';
+	roomId: number;
+}
+
+export interface HoldRefEntranceVoiceOver {
+	hold: Hold;
+	model: 'entranceVoiceOver';
+	entranceId: number;
+}
+
 export interface HoldRefNotApplicable {
 	hold: Hold;
 	model: 'notApplicable',
@@ -28,5 +58,10 @@ export interface HoldRefNotApplicable {
 
 export type HoldRef = HoldRefSpeech
 	| HoldRefCharacterCommand
+	| HoldRefCharacterAvatar
+	| HoldRefCharacterTiles
 	| HoldRefMonsterCommand
-	| HoldRefNotApplicable;
+	| HoldRefNotApplicable
+	| HoldRefRoomImage
+	| HoldRefRoomOverheadImage
+	| HoldRefEntranceVoiceOver;
