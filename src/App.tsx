@@ -1,4 +1,4 @@
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import { BrowserRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
 import NavHoldsList from "./components/common/NavHoldsList";
 import RouteHome from "./routes/RouteHome";
 import RouteViewHold from "./routes/RouteViewHold";
@@ -39,6 +39,7 @@ function App() {
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
 						<Route path="changes" element={<RouteViewHoldChanges />} />
 					</Route>
+					<Route path="*" element={<Navigate to="/" />} />
 				</Routes>
 			</BrowserRouter>
 		</>
