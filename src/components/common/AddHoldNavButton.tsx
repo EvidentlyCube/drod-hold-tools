@@ -16,7 +16,10 @@ export default function AddHoldNavButton() {
 
 	return (
 		<div className="navbar-item add-item">
-			Add Hold
+			<div className="icon">
+				<i className="fas fa-upload" />
+			</div>
+			&nbsp;&nbsp;Load Hold
 			<input type="file" onChange={onFileSelected} />
 		</div>
 	);

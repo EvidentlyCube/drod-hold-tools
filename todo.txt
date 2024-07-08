@@ -1,3 +1,7 @@
 * Display problems
 * Duplicate data checking
 * Unused data checking
+* Change "Delete" to something better
+* Front page:
+  * Add link to github
+  * Add roadmap and known bugs?
