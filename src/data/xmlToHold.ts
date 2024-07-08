@@ -15,6 +15,7 @@ import { HoldPlayer } from "./datatypes/HoldPlayer";
 import { HoldOrb, HoldRoom } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
+import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 
 export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: string) => void): Promise<Hold> {
 	const drodXml = xml.querySelector('drod');
@@ -71,7 +72,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			holdId: int(dataXml, 'HoldID'),
 			format: int(dataXml, 'DataFormat'),
 			encName: str(dataXml, 'DataNameText'),
-			encRawData: str(dataXml, 'RawData')
+			encRawData: strU(dataXml, 'RawData')
 		});
 
 		hold.datas.set(holdData.id, holdData);
@@ -144,6 +145,22 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		});
 
 		hold.characters.set(holdCharacter.id, holdCharacter);
+		await sleep();
+	}
+
+	for (const worldMapXml of xml.querySelectorAll('WorldMaps')) {
+		const id = int(worldMapXml, 'WorldMap');
+		log(`Parsing World Map ${id}`);
+
+		const holdWorldMap = new HoldWorldMap(hold, {
+			id,
+			dataId: intU(worldMapXml, 'DataID'),
+			displayType: int(worldMapXml, 'DisplayType'),
+			orderIndex: int(worldMapXml, 'OrderIndex'),
+			encName: str(worldMapXml, 'WorldMapNameText'),
+		});
+
+		hold.worldMaps.set(holdWorldMap.id, holdWorldMap);
 		await sleep();
 	}
 
@@ -291,9 +308,29 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 }
 
 function loadDynamicData(hold: Hold) {
+	for (const worldMap of hold.worldMaps.values()) {
+		if (worldMap.dataId) {
+			hold.datas.getOrError(worldMap.dataId).$uses.push({
+				hold,
+				model: 'worldMap',
+				worldMapId: worldMap.id
+			});
+		}
+	}
+
+	for (const speech of hold.speeches.values()) {
+		if (speech.dataId) {
+			hold.datas.getOrError(speech.dataId).$uses.push({
+				hold,
+				model: 'speech',
+				speechId: speech.id
+			});
+		}
+	}
+
 	for (const character of hold.characters.values()) {
-		if (character.tilesDataId) {
-			hold.datas.getOrError(character.tilesDataId).$uses.push({
+		if (character.avatarDataId) {
+			hold.datas.getOrError(character.avatarDataId).$uses.push({
 				hold,
 				model: 'charAvatar',
 				characterId: character.id

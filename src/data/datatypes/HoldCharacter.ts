@@ -39,8 +39,6 @@ export class HoldCharacter {
 		this.tilesDataId = options.tilesDataId;
 		this.avatarDataId = options.avatarDataId;
 
-		console.log(this.name.oldValue, this.type, this.extraVars);
-
 		if (this.extraVars && this.extraVars.hasVar('Commands')) {
 			this.$commandList = new CommandsList(hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
 		}

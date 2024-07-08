@@ -19,8 +19,8 @@ export default function DataUsesPreview(props: Props) {
 				<section className="modal-card-body">
 					<table>
 						<tbody>
-							{data.$uses.map(ref => (
-								<tr key={JSON.stringify(ref)}>
+							{data.$uses.map((ref, index) => (
+								<tr key={index}>
 									<td>
 										<HoldRefView holdRef={ref} />
 									</td>

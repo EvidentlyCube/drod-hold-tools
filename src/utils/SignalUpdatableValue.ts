@@ -28,4 +28,8 @@ export class SignalUpdatableValue<T> {
 		this.oldValue = oldValue;
 		this._newValue = newValue;
 	}
+
+	public unset() {
+		this.newValue = undefined;
+	}
 }

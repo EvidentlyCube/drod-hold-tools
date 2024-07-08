@@ -12,6 +12,7 @@ import { formatBytes } from "../../utils/Language";
 import { filterString, sortCompareNumber, sortCompareString, sortCompareWithUndefined, sortData } from "../../utils/SortUtils";
 import ReplaceButton from "../../components/viewHold/preview/ReplaceButton";
 import DataUsesPreviewButton from "../../components/viewHold/preview/DataUsesPreviewButton";
+import { useCallback } from "react";
 
 function HoldDataSize({ data }: { data: HoldData }) {
 	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
@@ -24,12 +25,21 @@ function HoldDataSize({ data }: { data: HoldData }) {
 function PreviewCell({ data }: { data: HoldData}) {
 	const [oldDetails, newDetails] = useSignalUpdatableValue(data.details);
 
+	const onUndoChanges = useCallback(() => {
+		data.details.unset();
+	}, [data])
+
 	if (!canPreviewData(data.details.finalValue)) {
 		return <span className="is-muted">Cannot preview </span>
 	} else if (newDetails) {
 		return <>
 			<PreviewButton data={data} details={oldDetails} text="Original" />
 			{" "}<PreviewButton data={data} details={newDetails} text="Updated" />
+			{" "}<button className="button" title="Undo changes" onClick={onUndoChanges}>
+				<span className="icon">
+					<i className="fas fa-xmark" />
+				</span>
+			</button>
 		</>
 	} else {
 		return <PreviewButton data={data} details={oldDetails} text="Preview" />;

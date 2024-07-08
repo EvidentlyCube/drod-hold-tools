@@ -13,8 +13,6 @@ export default function HoldReaderView({ holdReader }: Props) {
 	const logs = useSignalArrayThrottled(holdReader.logs, 100);
 	const error = useSignalValue(holdReader.error);
 
-	console.log(error);
-
 	if (error) {
 
 		return (

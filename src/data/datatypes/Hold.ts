@@ -2,15 +2,21 @@ import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { wcharBase64ToString } from "../Utils";
 import { HoldChangeList } from "./HoldChange";
-import { HoldCharacter } from "./HoldCharacter";
-import { HoldData } from "./HoldData";
-import { HoldEntrance } from "./HoldEntrance";
-import { HoldLevel } from "./HoldLevel";
-import { HoldPlayer } from "./HoldPlayer";
-import { HoldRoom } from "./HoldRoom";
-import { HoldSpeech } from "./HoldSpeech";
-import { HoldVariable } from "./HoldVariable";
+import type { HoldRef } from "../references/HoldReference";
+import type { HoldCharacter } from "./HoldCharacter";
+import type { HoldData } from "./HoldData";
+import type { HoldEntrance } from "./HoldEntrance";
+import type { HoldLevel } from "./HoldLevel";
+import type { HoldPlayer } from "./HoldPlayer";
+import type { HoldRoom } from "./HoldRoom";
+import type { HoldSpeech } from "./HoldSpeech";
+import type { HoldVariable } from "./HoldVariable";
+import { HoldWorldMap } from "./HoldWorldMap";
 
+interface HoldProblem {
+	ref: HoldRef;
+	problem: string;
+}
 interface HoldConstructor {
 	$holdReaderId: number;
 
@@ -63,9 +69,12 @@ export class Hold {
 	public readonly characters = new OrderedMap<number, HoldCharacter>();
 	public readonly levels = new OrderedMap<number, HoldLevel>();
 	public readonly rooms = new OrderedMap<number, HoldRoom>();
+	public readonly worldMaps = new OrderedMap<number, HoldWorldMap>();
 
 	public readonly $holdReaderId: number;
 	public readonly $changes = new HoldChangeList();
+
+	public readonly $problems: HoldProblem[] = [];
 
 	public constructor(options: HoldConstructor) {
 		this.$holdReaderId = options.$holdReaderId;

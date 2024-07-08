@@ -69,4 +69,8 @@ export class HoldChangeList {
 		return (this.list.find(stored => match(stored, change)) ?? change) as T;
 	}
 
+	public toJson() {
+		return JSON.stringify(this.list.values());
+	}
+
 }

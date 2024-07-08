@@ -11,27 +11,30 @@ import { HoldPlayer } from "./datatypes/HoldPlayer";
 import { HoldRoom } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
+import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 
 interface OutputRefs {
-	playerIds: Set<number>;
-	entranceIds: Set<number>;
-	dataIds: Set<number>;
-	varIds: Set<number>;
 	characterIds: Set<number>;
-	speechIds: Set<number>;
+	dataIds: Set<number>;
+	entranceIds: Set<number>;
 	levelIds: Set<number>;
+	playerIds: Set<number>;
 	roomIds: Set<number>;
+	speechIds: Set<number>;
+	varIds: Set<number>;
+	worldMapIds: Set<number>;
 }
 export async function holdToXml(hold: Hold) {
 	const refs: OutputRefs = {
-		playerIds: new Set(),
-		entranceIds: new Set(),
-		dataIds: new Set(),
-		varIds: new Set(),
 		characterIds: new Set(),
-		speechIds: new Set(),
+		dataIds: new Set(),
+		entranceIds: new Set(),
 		levelIds: new Set(),
+		playerIds: new Set(),
 		roomIds: new Set(),
+		speechIds: new Set(),
+		varIds: new Set(),
+		worldMapIds: new Set(),
 	};
 
 	const writer = new XMLWriter();
@@ -73,6 +76,10 @@ export async function holdToXml(hold: Hold) {
 
 	for (const character of hold.characters.values()) {
 		await writeCharacter(writer, refs, character)
+	}
+
+	for (const worldMap of hold.worldMaps.values()) {
+		await writeWorldMap(writer, refs, worldMap)
 	}
 
 	// @FIXME Export world maps
@@ -152,8 +159,14 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
 
 	writer.tag('Data')
 		.attr('DataFormat', data.details.finalValue.format)
-		.attr('DataNameText', data.name)
-		.attr('RawData', data.details.finalValue.format)
+		.attr('DataNameText', data.name);
+
+	// TSS hold file has <Data> with no RawData so I guess this is something to support??
+	if (data.details.finalValue.rawEncodedData) {
+		writer.attr('RawData', data.details.finalValue.format)
+	}
+
+	writer
 		.attr('HoldID', data.holdId)
 		.attr('DataID', data.id)
 		.end();
@@ -202,6 +215,30 @@ async function writeVariable(writer: XMLWriter, refs: OutputRefs, variable: Hold
 		.end();
 
 	await sleep();
+}
+
+async function writeWorldMap(writer: XMLWriter, refs: OutputRefs, worldMap: HoldWorldMap) {
+	if (refs.worldMapIds.has(worldMap.id)) {
+		return;
+	}
+
+	if (worldMap.dataId) {
+		// @FIXME - Null Data handler
+		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId)!)
+	}
+
+	refs.worldMapIds.add(worldMap.id);
+
+	writer.tag('WorldMaps')
+		.attr('WorldMap', worldMap.id)
+		.attr('DataID', worldMap.dataId ?? 0)
+		.attr('DisplayType', worldMap.displayType)
+		.attr('OrderIndex', worldMap.orderIndex)
+		.attr('WorldMapNameText', worldMap.name)
+		.end();
+
+	await sleep();
+
 }
 
 async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel) {

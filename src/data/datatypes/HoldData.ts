@@ -14,7 +14,7 @@ interface DataConstructor {
 	holdId: number;
 	format: DataFormat;
 	encName: string;
-	encRawData: string;
+	encRawData?: string;
 }
 export class HoldData {
 	public readonly $hold: Hold;
@@ -42,7 +42,18 @@ export class HoldData {
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
 		this.details = new SignalUpdatableValue({
 			format: opts.format,
-			rawEncodedData: opts.encRawData
+			rawEncodedData: opts.encRawData ?? ""
 		});
+
+		if (!this.details.oldValue.rawEncodedData) {
+			hold.$problems.push({
+				ref: {
+					hold,
+					model: "data",
+					dataId: this.id
+				},
+				problem: "No file data was given."
+			})
+		}
 	}
 }

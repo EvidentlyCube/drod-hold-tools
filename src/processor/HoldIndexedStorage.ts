@@ -141,10 +141,12 @@ class HoldIndexedStorageClass {
 			return;
 		}
 
+		const xmlBlob = new Blob([xmlText], { type: 'text/xml' });
+
 		this._saveHoldCounter += 2;
 
 		const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
-		const holdsStoreRequest = holdsStore.put({ holdId: holdReader.id, xmlText });
+		const holdsStoreRequest = holdsStore.put({ holdId: holdReader.id, xmlBlob });
 
 		holdsStoreRequest.onsuccess = e => {
 			this._saveHoldCounter--;
@@ -156,7 +158,7 @@ class HoldIndexedStorageClass {
 		}
 
 		const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
-		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changes: [] });
+		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changesBlob: new Blob(['[]'], { type: 'text/plain'}) });
 
 		changesStoreRequest.onsuccess = e => {
 			this._saveHoldCounter--;
@@ -172,7 +174,7 @@ class HoldIndexedStorageClass {
 		this._changesSaveLock = true;
 		this._holdChangesSaveQueue.clear();
 
-		const rows = holds.map(hold => ({ holdId: hold.$holdReaderId, changes: hold.$changes.list.values() }));
+		const rows = holds.map(hold => this.mapHoldToChangesRow(hold));
 
 		let remaining = rows.length;
 		const popRemaining = () => {
@@ -199,6 +201,13 @@ class HoldIndexedStorageClass {
 		}
 	}
 
+	private mapHoldToChangesRow(hold: Hold) {
+		return {
+			holdId: hold.$holdReaderId,
+			changesBlob: new Blob([hold.$changes.toJson()], { type: 'text/plain' })
+		};
+	}
+
 	private onDbOpenRequest_error(event: Event) {
 		// @FIXME DB Open failed
 	}
@@ -218,46 +227,103 @@ class HoldIndexedStorageClass {
 
 		if (!this.db.objectStoreNames.contains(STORE_HOLDS)) {
 			const holdStore = this.db.createObjectStore(STORE_HOLDS, { keyPath: 'holdId' });
-			holdStore.createIndex('xmlText', 'xmlText', { unique: false });
+			holdStore.createIndex('blob', 'xmlBlob', { unique: false });
 		}
 
 		if (!this.db.objectStoreNames.contains(STORE_CHANGES)) {
 			const changesStore = this.db.createObjectStore(STORE_CHANGES, { keyPath: 'holdId' });
-			changesStore.createIndex('changes', 'changes', { unique: false });
+			changesStore.createIndex('changesBlob', 'changesBlob', { unique: false });
 		}
 	}
 
 	private loadHolds() {
+		let counter = 0;
+		let isCursorFinished = false;
+		let doFinish = () => {
+			if (counter === 0 && isCursorFinished) {
+				this.loadChanges();
+			}
+		}
+
 		const holdsStore = this.db.transaction(STORE_HOLDS).objectStore(STORE_HOLDS);
 		holdsStore.openCursor().onsuccess = (event) => {
 			const cursor = (event as any).target.result as IDBCursorWithValue;
 
 			if (!cursor) {
-				this.loadChanges();
+				isCursorFinished = true;
+				doFinish();
 				return;
 			}
 
-			const { holdId, xmlText } = cursor.value;
-			this._storedHoldReaderIds.add(holdId);
-			HoldReaders.readHoldXmlString(xmlText, holdId);
+			counter++;
 
+			const { holdId, xmlBlob } = cursor.value;
+
+			const reader = new FileReader();
+			reader.onload = () => {
+				if (typeof reader.result === 'string') {
+					this._storedHoldReaderIds.add(holdId);
+					HoldReaders.readHoldXmlString(reader.result, holdId);
+				} else {
+					console.error("Stored hold was not loaded as string");
+				}
+
+				counter--;
+				doFinish();
+			}
+			reader.onerror = () => {
+				counter--;
+				doFinish();
+			}
+			reader.readAsText(xmlBlob);
 			cursor.continue();
 		}
 	}
 
 	private loadChanges() {
+		let counter = 0;
+		let isCursorFinished = false;
+		let doFinish = () => {
+			if (counter === 0 && isCursorFinished) {
+				this.isInitializing.value = false
+			}
+		}
+
 		const changesStore = this.db.transaction(STORE_CHANGES).objectStore(STORE_CHANGES);
 		changesStore.openCursor().onsuccess = (event) => {
 			const cursor = (event as any).target.result as IDBCursorWithValue;
 
 			if (!cursor) {
-				this.isInitializing.value = false
+				isCursorFinished = true;
+				doFinish();
 				return;
 			}
 
-			const { holdId, changes } = cursor.value;
-			this._loadedHoldToChanges.set(holdId, changes);
+			const { holdId, changesBlob } = cursor.value;
 
+			const reader = new FileReader();
+			reader.onload = () => {
+				if (typeof reader.result === 'string') {
+					try {
+						this._loadedHoldToChanges.set(holdId, JSON.parse(reader.result || "[]"));
+					} catch (e) {
+						console.log(e);
+						// ignore
+					}
+				} else {
+					console.error("Stored changes were not loaded as string");
+				}
+
+				counter--;
+				doFinish();
+			}
+			reader.onerror = () => {
+				counter--;
+				doFinish();
+			}
+			reader.readAsText(changesBlob);
+
+			counter++;
 			cursor.continue();
 		}
 	}
