@@ -8,7 +8,7 @@ This is a tool for inspecting and editing DROD holds, specifically things like:
 
 # How to use
 
-I'll put a link here in the next commit
+Just click [this link](https://evidentlycube.github.io/drod-hold-tools/). It's still work in progress so might have issues.
 
 # Building locally
 
