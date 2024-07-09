@@ -1,31 +1,30 @@
 import { useCallback, useRef } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
-import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 import ReactTextareaAutosize from "react-textarea-autosize";
+import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 
 interface Props {
 	text: SignalUpdatableValue<string>;
 	tag?: 'input'|'textarea';
 }
 export default function DrodTextEditor({text, tag}: Props) {
-	const [oldValue, newValue] = useSignalUpdatableValue(text);
+	const [oldValue, isEdited, newValue] = useSignalUpdatableValue(text);
 	const inputRef = useRef(null);
-	const isEdited = newValue !== undefined;
 
 	const onToggle = useCallback(() => {
-		if (newValue === undefined) {
+		if (!isEdited) {
 			text.newValue = text.oldValue;
 			if (inputRef.current) {
 				(inputRef.current as HTMLElement).focus()
 			}
 		} else {
-			text.newValue = undefined;
+			text.unset();
 		}
-	}, [text, newValue]);
+	}, [text, isEdited]);
 
 	const onBlur = useCallback(() => {
 		if (isEdited && text.newValue === text.oldValue) {
-			text.newValue = undefined;
+			text.unset();
 		}
 	}, [text, isEdited])
 
@@ -42,8 +41,8 @@ export default function DrodTextEditor({text, tag}: Props) {
 		return <div className="control has-icons-left">
 			<ReactTextareaAutosize
 				className="textarea textarea-auto-size is-read-only-hidden"
-				value={newValue ?? oldValue}
-				readOnly={newValue === undefined}
+				value={newValue}
+				readOnly={!isEdited}
 				onInput={onType}
 				ref={inputRef}
 				onClick={!isEdited ? onToggle : undefined}
@@ -53,16 +52,16 @@ export default function DrodTextEditor({text, tag}: Props) {
 				maxRows={8}
 				/>
 			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-				{newValue === undefined && <i className="fas fa-pen-to-square" />}
-				{newValue !== undefined && <i className="fas fa-rotate-left" />}
+				{!isEdited && <i className="fas fa-pen-to-square" />}
+				{isEdited && <i className="fas fa-rotate-left" />}
 			</div>
 		</div>
 	} else {
 		return <div className="control has-icons-left">
 			<input
 				className="input is-read-only-hidden"
-				value={newValue ?? oldValue}
-				readOnly={newValue === undefined}
+				value={newValue}
+				readOnly={!isEdited}
 				onInput={onType}
 				ref={inputRef}
 				onClick={!isEdited ? onToggle : undefined}
@@ -70,8 +69,8 @@ export default function DrodTextEditor({text, tag}: Props) {
 				title={oldValue}
 				/>
 			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-				{newValue === undefined && <i className="fas fa-pen-to-square" />}
-				{newValue !== undefined && <i className="fas fa-xmark" />}
+				{!isEdited && <i className="fas fa-pen-to-square" />}
+				{isEdited && <i className="fas fa-rotate-left" />}
 			</div>
 		</div>
 	}

@@ -1,8 +1,8 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { wcharBase64ToString } from "../Utils";
-import { HoldChangeList } from "./HoldChange";
 import type { HoldRef } from "../references/HoldReference";
+import { HoldChangeList } from "./HoldChange";
 import type { HoldCharacter } from "./HoldCharacter";
 import type { HoldData } from "./HoldData";
 import type { HoldEntrance } from "./HoldEntrance";

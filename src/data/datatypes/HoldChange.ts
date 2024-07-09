@@ -19,6 +19,7 @@ export type HoldChangeCharacterName = {
 	type: HoldChangeType.CharacterName,
 	location: { characterId: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 
@@ -26,6 +27,7 @@ export type HoldChangeDataName = {
 	type: HoldChangeType.DataName,
 	location: { dataId: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 
@@ -33,6 +35,7 @@ export type HoldChangeDataFile = {
 	type: HoldChangeType.DataFile,
 	location: { dataId: number };
 
+	hasChange: boolean;
 	value?: HoldDataDetails;
 }
 
@@ -40,6 +43,7 @@ export type HoldChangeEntranceDescription = {
 	type: HoldChangeType.EntranceDescription,
 	location: { entranceId: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 
@@ -47,6 +51,7 @@ export type HoldChangeEntranceShowDescription = {
 	type: HoldChangeType.EntranceShowDescription,
 	location: { entranceId: number };
 
+	hasChange: boolean;
 	value?: number;
 }
 
@@ -54,6 +59,7 @@ export type HoldChangeLevelName = {
 	type: HoldChangeType.LevelName,
 	location: { levelId: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 
@@ -61,6 +67,7 @@ export interface HoldChangeSpeechMessage {
 	type: HoldChangeType.SpeechMessage;
 	location: { speechId: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 
@@ -68,6 +75,7 @@ export interface HoldChangeSpeechMood {
 	type: HoldChangeType.SpeechMood;
 	location: { speechId: number };
 
+	hasChange: boolean;
 	value?: number;
 }
 
@@ -75,6 +83,7 @@ export interface HoldChangeScrollMessage {
 	type: HoldChangeType.ScrollMessage;
 	location: { roomId: number, x: number, y: number };
 
+	hasChange: boolean;
 	value?: string;
 }
 

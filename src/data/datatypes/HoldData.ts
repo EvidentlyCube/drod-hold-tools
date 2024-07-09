@@ -6,8 +6,8 @@ import { HoldRef } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 export interface HoldDataDetails {
-	format: DataFormat;
-	rawEncodedData: string;
+	readonly format: DataFormat;
+	readonly rawEncodedData: string;
 }
 interface DataConstructor {
 	id: number;

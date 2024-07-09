@@ -27,7 +27,7 @@ export class XMLWriter {
 			this._xml += writePackedVars(value);
 
 		} else if (value instanceof SignalUpdatableValue) {
-			this._xml += stringToWCharBase64(value.finalValue);
+			this._xml += stringToWCharBase64(value.newValue);
 
 		} else if (typeof value === 'boolean') {
 			this._xml += value ? '1' : '0';

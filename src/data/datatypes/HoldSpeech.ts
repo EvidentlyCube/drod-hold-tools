@@ -1,6 +1,4 @@
-import { Option } from "../../components/common/Select";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { Mood, MoodIdToName } from "../DrodEnums";
 import { HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/HoldReference";
 import { getCharacterName, getSpeakerMood, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";

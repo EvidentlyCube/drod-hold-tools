@@ -39,6 +39,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeCharacterName>({
 			type: HoldChangeType.CharacterName,
 			location: { characterId: id },
+			hasChange: false,
 			value: name.newValue
 		});
 
@@ -51,6 +52,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeDataName>({
 			type: HoldChangeType.DataName,
 			location: { dataId: id },
+			hasChange: false,
 			value: name.newValue
 		});
 
@@ -63,6 +65,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeDataFile>({
 			type: HoldChangeType.DataFile,
 			location: { dataId: id },
+			hasChange: false,
 			value: details.newValue
 		});
 
@@ -75,6 +78,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeEntranceDescription>({
 			type: HoldChangeType.EntranceDescription,
 			location: { entranceId: id },
+			hasChange: false,
 			value: description.newValue
 		});
 
@@ -87,6 +91,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeEntranceShowDescription>({
 			type: HoldChangeType.EntranceShowDescription,
 			location: { entranceId: id },
+			hasChange: false,
 			value: showDescription.newValue
 		});
 
@@ -99,6 +104,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeLevelName>({
 			type: HoldChangeType.LevelName,
 			location: { levelId: id },
+			hasChange: false,
 			value: name.newValue
 		});
 
@@ -112,6 +118,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeScrollMessage>({
 			type: HoldChangeType.ScrollMessage,
 			location: { roomId: $room.id, x, y },
+			hasChange: false,
 			value: message.newValue
 		});
 
@@ -124,6 +131,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeSpeechMessage>({
 			type: HoldChangeType.SpeechMessage,
 			location: { speechId: id },
+			hasChange: false,
 			value: message.newValue
 		});
 
@@ -136,6 +144,7 @@ export class HoldChangeListener {
 		const change = $hold.$changes.create<HoldChangeSpeechMood>({
 			type: HoldChangeType.SpeechMood,
 			location: { speechId: id },
+			hasChange: false,
 			value: mood.newValue
 		});
 
@@ -145,10 +154,11 @@ export class HoldChangeListener {
 }
 
 function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {
-	updatableValue.onChange.add(newValue => {
-		change.value = newValue;
+	updatableValue.onChange.add(props => {
+		change.hasChange = props.hasNewValue;
+		change.value = props.value;
 
-		if (newValue === undefined || newValue === updatableValue.oldValue) {
+		if (!props.hasNewValue || props.value === updatableValue.oldValue) {
 			hold.$changes.del(change)
 		} else {
 			hold.$changes.add(change)

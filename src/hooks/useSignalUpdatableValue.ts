@@ -1,15 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
-import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
+import { SignalUpdatableChangeData, SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 
 export function useSignalUpdatableValue<T>(updatableValue: SignalUpdatableValue<T>, returnFinal: true): T;
-export function useSignalUpdatableValue<T>(updatableValue: SignalUpdatableValue<T>, returnFinal?: false): [T, T|undefined];
-export function useSignalUpdatableValue<T>(updatableValue: SignalUpdatableValue<T>, returnFinal?: boolean): [T, T|undefined]|T {
+export function useSignalUpdatableValue<T>(updatableValue: SignalUpdatableValue<T>, returnFinal?: false): [T, boolean, T];
+export function useSignalUpdatableValue<T>(updatableValue: SignalUpdatableValue<T>, returnFinal?: boolean): [T, boolean, T]|T {
 	const [value, setValue] = useState(updatableValue.newValue);
+	const [isChanged, setIsChanged] = useState(updatableValue.isChanged);
 
-	const refresh  = useCallback((value?: T) => setValue(value), [setValue]);
+	const refresh  = useCallback((data: SignalUpdatableChangeData<T>) => {
+		setValue(data.value);
+		setIsChanged(data.hasNewValue);
+	}, [setValue, setIsChanged]);
+
 	useEffect(() => updatableValue.onChange.addForHook(refresh), [updatableValue, refresh]);
 
 	return returnFinal
-		? updatableValue.finalValue
-		: [updatableValue.oldValue, value];
+		? updatableValue.newValue
+		: [updatableValue.oldValue, isChanged, value];
 }

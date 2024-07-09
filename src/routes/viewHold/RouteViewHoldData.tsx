@@ -23,14 +23,15 @@ function HoldDataSize({ data }: { data: HoldData }) {
 }
 
 function PreviewCell({ data }: { data: HoldData}) {
-	const [oldDetails, newDetails] = useSignalUpdatableValue(data.details);
+	const [oldDetails, isChanged, newDetails] = useSignalUpdatableValue(data.details);
 
 	const onUndoChanges = useCallback(() => {
 		data.details.unset();
 	}, [data])
 
-	if (!canPreviewData(data.details.finalValue)) {
+	if (!canPreviewData(newDetails)) {
 		return <span className="is-muted">Cannot preview </span>
+
 	} else if (newDetails) {
 		return <>
 			<PreviewButton data={data} details={oldDetails} text="Original" />
