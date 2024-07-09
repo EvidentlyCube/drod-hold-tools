@@ -1,7 +1,7 @@
 import { ChangeEvent, useCallback } from "react";
 
 type OptionArray = [string, string];
-type OptionObject = { id?: string; value: string; label: string };
+type OptionObject = { id?: string|number; value: string|number; label: string };
 type OptionHr = ["hr"];
 type OptionString = string;
 

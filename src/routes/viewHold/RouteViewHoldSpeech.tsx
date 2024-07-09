@@ -9,6 +9,19 @@ import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
+import { Mood, MoodIdToName } from "../../data/DrodEnums";
+import { Option } from "../../components/common/Select";
+import SelectEditor from "../../components/viewHold/editables/SelectEditor";
+
+const MoodOptions: Option[] = [
+	{ id: 0, value: Mood.Normal, label: MoodIdToName.get(Mood.Normal)! },
+	{ id: 0, value: Mood.Aggressive, label: MoodIdToName.get(Mood.Aggressive)! },
+	{ id: 0, value: Mood.Nervous, label: MoodIdToName.get(Mood.Nervous)! },
+	{ id: 0, value: Mood.Strike, label: MoodIdToName.get(Mood.Strike)! },
+	{ id: 0, value: Mood.Happy, label: MoodIdToName.get(Mood.Happy)! },
+	{ id: 0, value: Mood.Dying, label: MoodIdToName.get(Mood.Dying)! },
+	{ id: 0, value: Mood.Talking, label: MoodIdToName.get(Mood.Talking)! },
+]
 
 const Columns: SortableTableColumn<HoldSpeech>[] = [
 	{
@@ -39,7 +52,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		widthPercent: 5,
 		canHide: true,
 
-		render: speech => speech.$mood,
+		render: speech => <SelectEditor value={speech.mood} options={MoodOptions} transformer={mood => parseInt(mood)} />,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood),
 		filter: (speech, filter) => filterString(speech.$mood, filter),
 		filterDebounce: 500,

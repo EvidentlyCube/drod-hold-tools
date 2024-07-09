@@ -4,6 +4,7 @@ import { Hold } from "../../data/datatypes/Hold";
 import { HoldRef } from "../../data/references/HoldReference";
 import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
 import { formatBytes } from "../../utils/Language";
+import { MoodIdToName } from "../../data/DrodEnums";
 
 export interface ChangeViewItem {
 	id: string;
@@ -152,6 +153,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				location: speech.$location,
 				before: speech.message.oldValue,
 				after: speech.message.finalValue
+			};
+		}
+
+		case HoldChangeType.SpeechMood: {
+			const speech = hold.speeches.get(change.location.speechId);
+
+			if (!speech) {
+				return invalid(id, "Speech Mood", "Cannot find speech");
+			}
+
+			return {
+				id,
+				type: 'Speech Mood',
+				location: speech.$location,
+				before: MoodIdToName.get(speech.mood.oldValue) ?? `Invalid mood ${speech.mood.oldValue}`,
+				after: MoodIdToName.get(speech.mood.finalValue) ?? `Invalid mood ${speech.mood.finalValue}`,
 			};
 		}
 

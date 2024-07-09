@@ -1,4 +1,6 @@
+import { Option } from "../../components/common/Select";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { Mood, MoodIdToName } from "../DrodEnums";
 import { HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/HoldReference";
 import { getCharacterName, getSpeakerMood, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
@@ -18,7 +20,7 @@ export class HoldSpeech {
 	public readonly id: number;
 	public readonly dataId?: number;
 	public readonly character: number;
-	public readonly mood: number;
+	public readonly mood: SignalUpdatableValue<number>;
 	public readonly delay: number;
 	public readonly message: SignalUpdatableValue<string>;
 
@@ -29,7 +31,7 @@ export class HoldSpeech {
 	}
 
 	public get $mood() :string {
-		return getSpeakerMood(this.mood);
+		return getSpeakerMood(this.mood.finalValue);
 	}
 
 	public get $data(): HoldData | undefined {
@@ -42,7 +44,7 @@ export class HoldSpeech {
 		this.id = opts.id
 		this.dataId = opts.dataId
 		this.character = opts.character
-		this.mood = opts.mood
+		this.mood = new SignalUpdatableValue(opts.mood);
 		this.delay = opts.delay
 		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
 	}

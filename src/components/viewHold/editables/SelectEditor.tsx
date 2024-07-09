@@ -28,7 +28,7 @@ export default function SelectEditor<T extends string|number>({ value, options, 
 
 	console.log(oldValue, newValue)
 
-	return <>
+	return <div className="is-no-wrap">
 		<Select
 			className={isEdited ? 'is-warning' : ''}
 			value={(newValue ?? oldValue).toString()}
@@ -40,5 +40,5 @@ export default function SelectEditor<T extends string|number>({ value, options, 
 				<i className="fas fa-rotate-left"></i>
 			</div>
 		</button>}
-	</>
+	</div>
 }

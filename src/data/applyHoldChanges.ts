@@ -38,6 +38,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.speeches.get(change.location.speechId)!.message.newValue = change.value;
 				break;
 
+			case HoldChangeType.SpeechMood:
+				hold.speeches.get(change.location.speechId)!.mood.newValue = change.value;
+				break;
+
 		}
 	}
 }

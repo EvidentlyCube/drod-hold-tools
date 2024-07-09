@@ -186,7 +186,7 @@ async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpee
 
 	writer.tag('Speech')
 		.attr('Character', speech.character)
-		.attr('Mood', speech.mood)
+		.attr('Mood', speech.mood.finalValue)
 		.attr('Message', speech.message)
 		.attr('Delay', speech.delay);
 

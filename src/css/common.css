@@ -112,3 +112,6 @@
 .is-white-space-pre {
 	white-space: pre;
 }
+.is-no-wrap {
+	white-space: nowrap;
+}

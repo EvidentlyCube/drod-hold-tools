@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -29,6 +29,7 @@ export class HoldChangeListener {
 		})
 		hold.speeches.forEach(speech => {
 			this.registerSpeechMessageChange(speech);
+			this.registerSpeechMoodChange(speech);
 		});
 	}
 
@@ -127,6 +128,18 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, message);
+	}
+
+	private registerSpeechMoodChange(speech: HoldSpeech) {
+		const { $hold, id, mood } = speech;
+
+		const change = $hold.$changes.create<HoldChangeSpeechMood>({
+			type: HoldChangeType.SpeechMood,
+			location: { speechId: id },
+			value: mood.newValue
+		});
+
+		registerTextChange($hold, change, mood);
 	}
 
 }
