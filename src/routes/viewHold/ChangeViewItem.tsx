@@ -17,20 +17,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 	const id = `${change.type}-${JSON.stringify(change.location)}`;
 
 	switch (change.type) {
-		case HoldChangeType.SpeechMessage:
-			const speech = hold.speeches.get(change.location.speechId);
+		case HoldChangeType.CharacterName:
+			{
+				const data = hold.characters.get(change.location.characterId);
 
-			if (!speech) {
-				return invalid(id, "Speech Message", "Cannot find speech");
+				if (!data) {
+					return invalid(id, "Character Name", "Cannot find data");
+				}
+
+				return {
+					id,
+					type: 'Character Name',
+					location: { hold, model: "notApplicable" },
+					before: data.name.oldValue,
+					after: data.name.finalValue
+				};
 			}
-
-			return {
-				id,
-				type: 'Speech Message',
-				location: speech.$location,
-				before: speech.message.oldValue,
-				after: speech.message.finalValue
-			};
 
 		case HoldChangeType.DataName:
 			{
@@ -81,6 +83,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				after: level.name.finalValue
 			};
 		}
+
+		case HoldChangeType.SpeechMessage:
+			const speech = hold.speeches.get(change.location.speechId);
+
+			if (!speech) {
+				return invalid(id, "Speech Message", "Cannot find speech");
+			}
+
+			return {
+				id,
+				type: 'Speech Message',
+				location: speech.$location,
+				before: speech.message.oldValue,
+				after: speech.message.finalValue
+			};
+
 
 		default:
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));

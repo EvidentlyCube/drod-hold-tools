@@ -1,14 +1,15 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeDataFile, HoldChangeDataName, HoldChangeLevelName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeLevelName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldLevel } from "./HoldLevel";
 import { HoldSpeech } from "./HoldSpeech";
 
 export class HoldChangeListener {
 	public register(hold: Hold) {
-		hold.speeches.forEach(speech => {
-			this.registerSpeechMessageChange(speech);
+		hold.characters.forEach(character => {
+			this.registerCharacterNameChange(character);
 		});
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
@@ -17,18 +18,21 @@ export class HoldChangeListener {
 		hold.levels.forEach(level => {
 			this.registerLevelNameChange(level);
 		})
+		hold.speeches.forEach(speech => {
+			this.registerSpeechMessageChange(speech);
+		});
 	}
 
-	private registerSpeechMessageChange(speech: HoldSpeech) {
-		const { $hold, id, message } = speech;
+	private registerCharacterNameChange(character: HoldCharacter) {
+		const { $hold, id, name } = character;
 
-		const change = $hold.$changes.create<HoldChangeSpeechMessage>({
-			type: HoldChangeType.SpeechMessage,
-			location: { speechId: id },
-			value: message.newValue
+		const change = $hold.$changes.create<HoldChangeCharacterName>({
+			type: HoldChangeType.CharacterName,
+			location: { characterId: id },
+			value: name.newValue
 		});
 
-		registerTextChange($hold, change, message);
+		registerTextChange($hold, change, name);
 	}
 
 	private registerDataNameChange(data: HoldData) {
@@ -66,6 +70,19 @@ export class HoldChangeListener {
 
 		registerTextChange($hold, change, name);
 	}
+
+	private registerSpeechMessageChange(speech: HoldSpeech) {
+		const { $hold, id, message } = speech;
+
+		const change = $hold.$changes.create<HoldChangeSpeechMessage>({
+			type: HoldChangeType.SpeechMessage,
+			location: { speechId: id },
+			value: message.newValue
+		});
+
+		registerTextChange($hold, change, message);
+	}
+
 }
 
 function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {

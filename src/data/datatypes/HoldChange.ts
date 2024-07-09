@@ -8,11 +8,12 @@ export enum HoldChangeType {
 	DataName = 1,
 	DataFile = 2,
 	LevelName = 3,
+	CharacterName = 4,
 }
 
-export interface HoldChangeSpeechMessage {
-	type: HoldChangeType.SpeechMessage;
-	location: { speechId: number };
+export type HoldChangeCharacterName = {
+	type: HoldChangeType.CharacterName,
+	location: { characterId: number };
 
 	value?: string;
 }
@@ -38,10 +39,18 @@ export type HoldChangeLevelName = {
 	value?: string;
 }
 
-export type HoldChange = HoldChangeSpeechMessage
+export interface HoldChangeSpeechMessage {
+	type: HoldChangeType.SpeechMessage;
+	location: { speechId: number };
+
+	value?: string;
+}
+
+export type HoldChange = HoldChangeCharacterName
 	| HoldChangeDataName
 	| HoldChangeDataFile
-	| HoldChangeLevelName;
+	| HoldChangeLevelName
+	| HoldChangeSpeechMessage
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

@@ -73,7 +73,6 @@ export default function RouteHome() {
 							<h3>Roadmap</h3>
 							<h5 className="is-muted">a.k.a planned features</h5>
 							<ul>
-								<li>Character list and renaming them</li>
 								<li>Variable list and renaming them</li>
 								<li>&hellip;with optional auto-changing it in all scripts</li>
 								<li>Editing entrance texts</li>
@@ -92,7 +91,11 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
-							<h5 className="subtitle is-6">v0.1.0</h5>
+							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
+							<ul>
+								<li>Character list and changing their name</li>
+							</ul>
+							<h5 className="subtitle is-6">v0.1.0{" "}<span className="is-muted">(2024-07-08)</span></h5>
 							<ul>
 								<li>Currently released version</li>
 								<li>Import & Export</li>

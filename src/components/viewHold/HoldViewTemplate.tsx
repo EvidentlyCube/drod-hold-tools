@@ -17,35 +17,22 @@ export default function HoldViewTemplate({ hold, holdReader }: Props) {
 					</div>
 				</div>
 				<div className="navbar-start">
-					<NavLink
-						className="navbar-item"
-						to={`/hold/${holdReader.id}`}
-						end
-					>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}`} end>
 						Summary
 					</NavLink>
-					<NavLink
-						className="navbar-item"
-						to={`/hold/${holdReader.id}/levels`}
-					>
-						Levels
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/characters`}>
+						Characters
 					</NavLink>
-					<NavLink
-						className="navbar-item"
-						to={`/hold/${holdReader.id}/datas`}
-					>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/datas`}>
 						Datas
 					</NavLink>
-					<NavLink
-						className="navbar-item"
-						to={`/hold/${holdReader.id}/speeches`}
-					>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/levels`} >
+						Levels
+					</NavLink>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/speeches`}>
 						Speeches
 					</NavLink>
-					<NavLink
-						className="navbar-item"
-						to={`/hold/${holdReader.id}/changes`}
-					>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/changes`}>
 						Changes
 					</NavLink>
 				</div>

@@ -16,7 +16,7 @@ interface CharacterConstructor {
 	avatarDataId?: number
 }
 export class HoldCharacter {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
 	public readonly name: SignalUpdatableValue<string>;
@@ -29,7 +29,7 @@ export class HoldCharacter {
 	public readonly $commandList?: CommandsList;
 
 	public constructor(hold: Hold, options: CharacterConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = options.id;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));

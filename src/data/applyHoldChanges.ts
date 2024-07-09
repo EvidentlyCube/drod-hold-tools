@@ -4,8 +4,8 @@ import { HoldChangeType } from "./datatypes/HoldChange";
 export function applyHoldChanges(hold: Hold) {
 	for (const change of hold.$changes.list.values()) {
 		switch (change.type) {
-			case HoldChangeType.SpeechMessage:
-				hold.speeches.get(change.location.speechId)!.message.newValue = change.value;
+			case HoldChangeType.CharacterName:
+				hold.characters.get(change.location.characterId)!.name.newValue = change.value;
 				break;
 
 			case HoldChangeType.DataName:
@@ -19,6 +19,11 @@ export function applyHoldChanges(hold: Hold) {
 			case HoldChangeType.LevelName:
 				hold.levels.get(change.location.levelId)!.name.newValue = change.value;
 				break;
+
+			case HoldChangeType.SpeechMessage:
+				hold.speeches.get(change.location.speechId)!.message.newValue = change.value;
+				break;
+
 		}
 	}
 }

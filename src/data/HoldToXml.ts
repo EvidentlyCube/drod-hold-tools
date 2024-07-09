@@ -420,11 +420,11 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 
 	if (character.avatarDataId) {
 		// @FIXME handle null data
-		await writeData(writer, refs, character.hold.datas.get(character.avatarDataId)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId)!)
 	}
 	if (character.tilesDataId) {
 		// @FIXME handle null data
-		await writeData(writer, refs, character.hold.datas.get(character.tilesDataId)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId)!)
 	}
 
 	if (character.$commandList) {
