@@ -309,7 +309,11 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 	const exportedXml = await holdToXml(hold);
 	log("Stability check: Comparing XMLs")
 	try {
-		await diffXml(xml, exportedXml)
+		await diffXml(xml, exportedXml, (index, total) => {
+			const percent = (index / total) * 100;
+			log(`Stability check: ${percent.toFixed(2)}% (${index} / ${total})`);
+		});
+
 	} catch (e) {
 		console.error(e);
 		throw new Error(

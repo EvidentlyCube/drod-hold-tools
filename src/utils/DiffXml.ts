@@ -1,15 +1,45 @@
 import { diffArrays } from "./ArrayUtils";
 import { parseXml } from "./XmlParser";
 
+type ProgressCallback = (index: number, total: number) => void;
 
-export async function diffXml(left: string|XMLDocument, right: string|XMLDocument) {
+interface DiffState {
+	onProgress: ProgressCallback;
+	flatDom: Element[];
+}
+
+export async function diffXml(left: string | XMLDocument, right: string | XMLDocument, onProgress: ProgressCallback) {
 	left = await toDocument(left);
 	right = await toDocument(right);
 
-	await compareNode(left, right, "ROOT");
+	const state: DiffState = {
+		onProgress,
+		flatDom: flattenDom(left)
+	}
+
+	await compareNode(left, right, "ROOT", state);
 }
 
-async function compareNode(left: Node, right: Node, context: string) {
+function flattenDom(document: XMLDocument): Element[] {
+	const elements: Element[] = [];
+
+	function traverse(element: Element) {
+        elements.push(element);
+
+        for (const child of element.children) {
+			traverse(child);
+		}
+    }
+
+    // Start traversal from the document body
+    for (const child of document.children) {
+		traverse(child);
+	}
+
+    return elements;
+}
+
+async function compareNode(left: Node, right: Node, context: string, state: DiffState) {
 	await sleep();
 
 	if (left.nodeType !== right.nodeType) {
@@ -18,10 +48,10 @@ async function compareNode(left: Node, right: Node, context: string) {
 
 	switch (left.nodeType) {
 		case Node.ELEMENT_NODE:
-			await compareElement(left as Element, right as Element, context);
+			await compareElement(left as Element, right as Element, context, state);
 			break;
 		case Node.DOCUMENT_NODE:
-			await compareDocuments(left as Document, right as Document, context);
+			await compareDocuments(left as Document, right as Document, context, state);
 			break;
 
 		default:
@@ -29,7 +59,11 @@ async function compareNode(left: Node, right: Node, context: string) {
 	}
 }
 
-async function compareElement(left: Element, right: Element, context: string) {
+async function compareElement(left: Element, right: Element, context: string, state: DiffState) {
+	const index = state.flatDom.indexOf(left);
+	if (index !== -1) {
+		state.onProgress(index, state.flatDom.length);
+	}
 	if (left.tagName !== right.tagName) {
 		console.log(left);
 		console.log(right);
@@ -65,11 +99,11 @@ async function compareElement(left: Element, right: Element, context: string) {
 	}
 
 	for (let i = 0; i < left.children.length; i++) {
-		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`)
+		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`, state)
 	}
 }
 
-async function compareDocuments(left: Document, right: Document, context: string) {
+async function compareDocuments(left: Document, right: Document, context: string, state: DiffState) {
 	context += ".document";
 
 	if (left.children.length !== right.children.length) {
@@ -77,11 +111,11 @@ async function compareDocuments(left: Document, right: Document, context: string
 	}
 
 	for (let i = 0; i < left.children.length; i++) {
-		compareNode(left.children[i], right.children[i], `${context}.[${i}]`)
+		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`, state)
 	}
 }
 
-async function toDocument(source: string|Document) {
+async function toDocument(source: string | Document) {
 	if (source instanceof Document) {
 		return source;
 	}

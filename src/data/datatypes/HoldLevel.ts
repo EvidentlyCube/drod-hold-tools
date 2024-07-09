@@ -28,10 +28,15 @@ export class HoldLevel {
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean;
 
+	private $_primaryEntranceIdCache?: number;
 	private $_roomsCache?: readonly HoldRoom[];
 
 	public get $primaryEntranceId() {
-		return getMainEntranceId(this.$hold, this.id) ?? 0;
+		if (this.$_primaryEntranceIdCache === undefined) {
+			this.$_primaryEntranceIdCache = getMainEntranceId(this.$hold, this.id) ?? 0;
+		}
+
+		return this.$_primaryEntranceIdCache;
 	}
 
 	public get $entranceCoords() {
