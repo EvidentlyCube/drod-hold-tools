@@ -86,7 +86,7 @@ export default function RouteViewHoldSpeeches() {
 
 	return <>
 		<SortableTable
-			tableId="speeches"
+			tableId={`speeches::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={speeches}

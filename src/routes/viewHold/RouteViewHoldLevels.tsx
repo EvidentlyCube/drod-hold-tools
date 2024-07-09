@@ -59,7 +59,7 @@ export default function RouteViewHoldLevels() {
 
 	return <>
 		<SortableTable
-			tableId="levels"
+			tableId={`levels::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={levels}

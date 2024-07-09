@@ -19,18 +19,18 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 	switch (change.type) {
 		case HoldChangeType.CharacterName:
 			{
-				const data = hold.characters.get(change.location.characterId);
+				const character = hold.characters.get(change.location.characterId);
 
-				if (!data) {
+				if (!character) {
 					return invalid(id, "Character Name", "Cannot find data");
 				}
 
 				return {
 					id,
 					type: 'Character Name',
-					location: { hold, model: "notApplicable" },
-					before: data.name.oldValue,
-					after: data.name.finalValue
+					location: { hold, model: "character", characterId: character.id },
+					before: character.name.oldValue,
+					after: character.name.finalValue
 				};
 			}
 
@@ -45,7 +45,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				return {
 					id,
 					type: 'Data Name',
-					location: { hold, model: "notApplicable" },
+					location: { hold, model: "data", dataId: data.id },
 					before: data.name.oldValue,
 					after: data.name.finalValue
 				};
@@ -67,6 +67,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					after: `${getFormatName(data.details.finalValue.format)} (${formatBytes(getBase64DecodedLength(data.details.finalValue.rawEncodedData))})`,
 				};
 			}
+
+		case HoldChangeType.EntranceDescription: {
+			const entrance = hold.entrances.get(change.location.entranceId);
+
+			if (!entrance) {
+				return invalid(id, "Entrance Description", "Cannot find entrance");
+			}
+
+			return {
+				id,
+				type: 'Entrance Description',
+				location: { hold, model: 'room', roomId: entrance.roomId },
+				before: <div className="is-white-space-pre">{entrance.description.oldValue}</div>,
+				after: <div className="is-white-space-pre">{entrance.description.finalValue}</div>,
+			};
+		}
 
 		case HoldChangeType.LevelName: {
 			const level = hold.levels.get(change.location.levelId);

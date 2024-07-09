@@ -46,10 +46,6 @@ export function sortCompareRefs(isAsc: boolean, left?: HoldRef, right?: HoldRef)
 		return sortCompareWithUndefined(isAsc, left, right);
 	}
 
-	if (left.model !== right.model) {
-		return sortCompareString(isAsc, left.model, right.model);
-	}
-
 	return sortCompareString(isAsc, holdRefToSortableString(left), holdRefToSortableString(right));
 }
 

@@ -7,6 +7,7 @@ import { HoldExporter } from "../../processor/HoldExporter";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import { filterString, sortCompareRefs, sortCompareString } from "../../utils/SortUtils";
 
 const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
@@ -14,14 +15,18 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 		displayName: 'Type',
 		widthPercent: 10,
 		canHide: true,
-		render: change => change.type
+		render: change => change.type,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.type, r.type),
+		filter: (change, filter) => filterString(change.type, filter),
+		filterDebounce: 300
 	},
 	{
 		id: 'location',
 		displayName: 'Location',
 		widthPercent: 10,
 		canHide: true,
-		render: change => <HoldRefView holdRef={change.location} />
+		render: change => <HoldRefView holdRef={change.location} />,
+		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.location, r.location),
 	},
 	{
 		id: 'before',
@@ -74,7 +79,7 @@ export default function RouteViewHoldChanges() {
 			>Delete</button>
 		</div>
 		<SortableTable
-			tableId="review-hold-changes"
+			tableId={`review-hold-changes::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={changes}

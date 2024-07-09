@@ -1,6 +1,4 @@
 import { ReactElement } from 'react';
-import TempImage from '../assets/images/TempImage.png';
-import FullPageMessage from "../components/common/FullPageMessage";
 
 export default function RouteHome() {
 	return <div className="container mt-5 homepage-cards">
@@ -75,7 +73,6 @@ export default function RouteHome() {
 							<ul>
 								<li>Variable list and renaming them</li>
 								<li>&hellip;with optional auto-changing it in all scripts</li>
-								<li>Editing entrance texts</li>
 								<li>Editing world map names</li>
 								<li>Editing scroll texts</li>
 								<li>Adding and removing data</li>
@@ -93,7 +90,10 @@ export default function RouteHome() {
 							<h3>Changelog</h3>
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
 							<ul>
-								<li>Character list and changing their name</li>
+								<li><Feat/> Character list and changing their name</li>
+								<li><Feat/> Editing entrance texts</li>
+								<li><Feat/> Change list sorting + better location displaying</li>
+								<li><Bug/> Table state and config is no longer shared between holds</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.0{" "}<span className="is-muted">(2024-07-08)</span></h5>
 							<ul>
@@ -137,4 +137,11 @@ function Card({ icon, title, subtitle, children }: CardProps) {
 			</div>
 		</div>
 	</div>;
+}
+
+function Feat() {
+	return <span className="icon has-text-success" title="New Feature or Improvement"><i className="fas fa-wrench"></i></span>
+}
+function Bug() {
+	return <span className="icon has-text-danger" title="Bugfix"><i className="fas fa-bug-slash"></i></span>
 }

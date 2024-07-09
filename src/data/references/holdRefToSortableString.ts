@@ -1,6 +1,7 @@
 import { formatString } from "../../utils/StringUtils";
 import { getCharacterName, getCommandName } from "../Utils";
-import { HoldRef, HoldRefCharacterCommand, HoldRefMonsterCommand } from "./HoldReference";
+import { Hold } from "../datatypes/Hold";
+import { HoldRef, HoldRefCharacter, HoldRefCharacterCommand, HoldRefMonsterCommand } from "./HoldReference";
 
 let cacheClearTimeout: undefined | number;
 const refsCache = new Map<HoldRef, string>();
@@ -27,13 +28,18 @@ export function holdRefToSortableString(ref?: HoldRef): string {
 	return sortableRef;
 }
 
-function toSortableString(ref: HoldRef) {
+function toSortableString(ref: HoldRef): string {
 	switch (ref.model) {
-		case "charCommand":
-			return toSortableCharCommand(ref);
-
-		case "monsterCommand":
-			return toSortableMonsterCommand(ref);
+		case "character": return getCharacterName(ref.hold, ref.characterId);
+		case "charAvatar": return getCharacterName(ref.hold, ref.characterId) + "::Avatar";
+		case "charTiles": return getCharacterName(ref.hold, ref.characterId) + "::Tiles";
+		case "charCommand": return toSortableCharCommand(ref);
+		case "data": return ref.hold.datas.getOrError(ref.dataId).name.finalValue;
+		case "entranceVoiceOver": return ref.hold.entrances.getOrError(ref.entranceId).$level.name.finalValue;
+		case "monsterCommand": return toSortableMonsterCommand(ref);
+		case "room": return toSortableRoomName(ref.hold, ref.roomId);
+		case "roomImage": return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
+		case "roomOverheadImage": return toSortableRoomName(ref.hold, ref.roomId) + "::OverheadImage";
 
 		default:
 			return 'Unknown model';
@@ -42,10 +48,16 @@ function toSortableString(ref: HoldRef) {
 
 function toSortableCharCommand(ref: HoldRefCharacterCommand) {
 	const { hold, characterId, commandIndex } = ref;
-	const character = hold.characters.getOrError(characterId);
-	const command = character.$commandList!.commands[commandIndex];
+	const command = hold.characters.getOrError(characterId).$commandList!.commands[commandIndex];
 
-	return `${getCharacterName(hold, character.type)} #${commandIndex}::${getCommandName(command.type)}`
+	return `${getCharacterName(hold, characterId)} #${commandIndex}::${getCommandName(command.type)}`
+}
+
+function toSortableRoomName(hold: Hold, roomId: number) {
+	const room = hold.rooms.getOrError(roomId);
+	const level = room.$level;
+
+	return formatString('%: %', level.name.finalValue, room.$coordsName);
 }
 
 function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {
@@ -57,9 +69,8 @@ function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {
 	const command = monster.$commandList!.commands[commandIndex];
 
 	return formatString(
-		'%: %, % (%,%) #%::%',
-		level.name.finalValue,
-		room.$coordsName,
+		'%, % (%,%) #%::%',
+		toSortableRoomName(hold, roomId),
 		getCharacterName(hold, monster.$characterTypeId),
 		monster.x, monster.y,
 		commandIndex,

@@ -1,5 +1,5 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
-import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefMonsterCommand, HoldRefRoomImage, HoldRefRoomOverheadImage } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage } from "../../data/references/HoldReference";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -13,12 +13,16 @@ export default function HoldRefView({ holdRef }: Props) {
 		</>;
 	}
 	switch (holdRef.model) {
+		case "character": return <Character r={ holdRef } />;
 		case "charAvatar": return <CharacterAvatar r={ holdRef } />;
 		case "charCommand": return <CharacterCommand r={ holdRef } />;
 		case "charTiles": return <CharacterTiles r={ holdRef } />;
 
+		case "data": return <Data r={ holdRef } />;
+
 		case "monsterCommand": return <MonsterCommand r={ holdRef } />;
 
+		case "room": return <Room r={ holdRef } />;
 		case "roomImage": return <RoomImage r={ holdRef } />;
 		case "roomOverheadImage": return <RoomOverheadImage r={ holdRef } />;
 
@@ -34,6 +38,19 @@ export default function HoldRefView({ holdRef }: Props) {
 				{" "}<code>{holdRef.model}</code>
 			</>
 	}
+}
+
+function Character({ r }: {r: HoldRefCharacter}) {
+	const { hold, characterId } = r;
+
+	const character = hold.characters.getOrError(characterId);
+
+	return <>
+		<span className="icon icon-monster-ref" title="Character">
+			<i className="fas fa-user"></i>
+		</span>
+		{" "}<strong>{character.name.finalValue}</strong>
+	</>
 }
 
 function CharacterCommand({ r }: {r: HoldRefCharacterCommand}) {
@@ -79,6 +96,19 @@ function CharacterTiles({ r }: {r: HoldRefCharacterTiles}) {
 	</>
 }
 
+function Data({ r }: {r: HoldRefData}) {
+	const { hold, dataId } = r;
+
+	const data = hold.datas.getOrError(dataId);
+
+	return <>
+		<span className="icon icon-monster-ref" title="Data">
+			<i className="fas fa-database"></i>
+		</span>
+		{" "}<strong>{data.name.finalValue}</strong>
+	</>
+}
+
 function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 	const { hold, roomId, monsterIndex, commandIndex } = r;
 
@@ -95,6 +125,20 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 		{", "}{getCharacterName(hold, monster.$characterTypeId)}
 		{" "}({monster.x},{monster.y})
 		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
+	</>
+}
+
+function Room({ r }: {r: HoldRefRoom}) {
+	const { hold, roomId } = r;
+
+	const room = hold.rooms.getOrError(roomId);
+	const level = room.$level;
+
+	return <>
+		<span className="icon icon-monster-ref" title="Room">
+			<i className="fas fa-house"></i>
+		</span>
+		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
 	</>
 }
 

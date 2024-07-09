@@ -35,7 +35,7 @@ export default function RouteViewHoldCharacters() {
 
 	return <>
 		<SortableTable
-			tableId="characters"
+			tableId={`characters::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={hold.characters.values()}

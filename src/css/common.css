@@ -51,6 +51,7 @@
 	cursor: pointer;
 }
 
+.textarea.is-read-only-hidden:read-only,
 .input.is-read-only-hidden:read-only {
 	border: none;
 	background: transparent;
@@ -67,4 +68,47 @@
 
 .homepage-cards .card {
 	height: 100%;
+}
+
+
+.control.has-icons-left .textarea:hover~.icon,
+.control.has-icons-right .textarea:hover~.icon {
+	color: var(--bulma-input-icon-hover-color);
+}
+
+.control.has-icons-left .textarea:focus~.icon,
+.control.has-icons-right .textarea:focus~.icon {
+	color: var(--bulma-input-icon-focus-color);
+}
+
+.control.has-icons-left .textarea.is-small~.icon,
+.control.has-icons-right .textarea.is-small~.icon {
+	font-size: var(--bulma-size-small);
+}
+
+.control.has-icons-left .textarea.is-medium~.icon,
+.control.has-icons-right .textarea.is-medium~.icon {
+	font-size: var(--bulma-size-medium);
+}
+
+.control.has-icons-left .textarea.is-large~.icon,
+.control.has-icons-right .textarea.is-large~.icon {
+	font-size: var(--bulma-size-large);
+}
+
+.control.has-icons-left .textarea {
+	padding-left: var(--bulma-input-height);
+}
+
+.control.has-icons-left .textarea~.icon {
+	height: 100%;
+}
+
+.textarea.textarea-auto-size {
+	min-height: auto;
+	max-height: auto;
+}
+
+.is-white-space-pre {
+	white-space: pre;
 }

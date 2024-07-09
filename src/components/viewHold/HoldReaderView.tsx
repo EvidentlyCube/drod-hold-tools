@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function HoldReaderView({ holdReader }: Props) {
-	const logs = useSignalArrayThrottled(holdReader.logs, 100);
+	const logs = useSignalArrayThrottled(holdReader.logs, 400);
 	const error = useSignalValue(holdReader.error);
 
 	if (error) {

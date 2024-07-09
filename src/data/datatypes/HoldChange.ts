@@ -9,6 +9,7 @@ export enum HoldChangeType {
 	DataFile = 2,
 	LevelName = 3,
 	CharacterName = 4,
+	EntranceDescription = 5,
 }
 
 export type HoldChangeCharacterName = {
@@ -32,6 +33,13 @@ export type HoldChangeDataFile = {
 	value?: HoldDataDetails;
 }
 
+export type HoldChangeEntranceDescription = {
+	type: HoldChangeType.EntranceDescription,
+	location: { entranceId: number };
+
+	value?: string;
+}
+
 export type HoldChangeLevelName = {
 	type: HoldChangeType.LevelName,
 	location: { levelId: number };
@@ -49,6 +57,7 @@ export interface HoldChangeSpeechMessage {
 export type HoldChange = HoldChangeCharacterName
 	| HoldChangeDataName
 	| HoldChangeDataFile
+	| HoldChangeEntranceDescription
 	| HoldChangeLevelName
 	| HoldChangeSpeechMessage
 

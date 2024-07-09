@@ -9,6 +9,7 @@ import NavBarEnd from "./components/common/NavBarEnd";
 import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
 import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 import RouteViewHoldCharacters from "./routes/viewHold/RouteViewHoldCharacters";
+import RouteViewHoldEntrances from "./routes/viewHold/RouteViewHoldEntrances";
 
 function App() {
 	const href = window.location.href.toLocaleLowerCase();
@@ -37,6 +38,7 @@ function App() {
 						<Route path="" element={<RouteViewHoldSummary />} />
 						<Route path="characters" element={<RouteViewHoldCharacters />} />
 						<Route path="datas" element={<RouteViewHoldData />} />
+						<Route path="entrances" element={<RouteViewHoldEntrances />} />
 						<Route path="levels" element={<RouteViewHoldLevels />} />
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
 						<Route path="changes" element={<RouteViewHoldChanges />} />

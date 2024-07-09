@@ -1,5 +1,11 @@
 import type { Hold } from "../datatypes/Hold";
 
+export interface HoldRefCharacter {
+	hold: Hold;
+	model: 'character',
+	characterId: number;
+};
+
 export interface HoldRefCharacterCommand {
 	hold: Hold;
 	model: 'charCommand',
@@ -39,6 +45,12 @@ export interface HoldRefMonsterCommand {
 	commandIndex: number;
 };
 
+export interface HoldRefRoom {
+	hold: Hold;
+	model: 'room';
+	roomId: number;
+}
+
 export interface HoldRefRoomImage {
 	hold: Hold;
 	model: 'roomImage';
@@ -69,12 +81,14 @@ export interface HoldRefNotApplicable {
 };
 
 export type HoldRef = HoldRefNotApplicable
+	| HoldRefCharacter
 	| HoldRefCharacterCommand
 	| HoldRefCharacterAvatar
 	| HoldRefCharacterTiles
 	| HoldRefData
 	| HoldRefEntranceVoiceOver
 	| HoldRefMonsterCommand
+	| HoldRefRoom
 	| HoldRefRoomImage
 	| HoldRefRoomOverheadImage
 	| HoldRefSpeech

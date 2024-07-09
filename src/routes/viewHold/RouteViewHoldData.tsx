@@ -129,7 +129,7 @@ export default function RouteViewHoldData() {
 
 	return <>
 		<SortableTable
-			tableId="data"
+			tableId={`data::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={datas}

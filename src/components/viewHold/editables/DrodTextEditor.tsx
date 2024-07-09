@@ -1,20 +1,22 @@
-import { ChangeEvent, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
 import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
+import ReactTextareaAutosize from "react-textarea-autosize";
 
 interface Props {
 	text: SignalUpdatableValue<string>;
+	tag?: 'input'|'textarea';
 }
-export default function DrodTextEditor({text}: Props) {
+export default function DrodTextEditor({text, tag}: Props) {
 	const [oldValue, newValue] = useSignalUpdatableValue(text);
-	const inputRef = useRef<HTMLInputElement>(null);
+	const inputRef = useRef(null);
 	const isEdited = newValue !== undefined;
 
 	const onToggle = useCallback(() => {
 		if (newValue === undefined) {
 			text.newValue = text.oldValue;
 			if (inputRef.current) {
-				inputRef.current.focus()
+				(inputRef.current as HTMLElement).focus()
 			}
 		} else {
 			text.newValue = undefined;
@@ -27,7 +29,8 @@ export default function DrodTextEditor({text}: Props) {
 		}
 	}, [text, isEdited])
 
-	const onType = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+	// Using any to avoid typescript complaints about type
+	const onType = useCallback((e: any) => {
 		text.newValue = e.target.value;
 	}, [text]);
 
@@ -35,20 +38,41 @@ export default function DrodTextEditor({text}: Props) {
 		? "Cancel changes"
 		: "Edit text";
 
-	return <div className="control has-icons-left">
-		<input
-			className="input is-read-only-hidden"
-			value={newValue ?? oldValue}
-			readOnly={newValue === undefined}
-			onInput={onType}
-			ref={inputRef}
-			onClick={!isEdited ? onToggle : undefined}
-			onBlur={onBlur}
-			title={oldValue}
-			/>
-		<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-			{newValue === undefined && <i className="fas fa-pen-to-square" />}
-			{newValue !== undefined && <i className="fas fa-xmark" />}
+	if (tag === 'textarea') {
+		return <div className="control has-icons-left">
+			<ReactTextareaAutosize
+				className="textarea textarea-auto-size is-read-only-hidden"
+				value={newValue ?? oldValue}
+				readOnly={newValue === undefined}
+				onInput={onType}
+				ref={inputRef}
+				onClick={!isEdited ? onToggle : undefined}
+				onBlur={onBlur}
+				title={oldValue}
+				minRows={1}
+				maxRows={8}
+				/>
+			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
+				{newValue === undefined && <i className="fas fa-pen-to-square" />}
+				{newValue !== undefined && <i className="fas fa-xmark" />}
+			</div>
 		</div>
-	</div>
+	} else {
+		return <div className="control has-icons-left">
+			<input
+				className="input is-read-only-hidden"
+				value={newValue ?? oldValue}
+				readOnly={newValue === undefined}
+				onInput={onType}
+				ref={inputRef}
+				onClick={!isEdited ? onToggle : undefined}
+				onBlur={onBlur}
+				title={oldValue}
+				/>
+			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
+				{newValue === undefined && <i className="fas fa-pen-to-square" />}
+				{newValue !== undefined && <i className="fas fa-xmark" />}
+			</div>
+		</div>
+	}
 }
