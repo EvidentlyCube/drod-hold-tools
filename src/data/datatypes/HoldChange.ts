@@ -10,6 +10,7 @@ export enum HoldChangeType {
 	LevelName = 3,
 	CharacterName = 4,
 	EntranceDescription = 5,
+	ScrollMessage = 6,
 }
 
 export type HoldChangeCharacterName = {
@@ -54,11 +55,19 @@ export interface HoldChangeSpeechMessage {
 	value?: string;
 }
 
+export interface HoldChangeScrollMessage {
+	type: HoldChangeType.ScrollMessage;
+	location: { roomId: number, x: number, y: number };
+
+	value?: string;
+}
+
 export type HoldChange = HoldChangeCharacterName
 	| HoldChangeDataName
 	| HoldChangeDataFile
 	| HoldChangeEntranceDescription
 	| HoldChangeLevelName
+	| HoldChangeScrollMessage
 	| HoldChangeSpeechMessage
 
 function match(left: HoldChange, right: HoldChange) {

@@ -11,9 +11,9 @@ import useSortableTableSort from "./useSortableTableSort";
 
 interface Props<TData extends SortableTableDataWithId> {
 	tableId: string;
-	columns: SortableTableColumn<TData>[];
+	columns: ReadonlyArray<SortableTableColumn<TData>>;
 	className?: string;
-	rows: TData[];
+	rows: readonly TData[];
 	pageSize: number;
 }
 export default function SortableTable<TData extends SortableTableDataWithId>(props: Props<TData>) {

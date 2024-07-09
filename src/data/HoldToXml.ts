@@ -278,12 +278,12 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 
 	if (room.dataId) {
 		// @FIXME - Null Data handler
-		await writeData(writer, refs, room.hold.datas.get(room.dataId)!)
+		await writeData(writer, refs, room.$hold.datas.get(room.dataId)!)
 	}
 
 	if (room.overheadDataId) {
 		// @FIXME - Null Data handler
-		await writeData(writer, refs, room.hold.datas.get(room.overheadDataId)!)
+		await writeData(writer, refs, room.$hold.datas.get(room.overheadDataId)!)
 	}
 
 	for (const monster of room.monsters) {

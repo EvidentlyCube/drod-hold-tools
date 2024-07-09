@@ -100,7 +100,30 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
-		case HoldChangeType.SpeechMessage:
+		case HoldChangeType.ScrollMessage: {
+			const room = hold.rooms.get(change.location.roomId);
+
+			if (!room) {
+				return invalid(id, "Scroll Message", "Cannot find room");
+			}
+
+			const scroll = room.scrolls
+				.find(scroll => scroll.x === change.location.x && scroll.y === change.location.y);
+
+			if (!scroll) {
+				return invalid(id, "Scroll Message", "Cannot find scroll");
+			}
+
+			return {
+				id,
+				type: 'Scroll Message',
+				location: scroll.$scrollRef,
+				before: <div className="is-white-space-pre">{scroll.message.oldValue}</div>,
+				after: <div className="is-white-space-pre">{scroll.message.finalValue}</div>,
+			};
+		}
+
+		case HoldChangeType.SpeechMessage: {
 			const speech = hold.speeches.get(change.location.speechId);
 
 			if (!speech) {
@@ -114,6 +137,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				before: speech.message.oldValue,
 				after: speech.message.finalValue
 			};
+		}
 
 
 		default:

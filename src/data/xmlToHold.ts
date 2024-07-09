@@ -256,9 +256,14 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 
 		log(`Parsing Room ${roomId} -> Scrolls`);
 		for (const scrollXml of roomXml.querySelectorAll('Scrolls')) {
+			const x = int(scrollXml, 'X');
+			const y = int(scrollXml, 'Y');
 			holdRoom.scrolls.push({
-				x: int(scrollXml, 'X'),
-				y: int(scrollXml, 'Y'),
+				id: `${roomId}:scroll:${x}:${y}`,
+				$room: holdRoom,
+				$scrollRef: { hold, model: 'scroll', roomId, x, y },
+				x,
+				y,
 				message: new SignalUpdatableValue(wcharBase64ToString(str(scrollXml, 'Message')))
 			});
 

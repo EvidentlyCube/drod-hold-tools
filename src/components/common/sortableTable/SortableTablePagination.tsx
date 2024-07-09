@@ -8,7 +8,7 @@ interface PaginationProps {
 	pageSize: number;
 	currentPage: number;
 	setPage: (page: number) => void;
-	columns: SortableTableColumnSansData[];
+	columns: readonly SortableTableColumnSansData[];
 	hiddenColumns: Set<string>;
 	toggleHiddenColumn: (column: string) => void;
 }

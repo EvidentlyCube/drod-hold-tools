@@ -1,7 +1,7 @@
 import { SortableTableColumnSansData } from "./SortableTableCommons";
 
 interface Props {
-	columns: SortableTableColumnSansData[];
+	columns: readonly SortableTableColumnSansData[];
 	hiddenColumns: Set<string>;
 	toggleHiddenColumn: (column: string) => void;
 }

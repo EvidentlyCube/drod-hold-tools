@@ -24,6 +24,12 @@ export function applyHoldChanges(hold: Hold) {
 				hold.levels.get(change.location.levelId)!.name.newValue = change.value;
 				break;
 
+			case HoldChangeType.ScrollMessage:
+				hold.rooms.get(change.location.roomId)!.scrolls
+					.find(scroll => scroll.x === change.location.x && scroll.y === change.location.y)!
+					.message.newValue = change.value;
+				break;
+
 			case HoldChangeType.SpeechMessage:
 				hold.speeches.get(change.location.speechId)!.message.newValue = change.value;
 				break;

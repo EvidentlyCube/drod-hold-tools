@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import DataRefView, { DataRefViewById } from "../../components/viewHold/DataRefView";
+import { DataRefViewById } from "../../components/viewHold/DataRefView";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";

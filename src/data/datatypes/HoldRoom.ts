@@ -3,6 +3,7 @@ import { Point } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
 import { getCoordinateName, wcharBase64ToString } from "../Utils";
+import { HoldRefScroll } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
 
@@ -31,6 +32,9 @@ interface Checkpoint {
 	y: number;
 }
 export interface HoldScroll {
+	id: string;
+	$room: HoldRoom;
+	$scrollRef: HoldRefScroll;
 	x: number;
 	y: number;
 	message: SignalUpdatableValue<string>;
@@ -54,7 +58,7 @@ export interface HoldExit {
 	bottom: number;
 }
 export class HoldRoom {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
 	public readonly levelId: number;
@@ -82,7 +86,7 @@ export class HoldRoom {
 	public readonly exits: HoldExit[] = [];
 
 	public get $level() {
-		return this.hold.levels.getOrError(this.levelId);
+		return this.$hold.levels.getOrError(this.levelId);
 	}
 
 	public get $coordsInLevel(): Point {
@@ -101,7 +105,7 @@ export class HoldRoom {
 	}
 
 	public constructor(hold: Hold, opts: RoomConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = opts.id
 		this.levelId = opts.levelId

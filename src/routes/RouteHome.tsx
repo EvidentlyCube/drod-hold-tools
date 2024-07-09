@@ -90,8 +90,9 @@ export default function RouteHome() {
 							<h3>Changelog</h3>
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
 							<ul>
-								<li><Feat/> Character list and changing their name</li>
-								<li><Feat/> Editing entrance texts</li>
+								<li><Feat/> Character list + edit name</li>
+								<li><Feat/> Entrance list + edit description</li>
+								<li><Feat/> Scroll list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
 							</ul>

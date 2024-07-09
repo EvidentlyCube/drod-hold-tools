@@ -1,10 +1,11 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDescription, HoldChangeLevelName, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechMessage, HoldChangeType } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
 import { HoldLevel } from "./HoldLevel";
+import { HoldScroll } from "./HoldRoom";
 import { HoldSpeech } from "./HoldSpeech";
 
 export class HoldChangeListener {
@@ -21,6 +22,9 @@ export class HoldChangeListener {
 		})
 		hold.levels.forEach(level => {
 			this.registerLevelNameChange(level);
+		})
+		hold.$scrolls.forEach(scroll => {
+			this.registerScrollMessageChange(scroll);
 		})
 		hold.speeches.forEach(speech => {
 			this.registerSpeechMessageChange(speech);
@@ -85,6 +89,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, name);
+	}
+
+	private registerScrollMessageChange(scroll: HoldScroll) {
+		const { $room, x, y, message } = scroll;
+		const { $hold } = $room;
+
+		const change = $hold.$changes.create<HoldChangeScrollMessage>({
+			type: HoldChangeType.ScrollMessage,
+			location: { roomId: $room.id, x, y },
+			value: message.newValue
+		});
+
+		registerTextChange($hold, change, message);
 	}
 
 	private registerSpeechMessageChange(speech: HoldSpeech) {

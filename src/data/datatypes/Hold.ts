@@ -8,7 +8,7 @@ import type { HoldData } from "./HoldData";
 import type { HoldEntrance } from "./HoldEntrance";
 import type { HoldLevel } from "./HoldLevel";
 import type { HoldPlayer } from "./HoldPlayer";
-import type { HoldRoom } from "./HoldRoom";
+import type { HoldRoom, HoldScroll } from "./HoldRoom";
 import type { HoldSpeech } from "./HoldSpeech";
 import type { HoldVariable } from "./HoldVariable";
 import { HoldWorldMap } from "./HoldWorldMap";
@@ -75,6 +75,19 @@ export class Hold {
 	public readonly $changes = new HoldChangeList();
 
 	public readonly $problems: HoldProblem[] = [];
+
+	private $_scrollsCache?: HoldScroll[];
+	public get $scrolls(): readonly HoldScroll[] {
+		if (!this.$_scrollsCache) {
+			this.$_scrollsCache = [];
+
+			for (const room of this.rooms.values()) {
+				this.$_scrollsCache.push(...room.scrolls);
+			}
+		}
+
+		return this.$_scrollsCache;
+	}
 
 	public constructor(options: HoldConstructor) {
 		this.$holdReaderId = options.$holdReaderId;

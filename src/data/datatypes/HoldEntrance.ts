@@ -37,7 +37,7 @@ export class HoldEntrance {
 
 	public get $roomRef(): HoldRefRoom {
 		return {
-			hold: this. $hold,
+			hold: this.$hold,
 			model: 'room',
 			roomId: this.roomId
 		};

@@ -50,7 +50,7 @@ export class HoldMonster {
 		this.extraVars = readPackedVars(opts.encExtraVars);
 
 		if (this.extraVars && this.extraVars.hasVar('Commands')) {
-			this.$commandList = new CommandsList(room.hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+			this.$commandList = new CommandsList(room.$hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
 		}
 	}
 }

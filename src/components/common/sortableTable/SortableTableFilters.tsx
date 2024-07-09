@@ -6,7 +6,7 @@ import {
 } from "./SortableTableCommons";
 
 interface Props<T extends SortableTableDataWithId> {
-	columns: SortableTableColumn<T>[];
+	columns: readonly SortableTableColumn<T>[];
 	columnFilters: Map<string, string>;
 	setColumnFilter: (column: string, filter: string) => void;
 }

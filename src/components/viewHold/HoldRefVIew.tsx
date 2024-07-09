@@ -1,5 +1,5 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
-import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -25,6 +25,8 @@ export default function HoldRefView({ holdRef }: Props) {
 		case "room": return <Room r={ holdRef } />;
 		case "roomImage": return <RoomImage r={ holdRef } />;
 		case "roomOverheadImage": return <RoomOverheadImage r={ holdRef } />;
+
+		case "scroll": return <Scroll r={ holdRef } />;
 
 		case "notApplicable":
 			return <span className="is-muted">Not Applicable</span>
@@ -169,5 +171,25 @@ function RoomOverheadImage({ r }: {r: HoldRefRoomOverheadImage}) {
 		</span>
 		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
 		{" "}&rarr;{" "}<em>Overhead Image</em>
+	</>;
+}
+
+function Scroll({ r }: {r: HoldRefScroll}) {
+	const { hold, roomId, x, y } = r;
+
+	const room = hold.rooms.getOrError(roomId);
+	const level = room.$level;
+
+	return <>
+		<span className="icon icon-scroll-ref" title="Scroll">
+			<i className="fas fa-scroll"></i>
+		</span>
+		{" "}<strong>
+			<span title="Level Name">{level.name.finalValue}</span>
+			{": "}
+			<span title="Room Coordinates">{room.$coordsName}</span>
+		</strong>
+		{" "}&rarr;{" "}
+		<em title="Scroll Coordinates">({x},{y})</em>
 	</>;
 }

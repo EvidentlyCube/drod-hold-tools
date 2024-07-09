@@ -63,6 +63,14 @@ export interface HoldRefRoomOverheadImage {
 	roomId: number;
 }
 
+export interface HoldRefScroll {
+	hold: Hold;
+	model: 'scroll',
+	roomId: number;
+	x: number;
+	y: number;
+};
+
 export interface HoldRefSpeech {
 	hold: Hold;
 	model: 'speech',
@@ -91,5 +99,6 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefRoom
 	| HoldRefRoomImage
 	| HoldRefRoomOverheadImage
+	| HoldRefScroll
 	| HoldRefSpeech
 	| HoldRefWorldMap

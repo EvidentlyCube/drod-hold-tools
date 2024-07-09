@@ -4,7 +4,7 @@ import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCom
 import SuperJSON from "superjson";
 
 export default function useSortableTableHiddenColumns<T extends SortableTableDataWithId>(
-	columns: SortableTableColumn<T>[],
+	columns: readonly SortableTableColumn<T>[],
 	localStorageKey: string
 ) {
 	const [hiddenColumns, setHiddenColumns] = useLocalStorageState(`${localStorageKey}-hidden`, {

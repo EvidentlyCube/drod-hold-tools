@@ -12,7 +12,8 @@ export function wcharBase64ToString(encodedText: string) {
 		codePoints.push(decodedData[i] | (decodedData[i + 1] << 8));
 	}
 
-	return String.fromCharCode.apply(String, codePoints);
+	return String.fromCharCode.apply(String, codePoints)
+		.replace(/\r/g, "\n");
 }
 
 export function stringToWCharBase64(s: string) {

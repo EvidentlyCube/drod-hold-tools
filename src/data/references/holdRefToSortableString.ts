@@ -1,7 +1,7 @@
 import { formatString } from "../../utils/StringUtils";
 import { getCharacterName, getCommandName } from "../Utils";
 import { Hold } from "../datatypes/Hold";
-import { HoldRef, HoldRefCharacter, HoldRefCharacterCommand, HoldRefMonsterCommand } from "./HoldReference";
+import { HoldRef, HoldRefCharacterCommand, HoldRefMonsterCommand } from "./HoldReference";
 
 let cacheClearTimeout: undefined | number;
 const refsCache = new Map<HoldRef, string>();
@@ -40,6 +40,7 @@ function toSortableString(ref: HoldRef): string {
 		case "room": return toSortableRoomName(ref.hold, ref.roomId);
 		case "roomImage": return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
 		case "roomOverheadImage": return toSortableRoomName(ref.hold, ref.roomId) + "::OverheadImage";
+		case "scroll": return toSortableRoomName(ref.hold, ref.roomId) + `::Scroll(${ref.x},${ref.y})`;
 
 		default:
 			return 'Unknown model';
@@ -64,7 +65,6 @@ function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {
 	const { hold, roomId, monsterIndex, commandIndex } = ref;
 
 	const room = hold.rooms.getOrError(roomId);
-	const level = room.$level;
 	const monster = room.monsters[monsterIndex];
 	const command = monster.$commandList!.commands[commandIndex];
 
