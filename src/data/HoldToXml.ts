@@ -44,9 +44,7 @@ export async function holdToXml(hold: Hold) {
 		.attr('Version', 508)
 		.nest();
 
-	for (const player of hold.players.values()) {
-		await writePlayer(writer, refs, player)
-	}
+	await writePlayer(writer, refs, hold.players.getOrError(hold.playerId));
 
 	writer.tag('Holds')
 		.attr('GID_Created', hold.gidCreated)
@@ -163,7 +161,7 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
 
 	// TSS hold file has <Data> with no RawData so I guess this is something to support??
 	if (data.details.finalValue.rawEncodedData) {
-		writer.attr('RawData', data.details.finalValue.format)
+		writer.attr('RawData', { _safeString: data.details.finalValue.rawEncodedData })
 	}
 
 	writer
@@ -245,6 +243,8 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 	if (refs.levelIds.has(level.id)) {
 		return;
 	}
+
+	await writePlayer(writer, refs, level.$hold.players.getOrError(level.playerId));
 
 	refs.levelIds.add(level.id);
 

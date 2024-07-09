@@ -1,5 +1,5 @@
 import { OptGroup } from "../components/common/Select";
-import { bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
+import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
@@ -12,8 +12,7 @@ export function wcharBase64ToString(encodedText: string) {
 		codePoints.push(decodedData[i] | (decodedData[i + 1] << 8));
 	}
 
-	return String.fromCharCode.apply(String, codePoints)
-		.replace(/\r/g, "\n");
+	return String.fromCharCode.apply(String, codePoints);
 }
 
 export function stringToWCharBase64(s: string) {
@@ -22,18 +21,15 @@ export function stringToWCharBase64(s: string) {
 	for (let i = 0; i < s.length; i++) {
 		const charCode = s.charCodeAt(i);
 		if (charCode > 128) {
-			throw new Error(`Unsupported wchar with code ${charCode}`);
+			bytes.push(charCode & 0xFF);
+			bytes.push(charCode >> 8);
+		} else {
+			bytes.push(charCode);
+			bytes.push(0);
 		}
-
-		bytes.push(charCode);
-		bytes.push(0);
 	}
 
 	return bytesToBase64(bytes);
-}
-
-export function base64ToUint8(data: string) {
-	return stringToUint8(atob(data));
 }
 
 export function stringToUint8(str: string) {

@@ -11,6 +11,7 @@ import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 import RouteViewHoldCharacters from "./routes/viewHold/RouteViewHoldCharacters";
 import RouteViewHoldEntrances from "./routes/viewHold/RouteViewHoldEntrances";
 import RouteViewHoldScrolls from "./routes/viewHold/RouteViewHoldScrolls";
+import { wcharBase64ToString } from "./data/Utils";
 
 function App() {
 	const href = window.location.href.toLocaleLowerCase();

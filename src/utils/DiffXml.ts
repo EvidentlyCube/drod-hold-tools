@@ -1,36 +1,27 @@
 import { diffArrays } from "./ArrayUtils";
+import { parseXml } from "./XmlParser";
 
 
-export function diffXml(left: string|XMLDocument, right: string|XMLDocument) {
-	left = toDocument(left);
-	right = toDocument(right);
+export async function diffXml(left: string|XMLDocument, right: string|XMLDocument) {
+	left = await toDocument(left);
+	right = await toDocument(right);
 
-	compareNode(left, right, "ROOT");
-
-	const leftString = new XMLSerializer().serializeToString(left).replace(/<\?.+?\?>/, '').replace(/\r|\n/g, "");
-	const rightString = new XMLSerializer().serializeToString(right).replace(/<\?.+?\?>/, '').replace(/\r|\n/g, "");
-
-	for (let i = 0; i < Math.max(leftString.length, rightString.length); i++) {
-		if (leftString.charAt(i) !== rightString.charAt(i)) {
-			console.log(`Failure at char #${i}`);
-			console.log(`Left: ${leftString.slice(Math.max(0, i - 100), Math.min(leftString.length, i + 100))}`);
-			console.log(`Right: ${rightString.slice(Math.max(0, i - 100), Math.min(rightString.length, i + 100))}`);
-			break;
-		}
-	}
+	await compareNode(left, right, "ROOT");
 }
 
-function compareNode(left: Node, right: Node, context: string) {
+async function compareNode(left: Node, right: Node, context: string) {
+	await sleep();
+
 	if (left.nodeType !== right.nodeType) {
 		throw new Error(`${context}: Node Type '${left.nodeType}'/'${right.nodeType}'`);
 	}
 
 	switch (left.nodeType) {
 		case Node.ELEMENT_NODE:
-			compareElement(left as Element, right as Element, context);
+			await compareElement(left as Element, right as Element, context);
 			break;
 		case Node.DOCUMENT_NODE:
-			compareDocuments(left as Document, right as Document, context);
+			await compareDocuments(left as Document, right as Document, context);
 			break;
 
 		default:
@@ -38,8 +29,10 @@ function compareNode(left: Node, right: Node, context: string) {
 	}
 }
 
-function compareElement(left: Element, right: Element, context: string) {
+async function compareElement(left: Element, right: Element, context: string) {
 	if (left.tagName !== right.tagName) {
+		console.log(left);
+		console.log(right);
 		throw new Error(`${context}: Tag Name '${left.tagName}'/'${right.tagName}'`);
 	}
 
@@ -61,6 +54,8 @@ function compareElement(left: Element, right: Element, context: string) {
 			throw new Error(`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`);
 
 		} else if (lAttr.value !== rAttr.value) {
+			console.log(left);
+			console.log(right);
 			throw new Error(`${context}.@${i}#${lAttr.name}: Attribute value mismatch ${getStringDiff(lAttr.value, rAttr.value, 32)}`);
 		}
 	}
@@ -70,11 +65,11 @@ function compareElement(left: Element, right: Element, context: string) {
 	}
 
 	for (let i = 0; i < left.children.length; i++) {
-		compareNode(left.children[i], right.children[i], `${context}.[${i}]`)
+		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`)
 	}
 }
 
-function compareDocuments(left: Document, right: Document, context: string) {
+async function compareDocuments(left: Document, right: Document, context: string) {
 	context += ".document";
 
 	if (left.children.length !== right.children.length) {
@@ -86,13 +81,12 @@ function compareDocuments(left: Document, right: Document, context: string) {
 	}
 }
 
-function toDocument(source: string|Document) {
+async function toDocument(source: string|Document) {
 	if (source instanceof Document) {
 		return source;
 	}
 
-	const parser = new DOMParser();
-	return parser.parseFromString(source, "text/xml");
+	return parseXml(source);
 }
 
 function getStringDiff(left: string, right: string, context: number) {
@@ -108,4 +102,18 @@ function getStringDiff(left: string, right: string, context: number) {
 	}
 
 	return "Strings are the same";
+}
+
+let lastSleep = 0;
+async function sleep(forced = false) {
+	return new Promise<void>(resolve => {
+		if (Date.now() > lastSleep + 16 || forced) {
+			setTimeout(() => {
+				lastSleep = Date.now();
+				resolve();
+			}, 100)
+		} else {
+			resolve();
+		}
+	})
 }

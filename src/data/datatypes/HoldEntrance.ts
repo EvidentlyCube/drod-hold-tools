@@ -11,7 +11,7 @@ interface EntranceConstructor {
 	y: number;
 	o: number;
 	isMainEntrance: boolean;
-	showDescription: boolean;
+	showDescription: number;
 	encDescription: string;
 }
 export class HoldEntrance {
@@ -24,7 +24,7 @@ export class HoldEntrance {
 	public readonly y: number;
 	public readonly o: number;
 	public readonly isMainEntrance: boolean;
-	public readonly showDescription: boolean;
+	public readonly showDescription: number;
 	public readonly description: SignalUpdatableValue<string>;
 
 	public get $room() {

@@ -73,7 +73,7 @@ class WrappedCommandBuffer {
 		for (let i = 0; i < s.length; i++) {
 			const charCode = s.charCodeAt(i);
 			if (charCode > 128) {
-				throw new Error(`Unsupported wchar with code ${charCode}`);
+				throw new Error(`CommandBuffer Writing WChar: Unsupported wchar with code ${charCode}`);
 			}
 
 			this._buffer[this._index++] = charCode;

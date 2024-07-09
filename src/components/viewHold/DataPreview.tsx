@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { DataFormat } from "../../data/DrodEnums";
-import { base64ToUint8 } from "../../data/Utils";
 import { HoldData, HoldDataDetails } from "../../data/datatypes/HoldData";
 import ImagePreview from "./preview/ImagePreview";
 import Modal from "../common/Modal";
 import AudioPreview from "./preview/AudioPreview";
+import { base64ToUint8 } from "../../utils/StringUtils";
 
 interface Props {
 	data: HoldData;

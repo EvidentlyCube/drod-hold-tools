@@ -1,7 +1,9 @@
 import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
+import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { getCommandDataId } from "./CommandUtils";
+import { holdToXml } from "./HoldToXml";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
@@ -45,6 +47,10 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		startingLevelId: int(holdXml, 'LevelID'),
 		status: int(holdXml, 'Status')
 	});
+
+	if (hold.version < 508) {
+		throw new Error("Hold was created with too old version of DROD.");
+	}
 
 	await sleep();
 
@@ -93,7 +99,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			y: int(entranceXml, 'Y'),
 			o: int(entranceXml, 'O'),
 			isMainEntrance: int(entranceXml, 'IsMainEntrance') === 1,
-			showDescription: int(entranceXml, 'ShowDescription') === 1
+			showDescription: int(entranceXml, 'ShowDescription')
 		});
 
 		hold.entrances.set(entranceData.id, entranceData);
@@ -298,6 +304,23 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 
 	/** Init dynamic data */
 	loadDynamicData(hold);
+
+	log("Stability check: Exporting XML")
+	const exportedXml = await holdToXml(hold);
+	log("Stability check: Comparing XMLs")
+	try {
+		await diffXml(xml, exportedXml)
+	} catch (e) {
+		console.error(e);
+		throw new Error(
+			"Stability check failed. When attempting to export\n"
+			+ "the hold without any changes the resulting output was\n"
+			+ "different from the provided input.\n"
+			+ "It can be that the hold was created with a version of DROD"
+			+ "that's earlier than supported by the tool or there is some other"
+			+ "issue - feel free to get in touch with me."
+		)
+	}
 
 	// Wait for store to be ready
 	while (HoldIndexedStorage.isInitializing.value) {

@@ -93,8 +93,11 @@ export default function RouteHome() {
 								<li><Feat/> Entrance list + edit description</li>
 								<li><Feat/> Scroll list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
+								<li><Feat/> Added a step after importing that validates the hold exports correctly</li>
+								<li><Feat/> Added version validation at the start</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
 								<li><Bug/> Hiding columns no longer break the table if it has any filters</li>
+								<li><Bug/> Fixed a bunch of small differences between DROD-created hold data and the data created by the tool</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.0{" "}<span className="is-muted">(2024-07-08)</span></h5>
 							<ul>

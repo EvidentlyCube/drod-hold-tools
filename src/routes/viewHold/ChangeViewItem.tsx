@@ -79,7 +79,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Entrance Description',
 				location: { hold, model: 'room', roomId: entrance.roomId },
-				before: <div className="is-white-space-pre">{entrance.description.oldValue}</div>,
+				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{entrance.description.finalValue}</div>,
 			};
 		}
@@ -118,7 +118,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Scroll Message',
 				location: scroll.$scrollRef,
-				before: <div className="is-white-space-pre">{scroll.message.oldValue}</div>,
+				before: <div className="is-white-space-pre">{scroll.message.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{scroll.message.finalValue}</div>,
 			};
 		}
