@@ -19,6 +19,15 @@ const Columns: SortableTableColumn<HoldCharacter>[] = [
 		filterDebounce: 500,
 	},
 	{
+		id: 'type',
+		displayName: 'Base Type',
+		widthPercent: 5,
+		render: character => character.$baseTypeName,
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$baseTypeName, r.$baseTypeName),
+		filter: (character, filter) => filterString(character.$baseTypeName, filter),
+		filterDebounce: 500,
+	},
+	{
 		id: 'name',
 		displayName: 'Name',
 		widthPercent: 30,

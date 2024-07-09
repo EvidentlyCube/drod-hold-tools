@@ -3,7 +3,7 @@ import { CommandsList } from "../CommandList";
 import { readCommandsBuffer } from "../CommandUtils";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
-import { wcharBase64ToString } from "../Utils";
+import { getCharacterName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 interface CharacterConstructor {
@@ -27,6 +27,10 @@ export class HoldCharacter {
 	public readonly avatarDataId?: number
 
 	public readonly $commandList?: CommandsList;
+
+	public get $baseTypeName() {
+		return getCharacterName(this.$hold, this.type);
+	}
 
 	public constructor(hold: Hold, options: CharacterConstructor) {
 		this.$hold = hold;
