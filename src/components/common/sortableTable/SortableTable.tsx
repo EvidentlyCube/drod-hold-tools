@@ -75,7 +75,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 					sortAsc={sortAsc} /> )}
 			</tr>
 			<SortableTableFilters
-				columns={columns}
+				columns={visibleColumns}
 				columnFilters={columnFilters}
 				setColumnFilter={setColumnFilter}
 			/>

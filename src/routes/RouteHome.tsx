@@ -74,7 +74,6 @@ export default function RouteHome() {
 								<li>Variable list and renaming them</li>
 								<li>&hellip;with optional auto-changing it in all scripts</li>
 								<li>Editing world map names</li>
-								<li>Editing scroll texts</li>
 								<li>Adding and removing data</li>
 								<li>Changing data attached to Speech</li>
 							</ul>
@@ -95,6 +94,7 @@ export default function RouteHome() {
 								<li><Feat/> Scroll list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
+								<li><Bug/> Hiding columns no longer break the table if it has any filters</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.0{" "}<span className="is-muted">(2024-07-08)</span></h5>
 							<ul>
