@@ -11,6 +11,7 @@ export enum HoldChangeType {
 	CharacterName = 4,
 	EntranceDescription = 5,
 	ScrollMessage = 6,
+	EntranceShowDescription = 7,
 }
 
 export type HoldChangeCharacterName = {
@@ -41,6 +42,13 @@ export type HoldChangeEntranceDescription = {
 	value?: string;
 }
 
+export type HoldChangeEntranceShowDescription = {
+	type: HoldChangeType.EntranceShowDescription,
+	location: { entranceId: number };
+
+	value?: number;
+}
+
 export type HoldChangeLevelName = {
 	type: HoldChangeType.LevelName,
 	location: { levelId: number };
@@ -66,6 +74,7 @@ export type HoldChange = HoldChangeCharacterName
 	| HoldChangeDataName
 	| HoldChangeDataFile
 	| HoldChangeEntranceDescription
+	| HoldChangeEntranceShowDescription
 	| HoldChangeLevelName
 	| HoldChangeScrollMessage
 	| HoldChangeSpeechMessage

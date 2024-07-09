@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { HoldChange, HoldChangeType } from "../../data/datatypes/HoldChange";
 import { Hold } from "../../data/datatypes/Hold";
 import { HoldRef } from "../../data/references/HoldReference";
-import { getBase64DecodedLength, getFormatName } from "../../data/Utils";
+import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
 import { formatBytes } from "../../utils/Language";
 
 export interface ChangeViewItem {
@@ -81,6 +81,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				location: { hold, model: 'room', roomId: entrance.roomId },
 				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{entrance.description.finalValue}</div>,
+			};
+		}
+
+		case HoldChangeType.EntranceShowDescription: {
+			const entrance = hold.entrances.get(change.location.entranceId);
+
+			if (!entrance) {
+				return invalid(id, "Entrance Show Description", "Cannot find entrance");
+			}
+
+			return {
+				id,
+				type: 'Entrance Show Description',
+				location: { hold, model: 'room', roomId: entrance.roomId },
+				before: getShowDescriptionName(entrance.showDescription.oldValue),
+				after: getShowDescriptionName(entrance.showDescription.finalValue),
 			};
 		}
 

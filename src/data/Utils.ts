@@ -106,6 +106,15 @@ export function getFormatName(type: DataFormat): string {
 		?? `Wrong Format[${type}]`;
 }
 
+export function getShowDescriptionName(type: number): string {
+	switch (type) {
+		case 0: return "Not Displayed";
+		case 1: return "Always";
+		case 2: return "Once";
+		default: return `Unknown Type ${type}`;
+	}
+}
+
 export function getSpeakerMood(mood: number): string {
 	return MoodIdToName.get(mood) ?? 'Unknown';
 }

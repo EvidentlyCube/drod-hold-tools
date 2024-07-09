@@ -24,7 +24,7 @@ export class HoldEntrance {
 	public readonly y: number;
 	public readonly o: number;
 	public readonly isMainEntrance: boolean;
-	public readonly showDescription: number;
+	public readonly showDescription: SignalUpdatableValue<number>;
 	public readonly description: SignalUpdatableValue<string>;
 
 	public get $room() {
@@ -57,7 +57,7 @@ export class HoldEntrance {
 		this.y = opts.y;
 		this.o = opts.o;
 		this.isMainEntrance = opts.isMainEntrance;
-		this.showDescription = opts.showDescription;
+		this.showDescription = new SignalUpdatableValue(opts.showDescription);
 		this.description = new SignalUpdatableValue(wcharBase64ToString(opts.encDescription));
 	}
 }

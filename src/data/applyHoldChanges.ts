@@ -20,6 +20,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.entrances.get(change.location.entranceId)!.description.newValue = change.value;
 				break;
 
+			case HoldChangeType.EntranceShowDescription:
+				hold.entrances.get(change.location.entranceId)!.showDescription.newValue = change.value;
+				break;
+
 			case HoldChangeType.LevelName:
 				hold.levels.get(change.location.levelId)!.name.newValue = change.value;
 				break;

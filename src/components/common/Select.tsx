@@ -14,26 +14,29 @@ export interface OptGroup {
 
 type SelectProps = {
 	className?: string;
+	selectClassName?: string;
 	emptyOption?: boolean|string;
 	options?: Option[];
 	optgroups?: OptGroup[];
 	onChange?: (value: string) => void;
 	value?: string;
+	defaultValue?: string;
 };
 
 export default function Select(props: SelectProps) {
-	const { className, options, optgroups, onChange, value, emptyOption } = props;
+	const { className, selectClassName, options, optgroups, onChange, value, defaultValue, emptyOption } = props;
 
 	const innerOnChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-		console.log(e.currentTarget.value);
 		onChange?.(e.currentTarget.value);
 	}, [onChange]);
 
 	return (
-		<div className={`select ${className} ${!value ? 'is-empty' : ''}`}>
+		<div className={`select ${className ?? ""} ${!value && emptyOption ? 'is-empty' : ''}`}>
 			<select
+				className={selectClassName}
 				onChange={innerOnChange}
-				defaultValue={value}
+				value={value}
+				defaultValue={defaultValue}
 			>
 				{emptyOption && <option value="">{emptyOption}</option>}
 				{options && mapOptions(options)}

@@ -54,7 +54,7 @@ export default function DrodTextEditor({text, tag}: Props) {
 				/>
 			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
 				{newValue === undefined && <i className="fas fa-pen-to-square" />}
-				{newValue !== undefined && <i className="fas fa-xmark" />}
+				{newValue !== undefined && <i className="fas fa-rotate-left" />}
 			</div>
 		</div>
 	} else {

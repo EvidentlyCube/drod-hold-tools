@@ -90,7 +90,7 @@ export default function RouteHome() {
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
 							<ul>
 								<li><Feat/> Character list + edit name</li>
-								<li><Feat/> Entrance list + edit description</li>
+								<li><Feat/> Entrance list + edit description/show description</li>
 								<li><Feat/> Scroll list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
 								<li><Feat/> Added a step after importing that validates the hold exports correctly</li>

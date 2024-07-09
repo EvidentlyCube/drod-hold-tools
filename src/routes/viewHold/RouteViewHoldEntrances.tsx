@@ -6,6 +6,16 @@ import { HoldEntrance } from "../../data/datatypes/HoldEntrance";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import SelectEditor from "../../components/viewHold/editables/SelectEditor";
+import { Option } from "../../components/common/Select";
+import { getShowDescriptionName } from "../../data/Utils";
+
+const ShowDescriptionOptions: Option[] = [
+	{id: '0', value: '0', label: getShowDescriptionName(0) },
+	{id: '1', value: '1', label: getShowDescriptionName(1) },
+	{id: '2', value: '2', label: getShowDescriptionName(2) },
+];
+const ShowDescriptionTransformer = (value: string) => parseInt(value);
 
 const Columns: SortableTableColumn<HoldEntrance>[] = [
 	{
@@ -29,6 +39,14 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 		sort: (isAsc, left, right) => sortCompareString(isAsc, left.$level.name.finalValue, right.$level.name.finalValue),
 		filter: (entrance, filter) => filterString(entrance.$level.name.finalValue, filter),
 		filterDebounce: 500,
+	},
+	{
+		id: 'show-description',
+		displayName: 'Show Description',
+		widthPercent: 10,
+		canHide: true,
+
+		render: (entrance) => <SelectEditor value={entrance.showDescription} options={ShowDescriptionOptions} transformer={ShowDescriptionTransformer} />
 	},
 	{
 		id: 'text',

@@ -138,7 +138,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 		.attr('Y', entrance.y)
 		.attr('O', entrance.o)
 		.attr('IsMainEntrance', entrance.isMainEntrance)
-		.attr('ShowDescription', entrance.showDescription);
+		.attr('ShowDescription', entrance.showDescription.finalValue);
 
 	if (entrance.dataId) {
 		writer.attr('DataID', entrance.dataId);
