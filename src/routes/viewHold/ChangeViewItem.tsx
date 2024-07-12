@@ -32,7 +32,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					type: 'Character Name',
 					location: { hold, model: "character", characterId: character.id },
 					before: character.name.oldValue,
-					after: character.name.finalValue
+					after: character.name.newValue
 				};
 			}
 
@@ -49,7 +49,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					type: 'Data Name',
 					location: { hold, model: "data", dataId: data.id },
 					before: data.name.oldValue,
-					after: data.name.finalValue
+					after: data.name.newValue
 				};
 			}
 
@@ -66,7 +66,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					type: 'Data File',
 					location: { hold, model: "notApplicable" },
 					before: `${getFormatName(data.details.oldValue.format)} (${formatBytes(getBase64DecodedLength(data.details.oldValue.rawEncodedData))})`,
-					after: `${getFormatName(data.details.finalValue.format)} (${formatBytes(getBase64DecodedLength(data.details.finalValue.rawEncodedData))})`,
+					after: `${getFormatName(data.details.newValue.format)} (${formatBytes(getBase64DecodedLength(data.details.newValue.rawEncodedData))})`,
 				};
 			}
 
@@ -99,7 +99,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Entrance Description',
 				location: { hold, model: 'room', roomId: entrance.roomId },
 				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
-				after: <div className="is-white-space-pre">{entrance.description.finalValue}</div>,
+				after: <div className="is-white-space-pre">{entrance.description.newValue}</div>,
 			};
 		}
 
@@ -115,7 +115,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Entrance Show Description',
 				location: { hold, model: 'room', roomId: entrance.roomId },
 				before: getShowDescriptionName(entrance.showDescription.oldValue),
-				after: getShowDescriptionName(entrance.showDescription.finalValue),
+				after: getShowDescriptionName(entrance.showDescription.newValue),
 			};
 		}
 
@@ -131,7 +131,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Level Name',
 				location: { hold, model: 'notApplicable' },
 				before: level.name.oldValue,
-				after: level.name.finalValue
+				after: level.name.newValue
 			};
 		}
 
@@ -154,7 +154,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Scroll Message',
 				location: scroll.$scrollRef,
 				before: <div className="is-white-space-pre">{scroll.message.oldValue.replace(/\r/g, "\n")}</div>,
-				after: <div className="is-white-space-pre">{scroll.message.finalValue}</div>,
+				after: <div className="is-white-space-pre">{scroll.message.newValue}</div>,
 			};
 		}
 
@@ -186,7 +186,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Speech Message',
 				location: speech.$location,
 				before: speech.message.oldValue,
-				after: speech.message.finalValue
+				after: speech.message.newValue
 			};
 		}
 
@@ -202,7 +202,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				type: 'Speech Mood',
 				location: speech.$location,
 				before: MoodIdToName.get(speech.mood.oldValue) ?? `Invalid mood ${speech.mood.oldValue}`,
-				after: MoodIdToName.get(speech.mood.finalValue) ?? `Invalid mood ${speech.mood.finalValue}`,
+				after: MoodIdToName.get(speech.mood.newValue) ?? `Invalid mood ${speech.mood.newValue}`,
 			};
 		}
 

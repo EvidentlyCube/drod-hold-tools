@@ -110,8 +110,10 @@
 }
 
 .is-white-space-pre {
-	white-space: pre;
+	text-wrap: wrap;
+	white-space-collapse: preserve;
 }
+
 .is-no-wrap {
 	white-space: nowrap;
 }

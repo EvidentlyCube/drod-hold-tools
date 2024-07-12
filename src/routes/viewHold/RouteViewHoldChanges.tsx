@@ -23,7 +23,7 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
 		id: 'location',
 		displayName: 'Location',
-		widthPercent: 10,
+		widthPercent: 20,
 		canHide: true,
 		render: change => <HoldRefView holdRef={change.location} />,
 		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.location, r.location),
@@ -31,14 +31,14 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 	{
 		id: 'before',
 		displayName: 'Before',
-		widthPercent: 10,
+		widthPercent: 35,
 		canHide: true,
 		render: change => change.before
 	},
 	{
 		id: 'after',
 		displayName: 'After',
-		widthPercent: 10,
+		widthPercent: 35,
 		canHide: true,
 		render: change => change.after
 	},

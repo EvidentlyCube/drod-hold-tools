@@ -16,14 +16,14 @@ export default function SelectDataModal(props: Props) {
 
 	const [filter, setFilter] = useState("");
 	const baseDatas = useMemo(() => {
-		const datas = hold.datas.filterToArray(data => formats.includes(data.details.finalValue.format));
-		datas.sort((l, r) => sortCompareString(true, l.name.finalValue, r.name.finalValue));
+		const datas = hold.datas.filterToArray(data => formats.includes(data.details.newValue.format));
+		datas.sort((l, r) => sortCompareString(true, l.name.newValue, r.name.newValue));
 
 		return datas;
 
 	}, [hold, formats]);
 
-	const filteredDatas = baseDatas.filter(data => filterString(data.name.finalValue, filter));
+	const filteredDatas = baseDatas.filter(data => filterString(data.name.newValue, filter));
 
 	const updateFilter = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		setFilter(e.target.value);

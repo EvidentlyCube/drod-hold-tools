@@ -22,8 +22,10 @@ export function _SortableTableFilters<T extends SortableTableDataWithId>(
 
 	return (
 		<tr>
-			{columns.map((column) => (
-				<th key={column.id}>
+			{columns.map((column) => {
+				const style = { width: `${column.widthPercent}%` };
+
+				return <th key={column.id} style={style}>
 					{column.filter && (
 						<FilterInput
 							column={column}
@@ -32,7 +34,7 @@ export function _SortableTableFilters<T extends SortableTableDataWithId>(
 						/>
 					)}
 				</th>
-			))}
+			})}
 		</tr>
 	);
 }

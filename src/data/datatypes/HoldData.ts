@@ -31,7 +31,7 @@ export class HoldData {
 	public readonly $uses: HoldRef[] = [];
 
 	public get $size() {
-		return this.details.finalValue.rawEncodedData.length * 3 / 4;
+		return this.details.newValue.rawEncodedData.length * 3 / 4;
 	}
 
 	public constructor(hold: Hold, opts: DataConstructor) {

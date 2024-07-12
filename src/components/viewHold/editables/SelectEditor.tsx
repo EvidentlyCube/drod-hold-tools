@@ -14,10 +14,12 @@ export default function SelectEditor<T extends string|number>({ value, options, 
 	const [, isEdited, newValue] = useSignalUpdatableValue(value);
 
 	const onChange = useCallback((val: string) => {
-		value.newValue = transformer(val);
+		const newValue = transformer(val);
 
-		if (value.newValue === value.oldValue) {
+		if (newValue === value.oldValue) {
 			value.unset();
+		} else {
+			value.set(true, newValue);
 		}
 	}, [value, transformer]);
 

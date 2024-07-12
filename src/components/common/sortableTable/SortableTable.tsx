@@ -115,11 +115,16 @@ interface RowProps<TData extends SortableTableDataWithId> {
 }
 function Row<TData extends SortableTableDataWithId>({ columns, data }: RowProps<TData>) {
 	return <tr>
-		{columns.map(column => <td
-			key={column.id}
-			className={column.className}
-		>
-			{column.render(data)}
-		</td>)}
+		{columns.map(column => {
+			const style = { width: `${column.widthPercent}%` };
+
+			return <td
+				key={column.id}
+				className={column.className}
+				style={style}
+			>
+				{column.render(data)}
+			</td>
+		})}
 	</tr>
 }

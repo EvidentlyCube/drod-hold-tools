@@ -15,7 +15,11 @@ export default function SwapDataButton({hold, dataSource, formats}: Props) {
 	const isChanged = useSignalUpdatableValue(dataSource)[1];
 	const [isOpen, setIsOpen] = useState(false);
 	const onSelect = useCallback((dataId: number|undefined) => {
-		dataSource.newValue = dataId;
+		if (dataId === dataSource.oldValue) {
+			dataSource.unset();
+		} else {
+			dataSource.set(true, dataId);
+		}
 		setIsOpen(false);
 	}, [ dataSource, setIsOpen ]);
 	const onUnset = useCallback(() => {

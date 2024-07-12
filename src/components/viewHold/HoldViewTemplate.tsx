@@ -13,7 +13,7 @@ export default function HoldViewTemplate({ hold, holdReader }: Props) {
 			<div className="navbar is-success">
 				<div className="navbar-brand">
 					<div className="navbar-item">
-						<strong>{hold.name.finalValue}</strong>
+						<strong>{hold.name.newValue}</strong>
 					</div>
 				</div>
 				<div className="navbar-start">

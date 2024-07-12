@@ -34,8 +34,8 @@ function toSortableString(ref: HoldRef): string {
 		case "charAvatar": return getCharacterName(ref.hold, ref.characterId) + "::Avatar";
 		case "charTiles": return getCharacterName(ref.hold, ref.characterId) + "::Tiles";
 		case "charCommand": return toSortableCharCommand(ref);
-		case "data": return ref.hold.datas.getOrError(ref.dataId).name.finalValue;
-		case "entranceVoiceOver": return ref.hold.entrances.getOrError(ref.entranceId).$level.name.finalValue;
+		case "data": return ref.hold.datas.getOrError(ref.dataId).name.newValue;
+		case "entranceVoiceOver": return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
 		case "monsterCommand": return toSortableMonsterCommand(ref);
 		case "room": return toSortableRoomName(ref.hold, ref.roomId);
 		case "roomImage": return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
@@ -58,7 +58,7 @@ function toSortableRoomName(hold: Hold, roomId: number) {
 	const room = hold.rooms.getOrError(roomId);
 	const level = room.$level;
 
-	return formatString('%: %', level.name.finalValue, room.$coordsName);
+	return formatString('%: %', level.name.newValue, room.$coordsName);
 }
 
 function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {

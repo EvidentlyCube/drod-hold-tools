@@ -26,8 +26,8 @@ const Columns: SortableTableColumn<HoldScroll>[] = [
 		displayName: 'scroll Text',
 		widthPercent: 30,
 		render: scroll => <DrodTextEditor text={scroll.message} tag="textarea" />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalValue, r.message.finalValue),
-		filter: (scroll, filter) => filterString(scroll.message.finalValue, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.newValue, r.message.newValue),
+		filter: (scroll, filter) => filterString(scroll.message.newValue, filter),
 		filterDebounce: 500,
 	}
 ];

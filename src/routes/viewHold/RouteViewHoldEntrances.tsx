@@ -39,8 +39,8 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 		canHide: true,
 
 		render: entrance => <HoldRefView holdRef={entrance.$roomRef} />,
-		sort: (isAsc, left, right) => sortCompareString(isAsc, left.$level.name.finalValue, right.$level.name.finalValue),
-		filter: (entrance, filter) => filterString(entrance.$level.name.finalValue, filter),
+		sort: (isAsc, left, right) => sortCompareString(isAsc, left.$level.name.newValue, right.$level.name.newValue),
+		filter: (entrance, filter) => filterString(entrance.$level.name.newValue, filter),
 		filterDebounce: 500,
 	},
 	{
@@ -64,15 +64,15 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 			<DataRefViewByIdDynamic hold={speech.$hold} dataIdSource={speech.dataId} showName={true} />
 		</div>,
 		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
-		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
+		filter: (speech, filter) => filterDataFormat(speech.$data?.details.newValue.format, filter)
 	},
 	{
 		id: 'text',
 		displayName: 'Entrance Text',
 		widthPercent: 30,
 		render: entrance => <DrodTextEditor text={entrance.description} tag="textarea" />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.description.finalValue, r.description.finalValue),
-		filter: (entrance, filter) => filterString(entrance.description.finalValue, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.description.newValue, r.description.newValue),
+		filter: (entrance, filter) => filterString(entrance.description.newValue, filter),
 		filterDebounce: 500,
 	}
 ];

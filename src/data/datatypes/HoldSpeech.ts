@@ -29,7 +29,7 @@ export class HoldSpeech {
 	}
 
 	public get $mood() :string {
-		return getSpeakerMood(this.mood.finalValue);
+		return getSpeakerMood(this.mood.newValue);
 	}
 
 	public get $data(): HoldData | undefined {

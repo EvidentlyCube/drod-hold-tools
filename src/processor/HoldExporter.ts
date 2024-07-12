@@ -58,7 +58,7 @@ class HoldExporterImpl {
 
 		downloadBlob(
 			packedBytes,
-			hold.name.finalValue.replace(/[^a-zA-Z0-9()_ -]/g, '') + ".hold",
+			hold.name.newValue.replace(/[^a-zA-Z0-9()_ -]/g, '') + ".hold",
 			'application/octet-stream'
 		);
 	}

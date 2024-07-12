@@ -69,7 +69,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 
 		render: data => <DataRefView data={data} />,
 		sort: (isAsc, l, r) => sortData(isAsc, l, r),
-		filter: (data, filter) => filterDataFormat(data.details.finalValue.format, filter)
+		filter: (data, filter) => filterDataFormat(data.details.newValue.format, filter)
 	},
 	{
 		id: 'size',
@@ -88,8 +88,8 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		canHide: true,
 
 		render: data => <DrodTextEditor text={data.name} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalValue, r.name.finalValue),
-		filter: (data, filter) => filterString(data.name.finalValue, filter)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
+		filter: (data, filter) => filterString(data.name.newValue, filter)
 	},
 	{
 		id: 'preview',
@@ -105,7 +105,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		widthPercent: 10,
 
 		render: data => {
-			if (!canPreviewData(data.details.finalValue)) {
+			if (!canPreviewData(data.details.newValue)) {
 				return <span className="is-muted">Cannot replace</span>
 			} else {
 				return <ReplaceButton data={data} />;

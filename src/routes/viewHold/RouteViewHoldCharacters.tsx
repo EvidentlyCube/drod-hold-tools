@@ -32,8 +32,8 @@ const Columns: SortableTableColumn<HoldCharacter>[] = [
 		displayName: 'Name',
 		widthPercent: 30,
 		render: character => <DrodTextEditor text={character.name} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalValue, r.name.finalValue),
-		filter: (character, filter) => filterString(character.name.finalValue, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
+		filter: (character, filter) => filterString(character.name.newValue, filter),
 		filterDebounce: 500,
 	}
 ];

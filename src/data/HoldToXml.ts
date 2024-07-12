@@ -142,7 +142,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 		.attr('Y', entrance.y)
 		.attr('O', entrance.o)
 		.attr('IsMainEntrance', entrance.isMainEntrance)
-		.attr('ShowDescription', entrance.showDescription.finalValue);
+		.attr('ShowDescription', entrance.showDescription.newValue);
 
 	if (entrance.dataId.newValue) {
 		writer.attr('DataID', entrance.dataId.newValue);
@@ -160,12 +160,12 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
 	refs.dataIds.add(data.id);
 
 	writer.tag('Data')
-		.attr('DataFormat', data.details.finalValue.format)
+		.attr('DataFormat', data.details.newValue.format)
 		.attr('DataNameText', data.name);
 
 	// TSS hold file has <Data> with no RawData so I guess this is something to support??
-	if (data.details.finalValue.rawEncodedData) {
-		writer.attr('RawData', { _safeString: data.details.finalValue.rawEncodedData })
+	if (data.details.newValue.rawEncodedData) {
+		writer.attr('RawData', { _safeString: data.details.newValue.rawEncodedData })
 	}
 
 	writer
@@ -190,7 +190,7 @@ async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpee
 
 	writer.tag('Speech')
 		.attr('Character', speech.character)
-		.attr('Mood', speech.mood.finalValue)
+		.attr('Mood', speech.mood.newValue)
 		.attr('Message', speech.message)
 		.attr('Delay', speech.delay);
 

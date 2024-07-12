@@ -51,7 +51,7 @@ function Character({ r }: {r: HoldRefCharacter}) {
 		<span className="icon icon-monster-ref" title="Character">
 			<i className="fas fa-user"></i>
 		</span>
-		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}<strong>{character.name.newValue}</strong>
 	</>
 }
 
@@ -65,7 +65,7 @@ function CharacterCommand({ r }: {r: HoldRefCharacterCommand}) {
 		<span className="icon icon-monster-ref" title="Character">
 			<i className="fas fa-user"></i>
 		</span>
-		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
 	</>
 }
@@ -79,7 +79,7 @@ function CharacterAvatar({ r }: {r: HoldRefCharacterAvatar}) {
 		<span className="icon icon-monster-ref" title="Character">
 			<i className="fas fa-user"></i>
 		</span>
-		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>Avatar</em>
 	</>
 }
@@ -93,7 +93,7 @@ function CharacterTiles({ r }: {r: HoldRefCharacterTiles}) {
 		<span className="icon icon-monster-ref" title="Character">
 			<i className="fas fa-user"></i>
 		</span>
-		{" "}<strong>{character.name.finalValue}</strong>
+		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>Tiles</em>
 	</>
 }
@@ -107,7 +107,7 @@ function Data({ r }: {r: HoldRefData}) {
 		<span className="icon icon-monster-ref" title="Data">
 			<i className="fas fa-database"></i>
 		</span>
-		{" "}<strong>{data.name.finalValue}</strong>
+		{" "}<strong>{data.name.newValue}</strong>
 	</>
 }
 
@@ -123,7 +123,7 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 		<span className="icon icon-monster-ref" title="Monster">
 			<i className="fas fa-bug"></i>
 		</span>
-		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 		{", "}{getCharacterName(hold, monster.$characterTypeId)}
 		{" "}({monster.x},{monster.y})
 		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
@@ -140,7 +140,7 @@ function Room({ r }: {r: HoldRefRoom}) {
 		<span className="icon icon-monster-ref" title="Room">
 			<i className="fas fa-house"></i>
 		</span>
-		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 	</>
 }
 
@@ -154,7 +154,7 @@ function RoomImage({ r }: {r: HoldRefRoomImage}) {
 		<span className="icon icon-monster-ref" title="Monster">
 			<i className="fas fa-bug"></i>
 		</span>
-		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 		{" "}&rarr;{" "}<em>Room Image</em>
 	</>
 }
@@ -169,7 +169,7 @@ function RoomOverheadImage({ r }: {r: HoldRefRoomOverheadImage}) {
 		<span className="icon icon-monster-ref" title="Monster">
 			<i className="fas fa-bug"></i>
 		</span>
-		{" "}<strong>{level.name.finalValue}{": "}{room.$coordsName}</strong>
+		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 		{" "}&rarr;{" "}<em>Overhead Image</em>
 	</>;
 }
@@ -185,7 +185,7 @@ function Scroll({ r }: {r: HoldRefScroll}) {
 			<i className="fas fa-scroll"></i>
 		</span>
 		{" "}<strong>
-			<span title="Level Name">{level.name.finalValue}</span>
+			<span title="Level Name">{level.name.newValue}</span>
 			{": "}
 			<span title="Room Coordinates">{room.$coordsName}</span>
 		</strong>

@@ -13,7 +13,7 @@ export default function DataUsesPreview(props: Props) {
 			<div className="modal-background" onClick={onClose}></div>
 			<div className="modal-card">
 				<header className="modal-card-head">
-					<p className="modal-card-title">Uses of {data.name.finalValue}</p>
+					<p className="modal-card-title">Uses of {data.name.newValue}</p>
 					<button className="delete" onClick={onClose}></button>
 				</header>
 				<section className="modal-card-body">

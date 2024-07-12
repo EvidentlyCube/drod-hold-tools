@@ -13,7 +13,7 @@ export default function DrodTextEditor({text, tag}: Props) {
 
 	const onToggle = useCallback(() => {
 		if (!isEdited) {
-			text.newValue = text.oldValue;
+			text.set(true, text.oldValue);
 			if (inputRef.current) {
 				(inputRef.current as HTMLElement).focus()
 			}
@@ -30,7 +30,7 @@ export default function DrodTextEditor({text, tag}: Props) {
 
 	// Using any to avoid typescript complaints about type
 	const onType = useCallback((e: any) => {
-		text.newValue = e.target.value;
+		text.set(true, e.target.value);
 	}, [text]);
 
 	const title = isEdited

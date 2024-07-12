@@ -45,8 +45,8 @@ const Columns: SortableTableColumn<HoldLevel>[] = [
 		displayName: 'Name',
 		widthPercent: 30,
 		render: level => <DrodTextEditor text={level.name} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.finalValue, r.name.finalValue),
-		filter: (level, filter) => filterString(level.name.finalValue, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
+		filter: (level, filter) => filterString(level.name.newValue, filter),
 		filterDebounce: 500,
 	}
 ];

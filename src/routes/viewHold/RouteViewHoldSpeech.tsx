@@ -82,15 +82,15 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 			<DataRefViewByIdDynamic hold={speech.$hold} dataIdSource={speech.dataId} showName={true} />
 		</div>,
 		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
-		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
+		filter: (speech, filter) => filterDataFormat(speech.$data?.details.newValue.format, filter)
 	},
 	{
 		id: 'text',
 		displayName: 'Text',
 		widthPercent: 30,
 		render: speech => <DrodTextEditor text={speech.message} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.finalValue, r.message.finalValue),
-		filter: (speech, filter) => filterString(speech.message.finalValue, filter),
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.newValue, r.message.newValue),
+		filter: (speech, filter) => filterString(speech.message.newValue, filter),
 		filterDebounce: 500,
 	}
 ];
