@@ -15,6 +15,7 @@ export enum HoldChangeType {
 	SpeechMood = 8,
 	SpeechDataId = 9,
 	EntranceDataId = 10,
+	WorldMapName = 11,
 }
 
 export type HoldChangeCharacterName = {
@@ -105,6 +106,14 @@ export interface HoldChangeScrollMessage {
 	value?: string;
 }
 
+export interface HoldChangeWorldMapName {
+	type: HoldChangeType.WorldMapName;
+	location: { worldMapId: number };
+
+	hasChange: boolean;
+	value: string;
+}
+
 export type HoldChange = HoldChangeCharacterName
 	| HoldChangeDataName
 	| HoldChangeDataFile
@@ -116,6 +125,7 @@ export type HoldChange = HoldChangeCharacterName
 	| HoldChangeSpeechDataId
 	| HoldChangeSpeechMessage
 	| HoldChangeSpeechMood
+	| HoldChangeWorldMapName
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

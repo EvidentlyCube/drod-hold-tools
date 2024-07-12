@@ -302,6 +302,13 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		await sleep();
 	}
 
+
+	for (const demoOrSavedGameXml of xml.querySelectorAll('SavedGames,Demos')) {
+		hold.demosAndSavedGames.push(demoOrSavedGameXml.outerHTML);
+		await sleep();
+	}
+
+
 	/** Init dynamic data */
 	loadDynamicData(hold);
 

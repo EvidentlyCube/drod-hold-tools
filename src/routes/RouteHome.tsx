@@ -89,7 +89,7 @@ export default function RouteHome() {
 							<h3>Changelog</h3>
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
 							<ul>
-								<li><Feat/> Character Elist + edit name</li>
+								<li><Feat/> Character list + edit name</li>
 								<li><Feat/> Entrance list + edit description/show description</li>
 								<li><Feat/> Scroll list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
@@ -98,9 +98,11 @@ export default function RouteHome() {
 								<li><Feat/> Speech list &rarr; Edit Mood</li>
 								<li><Feat/> Speech list &rarr; Edit Data</li>
 								<li><Feat/> Entrance list &rarr; Edit Data</li>
+								<li><Feat/> World Map list + Edit name</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
 								<li><Bug/> Hiding columns no longer break the table if it has any filters</li>
 								<li><Bug/> Fixed a bunch of small differences between DROD-created hold data and the data created by the tool</li>
+								<li><Bug/> Fixed saved games and demos not being lost during export.</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.0{" "}<span className="is-muted">(2024-07-08)</span></h5>
 							<ul>

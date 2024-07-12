@@ -1,12 +1,13 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
 import { HoldLevel } from "./HoldLevel";
 import { HoldScroll } from "./HoldRoom";
 import { HoldSpeech } from "./HoldSpeech";
+import { HoldWorldMap } from "./HoldWorldMap";
 
 export class HoldChangeListener {
 	public register(hold: Hold) {
@@ -32,6 +33,9 @@ export class HoldChangeListener {
 			this.registerSpeechDataIdChange(speech);
 			this.registerSpeechMessageChange(speech);
 			this.registerSpeechMoodChange(speech);
+		});
+		hold.worldMaps.forEach(worldMap => {
+			this.registerWorldMapNameChange(worldMap);
 		});
 	}
 
@@ -177,6 +181,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, mood);
+	}
+
+	private registerWorldMapNameChange(worldMap: HoldWorldMap) {
+		const { $hold, id, name } = worldMap;
+
+		const change = $hold.$changes.create<HoldChangeWorldMapName>({
+			type: HoldChangeType.WorldMapName,
+			location: { worldMapId: id },
+			hasChange: false,
+			value: name.newValue
+		});
+
+		registerTextChange($hold, change, name);
 	}
 
 }

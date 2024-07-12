@@ -38,6 +38,9 @@ export default function HoldViewTemplate({ hold, holdReader }: Props) {
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/speeches`}>
 						Speeches
 					</NavLink>
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/world-maps`}>
+						World Maps
+					</NavLink>
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/changes`}>
 						Changes
 					</NavLink>

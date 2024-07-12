@@ -95,6 +95,10 @@ async function compareElement(left: Element, right: Element, context: string, st
 	}
 
 	if (left.children.length !== right.children.length) {
+		(window as any)._l = left;
+		(window as any)._r = right;
+		console.log(left);
+		console.log(right);
 		throw new Error(`${context}: Different children number ${left.children.length} / ${right.children.length}`);
 	}
 

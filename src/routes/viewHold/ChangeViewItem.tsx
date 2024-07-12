@@ -206,6 +206,21 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
+		case HoldChangeType.WorldMapName: {
+			const worldMap = hold.worldMaps.get(change.location.worldMapId);
+
+			if (!worldMap) {
+				return invalid(id, "World Map Name", "Cannot find world map");
+			}
+
+			return {
+				id,
+				type: 'World Map Name',
+				location: { hold, model: 'notApplicable' },
+				before: worldMap.name.oldValue,
+				after: worldMap.name.newValue
+			};
+		}
 
 		default:
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));

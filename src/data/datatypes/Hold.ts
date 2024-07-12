@@ -71,6 +71,9 @@ export class Hold {
 	public readonly rooms = new OrderedMap<number, HoldRoom>();
 	public readonly worldMaps = new OrderedMap<number, HoldWorldMap>();
 
+	/** Currently not used, stored only so it can be included during export */
+	public readonly demosAndSavedGames: string[] = [];
+
 	public readonly $holdReaderId: number;
 	public readonly $changes = new HoldChangeList();
 

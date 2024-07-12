@@ -50,6 +50,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.speeches.get(change.location.speechId)!.mood.set(change.hasChange, change.value!); // @FIXME !
 				break;
 
+			case HoldChangeType.WorldMapName:
+				hold.worldMaps.get(change.location.worldMapId)!.name.set(change.hasChange, change.value);
+				break;
+
 		}
 	}
 }

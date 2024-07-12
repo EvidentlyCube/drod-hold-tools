@@ -18,6 +18,7 @@ export class SignalUpdatableValue<T> {
 
 	/**
 	 * @deprecated use `newValue` instead as it's always set to oldValue when not changed
+	 * @FIXME - Fix all uses
 	 */
 	public get finalValue(): T {
 		return this._hasNewValue ? this._newValue : this.oldValue;

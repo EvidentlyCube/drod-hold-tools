@@ -92,6 +92,10 @@ export async function holdToXml(hold: Hold) {
 		await writeLevel(writer, refs, level)
 	}
 
+	for (const demoOrSavedGame of hold.demosAndSavedGames) {
+		writer.write(demoOrSavedGame);
+	}
+
 	writer.end('drod');
 
 	return writer.getXml();
