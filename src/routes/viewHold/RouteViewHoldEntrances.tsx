@@ -4,11 +4,14 @@ import { SortableTableColumn } from "../../components/common/sortableTable/Sorta
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldEntrance } from "../../data/datatypes/HoldEntrance";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
+import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
 import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 import { Option } from "../../components/common/Select";
-import { getShowDescriptionName } from "../../data/Utils";
+import { filterDataFormat, getDataFormatFilterOptions, getShowDescriptionName } from "../../data/Utils";
+import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
+import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
+import { DataFormat } from "../../data/DrodEnums";
 
 const ShowDescriptionOptions: Option[] = [
 	{id: '0', value: '0', label: getShowDescriptionName(0) },
@@ -47,6 +50,21 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 		canHide: true,
 
 		render: (entrance) => <SelectEditor value={entrance.showDescription} options={ShowDescriptionOptions} transformer={ShowDescriptionTransformer} />
+	},
+	{
+		id: 'data',
+		displayName: 'Data',
+		widthPercent: 5,
+		canHide: true,
+
+		filterOptions: { optgroups: getDataFormatFilterOptions() },
+
+		render: speech => <div className="is-flex is-gap-1 is-align-items-center">
+			<SwapDataButton hold={speech.$hold} dataSource={speech.dataId} formats={[DataFormat.OGG, DataFormat.S3M, DataFormat.WAV]} />
+			<DataRefViewByIdDynamic hold={speech.$hold} dataIdSource={speech.dataId} showName={true} />
+		</div>,
+		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
+		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
 	},
 	{
 		id: 'text',

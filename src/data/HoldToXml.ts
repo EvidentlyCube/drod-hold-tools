@@ -125,9 +125,9 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 
 	refs.entranceIds.add(entrance.id);
 
-	if (entrance.dataId) {
+	if (entrance.dataId.newValue) {
 		// @FIXME handle null data
-		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId)!);
+		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue)!);
 	}
 
 	writer.tag('Entrances')
@@ -140,8 +140,8 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 		.attr('IsMainEntrance', entrance.isMainEntrance)
 		.attr('ShowDescription', entrance.showDescription.finalValue);
 
-	if (entrance.dataId) {
-		writer.attr('DataID', entrance.dataId);
+	if (entrance.dataId.newValue) {
+		writer.attr('DataID', entrance.dataId.newValue);
 	}
 	writer.end();
 

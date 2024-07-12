@@ -19,7 +19,7 @@ export class HoldEntrance {
 
 	public readonly id: number;
 	public readonly roomId: number;
-	public readonly dataId?: number;
+	public readonly dataId: SignalUpdatableValue<number|undefined>;
 	public readonly x: number;
 	public readonly y: number;
 	public readonly o: number;
@@ -44,7 +44,7 @@ export class HoldEntrance {
 	}
 
 	public get $data() {
-		return this.dataId ? this.$hold.datas.get(this.dataId) : undefined;
+		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
 	}
 
 	public constructor(hold: Hold, opts: EntranceConstructor) {
@@ -52,7 +52,7 @@ export class HoldEntrance {
 
 		this.id = opts.id;
 		this.roomId = opts.roomId;
-		this.dataId = opts.dataId;
+		this.dataId = new SignalUpdatableValue(opts.dataId);
 		this.x = opts.x;
 		this.y = opts.y;
 		this.o = opts.o;

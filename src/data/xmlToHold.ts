@@ -454,8 +454,8 @@ function loadDynamicData(hold: Hold) {
 	}
 
 	for (const entrance of hold.entrances.values()) {
-		if (entrance.dataId) {
-			hold.datas.getOrError(entrance.dataId).$uses.push({
+		if (entrance.dataId.newValue) {
+			hold.datas.getOrError(entrance.dataId.newValue).$uses.push({
 				hold,
 				model: 'entranceVoiceOver',
 				entranceId: entrance.id

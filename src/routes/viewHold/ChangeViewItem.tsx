@@ -70,6 +70,23 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				};
 			}
 
+
+		case HoldChangeType.EntranceDataId: {
+			const entrance = hold.entrances.get(change.location.entranceId);
+
+			if (!entrance) {
+				return invalid(id, "Entrance Data ID", "Cannot find entrance");
+			}
+
+			return {
+				id,
+				type: 'Entrance DataId',
+				location: { hold, model: 'room', roomId: entrance.roomId },
+				before: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.oldValue} showName={true} />,
+				after: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.newValue} showName={true} />,
+			};
+		}
+
 		case HoldChangeType.EntranceDescription: {
 			const entrance = hold.entrances.get(change.location.entranceId);
 

@@ -16,6 +16,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.datas.get(change.location.dataId)!.details.set(change.hasChange, change.value!);  // @FIXME !
 				break;
 
+			case HoldChangeType.EntranceDataId:
+				hold.entrances.get(change.location.entranceId)!.dataId.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.EntranceDescription:
 				hold.entrances.get(change.location.entranceId)!.description.set(change.hasChange, change.value!); // @FIXME !
 				break;
