@@ -13,6 +13,7 @@ export enum HoldChangeType {
 	ScrollMessage = 6,
 	EntranceShowDescription = 7,
 	SpeechMood = 8,
+	SpeechDataId = 9,
 }
 
 export type HoldChangeCharacterName = {
@@ -63,6 +64,14 @@ export type HoldChangeLevelName = {
 	value?: string;
 }
 
+export interface HoldChangeSpeechDataId {
+	type: HoldChangeType.SpeechDataId;
+	location: { speechId: number };
+
+	hasChange: boolean;
+	value?: number;
+}
+
 export interface HoldChangeSpeechMessage {
 	type: HoldChangeType.SpeechMessage;
 	location: { speechId: number };
@@ -94,6 +103,7 @@ export type HoldChange = HoldChangeCharacterName
 	| HoldChangeEntranceShowDescription
 	| HoldChangeLevelName
 	| HoldChangeScrollMessage
+	| HoldChangeSpeechDataId
 	| HoldChangeSpeechMessage
 	| HoldChangeSpeechMood
 

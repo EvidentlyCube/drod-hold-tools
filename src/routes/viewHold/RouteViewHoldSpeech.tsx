@@ -1,17 +1,18 @@
 import { useParams } from "react-router-dom";
+import { Option } from "../../components/common/Select";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import { DataRefViewById } from "../../components/viewHold/DataRefView";
+import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
+import SelectEditor from "../../components/viewHold/editables/SelectEditor";
+import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
+import { DataFormat, Mood, MoodIdToName } from "../../data/DrodEnums";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
-import { Mood, MoodIdToName } from "../../data/DrodEnums";
-import { Option } from "../../components/common/Select";
-import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 
 const MoodOptions: Option[] = [
 	{ id: 0, value: Mood.Normal, label: MoodIdToName.get(Mood.Normal)! },
@@ -76,7 +77,10 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 
 		filterOptions: { optgroups: getDataFormatFilterOptions() },
 
-		render: speech => <DataRefViewById hold={speech.$hold} dataId={speech.dataId} />,
+		render: speech => <div className="is-flex is-gap-1 is-align-items-center">
+			<SwapDataButton hold={speech.$hold} dataSource={speech.dataId} formats={[DataFormat.OGG, DataFormat.S3M, DataFormat.WAV]} />
+			<DataRefViewByIdDynamic hold={speech.$hold} dataIdSource={speech.dataId} showName={true} />
+		</div>,
 		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
 		filter: (speech, filter) => filterDataFormat(speech.$data?.details.finalValue.format, filter)
 	},

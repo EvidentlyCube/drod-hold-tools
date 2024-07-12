@@ -179,9 +179,9 @@ async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpee
 
 	refs.speechIds.add(speech.id);
 
-	if (speech.dataId) {
+	if (speech.dataId.newValue) {
 		// @FIXME null data check
-		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId)!);
+		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId.newValue)!);
 	}
 
 	writer.tag('Speech')
@@ -190,8 +190,8 @@ async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpee
 		.attr('Message', speech.message)
 		.attr('Delay', speech.delay);
 
-	if (speech.dataId) {
-		writer.attr('DataID', speech.dataId);
+	if (speech.dataId.newValue) {
+		writer.attr('DataID', speech.dataId.newValue);
 	}
 
 	writer.attr('SpeechID', speech.id)

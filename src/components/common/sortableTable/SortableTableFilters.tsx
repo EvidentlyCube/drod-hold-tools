@@ -4,13 +4,14 @@ import {
 	SortableTableColumn,
 	SortableTableDataWithId,
 } from "./SortableTableCommons";
+import { memo } from "react";
 
 interface Props<T extends SortableTableDataWithId> {
 	columns: readonly SortableTableColumn<T>[];
 	columnFilters: Map<string, string>;
 	setColumnFilter: (column: string, filter: string) => void;
 }
-export function SortableTableFilters<T extends SortableTableDataWithId>(
+export function _SortableTableFilters<T extends SortableTableDataWithId>(
 	props: Props<T>
 ) {
 	const { columns, columnFilters, setColumnFilter } = props;
@@ -35,6 +36,8 @@ export function SortableTableFilters<T extends SortableTableDataWithId>(
 		</tr>
 	);
 }
+
+export const SortableTableFilters = memo(_SortableTableFilters) as typeof _SortableTableFilters;
 
 interface FilterInputProps<T extends SortableTableDataWithId> {
 	column: SortableTableColumn<T>;

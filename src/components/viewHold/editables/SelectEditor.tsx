@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
-import Select, { OptGroup, Option } from "../../common/Select";
 import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
+import Select, { OptGroup, Option } from "../../common/Select";
 
 interface Props<T> {
 	value: SignalUpdatableValue<T>;
@@ -11,7 +11,7 @@ interface Props<T> {
 }
 
 export default function SelectEditor<T extends string|number>({ value, options, optGroups, transformer }: Props<T>) {
-	const [oldValue, isEdited, newValue] = useSignalUpdatableValue(value);
+	const [, isEdited, newValue] = useSignalUpdatableValue(value);
 
 	const onChange = useCallback((val: string) => {
 		value.newValue = transformer(val);

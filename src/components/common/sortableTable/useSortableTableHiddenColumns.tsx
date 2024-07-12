@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCommons";
 import SuperJSON from "superjson";
@@ -24,7 +24,9 @@ export default function useSortableTableHiddenColumns<T extends SortableTableDat
 		setHiddenColumns(newHiddenColumns);
 	}, [ hiddenColumns, setHiddenColumns ]);
 
-	const visibleColumns = columns.filter(column => !hiddenColumns.has(column.id));
+	const visibleColumns = useMemo(() => {
+		return columns.filter(column => !hiddenColumns.has(column.id));
+	}, [ columns, hiddenColumns ]);
 
 	return { visibleColumns, hiddenColumns, toggleHiddenColumn };
 }

@@ -72,7 +72,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 					column={column}
 					onSort={onSort}
 					sortBy={sortBy}
-					sortAsc={sortAsc} /> )}
+					sortAsc={sortAsc} />)}
 			</tr>
 			<SortableTableFilters
 				columns={visibleColumns}
@@ -113,13 +113,13 @@ interface RowProps<TData extends SortableTableDataWithId> {
 	columns: SortableTableColumn<TData>[];
 	data: TData;
 }
-function Row<TData extends SortableTableDataWithId>({columns, data}: RowProps<TData>) {
+function Row<TData extends SortableTableDataWithId>({ columns, data }: RowProps<TData>) {
 	return <tr>
-			{columns.map(column => <td
-				key={column.id}
-				className={column.className}
-			>
-				{column.render(data)}
-			</td>)}
+		{columns.map(column => <td
+			key={column.id}
+			className={column.className}
+		>
+			{column.render(data)}
+		</td>)}
 	</tr>
 }

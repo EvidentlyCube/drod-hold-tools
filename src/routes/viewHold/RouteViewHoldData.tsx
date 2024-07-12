@@ -32,7 +32,7 @@ function PreviewCell({ data }: { data: HoldData}) {
 	if (!canPreviewData(newDetails)) {
 		return <span className="is-muted">Cannot preview </span>
 
-	} else if (newDetails) {
+	} else if (isChanged) {
 		return <>
 			<PreviewButton data={data} details={oldDetails} text="Original" />
 			{" "}<PreviewButton data={data} details={newDetails} text="Updated" />

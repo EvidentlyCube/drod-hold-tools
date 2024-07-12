@@ -351,8 +351,8 @@ function loadDynamicData(hold: Hold) {
 	}
 
 	for (const speech of hold.speeches.values()) {
-		if (speech.dataId) {
-			hold.datas.getOrError(speech.dataId).$uses.push({
+		if (speech.dataId.newValue) {
+			hold.datas.getOrError(speech.dataId.newValue).$uses.push({
 				hold,
 				model: 'speech',
 				speechId: speech.id

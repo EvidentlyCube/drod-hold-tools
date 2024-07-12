@@ -5,6 +5,7 @@ import { HoldRef } from "../../data/references/HoldReference";
 import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
 import { formatBytes } from "../../utils/Language";
 import { MoodIdToName } from "../../data/DrodEnums";
+import { DataRefViewById } from "../../components/viewHold/DataRefView";
 
 export interface ChangeViewItem {
 	id: string;
@@ -137,6 +138,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				location: scroll.$scrollRef,
 				before: <div className="is-white-space-pre">{scroll.message.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{scroll.message.finalValue}</div>,
+			};
+		}
+
+		case HoldChangeType.SpeechDataId: {
+			const speech = hold.speeches.get(change.location.speechId);
+
+			if (!speech) {
+				return invalid(id, "Speech Data ID", "Cannot find speech");
+			}
+
+			return {
+				id,
+				type: 'Speech Data ID',
+				location: speech.$location,
+				before: <DataRefViewById hold={speech.$hold} dataId={speech.dataId.oldValue} showName={true} />,
+				after: <DataRefViewById hold={speech.$hold} dataId={speech.dataId.newValue} showName={true} />,
 			};
 		}
 

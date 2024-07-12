@@ -16,7 +16,7 @@ export class HoldSpeech {
 	public readonly $hold: Hold;
 
 	public readonly id: number;
-	public readonly dataId?: number;
+	public readonly dataId: SignalUpdatableValue<number|undefined>;
 	public readonly character: number;
 	public readonly mood: SignalUpdatableValue<number>;
 	public readonly delay: number;
@@ -33,14 +33,14 @@ export class HoldSpeech {
 	}
 
 	public get $data(): HoldData | undefined {
-		return this.dataId ? this.$hold.datas.get(this.dataId) : undefined;
+		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
 	}
 
 	public constructor(hold: Hold, opts: SpeechConstructor) {
 		this.$hold = hold;
 
 		this.id = opts.id
-		this.dataId = opts.dataId
+		this.dataId = new SignalUpdatableValue(opts.dataId)
 		this.character = opts.character
 		this.mood = new SignalUpdatableValue(opts.mood);
 		this.delay = opts.delay

@@ -1,17 +1,16 @@
 import { BrowserRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
+import NavBarEnd from "./components/common/NavBarEnd";
 import NavHoldsList from "./components/common/NavHoldsList";
 import RouteHome from "./routes/RouteHome";
 import RouteViewHold from "./routes/RouteViewHold";
-import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
-import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeech";
 import RouteViewHoldChanges from "./routes/viewHold/RouteViewHoldChanges";
-import NavBarEnd from "./components/common/NavBarEnd";
-import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
-import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 import RouteViewHoldCharacters from "./routes/viewHold/RouteViewHoldCharacters";
+import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
 import RouteViewHoldEntrances from "./routes/viewHold/RouteViewHoldEntrances";
+import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 import RouteViewHoldScrolls from "./routes/viewHold/RouteViewHoldScrolls";
-import { wcharBase64ToString } from "./data/Utils";
+import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeech";
+import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
 
 function App() {
 	const href = window.location.href.toLocaleLowerCase();

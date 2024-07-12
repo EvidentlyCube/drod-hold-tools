@@ -1,13 +1,13 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
-import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareRefs, sortCompareString } from "../../utils/SortUtils";
 import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldScroll } from "../../data/datatypes/HoldRoom";
 import { getScrollRef } from "../../data/references/HoldReferenceUtils";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
+import { HoldReaders } from "../../processor/HoldReaders";
+import { filterString, sortCompareRefs, sortCompareString } from "../../utils/SortUtils";
 
 const Columns: SortableTableColumn<HoldScroll>[] = [
 	{

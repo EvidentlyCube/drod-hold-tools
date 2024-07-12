@@ -1,19 +1,18 @@
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { DataFormat } from "../../../data/DrodEnums";
 import { Hold } from "../../../data/datatypes/Hold";
-import { HoldData } from "../../../data/datatypes/HoldData";
-import HoldRefView from "../HoldRefVIew";
 import { filterString, sortCompareString } from "../../../utils/SortUtils";
 import DataRefView from "../DataRefView";
 
 interface Props {
 	hold: Hold;
 	formats: DataFormat[];
+	allowEmpty: boolean;
 	onClose: () => void;
-	onSelect: (data: HoldData) => void;
+	onSelect: (dataId: number|undefined) => void;
 }
 export default function SelectDataModal(props: Props) {
-	const { hold, formats, onClose, onSelect } = props;
+	const { hold, formats, onClose, onSelect, allowEmpty } = props;
 
 	const [filter, setFilter] = useState("");
 	const baseDatas = useMemo(() => {
@@ -39,10 +38,10 @@ export default function SelectDataModal(props: Props) {
 					<button className="delete" onClick={onClose}></button>
 				</header>
 				<section className="modal-card-body">
-					<table>
+					<table className="table is-fullwidth is-hoverable is-striped is-middle">
 						<thead>
 							<tr>
-								<th colSpan={2}>
+								<th colSpan={3}>
 								<div className="control has-icons-left">
 									<input
 										className="input is-small is-rounded"
@@ -58,14 +57,25 @@ export default function SelectDataModal(props: Props) {
 							</tr>
 						</thead>
 						<tbody>
+							{allowEmpty && <tr>
+								<td><span className="is-muted">n/a</span></td>
+								<td><span className="is-muted">No Data</span></td>
+								<td>
+									<button className="button" onClick={() => onSelect(undefined)}>
+										Select
+									</button>
+								</td>
+							</tr>}
 							{filteredDatas.map(data => (
 								<tr key={data.id}>
 									<td>
 										<DataRefView data={data} />
-										{data.name.finalValue}
 									</td>
 									<td>
-										<button className="button" onClick={() => onSelect(data)}>
+										{data.name.newValue}
+									</td>
+									<td>
+										<button className="button" onClick={() => onSelect(data.id)}>
 											Select
 										</button>
 									</td>

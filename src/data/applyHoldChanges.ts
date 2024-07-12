@@ -38,8 +38,12 @@ export function applyHoldChanges(hold: Hold) {
 				hold.speeches.get(change.location.speechId)!.message.set(change.hasChange, change.value!);  // @FIXME !
 				break;
 
+			case HoldChangeType.SpeechDataId:
+				hold.speeches.get(change.location.speechId)!.dataId.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.SpeechMood:
-				hold.speeches.get(change.location.speechId)!.mood.set(change.hasChange, change.value!);  // @FIXME !
+				hold.speeches.get(change.location.speechId)!.mood.set(change.hasChange, change.value!); // @FIXME !
 				break;
 
 		}

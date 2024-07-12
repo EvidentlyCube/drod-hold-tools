@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { getPaginationPageNumbers } from "./SortableTableUtils";
 import SortableTableColumnOptions from "./SortableTableColumnOptions";
 import { SortableTableColumnSansData } from "./SortableTableCommons";
@@ -12,7 +12,7 @@ interface PaginationProps {
 	hiddenColumns: Set<string>;
 	toggleHiddenColumn: (column: string) => void;
 }
-export function SortableTablePagination(props: PaginationProps) {
+function _SortableTablePagination(props: PaginationProps) {
 	const { totalRecords, pageSize, currentPage, setPage, columns, hiddenColumns, toggleHiddenColumn } = props;
 
 	const pages = Math.max(1, Math.ceil(totalRecords / pageSize));
@@ -66,6 +66,7 @@ export function SortableTablePagination(props: PaginationProps) {
 	);
 }
 
+export const SortableTablePagination = memo(_SortableTablePagination) as typeof _SortableTablePagination;
 interface PaginationLinkProps {
 	selected: number;
 	setPage: (page: number) => void;

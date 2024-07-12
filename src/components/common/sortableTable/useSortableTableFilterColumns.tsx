@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCommons";
 import SuperJSON from "superjson";
@@ -24,7 +24,9 @@ export default function useSortableTableFilterColumns<T extends SortableTableDat
 		setColumnFilters(newColumnFilters);
 	}, [ columnFilters, setColumnFilters ]);
 
-	const filterableColumns = columns.filter(column => column.filter);
+	const filterableColumns = useMemo(() => {
+		return columns.filter(column => column.filter);
+	}, [ columns ]);
 
 	return { filterableColumns, columnFilters, setColumnFilter };
 }

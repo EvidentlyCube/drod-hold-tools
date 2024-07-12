@@ -92,7 +92,7 @@ export function getCoordinateName(x: number, y: number) {
 
 export function getCharacterName(hold: Hold, characterId: number): string {
 	return MonsterIdToName.get(characterId)
-		?? hold.characters.get(characterId)?.name.finalValue
+		?? hold.characters.get(characterId)?.name.newValue
 		?? `Unknown Character[${characterId}]`;
 }
 
