@@ -23,7 +23,7 @@ export type HoldChangeCharacterName = {
 	location: { characterId: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export type HoldChangeDataName = {
@@ -31,7 +31,7 @@ export type HoldChangeDataName = {
 	location: { dataId: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export type HoldChangeDataFile = {
@@ -39,7 +39,7 @@ export type HoldChangeDataFile = {
 	location: { dataId: number };
 
 	hasChange: boolean;
-	value?: HoldDataDetails;
+	value: HoldDataDetails;
 }
 
 export type HoldChangeEntranceDataId = {
@@ -55,7 +55,7 @@ export type HoldChangeEntranceDescription = {
 	location: { entranceId: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export type HoldChangeEntranceShowDescription = {
@@ -63,7 +63,7 @@ export type HoldChangeEntranceShowDescription = {
 	location: { entranceId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number;
 }
 
 export type HoldChangeLevelName = {
@@ -71,7 +71,7 @@ export type HoldChangeLevelName = {
 	location: { levelId: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export interface HoldChangeSpeechDataId {
@@ -87,7 +87,7 @@ export interface HoldChangeSpeechMessage {
 	location: { speechId: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export interface HoldChangeSpeechMood {
@@ -95,7 +95,7 @@ export interface HoldChangeSpeechMood {
 	location: { speechId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number;
 }
 
 export interface HoldChangeScrollMessage {
@@ -103,7 +103,7 @@ export interface HoldChangeScrollMessage {
 	location: { roomId: number, x: number, y: number };
 
 	hasChange: boolean;
-	value?: string;
+	value: string;
 }
 
 export interface HoldChangeWorldMapName {

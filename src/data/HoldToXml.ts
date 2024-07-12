@@ -80,8 +80,6 @@ export async function holdToXml(hold: Hold) {
 		await writeWorldMap(writer, refs, worldMap)
 	}
 
-	// @FIXME Export world maps
-
 	writer.end('Holds');
 
 	for (const data of hold.datas.values()) {
