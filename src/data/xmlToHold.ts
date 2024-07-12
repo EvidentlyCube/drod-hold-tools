@@ -368,15 +368,15 @@ function loadDynamicData(hold: Hold) {
 	}
 
 	for (const character of hold.characters.values()) {
-		if (character.avatarDataId) {
-			hold.datas.getOrError(character.avatarDataId).$uses.push({
+		if (character.avatarDataId.newValue) {
+			hold.datas.getOrError(character.avatarDataId.newValue).$uses.push({
 				hold,
 				model: 'charAvatar',
 				characterId: character.id
 			});
 		}
-		if (character.tilesDataId) {
-			hold.datas.getOrError(character.tilesDataId).$uses.push({
+		if (character.tilesDataId.newValue) {
+			hold.datas.getOrError(character.tilesDataId.newValue).$uses.push({
 				hold,
 				model: 'charTiles',
 				characterId: character.id

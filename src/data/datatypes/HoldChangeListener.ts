@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterName, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -12,7 +12,9 @@ import { HoldWorldMap } from "./HoldWorldMap";
 export class HoldChangeListener {
 	public register(hold: Hold) {
 		hold.characters.forEach(character => {
+			this.registerCharacterAvatarDataIdChange(character);
 			this.registerCharacterNameChange(character);
+			this.registerCharacterTilesDataIdChange(character);
 		});
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
@@ -39,6 +41,19 @@ export class HoldChangeListener {
 		});
 	}
 
+	private registerCharacterAvatarDataIdChange(character: HoldCharacter) {
+		const { $hold, id, avatarDataId } = character;
+
+		const change = $hold.$changes.create<HoldChangeCharacterAvatarDataId>({
+			type: HoldChangeType.CharacterAvatarDataId,
+			location: { characterId: id },
+			hasChange: false,
+			value: avatarDataId.newValue
+		});
+
+		registerTextChange($hold, change, avatarDataId);
+	}
+
 	private registerCharacterNameChange(character: HoldCharacter) {
 		const { $hold, id, name } = character;
 
@@ -50,6 +65,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, name);
+	}
+
+	private registerCharacterTilesDataIdChange(character: HoldCharacter) {
+		const { $hold, id, tilesDataId } = character;
+
+		const change = $hold.$changes.create<HoldChangeCharacterTilesDataId>({
+			type: HoldChangeType.CharacterTilesDataId,
+			location: { characterId: id },
+			hasChange: false,
+			value: tilesDataId.newValue
+		});
+
+		registerTextChange($hold, change, tilesDataId);
 	}
 
 	private registerDataNameChange(data: HoldData) {

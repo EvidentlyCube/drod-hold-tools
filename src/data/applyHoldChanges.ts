@@ -4,8 +4,16 @@ import { HoldChangeType } from "./datatypes/HoldChange";
 export function applyHoldChanges(hold: Hold) {
 	for (const change of hold.$changes.list.values()) {
 		switch (change.type) {
+			case HoldChangeType.CharacterAvatarDataId:
+				hold.characters.getOrError(change.location.characterId).avatarDataId.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.CharacterName:
 				hold.characters.getOrError(change.location.characterId).name.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.CharacterTilesDataId:
+				hold.characters.getOrError(change.location.characterId).tilesDataId.set(change.hasChange, change.value);
 				break;
 
 			case HoldChangeType.DataName:

@@ -73,9 +73,7 @@ export default function RouteHome() {
 							<ul>
 								<li>Variable list and renaming them</li>
 								<li>&hellip;with optional auto-changing it in all scripts</li>
-								<li>Editing world map names</li>
 								<li>Adding and removing data</li>
-								<li>Changing data attached to Speech</li>
 							</ul>
 						</div>
 					</div>
@@ -99,6 +97,7 @@ export default function RouteHome() {
 								<li><Feat/> Speech list &rarr; Edit Data</li>
 								<li><Feat/> Entrance list &rarr; Edit Data</li>
 								<li><Feat/> World Map list + Edit name</li>
+								<li><Feat/> Character list &rarr; Edit avatar & tile data IDs</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
 								<li><Bug/> Hiding columns no longer break the table if it has any filters</li>
 								<li><Bug/> Fixed a bunch of small differences between DROD-created hold data and the data created by the tool</li>

@@ -16,6 +16,16 @@ export enum HoldChangeType {
 	SpeechDataId = 9,
 	EntranceDataId = 10,
 	WorldMapName = 11,
+	CharacterAvatarDataId = 12,
+	CharacterTilesDataId = 13,
+}
+
+export type HoldChangeCharacterAvatarDataId = {
+	type: HoldChangeType.CharacterAvatarDataId,
+	location: { characterId: number };
+
+	hasChange: boolean;
+	value?: number;
 }
 
 export type HoldChangeCharacterName = {
@@ -24,6 +34,14 @@ export type HoldChangeCharacterName = {
 
 	hasChange: boolean;
 	value: string;
+}
+
+export type HoldChangeCharacterTilesDataId = {
+	type: HoldChangeType.CharacterTilesDataId,
+	location: { characterId: number };
+
+	hasChange: boolean;
+	value?: number;
 }
 
 export type HoldChangeDataName = {
@@ -114,7 +132,9 @@ export interface HoldChangeWorldMapName {
 	value: string;
 }
 
-export type HoldChange = HoldChangeCharacterName
+export type HoldChange = HoldChangeCharacterAvatarDataId
+	| HoldChangeCharacterName
+	| HoldChangeCharacterTilesDataId
 	| HoldChangeDataName
 	| HoldChangeDataFile
 	| HoldChangeEntranceDataId

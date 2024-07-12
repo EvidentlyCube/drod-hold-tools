@@ -420,13 +420,13 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 
 	refs.characterIds.add(character.id);
 
-	if (character.avatarDataId) {
+	if (character.avatarDataId.newValue) {
 		// @FIXME handle null data
-		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId.newValue)!)
 	}
-	if (character.tilesDataId) {
+	if (character.tilesDataId.newValue) {
 		// @FIXME handle null data
-		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId.newValue)!)
 	}
 
 	if (character.$commandList) {
@@ -443,11 +443,11 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 		writer.attr('ExtraVars', character.extraVars);
 	}
 
-	if (character.avatarDataId) {
-		writer.attr('DataID', character.avatarDataId);
+	if (character.avatarDataId.newValue) {
+		writer.attr('DataID', character.avatarDataId.newValue);
 	}
-	if (character.tilesDataId) {
-		writer.attr('DataIDTiles', character.tilesDataId);
+	if (character.tilesDataId.newValue) {
+		writer.attr('DataIDTiles', character.tilesDataId.newValue);
 	}
 
 	writer.end();

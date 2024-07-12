@@ -19,22 +19,53 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 	const id = `${change.type}-${JSON.stringify(change.location)}`;
 
 	switch (change.type) {
-		case HoldChangeType.CharacterName:
-			{
-				const character = hold.characters.get(change.location.characterId);
+		case HoldChangeType.CharacterAvatarDataId: {
+			const character = hold.characters.get(change.location.characterId);
 
-				if (!character) {
-					return invalid(id, "Character Name", "Cannot find data");
-				}
-
-				return {
-					id,
-					type: 'Character Name',
-					location: { hold, model: "character", characterId: character.id },
-					before: character.name.oldValue,
-					after: character.name.newValue
-				};
+			if (!character) {
+				return invalid(id, "Character Avatar Data Id", "Cannot find character");
 			}
+
+			return {
+				id,
+				type: 'Character Avatar Data Id',
+				location: { hold, model: "character", characterId: character.id },
+				before: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.oldValue} showName={true} />,
+				after: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.newValue} showName={true} />,
+			};
+		}
+
+		case HoldChangeType.CharacterName: {
+			const character = hold.characters.get(change.location.characterId);
+
+			if (!character) {
+				return invalid(id, "Character Name", "Cannot find data");
+			}
+
+			return {
+				id,
+				type: 'Character Name',
+				location: { hold, model: "character", characterId: character.id },
+				before: character.name.oldValue,
+				after: character.name.newValue
+			};
+		}
+
+		case HoldChangeType.CharacterTilesDataId: {
+			const character = hold.characters.get(change.location.characterId);
+
+			if (!character) {
+				return invalid(id, "Character Tiles Data Id", "Cannot find character");
+			}
+
+			return {
+				id,
+				type: 'Character Tiles Data Id',
+				location: { hold, model: "character", characterId: character.id },
+				before: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.oldValue} showName={true} />,
+				after: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.newValue} showName={true} />,
+			};
+		}
 
 		case HoldChangeType.DataName:
 			{
