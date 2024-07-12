@@ -85,7 +85,7 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
-							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(unreleased)</span></h5>
+							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(2024-07-12)</span></h5>
 							<ul>
 								<li><Feat/> Character list + edit name</li>
 								<li><Feat/> Entrance list + edit description/show description</li>
