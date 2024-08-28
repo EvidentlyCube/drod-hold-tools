@@ -49,7 +49,11 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 		widthPercent: 10,
 		canHide: true,
 
-		render: (entrance) => <SelectEditor value={entrance.showDescription} options={ShowDescriptionOptions} transformer={ShowDescriptionTransformer} />
+		render: (entrance) => <SelectEditor
+			value={entrance.showDescription}
+			options={ShowDescriptionOptions}
+			transformer={ShowDescriptionTransformer}
+		/>
 	},
 	{
 		id: 'data',

@@ -34,6 +34,7 @@ export class XMLWriter {
 
 		} else if (typeof value === 'number') {
 			this._xml += value.toString();
+
 		} else if (typeof value === 'object' && '_safeString' in value) {
 			this._xml += value._safeString;
 		}

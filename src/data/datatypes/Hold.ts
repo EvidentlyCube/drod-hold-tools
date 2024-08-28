@@ -1,13 +1,14 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { wcharBase64ToString } from "../Utils";
+import { stringToWCharBase64, wcharBase64ToString } from "../Utils";
 import type { HoldRef } from "../references/HoldReference";
 import { HoldChangeList } from "./HoldChange";
+import { HoldChangeListener } from "./HoldChangeListener";
 import type { HoldCharacter } from "./HoldCharacter";
 import type { HoldData } from "./HoldData";
 import type { HoldEntrance } from "./HoldEntrance";
 import type { HoldLevel } from "./HoldLevel";
-import type { HoldPlayer } from "./HoldPlayer";
+import { HoldPlayer } from "./HoldPlayer";
 import type { HoldRoom, HoldScroll } from "./HoldRoom";
 import type { HoldSpeech } from "./HoldSpeech";
 import type { HoldVariable } from "./HoldVariable";
@@ -78,6 +79,7 @@ export class Hold {
 	public readonly $changes = new HoldChangeList();
 
 	public readonly $problems: HoldProblem[] = [];
+	public readonly $changeListener = new HoldChangeListener();
 
 	private $_scrollsCache?: HoldScroll[];
 	public get $scrolls(): readonly HoldScroll[] {
@@ -111,6 +113,24 @@ export class Hold {
 		this.lastCharId = options.lastCharId;
 		this.lastWorldMapId = options.lastWorldMapId;
 		this.startingLevelId = options.startingLevelId;
+	}
+
+	public addNewPlayer(source?: {id: number, name: string, gidOriginalName: string, gidCreated: number}) {
+		const id = source?.id ?? this.nextAvailablePlayerId();
+		const player = new HoldPlayer(this, {
+			id,
+			encOriginalName: stringToWCharBase64(source?.gidOriginalName ?? id.toString()),
+			gidCreated: source?.gidCreated ?? Date.now(),
+			encName: stringToWCharBase64(source?.name ?? `New Player ${id}`),
+			$isNewlyAdded: true
+		});
+
+		this.players.set(id, player);
+		this.$changeListener.registerNewPlayer(player);
+	}
+
+	private nextAvailablePlayerId() {
+		return this.players.keys().reduce((max, next) => Math.max(max, next), 0) + 1;
 	}
 }
 

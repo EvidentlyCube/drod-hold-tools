@@ -1,11 +1,12 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
 import { HoldLevel } from "./HoldLevel";
+import { HoldPlayer } from "./HoldPlayer";
 import { HoldScroll } from "./HoldRoom";
 import { HoldSpeech } from "./HoldSpeech";
 import { HoldWorldMap } from "./HoldWorldMap";
@@ -28,7 +29,9 @@ export class HoldChangeListener {
 		})
 		hold.levels.forEach(level => {
 			this.registerLevelNameChange(level);
+			this.registerLevelPlayerIdChange(level);
 		})
+		hold.players.forEach(player => this.registerNewPlayer(player));
 		hold.$scrolls.forEach(scroll => {
 			this.registerScrollMessageChange(scroll);
 		})
@@ -40,6 +43,15 @@ export class HoldChangeListener {
 		hold.worldMaps.forEach(worldMap => {
 			this.registerWorldMapNameChange(worldMap);
 		});
+	}
+
+	public registerNewPlayer(player: HoldPlayer) {
+		if (player.$isNewlyAdded) {
+			this.registerPlayerInsertion(player);
+		} else {
+			this.registerPlayerNameChange(player);
+			this.registerPlayerDeletion(player);
+		}
 	}
 
 	private registerCharacterAvatarDataIdChange(character: HoldCharacter) {
@@ -161,6 +173,71 @@ export class HoldChangeListener {
 		registerTextChange($hold, change, name);
 	}
 
+	private registerLevelPlayerIdChange(level: HoldLevel) {
+		const { $hold, id, playerId } = level;
+
+		const change = $hold.$changes.create<HoldChangeLevelPlayerId>({
+			type: HoldChangeType.LevelPlayerId,
+			location: { levelId: id },
+			hasChange: false,
+			value: playerId.newValue
+		});
+
+		registerTextChange($hold, change, playerId);
+	}
+
+	private registerPlayerDeletion(player: HoldPlayer) {
+		const { $hold, id, $isDeleted } = player;
+
+		const change = $hold.$changes.create<HoldChangePlayerDeletion>({
+			type: HoldChangeType.PlayerDeletion,
+			location: { playerId: id },
+			hasChange: false,
+			value: $isDeleted.newValue
+		});
+
+		registerTextChange($hold, change, $isDeleted);
+	}
+
+
+	private registerPlayerInsertion(player: HoldPlayer) {
+		const { $hold, id, $isDeleted } = player;
+
+		const change = $hold.$changes.create<HoldChangePlayerInsertion>({
+			type: HoldChangeType.PlayerInsertion,
+			location: { playerId: id },
+
+			hasChange: true,
+			value: {
+				gidCreated: player.gidCreated,
+				gidOriginalName: player.gidOriginalName,
+				name: player.name.newValue
+			}
+		});
+
+		$hold.$changes.add(change);
+
+		$isDeleted.onChange.add(props => {
+			if (props.value === true) {
+				$hold.players.del(id);
+				$hold.$changes.del(change);
+			}
+		})
+	}
+
+	private registerPlayerNameChange(player: HoldPlayer) {
+		const { $hold, id, name } = player;
+
+		const change = $hold.$changes.create<HoldChangePlayerName>({
+			type: HoldChangeType.PlayerName,
+			location: { playerId: id },
+			hasChange: false,
+			value: name.newValue
+		});
+
+		registerTextChange($hold, change, name);
+	}
+
 	private registerScrollMessageChange(scroll: HoldScroll) {
 		const { $room, x, y, message } = scroll;
 		const { $hold } = $room;
@@ -243,7 +320,7 @@ function registerTextChange(hold: Hold, change: HoldChange, updatableValue: Sign
 }
 
 function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any>) {
-	updatableValue.onChange.add(({value, previousValue}) => {
+	updatableValue.onChange.add(({ value, previousValue }) => {
 		if (previousValue) {
 			regenerateHoldDataUses(hold, previousValue);
 		}

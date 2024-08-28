@@ -56,6 +56,12 @@ export interface HoldRefMonsterCommand {
 	commandIndex: number;
 };
 
+export interface HoldRefPlayer {
+	hold: Hold;
+	model: 'player',
+	playerId: number;
+};
+
 export interface HoldRefRoom {
 	hold: Hold;
 	model: 'room';
@@ -109,6 +115,7 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefHold
 	| HoldRefLevel
 	| HoldRefMonsterCommand
+	| HoldRefPlayer
 	| HoldRefRoom
 	| HoldRefRoomImage
 	| HoldRefRoomOverheadImage

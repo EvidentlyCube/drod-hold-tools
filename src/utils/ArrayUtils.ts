@@ -26,3 +26,13 @@ export function diffArrays<T extends (string|number)>(left: T[], right: T[]): T[
 export function copyWithout<T>(arr: T[], ...elements:T[]): T[] {
 	return arr.filter(item => elements.includes(item));
 }
+
+export function removeArrayElementInline<T>(arr: T[], ...elements: T[]) {
+	for (const element of elements) {
+		const index = arr.indexOf(element);
+
+		if (index !== -1) {
+			arr.splice(index, 1);
+		}
+	}
+}

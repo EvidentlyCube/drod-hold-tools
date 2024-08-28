@@ -1,51 +1,63 @@
+import { Memoizer } from "../../utils/Memoizer";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { HoldRef } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
+
+const usesMemoizer = new Memoizer<number, ReadonlyArray<HoldRef>>();
 
 interface PlayerConstructor {
 	id: number;
 	encOriginalName: string;
 	gidCreated: number;
 	encName: string;
+	$isNewlyAdded: boolean;
 }
 export class HoldPlayer {
-	public readonly hold: Hold;
+	public readonly $hold: Hold;
 
 	public readonly id: number;
-	public readonly gidOriginalName: SignalUpdatableValue<string>;
+	public readonly gidOriginalName: string;
 	public readonly gidCreated: number;
 	public readonly name: SignalUpdatableValue<string>;
 
+	public readonly $isDeleted: SignalUpdatableValue<boolean>;
+	public readonly $isNewlyAdded: boolean;
+
 	public get $uses(): ReadonlyArray<HoldRef> {
-		const uses: HoldRef[] = [];
+		return usesMemoizer.grab(this.id, () => {
+			const uses: HoldRef[] = [];
 
-		if (this.hold.playerId === this.id) {
-			uses.push({
-				hold: this.hold,
-				model: 'hold',
-			});
-		}
-
-		this.hold.levels.forEach(level => {
-			if (level.playerId === this.id) {
+			if (this.$hold.playerId === this.id) {
 				uses.push({
-					hold: this.hold,
-					model: "level",
-					levelId: level.id
+					hold: this.$hold,
+					model: 'hold',
 				});
 			}
-		});
 
-		return uses;
+			this.$hold.levels.forEach(level => {
+				if (level.playerId.newValue === this.id) {
+					uses.push({
+						hold: this.$hold,
+						model: "level",
+						levelId: level.id
+					});
+				}
+			});
+
+			return uses;
+		});
 	}
 
 	public constructor(hold: Hold, opts: PlayerConstructor) {
-		this.hold = hold;
+		this.$hold = hold;
 
 		this.id = opts.id;
-		this.gidOriginalName = new SignalUpdatableValue(wcharBase64ToString(opts.encOriginalName));
+		this.gidOriginalName = wcharBase64ToString(opts.encOriginalName);
 		this.gidCreated = opts.gidCreated;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+
+		this.$isNewlyAdded = opts.$isNewlyAdded;
+		this.$isDeleted = new SignalUpdatableValue(false);
 	}
 }

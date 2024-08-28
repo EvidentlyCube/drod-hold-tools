@@ -1,6 +1,7 @@
 import { CommandsList } from "./CommandList";
 import { getCommandDataId } from "./CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE } from "./DrodCommonTypes";
+import { stringToWCharBase64 } from "./Utils";
 import { XMLWriter } from "./XMLWriter";
 import { Hold } from "./datatypes/Hold";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
@@ -107,7 +108,7 @@ async function writePlayer(writer: XMLWriter, refs: OutputRefs, player: HoldPlay
 	refs.playerIds.add(player.id);
 
 	writer.tag('Players')
-		.attr('GID_OriginalNameMessage', player.gidOriginalName)
+		.attr('GID_OriginalNameMessage', { _safeString: stringToWCharBase64(player.gidOriginalName) })
 		.attr('GID_Created', player.gidCreated)
 		.attr('LastUpdated', 0)
 		.attr('NameMessage', player.name)
@@ -246,7 +247,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 		return;
 	}
 
-	await writePlayer(writer, refs, level.$hold.players.getOrError(level.playerId));
+	await writePlayer(writer, refs, level.$hold.players.getOrError(level.playerId.newValue));
 
 	refs.levelIds.add(level.id);
 
@@ -254,7 +255,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 		.attr('HoldID', level.$hold.id)
 		.attr('GID_LevelIndex', level.gidLevelIndex)
 		.attr('OrderIndex', level.orderIndex)
-		.attr('PlayerID', level.playerId)
+		.attr('PlayerID', level.playerId.newValue)
 		.attr('NameMessage', level.name)
 		.attr('Created', level.created)
 		.attr('LastUpdated', level.lastUpdated)

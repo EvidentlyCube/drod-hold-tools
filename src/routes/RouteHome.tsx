@@ -87,21 +87,23 @@ export default function RouteHome() {
 							<h3>Changelog</h3>
 							<h5 className="subtitle is-6">v0.1.2{" "}<span className="is-muted">(????-??-??)</span></h5>
 							<ul>
+								<li><Feat/>Players list &rarr; Added</li>
+								<li><Feat/>Levels list &rarr; Edit author</li>
 								<li><Bug/>Data <strong>uses</strong> update when used data is changed anywhere</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(2024-07-12)</span></h5>
 							<ul>
-								<li><Feat/> Character list + edit name</li>
-								<li><Feat/> Entrance list + edit description/show description</li>
-								<li><Feat/> Scroll list + edit message</li>
+								<li><Feat/> Characters list + edit name</li>
+								<li><Feat/> Entrances list + edit description/show description</li>
+								<li><Feat/> Scrolls list + edit message</li>
 								<li><Feat/> Change list sorting + better location displaying</li>
 								<li><Feat/> Added a step after importing that validates the hold exports correctly</li>
 								<li><Feat/> Added version validation at the start</li>
-								<li><Feat/> Speech list &rarr; Edit Mood</li>
-								<li><Feat/> Speech list &rarr; Edit Data</li>
-								<li><Feat/> Entrance list &rarr; Edit Data</li>
-								<li><Feat/> World Map list + Edit name</li>
-								<li><Feat/> Character list &rarr; Edit avatar & tile data IDs</li>
+								<li><Feat/> Speeches list &rarr; Edit Mood</li>
+								<li><Feat/> Speeches list &rarr; Edit Data</li>
+								<li><Feat/> Entrances list &rarr; Edit Data</li>
+								<li><Feat/> World Maps list + Edit name</li>
+								<li><Feat/> Characters list &rarr; Edit avatar & tile data IDs</li>
 								<li><Bug/> Table state and config is no longer shared between holds</li>
 								<li><Bug/> Hiding columns no longer break the table if it has any filters</li>
 								<li><Bug/> Fixed a bunch of small differences between DROD-created hold data and the data created by the tool</li>

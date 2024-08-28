@@ -7,7 +7,6 @@ import { regenerateHoldDataUses, regenerateHoldSpeechLocations } from "./HoldUti
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
-import { HoldChangeListener } from "./datatypes/HoldChangeListener";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldData } from "./datatypes/HoldData";
 import { HoldEntrance } from "./datatypes/HoldEntrance";
@@ -62,7 +61,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			id,
 			encName: str(playerXml, 'NameMessage'),
 			encOriginalName: str(playerXml, 'GID_OriginalNameMessage'),
-			gidCreated: int(playerXml, 'GID_Created')
+			gidCreated: int(playerXml, 'GID_Created'),
+			$isNewlyAdded: false
 		});
 
 		hold.players.set(playerData.id, playerData);
@@ -342,7 +342,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
 	applyHoldChanges(hold);
 
-	new HoldChangeListener().register(hold);
+	hold.$changeListener.register(hold);
 
 	return hold;
 }

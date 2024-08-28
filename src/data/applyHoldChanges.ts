@@ -40,6 +40,27 @@ export function applyHoldChanges(hold: Hold) {
 				hold.levels.getOrError(change.location.levelId).name.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.LevelPlayerId:
+				hold.levels.getOrError(change.location.levelId).playerId.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.PlayerDeletion:
+				hold.players.getOrError(change.location.playerId).$isDeleted.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.PlayerInsertion:
+				hold.addNewPlayer({
+					id: change.location.playerId,
+					gidCreated: change.value.gidCreated,
+					gidOriginalName: change.value.gidOriginalName,
+					name: change.value.name
+				});
+				break;
+
+			case HoldChangeType.PlayerName:
+				hold.players.getOrError(change.location.playerId).name.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.ScrollMessage: {
 				const scroll = hold.rooms.getOrError(change.location.roomId).scrolls
 					.find(scroll => scroll.x === change.location.x && scroll.y === change.location.y);

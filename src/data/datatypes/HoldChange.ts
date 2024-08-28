@@ -18,6 +18,10 @@ export enum HoldChangeType {
 	WorldMapName = 11,
 	CharacterAvatarDataId = 12,
 	CharacterTilesDataId = 13,
+	LevelPlayerId = 14,
+	PlayerName = 15,
+	PlayerDeletion = 16,
+	PlayerInsertion = 17,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -92,6 +96,42 @@ export type HoldChangeLevelName = {
 	value: string;
 }
 
+export type HoldChangeLevelPlayerId = {
+	type: HoldChangeType.LevelPlayerId,
+	location: { levelId: number };
+
+	hasChange: boolean;
+	value: number;
+}
+
+export type HoldChangePlayerDeletion = {
+	type: HoldChangeType.PlayerDeletion,
+	location: { playerId: number };
+
+	hasChange: boolean;
+	value: boolean;
+}
+
+export type HoldChangePlayerInsertion = {
+	type: HoldChangeType.PlayerInsertion,
+	location: { playerId: number };
+
+	hasChange: boolean;
+	value: {
+		name: string;
+		gidOriginalName: string;
+		gidCreated: number;
+	}
+}
+
+export type HoldChangePlayerName = {
+	type: HoldChangeType.PlayerName,
+	location: { playerId: number };
+
+	hasChange: boolean;
+	value: string;
+}
+
 export interface HoldChangeSpeechDataId {
 	type: HoldChangeType.SpeechDataId;
 	location: { speechId: number };
@@ -141,6 +181,10 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeEntranceDescription
 	| HoldChangeEntranceShowDescription
 	| HoldChangeLevelName
+	| HoldChangeLevelPlayerId
+	| HoldChangePlayerDeletion
+	| HoldChangePlayerInsertion
+	| HoldChangePlayerName
 	| HoldChangeScrollMessage
 	| HoldChangeSpeechDataId
 	| HoldChangeSpeechMessage

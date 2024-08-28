@@ -160,9 +160,73 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Level Name',
-				location: { hold, model: 'notApplicable' },
+				location: { hold, model: 'level', levelId: level.id },
 				before: level.name.oldValue,
 				after: level.name.newValue
+			};
+		}
+
+		case HoldChangeType.LevelPlayerId: {
+			const level = hold.levels.get(change.location.levelId);
+
+			if (!level) {
+				return invalid(id, "Level Player ID", "Cannot find level");
+			}
+
+			return {
+				id,
+				type: 'Level Player Id',
+				location: { hold, model: 'level', levelId: level.id },
+				before: level.name.oldValue,
+				after: level.name.newValue
+			};
+		}
+
+		case HoldChangeType.PlayerDeletion: {
+			const player = hold.players.get(change.location.playerId);
+
+			if (!player) {
+				return invalid(id, "Player Deletion", "Cannot find player");
+			}
+
+			return {
+				id,
+				type: 'Player Deletion',
+				location: { hold, model: 'player', playerId: player.id },
+				before: "—",
+				after: "Deleting player!"
+			};
+		}
+
+		case HoldChangeType.PlayerInsertion: {
+			const player = hold.players.get(change.location.playerId);
+
+			if (!player) {
+				return invalid(id, "Player Insertion", "Cannot find player");
+			}
+
+			return {
+				id,
+				type: 'Player Insertion',
+				location: { hold, model: 'player', playerId: player.id },
+				before: "n/a",
+				after: `New player #${player.id}: ${player.name.newValue}`
+			};
+		}
+
+		case HoldChangeType.PlayerName: {
+			const player = hold.players.get(change.location.playerId);
+
+			if (!player) {
+				return invalid(id, "Player Name", "Cannot find player");
+			}
+
+			return {
+				id,
+				type: 'Player Name',
+				location: { hold, model: 'player', playerId: player.id },
+				before: player.name.oldValue,
+				after: player.name.newValue
 			};
 		}
 

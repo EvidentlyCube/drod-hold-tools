@@ -1,5 +1,5 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
-import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefHold, HoldRefLevel, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll, HoldRefSpeech } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefHold, HoldRefLevel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll, HoldRefSpeech } from "../../data/references/HoldReference";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -23,6 +23,7 @@ export default function HoldRefView({ holdRef }: Props) {
 		case "level": return <Level r={ holdRef } />;
 
 		case "monsterCommand": return <MonsterCommand r={ holdRef } />;
+		case "player": return <Player r={ holdRef } />;
 
 		case "room": return <Room r={ holdRef } />;
 		case "roomImage": return <RoomImage r={ holdRef } />;
@@ -155,6 +156,18 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 	</>
 }
 
+function Player({ r }: {r: HoldRefPlayer}) {
+	const { hold, playerId } = r;
+
+	const player = hold.players.getOrError(playerId);
+
+	return <>
+		<span className="icon icon-ref" title="Room">
+			<i className="fas fa-circle-user"></i>
+		</span>
+		{" "}<strong>{player.name.newValue}</strong>
+	</>
+}
 function Room({ r }: {r: HoldRefRoom}) {
 	const { hold, roomId } = r;
 

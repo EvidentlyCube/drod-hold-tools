@@ -68,7 +68,6 @@ export function filterString(toFilter: string, filter: string): boolean {
 		regex = new RegExp(escapeFilterToRegex(filter), 'i');
 		filterStringCache.set(filter, regex);
 
-
 		if (!cacheClearTimeout) {
 			cacheClearTimeout = window.setTimeout(() => {
 				filterStringCache.clear();

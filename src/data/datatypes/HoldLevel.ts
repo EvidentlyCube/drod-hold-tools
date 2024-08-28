@@ -20,7 +20,7 @@ export class HoldLevel {
 
 	public readonly id: number;
 	public readonly holdId: number;
-	public readonly playerId: number;
+	public readonly playerId: SignalUpdatableValue<number>;
 	public readonly gidLevelIndex: number;
 	public readonly orderIndex: number;
 	public readonly name: SignalUpdatableValue<string>;
@@ -58,7 +58,7 @@ export class HoldLevel {
 
 		this.id = opts.id;
 		this.holdId = opts.holdId;
-		this.playerId = opts.playerId;
+		this.playerId = new SignalUpdatableValue(opts.playerId);
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
