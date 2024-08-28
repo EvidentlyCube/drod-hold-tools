@@ -122,7 +122,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 	},
 ];
 
-export default function RouteViewHoldData() {
+export default function RouteViewHoldDatas() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 

@@ -5,11 +5,11 @@ import RouteHome from "./routes/RouteHome";
 import RouteViewHold from "./routes/RouteViewHold";
 import RouteViewHoldChanges from "./routes/viewHold/RouteViewHoldChanges";
 import RouteViewHoldCharacters from "./routes/viewHold/RouteViewHoldCharacters";
-import RouteViewHoldData from "./routes/viewHold/RouteViewHoldData";
+import RouteViewHoldDatas from "./routes/viewHold/RouteViewHoldDatas";
 import RouteViewHoldEntrances from "./routes/viewHold/RouteViewHoldEntrances";
 import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
 import RouteViewHoldScrolls from "./routes/viewHold/RouteViewHoldScrolls";
-import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeech";
+import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeeches";
 import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
 import RouteViewHoldWorldMaps from "./routes/viewHold/RouteViewHoldWorldMaps";
 
@@ -39,7 +39,7 @@ function App() {
 					<Route path="/hold/:holdReaderId" element={<RouteViewHold />}>
 						<Route path="" element={<RouteViewHoldSummary />} />
 						<Route path="characters" element={<RouteViewHoldCharacters />} />
-						<Route path="datas" element={<RouteViewHoldData />} />
+						<Route path="datas" element={<RouteViewHoldDatas />} />
 						<Route path="entrances" element={<RouteViewHoldEntrances />} />
 						<Route path="levels" element={<RouteViewHoldLevels />} />
 						<Route path="scrolls" element={<RouteViewHoldScrolls />} />
