@@ -2,7 +2,7 @@ import { SignalNullable } from "../../utils/SignalNullable";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { DataFormat } from "../DrodEnums";
 import { wcharBase64ToString } from "../Utils";
-import { HoldRef } from "../references/HoldReference";
+import { HoldRef, HoldRefModel } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 export interface HoldDataDetails {
@@ -49,7 +49,7 @@ export class HoldData {
 			hold.$problems.push({
 				ref: {
 					hold,
-					model: "data",
+					model: HoldRefModel.Data,
 					dataId: this.id
 				},
 				problem: "No file data was given."

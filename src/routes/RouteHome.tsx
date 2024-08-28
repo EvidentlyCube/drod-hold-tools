@@ -89,6 +89,7 @@ export default function RouteHome() {
 							<ul>
 								<li><Feat/>Players list &rarr; Added</li>
 								<li><Feat/>Levels list &rarr; Edit author</li>
+								<li><Feat/>Improved how references are displayed</li>
 								<li><Bug/>Data <strong>uses</strong> update when used data is changed anywhere</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.1{" "}<span className="is-muted">(2024-07-12)</span></h5>

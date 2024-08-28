@@ -117,3 +117,7 @@
 .is-no-wrap {
 	white-space: nowrap;
 }
+
+.modal-card {
+	--bulma-modal-content-width: 60em;
+}

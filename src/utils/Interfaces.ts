@@ -1,0 +1,1 @@
+export function shouldBeUnreachable(value: never) { }

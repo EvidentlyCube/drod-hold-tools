@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { wcharBase64ToString } from "../Utils";
-import { HoldRefRoom } from "../references/HoldReference";
+import { HoldRefModel, HoldRefRoom } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 interface EntranceConstructor {
@@ -38,7 +38,7 @@ export class HoldEntrance {
 	public get $roomRef(): HoldRefRoom {
 		return {
 			hold: this.$hold,
-			model: 'room',
+			model: HoldRefModel.Room,
 			roomId: this.roomId
 		};
 	}

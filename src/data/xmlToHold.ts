@@ -17,6 +17,7 @@ import { HoldOrb, HoldRoom } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
+import { HoldRefModel } from "./references/HoldReference";
 
 export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: string) => void): Promise<Hold> {
 	const drodXml = xml.querySelector('drod');
@@ -268,7 +269,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			holdRoom.scrolls.push({
 				id: `${roomId}:scroll:${x}:${y}`,
 				$room: holdRoom,
-				$scrollRef: { hold, model: 'scroll', roomId, x, y },
+				$scrollRef: { hold, model: HoldRefModel.Scroll, roomId, x, y },
 				x,
 				y,
 				message: new SignalUpdatableValue(wcharBase64ToString(str(scrollXml, 'Message')))
@@ -341,6 +342,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 
 	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
 	applyHoldChanges(hold);
+
+	loadDynamicData(hold);
 
 	hold.$changeListener.register(hold);
 

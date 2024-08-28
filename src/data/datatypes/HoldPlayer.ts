@@ -1,6 +1,6 @@
 import { Memoizer } from "../../utils/Memoizer";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { HoldRef } from "../references/HoldReference";
+import { HoldRef, HoldRefModel } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
@@ -31,7 +31,7 @@ export class HoldPlayer {
 			if (this.$hold.playerId === this.id) {
 				uses.push({
 					hold: this.$hold,
-					model: 'hold',
+					model: HoldRefModel.Hold,
 				});
 			}
 
@@ -39,7 +39,7 @@ export class HoldPlayer {
 				if (level.playerId.newValue === this.id) {
 					uses.push({
 						hold: this.$hold,
-						model: "level",
+						model: HoldRefModel.Level,
 						levelId: level.id
 					});
 				}

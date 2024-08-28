@@ -1,7 +1,7 @@
 import { ReactElement } from "react";
 import { HoldChange, HoldChangeType } from "../../data/datatypes/HoldChange";
 import { Hold } from "../../data/datatypes/Hold";
-import { HoldRef } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefModel } from "../../data/references/HoldReference";
 import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
 import { formatBytes } from "../../utils/Language";
 import { MoodIdToName } from "../../data/DrodEnums";
@@ -29,7 +29,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Character Avatar Data Id',
-				location: { hold, model: "character", characterId: character.id },
+				location: { hold, model: HoldRefModel.Character, characterId: character.id },
 				before: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.oldValue} showName={true} />,
 				after: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.newValue} showName={true} />,
 			};
@@ -45,7 +45,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Character Name',
-				location: { hold, model: "character", characterId: character.id },
+				location: { hold, model: HoldRefModel.Character, characterId: character.id },
 				before: character.name.oldValue,
 				after: character.name.newValue
 			};
@@ -61,7 +61,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Character Tiles Data Id',
-				location: { hold, model: "character", characterId: character.id },
+				location: { hold, model: HoldRefModel.Character, characterId: character.id },
 				before: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.oldValue} showName={true} />,
 				after: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.newValue} showName={true} />,
 			};
@@ -78,7 +78,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				return {
 					id,
 					type: 'Data Name',
-					location: { hold, model: "data", dataId: data.id },
+					location: { hold, model: HoldRefModel.Data, dataId: data.id },
 					before: data.name.oldValue,
 					after: data.name.newValue
 				};
@@ -95,7 +95,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				return {
 					id,
 					type: 'Data File',
-					location: { hold, model: "notApplicable" },
+					location: { hold, model: HoldRefModel.NotApplicable },
 					before: `${getFormatName(data.details.oldValue.format)} (${formatBytes(getBase64DecodedLength(data.details.oldValue.rawEncodedData))})`,
 					after: `${getFormatName(data.details.newValue.format)} (${formatBytes(getBase64DecodedLength(data.details.newValue.rawEncodedData))})`,
 				};
@@ -112,7 +112,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Entrance DataId',
-				location: { hold, model: 'room', roomId: entrance.roomId },
+				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
 				before: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.oldValue} showName={true} />,
 				after: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.newValue} showName={true} />,
 			};
@@ -128,7 +128,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Entrance Description',
-				location: { hold, model: 'room', roomId: entrance.roomId },
+				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
 				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{entrance.description.newValue}</div>,
 			};
@@ -144,7 +144,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Entrance Show Description',
-				location: { hold, model: 'room', roomId: entrance.roomId },
+				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
 				before: getShowDescriptionName(entrance.showDescription.oldValue),
 				after: getShowDescriptionName(entrance.showDescription.newValue),
 			};
@@ -160,7 +160,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Level Name',
-				location: { hold, model: 'level', levelId: level.id },
+				location: { hold, model: HoldRefModel.Level, levelId: level.id },
 				before: level.name.oldValue,
 				after: level.name.newValue
 			};
@@ -176,7 +176,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Level Player Id',
-				location: { hold, model: 'level', levelId: level.id },
+				location: { hold, model: HoldRefModel.Level, levelId: level.id },
 				before: level.name.oldValue,
 				after: level.name.newValue
 			};
@@ -192,7 +192,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Player Deletion',
-				location: { hold, model: 'player', playerId: player.id },
+				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: "—",
 				after: "Deleting player!"
 			};
@@ -208,7 +208,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Player Insertion',
-				location: { hold, model: 'player', playerId: player.id },
+				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: "n/a",
 				after: `New player #${player.id}: ${player.name.newValue}`
 			};
@@ -224,7 +224,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Player Name',
-				location: { hold, model: 'player', playerId: player.id },
+				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: player.name.oldValue,
 				after: player.name.newValue
 			};
@@ -311,7 +311,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'World Map Name',
-				location: { hold, model: 'notApplicable' },
+				location: { hold, model: HoldRefModel.NotApplicable },
 				before: worldMap.name.oldValue,
 				after: worldMap.name.newValue
 			};

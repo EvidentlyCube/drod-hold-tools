@@ -5,6 +5,7 @@ import {
 import { Hold } from "../../data/datatypes/Hold";
 import { HoldData } from "../../data/datatypes/HoldData";
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
+import { shouldBeUnreachable } from "../../utils/Interfaces";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 
 interface PropsById {
@@ -75,6 +76,7 @@ function getDataIconClass(format: DataFormat) {
 		case DataFormat.Unknown:
 			return "fa-question";
 		default:
+			shouldBeUnreachable(format);
 			return "fa-triangle-exclamation";
 	}
 }

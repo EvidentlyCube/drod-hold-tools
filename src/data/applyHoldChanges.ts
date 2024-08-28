@@ -1,9 +1,11 @@
+import { shouldBeUnreachable } from "../utils/Interfaces";
 import { Hold } from "./datatypes/Hold";
 import { HoldChangeType } from "./datatypes/HoldChange";
 
 export function applyHoldChanges(hold: Hold) {
 	for (const change of hold.$changes.list.values()) {
-		switch (change.type) {
+		const changeType = change.type;
+		switch (changeType) {
 			case HoldChangeType.CharacterAvatarDataId:
 				hold.characters.getOrError(change.location.characterId).avatarDataId.set(change.hasChange, change.value);
 				break;
@@ -87,6 +89,9 @@ export function applyHoldChanges(hold: Hold) {
 				hold.worldMaps.getOrError(change.location.worldMapId).name.set(change.hasChange, change.value);
 				break;
 
+			default:
+				shouldBeUnreachable(changeType);
+				break;
 		}
 	}
 }

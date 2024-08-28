@@ -105,7 +105,7 @@ export function readCommandsBuffer(buffer: number[]) {
 		const labelSize = arr.readBpUint();
 		const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
-		const index = commands.length + 1;
+		const index = commands.length;
 		commands.push({ index, type, x, y, w, h, flags, speechId, label});
 	}
 

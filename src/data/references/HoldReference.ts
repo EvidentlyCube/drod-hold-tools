@@ -1,56 +1,76 @@
 import type { Hold } from "../datatypes/Hold";
 
+export enum HoldRefModel {
+	Character = 'character',
+	CharacterCommand = 'charCommand',
+	CharacterAvatar = 'charAvatar',
+	CharacterTiles = 'charTiles',
+	Data = 'data',
+	EntranceVoiceOver = 'entranceVoiceOver',
+	Hold = 'hold',
+	Level = 'level',
+	MonsterCommand = 'monsterCommand',
+	Player = 'player',
+	Room = 'room',
+	RoomImage = 'roomImage',
+	RoomOverheadImage = 'roomOverheadImage',
+	Scroll = 'scroll',
+	Speech = 'speech',
+	WorldMap = 'worldMap',
+	NotApplicable = 'notApplicable',
+}
+
 export interface HoldRefCharacter {
 	hold: Hold;
-	model: 'character',
+	model: HoldRefModel.Character,
 	characterId: number;
 };
 
 export interface HoldRefCharacterCommand {
 	hold: Hold;
-	model: 'charCommand',
+	model: HoldRefModel.CharacterCommand,
 	characterId: number;
 	commandIndex: number;
 };
 
 export interface HoldRefCharacterAvatar {
 	hold: Hold;
-	model: 'charAvatar',
+	model: HoldRefModel.CharacterAvatar,
 	characterId: number;
 };
 
 export interface HoldRefCharacterTiles {
 	hold: Hold;
-	model: 'charTiles',
+	model: HoldRefModel.CharacterTiles,
 	characterId: number;
 };
 
 export interface HoldRefData {
 	hold: Hold;
-	model: 'data',
+	model: HoldRefModel.Data,
 	dataId: number;
 }
 
 export interface HoldRefEntranceVoiceOver {
 	hold: Hold;
-	model: 'entranceVoiceOver';
+	model: HoldRefModel.EntranceVoiceOver;
 	entranceId: number;
 }
 
 export interface HoldRefHold {
 	hold: Hold;
-	model: 'hold';
+	model: HoldRefModel.Hold;
 }
 
 export interface HoldRefLevel {
 	hold: Hold;
-	model: 'level';
+	model: HoldRefModel.Level;
 	levelId: number;
 }
 
 export interface HoldRefMonsterCommand {
 	hold: Hold;
-	model: 'monsterCommand',
+	model: HoldRefModel.MonsterCommand,
 	roomId: number;
 	monsterIndex: number;
 	commandIndex: number;
@@ -58,31 +78,31 @@ export interface HoldRefMonsterCommand {
 
 export interface HoldRefPlayer {
 	hold: Hold;
-	model: 'player',
+	model: HoldRefModel.Player,
 	playerId: number;
 };
 
 export interface HoldRefRoom {
 	hold: Hold;
-	model: 'room';
+	model: HoldRefModel.Room;
 	roomId: number;
 }
 
 export interface HoldRefRoomImage {
 	hold: Hold;
-	model: 'roomImage';
+	model: HoldRefModel.RoomImage;
 	roomId: number;
 }
 
 export interface HoldRefRoomOverheadImage {
 	hold: Hold;
-	model: 'roomOverheadImage';
+	model: HoldRefModel.RoomOverheadImage;
 	roomId: number;
 }
 
 export interface HoldRefScroll {
 	hold: Hold;
-	model: 'scroll',
+	model: HoldRefModel.Scroll,
 	roomId: number;
 	x: number;
 	y: number;
@@ -90,19 +110,19 @@ export interface HoldRefScroll {
 
 export interface HoldRefSpeech {
 	hold: Hold;
-	model: 'speech',
+	model: HoldRefModel.Speech,
 	speechId: number;
 };
 
 export interface HoldRefWorldMap {
 	hold: Hold;
-	model: 'worldMap',
+	model: HoldRefModel.WorldMap,
 	worldMapId: number;
 };
 
 export interface HoldRefNotApplicable {
 	hold: Hold;
-	model: 'notApplicable',
+	model: HoldRefModel.NotApplicable,
 };
 
 export type HoldRef = HoldRefNotApplicable

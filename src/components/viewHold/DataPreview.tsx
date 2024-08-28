@@ -5,6 +5,7 @@ import ImagePreview from "./preview/ImagePreview";
 import Modal from "../common/Modal";
 import AudioPreview from "./preview/AudioPreview";
 import { base64ToUint8 } from "../../utils/StringUtils";
+import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
 	data: HoldData;
@@ -69,7 +70,14 @@ function formatToMimetype(format: DataFormat): string | undefined {
 			return 'audio/ogg';
 		case DataFormat.WAV:
 			return 'audio/wav';
+		case DataFormat.S3M:
+		case DataFormat.THEORA:
+		case DataFormat.TTF:
+		case DataFormat.Unknown:
+			return 'application/octet-stream';
+
 		default:
+			shouldBeUnreachable(format);
 			return undefined;
 	}
 }

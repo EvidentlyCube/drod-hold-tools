@@ -1,5 +1,6 @@
 import { getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
+import { HoldRefModel } from "./references/HoldReference";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
 	return hold.rooms.filterToArray(room => room.levelId === levelId).map(room => room.id);
@@ -24,7 +25,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (worldMap.dataId && isMatch(worldMap.dataId)) {
 			hold.datas.getOrError(worldMap.dataId).$uses.push({
 				hold,
-				model: 'worldMap',
+				model: HoldRefModel.WorldMap,
 				worldMapId: worldMap.id
 			});
 		}
@@ -34,7 +35,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (speech.dataId.newValue && isMatch(speech.dataId.newValue)) {
 			hold.datas.getOrError(speech.dataId.newValue).$uses.push({
 				hold,
-				model: 'speech',
+				model: HoldRefModel.Speech,
 				speechId: speech.id
 			});
 		}
@@ -44,14 +45,14 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (character.avatarDataId.newValue && isMatch(character.avatarDataId.newValue)) {
 			hold.datas.getOrError(character.avatarDataId.newValue).$uses.push({
 				hold,
-				model: 'charAvatar',
+				model: HoldRefModel.CharacterAvatar,
 				characterId: character.id
 			});
 		}
 		if (character.tilesDataId.newValue && isMatch(character.tilesDataId.newValue)) {
 			hold.datas.getOrError(character.tilesDataId.newValue).$uses.push({
 				hold,
-				model: 'charTiles',
+				model: HoldRefModel.CharacterTiles,
 				characterId: character.id
 			});
 		}
@@ -65,7 +66,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 			if (dataId && isMatch(dataId)) {
 				hold.datas.getOrError(dataId).$uses.push({
 					hold,
-					model: 'charCommand',
+					model: HoldRefModel.CharacterCommand,
 					characterId: character.id,
 					commandIndex: command.index
 				});
@@ -77,7 +78,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (room.dataId && isMatch(room.dataId)) {
 			hold.datas.getOrError(room.dataId).$uses.push({
 				hold,
-				model: 'roomImage',
+				model: HoldRefModel.RoomImage,
 				roomId: room.id
 			});
 		}
@@ -85,7 +86,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (room.overheadDataId && isMatch(room.overheadDataId)) {
 			hold.datas.getOrError(room.overheadDataId).$uses.push({
 				hold,
-				model: 'roomOverheadImage',
+				model: HoldRefModel.RoomOverheadImage,
 				roomId: room.id
 			});
 		}
@@ -100,7 +101,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 				if (dataId && isMatch(dataId)) {
 					hold.datas.getOrError(dataId).$uses.push({
 						hold,
-						model: 'monsterCommand',
+						model: HoldRefModel.MonsterCommand,
 						roomId: room.id,
 						monsterIndex: monster.$index,
 						commandIndex: command.index
@@ -114,7 +115,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		if (entrance.dataId.newValue && isMatch(entrance.dataId.newValue)) {
 			hold.datas.getOrError(entrance.dataId.newValue).$uses.push({
 				hold,
-				model: 'entranceVoiceOver',
+				model: HoldRefModel.EntranceVoiceOver,
 				entranceId: entrance.id
 			});
 		}
@@ -135,7 +136,7 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 			if (speechId && isMatch(speechId)) {
 				hold.speeches.getOrError(speechId).$location = {
 					hold,
-					model: 'charCommand',
+					model: HoldRefModel.CharacterCommand,
 					characterId: character.id,
 					commandIndex: index
 				}
@@ -154,7 +155,7 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 				if (speechId && isMatch(speechId)) {
 					hold.speeches.getOrError(speechId).$location = {
 						hold,
-						model: 'monsterCommand',
+						model: HoldRefModel.MonsterCommand,
 						roomId: room.id,
 						monsterIndex: monster.$index,
 						commandIndex: index
