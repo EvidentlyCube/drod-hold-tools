@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
 import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
@@ -78,6 +79,7 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, tilesDataId);
+		registerDataChange($hold, tilesDataId);
 	}
 
 	private registerDataNameChange(data: HoldData) {
@@ -117,6 +119,7 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, dataId);
+		registerDataChange($hold, dataId);
 	}
 
 	private registerEntranceDescriptionChange(entrance: HoldEntrance) {
@@ -183,6 +186,7 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, dataId);
+		registerDataChange($hold, dataId);
 	}
 
 	private registerSpeechMessageChange(speech: HoldSpeech) {
@@ -223,7 +227,6 @@ export class HoldChangeListener {
 
 		registerTextChange($hold, change, name);
 	}
-
 }
 
 function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {
@@ -235,6 +238,17 @@ function registerTextChange(hold: Hold, change: HoldChange, updatableValue: Sign
 			hold.$changes.del(change)
 		} else {
 			hold.$changes.add(change)
+		}
+	})
+}
+
+function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any>) {
+	updatableValue.onChange.add(({value, previousValue}) => {
+		if (previousValue) {
+			regenerateHoldDataUses(hold, previousValue);
+		}
+		if (value && value !== previousValue) {
+			regenerateHoldDataUses(hold, value);
 		}
 	})
 }

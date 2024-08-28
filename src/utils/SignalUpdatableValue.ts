@@ -2,6 +2,7 @@ import { Signal } from "./Signals";
 
 export interface SignalUpdatableChangeData<T> {
 	value: T;
+	previousValue: T;
 	hasNewValue: boolean;
 }
 export class SignalUpdatableValue<T> {
@@ -22,10 +23,11 @@ export class SignalUpdatableValue<T> {
 
 	public set newValue(value: T) {
 		if (this._newValue !== value || !this._hasNewValue) {
+			const previousValue = this._newValue;
 			this._newValue = value;
 			this._hasNewValue = true;
 
-			this.onChange.dispatch({ value, hasNewValue: true });
+			this.onChange.dispatch({ value, previousValue, hasNewValue: true });
 		}
 	}
 
@@ -47,9 +49,15 @@ export class SignalUpdatableValue<T> {
 			return;
 		}
 
+		const previousValue = this._newValue;
+
 		this._newValue = this.oldValue;
 		this._hasNewValue = false;
 
-		this.onChange.dispatch({ value: this.oldValue, hasNewValue: false });
+		this.onChange.dispatch({
+			value: this.oldValue,
+			previousValue,
+			hasNewValue: false
+		});
 	}
 }

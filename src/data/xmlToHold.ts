@@ -2,8 +2,8 @@ import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
 import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
-import { getCommandDataId } from "./CommandUtils";
 import { holdToXml } from "./HoldToXml";
+import { regenerateHoldDataUses, regenerateHoldSpeechLocations } from "./HoldUtils";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
@@ -238,8 +238,9 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		}
 
 		log(`Parsing Room ${roomId} -> Monsters`);
+		let monsterIndex = 0;
 		for (const monsterXml of roomXml.querySelectorAll('Monsters')) {
-			const holdMonster = new HoldMonster(holdRoom, {
+			const holdMonster = new HoldMonster(holdRoom, monsterIndex++, {
 				x: int(monsterXml, 'X'),
 				y: int(monsterXml, 'Y'),
 				o: int(monsterXml, 'O'),
@@ -347,128 +348,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 }
 
 function loadDynamicData(hold: Hold) {
-	for (const worldMap of hold.worldMaps.values()) {
-		if (worldMap.dataId) {
-			hold.datas.getOrError(worldMap.dataId).$uses.push({
-				hold,
-				model: 'worldMap',
-				worldMapId: worldMap.id
-			});
-		}
-	}
-
-	for (const speech of hold.speeches.values()) {
-		if (speech.dataId.newValue) {
-			hold.datas.getOrError(speech.dataId.newValue).$uses.push({
-				hold,
-				model: 'speech',
-				speechId: speech.id
-			});
-		}
-	}
-
-	for (const character of hold.characters.values()) {
-		if (character.avatarDataId.newValue) {
-			hold.datas.getOrError(character.avatarDataId.newValue).$uses.push({
-				hold,
-				model: 'charAvatar',
-				characterId: character.id
-			});
-		}
-		if (character.tilesDataId.newValue) {
-			hold.datas.getOrError(character.tilesDataId.newValue).$uses.push({
-				hold,
-				model: 'charTiles',
-				characterId: character.id
-			});
-		}
-		if (!character.$commandList) {
-			continue;
-		}
-
-		const { commands } = character.$commandList;
-		for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
-			const {speechId} = commands[commandIndex];
-			if (speechId) {
-				hold.speeches.getOrError(speechId).$location = {
-					hold,
-					model: 'charCommand',
-					characterId: character.id,
-					commandIndex
-				}
-			}
-
-			const dataId = getCommandDataId(commands[commandIndex]);
-			if (dataId) {
-				hold.datas.getOrError(dataId).$uses.push({
-					hold,
-					model: 'charCommand',
-					characterId: character.id,
-					commandIndex
-				});
-			}
-		}
-	}
-
-	for (const room of hold.rooms.values()) {
-		if (room.dataId) {
-			hold.datas.getOrError(room.dataId).$uses.push({
-				hold,
-				model: 'roomImage',
-				roomId: room.id
-			});
-		}
-
-		if (room.overheadDataId) {
-			hold.datas.getOrError(room.overheadDataId).$uses.push({
-				hold,
-				model: 'roomOverheadImage',
-				roomId: room.id
-			});
-		}
-
-		for (let monsterIndex = 0; monsterIndex < room.monsters.length; monsterIndex++) {
-			const monster = room.monsters[monsterIndex];
-			if (!monster.$commandList) {
-				continue;
-			}
-
-			const { commands } = monster.$commandList;
-			for (let commandIndex = 0; commandIndex < commands.length; commandIndex++) {
-				const {speechId} = commands[commandIndex];
-				if (speechId) {
-					hold.speeches.getOrError(speechId).$location = {
-						hold,
-						model: 'monsterCommand',
-						roomId: room.id,
-						monsterIndex,
-						commandIndex
-					}
-				}
-
-				const dataId = getCommandDataId(commands[commandIndex]);
-				if (dataId) {
-					hold.datas.getOrError(dataId).$uses.push({
-						hold,
-						model: 'monsterCommand',
-						roomId: room.id,
-						monsterIndex,
-						commandIndex
-					});
-				}
-			}
-		}
-	}
-
-	for (const entrance of hold.entrances.values()) {
-		if (entrance.dataId.newValue) {
-			hold.datas.getOrError(entrance.dataId.newValue).$uses.push({
-				hold,
-				model: 'entranceVoiceOver',
-				entranceId: entrance.id
-			});
-		}
-	}
+	regenerateHoldDataUses(hold);
+	regenerateHoldSpeechLocations(hold);
 }
 
 function str(node: Element, attribute: string) {

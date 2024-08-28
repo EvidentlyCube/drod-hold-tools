@@ -162,7 +162,7 @@ function isMusicCommand(type: ScriptCommandType) {
 	return type === ScriptCommandType.CC_SetMusic || type === ScriptCommandType.CC_WorldMapMusic;
 }
 
-export function getCommandDataId(command: ScriptCommand) {
+export function getCommandDataId(command: ScriptCommand): number {
 	const {type} = command;
 	if (!doesCommandHaveData(type)) {
 		return 0;

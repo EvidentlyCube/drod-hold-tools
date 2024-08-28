@@ -21,6 +21,7 @@ interface MonsterPiece {
 export class HoldMonster {
 	public readonly $room: HoldRoom;
 
+	public readonly $index: number;
 	public readonly type: number;
 	public readonly x: number;
 	public readonly y: number;
@@ -39,8 +40,9 @@ export class HoldMonster {
 		return this.extraVars?.readUint('id', UINT_MINUS_1) ?? UINT_MINUS_1;
 	}
 
-	public constructor(room: HoldRoom, opts: MonsterConstructor) {
+	public constructor(room: HoldRoom, index: number, opts: MonsterConstructor) {
 		this.$room = room;
+		this.$index = index;
 
 		this.type = opts.type;
 		this.x = opts.x;

@@ -85,6 +85,25 @@ export class HoldRoom {
 	public readonly orbs: HoldOrb[] = [];
 	public readonly exits: HoldExit[] = [];
 
+	private _monstersWithSpeechCommand?: ReadonlyArray<HoldMonster>;
+	private _monstersWithDataCommand?: ReadonlyArray<HoldMonster>;
+
+	public get $monstersWithSpeechCommand() {
+		if (!this._monstersWithSpeechCommand) {
+			this._monstersWithSpeechCommand = this.monsters.filter(monster => monster.$commandList?.$commandsWithSpeech?.length);
+		}
+
+		return this._monstersWithSpeechCommand;
+	}
+
+	public get $monstersWithDataCommand() {
+		if (!this._monstersWithDataCommand) {
+			this._monstersWithDataCommand = this.monsters.filter(monster => monster.$commandList?.$commandsWithData?.length);
+		}
+
+		return this._monstersWithDataCommand;
+	}
+
 	public get $level() {
 		return this.$hold.levels.getOrError(this.levelId);
 	}
