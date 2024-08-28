@@ -1,5 +1,5 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
-import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefHold, HoldRefLevel, HoldRefMonsterCommand, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll, HoldRefSpeech } from "../../data/references/HoldReference";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -19,6 +19,8 @@ export default function HoldRefView({ holdRef }: Props) {
 		case "charTiles": return <CharacterTiles r={ holdRef } />;
 
 		case "data": return <Data r={ holdRef } />;
+		case "hold": return <Hold r={ holdRef } />;
+		case "level": return <Level r={ holdRef } />;
 
 		case "monsterCommand": return <MonsterCommand r={ holdRef } />;
 
@@ -27,6 +29,7 @@ export default function HoldRefView({ holdRef }: Props) {
 		case "roomOverheadImage": return <RoomOverheadImage r={ holdRef } />;
 
 		case "scroll": return <Scroll r={ holdRef } />;
+		case "speech": return <Speech r={ holdRef } />;
 
 		case "notApplicable":
 			return <span className="is-muted">Not Applicable</span>
@@ -48,8 +51,8 @@ function Character({ r }: {r: HoldRefCharacter}) {
 	const character = hold.characters.getOrError(characterId);
 
 	return <>
-		<span className="icon icon-monster-ref" title="Character">
-			<i className="fas fa-user"></i>
+		<span className="icon icon-ref" title="Character">
+			<i className="fas fa-person-walking"></i>
 		</span>
 		{" "}<strong>{character.name.newValue}</strong>
 	</>
@@ -62,8 +65,8 @@ function CharacterCommand({ r }: {r: HoldRefCharacterCommand}) {
 	const command = character.$commandList!.commands[commandIndex];
 
 	return <>
-		<span className="icon icon-monster-ref" title="Character">
-			<i className="fas fa-user"></i>
+		<span className="icon icon-ref" title="Character">
+			<i className="fas fa-person-walking"></i>
 		</span>
 		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>#{commandIndex}::{getCommandName(command.type)}</em>
@@ -76,8 +79,8 @@ function CharacterAvatar({ r }: {r: HoldRefCharacterAvatar}) {
 	const character = hold.characters.getOrError(characterId);
 
 	return <>
-		<span className="icon icon-monster-ref" title="Character">
-			<i className="fas fa-user"></i>
+		<span className="icon icon-ref" title="Character">
+			<i className="fas fa-person-walking"></i>
 		</span>
 		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>Avatar</em>
@@ -90,8 +93,8 @@ function CharacterTiles({ r }: {r: HoldRefCharacterTiles}) {
 	const character = hold.characters.getOrError(characterId);
 
 	return <>
-		<span className="icon icon-monster-ref" title="Character">
-			<i className="fas fa-user"></i>
+		<span className="icon icon-ref" title="Character">
+			<i className="fas fa-person-walking"></i>
 		</span>
 		{" "}<strong>{character.name.newValue}</strong>
 		{" "}&rarr;{" "}<em>Tiles</em>
@@ -104,10 +107,32 @@ function Data({ r }: {r: HoldRefData}) {
 	const data = hold.datas.getOrError(dataId);
 
 	return <>
-		<span className="icon icon-monster-ref" title="Data">
+		<span className="icon icon-ref" title="Data">
 			<i className="fas fa-database"></i>
 		</span>
 		{" "}<strong>{data.name.newValue}</strong>
+	</>
+}
+
+function Hold({ r }: {r: HoldRefHold}) {
+	return <>
+		<span className="icon" title="Hold">
+			<i className="fas fa-house-chimney"></i>
+		</span>
+		{" "}<strong>The Hold Itself</strong>
+	</>
+}
+
+function Level({ r }: {r: HoldRefLevel}) {
+	const {hold, levelId} = r;
+
+	const level = hold.levels.getOrError(levelId);
+
+	return <>
+		<span className="icon" title="Level">
+			<i className="fas fa-layer-group"></i>
+		</span>
+		{" "}<strong>{level.name.newValue}</strong>
 	</>
 }
 
@@ -120,7 +145,7 @@ function MonsterCommand({ r }: {r: HoldRefMonsterCommand}) {
 	const command = monster.$commandList!.commands[commandIndex];
 
 	return <>
-		<span className="icon icon-monster-ref" title="Monster">
+		<span className="icon icon-ref" title="Monster">
 			<i className="fas fa-bug"></i>
 		</span>
 		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
@@ -137,8 +162,8 @@ function Room({ r }: {r: HoldRefRoom}) {
 	const level = room.$level;
 
 	return <>
-		<span className="icon icon-monster-ref" title="Room">
-			<i className="fas fa-house"></i>
+		<span className="icon icon-ref" title="Room">
+			<i className="fas fa-kaaba"></i>
 		</span>
 		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 	</>
@@ -151,8 +176,8 @@ function RoomImage({ r }: {r: HoldRefRoomImage}) {
 	const level = room.$level;
 
 	return <>
-		<span className="icon icon-monster-ref" title="Monster">
-			<i className="fas fa-bug"></i>
+		<span className="icon icon-ref" title="Room">
+			<i className="fas fa-kaaba"></i>
 		</span>
 		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 		{" "}&rarr;{" "}<em>Room Image</em>
@@ -166,8 +191,8 @@ function RoomOverheadImage({ r }: {r: HoldRefRoomOverheadImage}) {
 	const level = room.$level;
 
 	return <>
-		<span className="icon icon-monster-ref" title="Monster">
-			<i className="fas fa-bug"></i>
+		<span className="icon icon-ref" title="Room">
+			<i className="fas fa-kaaba"></i>
 		</span>
 		{" "}<strong>{level.name.newValue}{": "}{room.$coordsName}</strong>
 		{" "}&rarr;{" "}<em>Overhead Image</em>
@@ -181,7 +206,7 @@ function Scroll({ r }: {r: HoldRefScroll}) {
 	const level = room.$level;
 
 	return <>
-		<span className="icon icon-scroll-ref" title="Scroll">
+		<span className="icon icon-ref" title="Scroll">
 			<i className="fas fa-scroll"></i>
 		</span>
 		{" "}<strong>
@@ -191,5 +216,18 @@ function Scroll({ r }: {r: HoldRefScroll}) {
 		</strong>
 		{" "}&rarr;{" "}
 		<em title="Scroll Coordinates">({x},{y})</em>
+	</>;
+}
+
+function Speech({ r }: {r: HoldRefSpeech}) {
+	const { hold, speechId } = r;
+
+	const speech = hold.speeches.getOrError(speechId);
+
+	return <>
+		<span className="icon icon-ref" title="Speech">
+			<i className="far fa-comment"></i>
+		</span>
+		Speech in: <HoldRefView holdRef={speech.$location} />
 	</>;
 }

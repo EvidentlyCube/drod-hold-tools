@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { getScrollRef } from "../../data/references/HoldReferenceUtils";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";

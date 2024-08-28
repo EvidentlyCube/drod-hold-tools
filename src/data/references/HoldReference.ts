@@ -37,6 +37,17 @@ export interface HoldRefEntranceVoiceOver {
 	entranceId: number;
 }
 
+export interface HoldRefHold {
+	hold: Hold;
+	model: 'hold';
+}
+
+export interface HoldRefLevel {
+	hold: Hold;
+	model: 'level';
+	levelId: number;
+}
+
 export interface HoldRefMonsterCommand {
 	hold: Hold;
 	model: 'monsterCommand',
@@ -95,6 +106,8 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefCharacterTiles
 	| HoldRefData
 	| HoldRefEntranceVoiceOver
+	| HoldRefHold
+	| HoldRefLevel
 	| HoldRefMonsterCommand
 	| HoldRefRoom
 	| HoldRefRoomImage

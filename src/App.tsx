@@ -8,6 +8,7 @@ import RouteViewHoldCharacters from "./routes/viewHold/RouteViewHoldCharacters";
 import RouteViewHoldDatas from "./routes/viewHold/RouteViewHoldDatas";
 import RouteViewHoldEntrances from "./routes/viewHold/RouteViewHoldEntrances";
 import RouteViewHoldLevels from "./routes/viewHold/RouteViewHoldLevels";
+import RouteViewHoldPlayers from "./routes/viewHold/RouteViewHoldPlayers";
 import RouteViewHoldScrolls from "./routes/viewHold/RouteViewHoldScrolls";
 import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeeches";
 import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
@@ -42,6 +43,7 @@ function App() {
 						<Route path="datas" element={<RouteViewHoldDatas />} />
 						<Route path="entrances" element={<RouteViewHoldEntrances />} />
 						<Route path="levels" element={<RouteViewHoldLevels />} />
+						<Route path="players" element={<RouteViewHoldPlayers />} />
 						<Route path="scrolls" element={<RouteViewHoldScrolls />} />
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
 						<Route path="world-maps" element={<RouteViewHoldWorldMaps />} />

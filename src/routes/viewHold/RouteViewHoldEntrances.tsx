@@ -5,7 +5,7 @@ import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldEntrance } from "../../data/datatypes/HoldEntrance";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 import { Option } from "../../components/common/Select";
 import { filterDataFormat, getDataFormatFilterOptions, getShowDescriptionName } from "../../data/Utils";

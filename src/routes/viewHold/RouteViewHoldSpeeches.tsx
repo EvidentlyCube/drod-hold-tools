@@ -3,7 +3,7 @@ import { Option } from "../../components/common/Select";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldScroll } from "../../data/datatypes/HoldRoom";
 import { getScrollRef } from "../../data/references/HoldReferenceUtils";
@@ -23,7 +23,7 @@ const Columns: SortableTableColumn<HoldScroll>[] = [
 	},
 	{
 		id: 'text',
-		displayName: 'scroll Text',
+		displayName: 'Scroll Text',
 		widthPercent: 30,
 		render: scroll => <DrodTextEditor text={scroll.message} tag="textarea" />,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.newValue, r.message.newValue),

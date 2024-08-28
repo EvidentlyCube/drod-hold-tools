@@ -6,7 +6,7 @@ import { useSignalArray } from "../../hooks/useSignalArray";
 import { HoldExporter } from "../../processor/HoldExporter";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { ChangeViewItem, changeToViewItem } from "./ChangeViewItem";
-import HoldRefView from "../../components/viewHold/HoldRefVIew";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import { filterString, sortCompareRefs, sortCompareString } from "../../utils/SortUtils";
 
 const Columns: SortableTableColumn<ChangeViewItem>[] = [
