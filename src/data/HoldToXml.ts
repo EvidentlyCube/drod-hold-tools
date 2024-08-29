@@ -45,11 +45,11 @@ export async function holdToXml(hold: Hold) {
 		.attr('Version', 508)
 		.nest();
 
-	await writePlayer(writer, refs, hold.players.getOrError(hold.playerId));
+	await writePlayer(writer, refs, hold.players.getOrError(hold.playerId.newValue));
 
 	writer.tag('Holds')
 		.attr('GID_Created', hold.gidCreated)
-		.attr('GID_PlayerID', hold.playerId)
+		.attr('GID_PlayerID', hold.playerId.newValue)
 		.attr('LastUpdated', hold.lastUpdated)
 		.attr('Status', hold.status)
 		.attr('NameMessage', hold.name)
@@ -257,7 +257,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel)
 		.attr('OrderIndex', level.orderIndex)
 		.attr('PlayerID', level.playerId.newValue)
 		.attr('NameMessage', level.name)
-		.attr('Created', level.created)
+		.attr('Created', (level.createdTimestamp.newValue / 1000) | 0)
 		.attr('LastUpdated', level.lastUpdated)
 		.attr('IsRequired', level.isRequired)
 		.attr('LevelID', level.id)

@@ -22,6 +22,8 @@ export enum HoldChangeType {
 	PlayerName = 15,
 	PlayerDeletion = 16,
 	PlayerInsertion = 17,
+	LevelCreated = 18,
+	HoldPlayer = 19,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -83,6 +85,22 @@ export type HoldChangeEntranceDescription = {
 export type HoldChangeEntranceShowDescription = {
 	type: HoldChangeType.EntranceShowDescription,
 	location: { entranceId: number };
+
+	hasChange: boolean;
+	value: number;
+}
+
+export type HoldChangeHoldPlayer = {
+	type: HoldChangeType.HoldPlayer,
+	location: { };
+
+	hasChange: boolean;
+	value: number;
+}
+
+export type HoldChangeLevelCreated = {
+	type: HoldChangeType.LevelCreated,
+	location: { levelId: number };
 
 	hasChange: boolean;
 	value: number;
@@ -180,6 +198,8 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeEntranceDataId
 	| HoldChangeEntranceDescription
 	| HoldChangeEntranceShowDescription
+	| HoldChangeHoldPlayer
+	| HoldChangeLevelCreated
 	| HoldChangeLevelName
 	| HoldChangeLevelPlayerId
 	| HoldChangePlayerDeletion

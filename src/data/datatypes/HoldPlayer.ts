@@ -28,7 +28,7 @@ export class HoldPlayer {
 		return usesMemoizer.grab(this.id, () => {
 			const uses: HoldRef[] = [];
 
-			if (this.$hold.playerId === this.id) {
+			if (this.$hold.playerId.newValue === this.id) {
 				uses.push({
 					hold: this.$hold,
 					model: HoldRefModel.Hold,

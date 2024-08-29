@@ -50,7 +50,7 @@ export class Hold {
 	public readonly gidCreated: number;
 	public readonly gidNewLevelIndex: number;
 	public readonly editingPrivileges: number;
-	public readonly playerId: number;
+	public readonly playerId: SignalUpdatableValue<number>;
 	public readonly lastUpdated: number;
 	public readonly status: number;
 	public readonly name: SignalUpdatableValue<string>;
@@ -102,7 +102,7 @@ export class Hold {
 		this.gidCreated = options.gidCreated;
 		this.gidNewLevelIndex = options.gidNewLevelIndex;
 		this.editingPrivileges = options.editingPrivileges;
-		this.playerId = options.playerId;
+		this.playerId = new SignalUpdatableValue(options.playerId);
 		this.lastUpdated = options.lastUpdated;
 		this.status = options.status;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));

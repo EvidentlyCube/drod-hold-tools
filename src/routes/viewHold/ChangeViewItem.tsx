@@ -6,6 +6,7 @@ import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from ".
 import { formatBytes } from "../../utils/Language";
 import { MoodIdToName } from "../../data/DrodEnums";
 import { DataRefViewById } from "../../components/viewHold/DataRefView";
+import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 export interface ChangeViewItem {
 	id: string;
@@ -18,7 +19,8 @@ export interface ChangeViewItem {
 export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem {
 	const id = `${change.type}-${JSON.stringify(change.location)}`;
 
-	switch (change.type) {
+	const changeType = change.type;
+	switch (changeType) {
 		case HoldChangeType.CharacterAvatarDataId: {
 			const character = hold.characters.get(change.location.characterId);
 
@@ -150,6 +152,35 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
+		case HoldChangeType.HoldPlayer: {
+			const oldPlayer = hold.players.getOrError(hold.playerId.oldValue);
+			const newPlayer = hold.players.getOrError(hold.playerId.newValue);
+
+			return {
+				id,
+				type: 'Hold Player',
+				location: { hold, model: HoldRefModel.Hold },
+				before: oldPlayer.name.newValue,
+				after: newPlayer.name.newValue,
+			};
+		}
+
+		case HoldChangeType.LevelCreated: {
+			const level = hold.levels.get(change.location.levelId);
+
+			if (!level) {
+				return invalid(id, "Level Created", "Cannot find level");
+			}
+
+			return {
+				id,
+				type: 'Level Created',
+				location: { hold, model: HoldRefModel.Level, levelId: level.id },
+				before: (new Date(level.createdTimestamp.oldValue)).toLocaleString(),
+				after: (new Date(level.createdTimestamp.newValue)).toLocaleString()
+			};
+		}
+
 		case HoldChangeType.LevelName: {
 			const level = hold.levels.get(change.location.levelId);
 
@@ -173,12 +204,15 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				return invalid(id, "Level Player ID", "Cannot find level");
 			}
 
+			const oldPlayer = hold.players.getOrError(level.playerId.oldValue);
+			const newPlayer = hold.players.getOrError(level.playerId.newValue);
+
 			return {
 				id,
 				type: 'Level Player Id',
 				location: { hold, model: HoldRefModel.Level, levelId: level.id },
-				before: level.name.oldValue,
-				after: level.name.newValue
+				before: oldPlayer.name.newValue,
+				after: newPlayer.name.newValue
 			};
 		}
 
@@ -318,6 +352,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 		}
 
 		default:
+			shouldBeUnreachable(changeType);
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));
 	}
 }

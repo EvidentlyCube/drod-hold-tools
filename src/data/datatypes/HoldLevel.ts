@@ -24,12 +24,16 @@ export class HoldLevel {
 	public readonly gidLevelIndex: number;
 	public readonly orderIndex: number;
 	public readonly name: SignalUpdatableValue<string>;
-	public readonly created: number;
+	public readonly createdTimestamp: SignalUpdatableValue<number>;
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean;
 
 	private $_primaryEntranceIdCache?: number;
 	private $_roomsCache?: readonly HoldRoom[];
+
+	public get $player() {
+		return this.$hold.players.getOrError(this.playerId.newValue);
+	}
 
 	public get $primaryEntranceId() {
 		if (this.$_primaryEntranceIdCache === undefined) {
@@ -62,7 +66,7 @@ export class HoldLevel {
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
-		this.created = opts.created;
+		this.createdTimestamp = new SignalUpdatableValue(opts.created * 1000);
 		this.lastUpdated = opts.lastUpdated;
 		this.isRequired = opts.isRequired;
 	}

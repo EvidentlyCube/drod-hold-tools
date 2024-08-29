@@ -38,8 +38,16 @@ export function applyHoldChanges(hold: Hold) {
 				hold.entrances.getOrError(change.location.entranceId).showDescription.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.HoldPlayer:
+				hold.playerId.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.LevelName:
 				hold.levels.getOrError(change.location.levelId).name.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.LevelCreated:
+				hold.levels.getOrError(change.location.levelId).createdTimestamp.set(change.hasChange, change.value);
 				break;
 
 			case HoldChangeType.LevelPlayerId:

@@ -1,7 +1,7 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeHoldPlayer, HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -13,6 +13,8 @@ import { HoldWorldMap } from "./HoldWorldMap";
 
 export class HoldChangeListener {
 	public register(hold: Hold) {
+		this.registerHoldPlayerChange(hold);
+
 		hold.characters.forEach(character => {
 			this.registerCharacterAvatarDataIdChange(character);
 			this.registerCharacterNameChange(character);
@@ -28,6 +30,7 @@ export class HoldChangeListener {
 			this.registerEntranceShowDescriptionChange(entrance);
 		})
 		hold.levels.forEach(level => {
+			this.registerLevelCreatedChange(level);
 			this.registerLevelNameChange(level);
 			this.registerLevelPlayerIdChange(level);
 		})
@@ -52,6 +55,18 @@ export class HoldChangeListener {
 			this.registerPlayerNameChange(player);
 			this.registerPlayerDeletion(player);
 		}
+	}
+
+	private registerHoldPlayerChange(hold: Hold) {
+		const change = hold.$changes.create<HoldChangeHoldPlayer>({
+			type: HoldChangeType.HoldPlayer,
+			location: { },
+			hasChange: false,
+			value: hold.playerId.newValue
+		});
+
+		registerTextChange(hold, change, hold.playerId);
+		registerPlayerRestoration(hold, hold.playerId);
 	}
 
 	private registerCharacterAvatarDataIdChange(character: HoldCharacter) {
@@ -160,6 +175,19 @@ export class HoldChangeListener {
 		registerTextChange($hold, change, showDescription);
 	}
 
+	private registerLevelCreatedChange(level: HoldLevel) {
+		const { $hold, id, createdTimestamp } = level;
+
+		const change = $hold.$changes.create<HoldChangeLevelCreated>({
+			type: HoldChangeType.LevelCreated,
+			location: { levelId: id },
+			hasChange: false,
+			value: createdTimestamp.newValue
+		});
+
+		registerTextChange($hold, change, createdTimestamp);
+	}
+
 	private registerLevelNameChange(level: HoldLevel) {
 		const { $hold, id, name } = level;
 
@@ -184,6 +212,7 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, playerId);
+		registerPlayerRestoration($hold, playerId);
 	}
 
 	private registerPlayerDeletion(player: HoldPlayer) {
@@ -201,7 +230,7 @@ export class HoldChangeListener {
 
 
 	private registerPlayerInsertion(player: HoldPlayer) {
-		const { $hold, id, $isDeleted } = player;
+		const { $hold, id, $isDeleted, name } = player;
 
 		const change = $hold.$changes.create<HoldChangePlayerInsertion>({
 			type: HoldChangeType.PlayerInsertion,
@@ -213,6 +242,11 @@ export class HoldChangeListener {
 				gidOriginalName: player.gidOriginalName,
 				name: player.name.newValue
 			}
+		});
+
+		name.onChange.add(({value}) => {
+			change.value.name = value;
+			$hold.$changes.add(change);
 		});
 
 		$hold.$changes.add(change);
@@ -327,5 +361,13 @@ function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any
 		if (value && value !== previousValue) {
 			regenerateHoldDataUses(hold, value);
 		}
+	})
+}
+
+function registerPlayerRestoration(hold: Hold, updatableValue: SignalUpdatableValue<number>) {
+	updatableValue.onChange.add(({ value }) => {
+		const player = hold.players.get(value);
+
+		player?.$isDeleted.unset();
 	})
 }

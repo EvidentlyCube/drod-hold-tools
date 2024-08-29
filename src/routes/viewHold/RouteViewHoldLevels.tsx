@@ -7,6 +7,7 @@ import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton
 import { HoldLevel } from "../../data/datatypes/HoldLevel";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
+import DateTimeEditor from "../../components/viewHold/editables/DateTimeEditor";
 
 const Columns: SortableTableColumn<HoldLevel>[] = [
 	{
@@ -52,8 +53,18 @@ const Columns: SortableTableColumn<HoldLevel>[] = [
 			<SwapPlayerButton hold={level.$hold} playerSource={level.playerId} />
 			<PlayerRefViewByIdDynamic hold={level.$hold} playerIdSource={level.playerId} />
 		</div>,
-		// sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
-		// filter: (speech, filter) => filterDataFormat(speech.$data?.details.newValue.format, filter)
+		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$player.name.newValue, r.$player.name.newValue),
+		filter: (speech, filter) => filterString(speech.$player.name.newValue, filter),
+		filterDebounce: 500,
+	},
+	{
+		id: 'created',
+		displayName: 'Created At',
+		widthPercent: 15,
+		render: level => <DateTimeEditor datetime={level.createdTimestamp} />,
+		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.createdTimestamp.newValue, r.createdTimestamp.newValue),
+		// filter: (level, filter) => filterString(level.name.newValue, filter),
+		filterDebounce: 500,
 	},
 	{
 		id: 'name',
@@ -63,7 +74,7 @@ const Columns: SortableTableColumn<HoldLevel>[] = [
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
 		filter: (level, filter) => filterString(level.name.newValue, filter),
 		filterDebounce: 500,
-	}
+	},
 ];
 
 export default function RouteViewHoldLevels() {

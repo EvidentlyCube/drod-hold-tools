@@ -1,6 +1,7 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
-import { HoldRef, HoldRefCharacter, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefModel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoom, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll, HoldRefSpeech } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefModel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
+import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
 	holdRef?: HoldRef;
@@ -18,9 +19,9 @@ export default function HoldRefView({ holdRef }: Props) {
 
 	switch (model) {
 		case HoldRefModel.Character: return <Character hold={holdRef.hold} characterId={holdRef.characterId} />;
-		case HoldRefModel.CharacterAvatar: return <CharacterAvatar r={holdRef} />;
+		case HoldRefModel.CharacterAvatar: return <ViewCharacterAvatar r={holdRef} />;
 		case HoldRefModel.CharacterCommand: return <CharacterCommand r={holdRef} />;
-		case HoldRefModel.CharacterTiles: return <CharacterTiles r={holdRef} />;
+		case HoldRefModel.CharacterTiles: return <ViewCharacterTiles r={holdRef} />;
 
 		case HoldRefModel.Data: return <Data r={holdRef} />;
 		case HoldRefModel.Hold: return <HoldView r={holdRef} />;
@@ -28,7 +29,7 @@ export default function HoldRefView({ holdRef }: Props) {
 
 		case HoldRefModel.MonsterCommand: return <MonsterCommand r={holdRef} />;
 
-		case HoldRefModel.Player: return <Player r={holdRef} />;
+		case HoldRefModel.Player: return <ViewPlayer r={holdRef} />;
 
 		case HoldRefModel.Room: return <ViewRoom hold={holdRef.hold} roomId={holdRef.roomId} />;
 		case HoldRefModel.RoomImage: return <ViewRoomImage r={holdRef} />;
@@ -39,17 +40,18 @@ export default function HoldRefView({ holdRef }: Props) {
 
 		case HoldRefModel.NotApplicable: return <span className="is-muted">Not Applicable</span>
 		case HoldRefModel.EntranceVoiceOver: return <EntranceVoiceOver r={holdRef} />
+		case HoldRefModel.WorldMap: return <ViewWorldMap hold={holdRef.hold} worldMapId={holdRef.worldMapId} />
 
 
 		default:
-			// shouldBeUnreachable(model);
+			shouldBeUnreachable(model);
 
 			return <>
 				<span className="icon icon-unknown-ref">
 					<i className="fas fa-question"></i>
 				</span>
 				{" "}<strong>Unknown ref</strong>
-				{" "}<code>{holdRef.model}</code>
+				{" "}<code>{(holdRef as any).model}</code>
 			</>
 	}
 }
@@ -81,30 +83,24 @@ function CharacterCommand({ r }: { r: HoldRefCharacterCommand }) {
 	</>
 }
 
-function CharacterAvatar({ r }: { r: HoldRefCharacterAvatar }) {
+function ViewCharacterAvatar({ r }: { r: HoldRefCharacterAvatar }) {
 	const { hold, characterId } = r;
 
-	const character = hold.characters.getOrError(characterId);
-
 	return <>
-		<span className="icon icon-ref" title="Character">
-			<i className="fas fa-person-walking"></i>
+		<Character hold={hold} characterId={characterId} />
+		{" "}&rarr;
+		<span className="icon icon-ref" title="Character Portrait">
+			<i className="fas fa-image-portrait"></i>
 		</span>
-		{" "}<strong>{character.name.newValue}</strong>
-		{" "}&rarr;{" "}<em>Avatar</em>
+		{" "}<em>Avatar</em>
 	</>
 }
 
-function CharacterTiles({ r }: { r: HoldRefCharacterTiles }) {
+function ViewCharacterTiles({ r }: { r: HoldRefCharacterTiles }) {
 	const { hold, characterId } = r;
 
-	const character = hold.characters.getOrError(characterId);
-
 	return <>
-		<span className="icon icon-ref" title="Character">
-			<i className="fas fa-person-walking"></i>
-		</span>
-		{" "}<strong>{character.name.newValue}</strong>
+		<Character hold={hold} characterId={characterId} />
 		{" "}&rarr;
 		<span className="icon icon-ref" title="Character Tiles">
 			<i className="fas fa-table-cells-large"></i>
@@ -162,13 +158,13 @@ function MonsterCommand({ r }: { r: HoldRefMonsterCommand }) {
 	</>
 }
 
-function Player({ r }: { r: HoldRefPlayer }) {
+function ViewPlayer({ r }: { r: HoldRefPlayer }) {
 	const { hold, playerId } = r;
 
 	const player = hold.players.getOrError(playerId);
 
 	return <>
-		<span className="icon icon-ref" title="Room">
+		<span className="icon icon-ref" title="Player">
 			<i className="fas fa-circle-user"></i>
 		</span>
 		{" "}<strong>{player.name.newValue}</strong>
@@ -280,5 +276,16 @@ function ViewLevel({ hold, levelId }: { hold: Hold, levelId: number }) {
 			<i className="fas fa-layer-group"></i>
 		</span>
 		{" "}<strong>{level.name.newValue}</strong>
+	</>
+}
+
+function ViewWorldMap({ hold, worldMapId }: { hold: Hold, worldMapId: number }) {
+	const worldMap = hold.worldMaps.getOrError(worldMapId);
+
+	return <>
+		<span className="icon icon-ref" title="Entrance">
+			<i className="fas fa-map"></i>
+		</span>
+		{" "}<strong>{worldMap.name.newValue}</strong>
 	</>
 }
