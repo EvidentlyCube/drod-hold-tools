@@ -6,6 +6,7 @@ export enum HoldRefModel {
 	CharacterAvatar = 'charAvatar',
 	CharacterTiles = 'charTiles',
 	Data = 'data',
+	Entrance = 'entrance',
 	EntranceVoiceOver = 'entranceVoiceOver',
 	Hold = 'hold',
 	Level = 'level',
@@ -49,6 +50,12 @@ export interface HoldRefData {
 	hold: Hold;
 	model: HoldRefModel.Data,
 	dataId: number;
+}
+
+export interface HoldRefEntrance {
+	hold: Hold;
+	model: HoldRefModel.Entrance;
+	entranceId: number;
 }
 
 export interface HoldRefEntranceVoiceOver {
@@ -131,6 +138,7 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefCharacterAvatar
 	| HoldRefCharacterTiles
 	| HoldRefData
+	| HoldRefEntrance
 	| HoldRefEntranceVoiceOver
 	| HoldRefHold
 	| HoldRefLevel

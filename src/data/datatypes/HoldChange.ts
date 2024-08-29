@@ -24,6 +24,7 @@ export enum HoldChangeType {
 	PlayerInsertion = 17,
 	LevelCreated = 18,
 	HoldPlayer = 19,
+	WorldMapDataId = 20,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -182,6 +183,14 @@ export interface HoldChangeScrollMessage {
 	value: string;
 }
 
+export interface HoldChangeWorldMapDataId {
+	type: HoldChangeType.WorldMapDataId;
+	location: { worldMapId: number };
+
+	hasChange: boolean;
+	value?: number;
+}
+
 export interface HoldChangeWorldMapName {
 	type: HoldChangeType.WorldMapName;
 	location: { worldMapId: number };
@@ -209,6 +218,7 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeSpeechDataId
 	| HoldChangeSpeechMessage
 	| HoldChangeSpeechMood
+	| HoldChangeWorldMapDataId
 	| HoldChangeWorldMapName
 
 function match(left: HoldChange, right: HoldChange) {

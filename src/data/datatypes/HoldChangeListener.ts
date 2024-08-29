@@ -1,7 +1,7 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeHoldPlayer, HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapName } from "./HoldChange";
+import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeHoldPlayer, HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapDataId, HoldChangeWorldMapName } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -44,6 +44,7 @@ export class HoldChangeListener {
 			this.registerSpeechMoodChange(speech);
 		});
 		hold.worldMaps.forEach(worldMap => {
+			this.registerWorldMapDataIdChange(worldMap);
 			this.registerWorldMapNameChange(worldMap);
 		});
 	}
@@ -324,6 +325,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, mood);
+	}
+
+	private registerWorldMapDataIdChange(worldMap: HoldWorldMap) {
+		const { $hold, id, dataId } = worldMap;
+
+		const change = $hold.$changes.create<HoldChangeWorldMapDataId>({
+			type: HoldChangeType.WorldMapDataId,
+			location: { worldMapId: id },
+			hasChange: false,
+			value: dataId.newValue
+		});
+
+		registerTextChange($hold, change, dataId);
 	}
 
 	private registerWorldMapNameChange(worldMap: HoldWorldMap) {

@@ -22,8 +22,8 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 	const isMatch = (inputDataId: number) => !dataId || inputDataId === dataId;
 
 	for (const worldMap of hold.worldMaps.values()) {
-		if (worldMap.dataId && isMatch(worldMap.dataId)) {
-			hold.datas.getOrError(worldMap.dataId).$uses.push({
+		if (worldMap.dataId.newValue && isMatch(worldMap.dataId.newValue)) {
+			hold.datas.getOrError(worldMap.dataId.newValue).$uses.push({
 				hold,
 				model: HoldRefModel.WorldMap,
 				worldMapId: worldMap.id

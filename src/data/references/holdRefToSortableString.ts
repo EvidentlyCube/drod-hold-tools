@@ -42,6 +42,7 @@ function toSortableString(ref?: HoldRef): string {
 		case HoldRefModel.CharacterTiles: return getCharacterName(ref.hold, ref.characterId) + "::Tiles";
 		case HoldRefModel.CharacterCommand: return toSortableCharCommand(ref);
 		case HoldRefModel.Data: return ref.hold.datas.getOrError(ref.dataId).name.newValue;
+		case HoldRefModel.Entrance: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
 		case HoldRefModel.EntranceVoiceOver: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
 		case HoldRefModel.MonsterCommand: return toSortableMonsterCommand(ref);
 		case HoldRefModel.Room: return toSortableRoomName(ref.hold, ref.roomId);

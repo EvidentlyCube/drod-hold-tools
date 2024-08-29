@@ -18,7 +18,7 @@ export default function HoldViewTemplate({ hold, holdReader }: Props) {
 				</div>
 				<div className="navbar-start">
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}`} end>
-						Summary
+						Hold
 					</NavLink>
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/characters`}>
 						Characters

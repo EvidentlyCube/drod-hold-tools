@@ -130,7 +130,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Entrance Description',
-				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
+				location: { hold, model: HoldRefModel.Entrance, entranceId: entrance.id },
 				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
 				after: <div className="is-white-space-pre">{entrance.description.newValue}</div>,
 			};
@@ -335,6 +335,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
+		case HoldChangeType.WorldMapDataId: {
+			const worldMap = hold.worldMaps.get(change.location.worldMapId);
+
+			if (!worldMap) {
+				return invalid(id, "World Map Data", "Cannot find world map");
+			}
+
+			return {
+				id,
+				type: 'World Map Data',
+				location: { hold, model: HoldRefModel.WorldMap, worldMapId: worldMap.id },
+				before: <DataRefViewById hold={worldMap.$hold} dataId={worldMap.dataId.oldValue} showName={true} />,
+				after: <DataRefViewById hold={worldMap.$hold} dataId={worldMap.dataId.newValue} showName={true} />,
+			};
+		}
+
 		case HoldChangeType.WorldMapName: {
 			const worldMap = hold.worldMaps.get(change.location.worldMapId);
 
@@ -345,7 +361,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'World Map Name',
-				location: { hold, model: HoldRefModel.NotApplicable },
+				location: { hold, model: HoldRefModel.WorldMap, worldMapId: worldMap.id },
 				before: worldMap.name.oldValue,
 				after: worldMap.name.newValue
 			};

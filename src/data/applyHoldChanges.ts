@@ -93,6 +93,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.speeches.getOrError(change.location.speechId).mood.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.WorldMapDataId:
+				hold.worldMaps.getOrError(change.location.worldMapId).dataId.set(change.hasChange, change.value);
+				break;
+
 			case HoldChangeType.WorldMapName:
 				hold.worldMaps.getOrError(change.location.worldMapId).name.set(change.hasChange, change.value);
 				break;

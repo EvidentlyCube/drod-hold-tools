@@ -223,16 +223,16 @@ async function writeWorldMap(writer: XMLWriter, refs: OutputRefs, worldMap: Hold
 		return;
 	}
 
-	if (worldMap.dataId) {
+	if (worldMap.dataId.newValue) {
 		// @FIXME - Null Data handler
-		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId)!)
+		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId.newValue)!)
 	}
 
 	refs.worldMapIds.add(worldMap.id);
 
 	writer.tag('WorldMaps')
 		.attr('WorldMap', worldMap.id)
-		.attr('DataID', worldMap.dataId ?? 0)
+		.attr('DataID', worldMap.dataId.newValue ?? 0)
 		.attr('DisplayType', worldMap.displayType)
 		.attr('OrderIndex', worldMap.orderIndex)
 		.attr('WorldMapNameText', worldMap.name)

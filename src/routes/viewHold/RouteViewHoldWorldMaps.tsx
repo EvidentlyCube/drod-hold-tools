@@ -4,7 +4,11 @@ import { SortableTableColumn } from "../../components/common/sortableTable/Sorta
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldWorldMap } from "../../data/datatypes/HoldWorldMap";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
+import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
+import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
+import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
+import { DataFormat } from "../../data/DrodEnums";
+import { filterDataFormat } from "../../data/Utils";
 
 const Columns: SortableTableColumn<HoldWorldMap>[] = [
 
@@ -29,6 +33,19 @@ const Columns: SortableTableColumn<HoldWorldMap>[] = [
 		sort: (isAsc, left, right) => sortCompareNumber(isAsc, left.orderIndex, right.orderIndex),
 		filter: (worldMap, filter) => filterString(worldMap.orderIndex.toString(), filter),
 		filterDebounce: 500,
+	},
+	{
+		id: 'image',
+		displayName: 'Image',
+		widthPercent: 15,
+		canHide: true,
+
+		render: worldMap => <div className="is-flex is-gap-1 is-align-items-center">
+			<SwapDataButton hold={worldMap.$hold} dataSource={worldMap.dataId} formats={[DataFormat.PNG, DataFormat.JPG, DataFormat.BMP]} />
+			<DataRefViewByIdDynamic hold={worldMap.$hold} dataIdSource={worldMap.dataId} showName={true} />
+		</div>,
+		sort: (isAsc, l, r) => sortData(isAsc, l.$data, r.$data),
+		filter: (worldMap, filter) => filterDataFormat(worldMap.$data?.details.newValue.format, filter)
 	},
 	{
 		id: 'name',
