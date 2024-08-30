@@ -48,7 +48,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 
 	}, [filteredRows, columns, sortBy, sortAsc]);
 	const paginatedRows = useMemo(() => {
-		return sortedRows.slice(page * pageSize, page * pageSize + pageSize - 1)
+		return sortedRows.slice(page * pageSize, page * pageSize + pageSize)
 	}, [page, sortedRows, pageSize]);
 
 	return <table className={className}>
