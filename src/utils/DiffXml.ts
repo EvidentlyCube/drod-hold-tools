@@ -87,6 +87,9 @@ async function compareElement(left: Element, right: Element, context: string, st
 		if (lAttr.name !== rAttr.name) {
 			throw new Error(`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`);
 
+		} else if (skipAttribute(left.tagName, lAttr.name)) {
+			continue;
+
 		} else if (lAttr.value !== rAttr.value) {
 			console.log(left);
 			console.log(right);
@@ -154,4 +157,8 @@ async function sleep(forced = false) {
 			resolve();
 		}
 	})
+}
+
+function skipAttribute(tagName: string, attributeName: string) {
+	return (tagName === 'Holds' && attributeName === 'LastUpdated');
 }

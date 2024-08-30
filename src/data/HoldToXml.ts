@@ -50,7 +50,7 @@ export async function holdToXml(hold: Hold) {
 	writer.tag('Holds')
 		.attr('GID_Created', hold.gidCreated)
 		.attr('GID_PlayerID', hold.playerId.newValue)
-		.attr('LastUpdated', hold.lastUpdated)
+		.attr('LastUpdated', Date.now() / 1000 | 0)
 		.attr('Status', hold.status)
 		.attr('NameMessage', hold.name)
 		.attr('DescriptionMessage', hold.descriptionMessage)

@@ -88,6 +88,8 @@ export default function RouteHome() {
 							<h5 className="subtitle is-6">v0.1.3{" "}<span className="is-muted">(????-??-??)</span></h5>
 							<ul>
 								<li><Bug/>Tables were not displaying every 25th element</li>
+								<li><Bug/>Exported hold did not change Last Updated date which made it impossible
+								to import the hold without deleting it first</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.2{" "}<span className="is-muted">(2024-08-29)</span></h5>
 							<ul>

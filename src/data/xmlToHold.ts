@@ -330,8 +330,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 			+ "the hold without any changes the resulting output was\n"
 			+ "different from the provided input.\n"
 			+ "It can be that the hold was created with a version of DROD"
-			+ "that's earlier than supported by the tool or there is some other"
-			+ "issue - feel free to get in touch with me."
+			+ " that's earlier than supported by the tool or there is some other"
+			+ " issue - feel free to get in touch with me."
 		)
 	}
 
