@@ -3,17 +3,32 @@ import { parseXml } from "./XmlParser";
 
 type ProgressCallback = (index: number, total: number) => void;
 
+interface AttributeSkip {
+	type: 'attribute';
+	tagName: string;
+	attributeName: string;
+}
+
+type Skip = AttributeSkip;
+
 interface DiffState {
 	onProgress: ProgressCallback;
 	flatDom: Element[];
+	skips: Skip[];
 }
 
-export async function diffXml(left: string | XMLDocument, right: string | XMLDocument, onProgress: ProgressCallback) {
+export async function diffXml(
+	left: string | XMLDocument,
+	right: string | XMLDocument,
+	onProgress: ProgressCallback,
+	skips: Skip[] = [],
+) {
 	left = await toDocument(left);
 	right = await toDocument(right);
 
 	const state: DiffState = {
 		onProgress,
+		skips,
 		flatDom: flattenDom(left)
 	}
 
@@ -87,7 +102,7 @@ async function compareElement(left: Element, right: Element, context: string, st
 		if (lAttr.name !== rAttr.name) {
 			throw new Error(`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`);
 
-		} else if (skipAttribute(left.tagName, lAttr.name)) {
+		} else if (skipAttribute(left.tagName, lAttr.name, state)) {
 			continue;
 
 		} else if (lAttr.value !== rAttr.value) {
@@ -159,6 +174,11 @@ async function sleep(forced = false) {
 	})
 }
 
-function skipAttribute(tagName: string, attributeName: string) {
+function skipAttribute(tagName: string, attributeName: string, state: DiffState) {
+	for (const skip of state.skips) {
+		if (skip.type !== 'attribute') {
+			continue;
+		}
+	}
 	return (tagName === 'Holds' && attributeName === 'LastUpdated');
 }

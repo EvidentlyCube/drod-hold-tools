@@ -26,7 +26,9 @@ class HoldExporterImpl {
 	}
 
 	private async export(hold: Hold) {
-		const xmlString = await holdToXml(hold)
+		const xmlString = await holdToXml(hold, {
+			updateHoldDate: true
+		})
 		const xmlBytes = stringToUint8(xmlString);
 		const asyncZlib = new AsyncZlib();
 

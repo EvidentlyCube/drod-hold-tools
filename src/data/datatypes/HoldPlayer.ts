@@ -24,6 +24,10 @@ export class HoldPlayer {
 	public readonly $isDeleted: SignalUpdatableValue<boolean>;
 	public readonly $isNewlyAdded: boolean;
 
+	public get $isModified() {
+		return this.name.isChanged;
+	}
+
 	public get $uses(): ReadonlyArray<HoldRef> {
 		return usesMemoizer.grab(this.id, () => {
 			const uses: HoldRef[] = [];

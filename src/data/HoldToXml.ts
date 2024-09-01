@@ -25,7 +25,14 @@ interface OutputRefs {
 	varIds: Set<number>;
 	worldMapIds: Set<number>;
 }
-export async function holdToXml(hold: Hold) {
+interface HoldToXmlOptions {
+	updateHoldDate?: boolean;
+}
+export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> = {}) {
+	const finalOptions: HoldToXmlOptions = {
+		updateHoldDate: options.updateHoldDate ?? false
+	};
+
 	const refs: OutputRefs = {
 		characterIds: new Set(),
 		dataIds: new Set(),
@@ -50,7 +57,9 @@ export async function holdToXml(hold: Hold) {
 	writer.tag('Holds')
 		.attr('GID_Created', hold.gidCreated)
 		.attr('GID_PlayerID', hold.playerId.newValue)
-		.attr('LastUpdated', Date.now() / 1000 | 0)
+		.attr('LastUpdated', finalOptions.updateHoldDate
+			? (Date.now() / 1000 | 0)
+			: hold.lastUpdated)
 		.attr('Status', hold.status)
 		.attr('NameMessage', hold.name)
 		.attr('DescriptionMessage', hold.descriptionMessage)
@@ -105,11 +114,17 @@ async function writePlayer(writer: XMLWriter, refs: OutputRefs, player: HoldPlay
 		return;
 	}
 
+	const { $isModified } = player;
+	const originalName = $isModified
+		? player.name
+		: { _safeString: stringToWCharBase64(player.gidOriginalName) }
+	const gidCreated = $isModified ? (Date.now() / 1000 | 0) : player.gidCreated;
+
 	refs.playerIds.add(player.id);
 
 	writer.tag('Players')
-		.attr('GID_OriginalNameMessage', { _safeString: stringToWCharBase64(player.gidOriginalName) })
-		.attr('GID_Created', player.gidCreated)
+		.attr('GID_OriginalNameMessage', originalName)
+		.attr('GID_Created', gidCreated)
 		.attr('LastUpdated', 0)
 		.attr('NameMessage', player.name)
 		.attr('ForumName', 0)
