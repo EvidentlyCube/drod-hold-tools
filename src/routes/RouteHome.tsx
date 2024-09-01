@@ -85,7 +85,7 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
-							<h5 className="subtitle is-6">v0.1.3{" "}<span className="is-muted">(????-??-??)</span></h5>
+							<h5 className="subtitle is-6">v0.1.3{" "}<span className="is-muted">(2024-09-01)</span></h5>
 							<ul>
 								<li><Feat/>Added page for viewing variables</li>
 								<li><Bug/>Tables were not displaying every 25th element</li>

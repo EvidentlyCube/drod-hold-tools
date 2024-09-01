@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/drod-hold-tools/static/css/main.be332e3e.css",
-    "main.js": "/drod-hold-tools/static/js/main.9803687f.js",
+    "main.js": "/drod-hold-tools/static/js/main.a51e384f.js",
     "static/js/453.c981c649.chunk.js": "/drod-hold-tools/static/js/453.c981c649.chunk.js",
     "static/media/fa-solid-900.ttf": "/drod-hold-tools/static/media/fa-solid-900.bacd5de623fb563b961a.ttf",
     "static/media/fa-brands-400.ttf": "/drod-hold-tools/static/media/fa-brands-400.60127e352b7a11f7f1bc.ttf",
@@ -13,11 +13,11 @@
     "static/media/fa-v4compatibility.woff2": "/drod-hold-tools/static/media/fa-v4compatibility.cf7f5903d06b79ad60f1.woff2",
     "index.html": "/drod-hold-tools/index.html",
     "main.be332e3e.css.map": "/drod-hold-tools/static/css/main.be332e3e.css.map",
-    "main.9803687f.js.map": "/drod-hold-tools/static/js/main.9803687f.js.map",
+    "main.a51e384f.js.map": "/drod-hold-tools/static/js/main.a51e384f.js.map",
     "453.c981c649.chunk.js.map": "/drod-hold-tools/static/js/453.c981c649.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.be332e3e.css",
-    "static/js/main.9803687f.js"
+    "static/js/main.a51e384f.js"
   ]
 }
