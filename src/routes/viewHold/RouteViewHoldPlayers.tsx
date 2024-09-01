@@ -16,19 +16,17 @@ function DeleteCell({player}: {player: HoldPlayer}) {
 		player.$isDeleted.newValue = !player.$isDeleted.newValue;
 	};
 
-	if (isDeleted) {
-		return <button
-			className="button is-danger is-outlined"
-			onClick={onClick}
-		>Restore</button>
-	} else if (player.$uses.length > 0) {
-		return <em>Cannot delete used player</em>;
-
+	if (player.$uses.length > 0) {
+		return <PlayerUsesPreviewButton player={player} />
+	} else if (!player.$isNewlyAdded) {
+		return <span className="is-muted">
+			Deleted on export
+		</span>
 	} else {
 		return <button
 			className="button is-danger"
 			onClick={onClick}
-		>Delete</button>
+		>Delete</button>;
 	}
 }
 
@@ -62,20 +60,12 @@ const Columns: SortableTableColumn<HoldPlayer>[] = [
 	},
 	{
 		id: 'uses',
-		displayName: 'Uses',
-		widthPercent: 5,
-
-		render: player => <PlayerUsesPreviewButton player={player} />,
-		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
-	},
-	{
-		id: 'delete',
-		displayName: 'Delete',
+		displayName: 'Uses / Delete',
 		widthPercent: 5,
 
 		render: player => <DeleteCell player={player} />,
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
-	},
+	}
 ];
 
 export default function RouteViewHoldPlayers() {
