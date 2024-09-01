@@ -7,11 +7,8 @@ import { HoldPlayer } from "../../data/datatypes/HoldPlayer";
 import { useSignalOrderedMapValues } from "../../hooks/useSignalOrderedMapValues";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
-import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 
 function DeleteCell({player}: {player: HoldPlayer}) {
-	const isDeleted = useSignalUpdatableValue(player.$isDeleted, true);
-
 	const onClick = () => {
 		player.$isDeleted.newValue = !player.$isDeleted.newValue;
 	};

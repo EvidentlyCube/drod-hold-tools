@@ -87,6 +87,7 @@ export default function RouteHome() {
 							<h3>Changelog</h3>
 							<h5 className="subtitle is-6">v0.1.3{" "}<span className="is-muted">(????-??-??)</span></h5>
 							<ul>
+								<li><Feat/>Added page for viewing variables</li>
 								<li><Bug/>Tables were not displaying every 25th element</li>
 								<li><Bug/>Exported hold did not change Last Updated date which made it impossible
 								to import the hold without deleting it first</li>

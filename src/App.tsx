@@ -13,6 +13,7 @@ import RouteViewHoldScrolls from "./routes/viewHold/RouteViewHoldScrolls";
 import RouteViewHoldSpeeches from "./routes/viewHold/RouteViewHoldSpeeches";
 import RouteViewHoldSummary from "./routes/viewHold/RouteViewHoldSummary";
 import RouteViewHoldWorldMaps from "./routes/viewHold/RouteViewHoldWorldMaps";
+import RouteViewHoldVariables from "./routes/viewHold/RouteViewHoldVariables";
 
 function App() {
 	const href = window.location.href.toLocaleLowerCase();
@@ -47,6 +48,7 @@ function App() {
 						<Route path="scrolls" element={<RouteViewHoldScrolls />} />
 						<Route path="speeches" element={<RouteViewHoldSpeeches />} />
 						<Route path="world-maps" element={<RouteViewHoldWorldMaps />} />
+						<Route path="variables" element={<RouteViewHoldVariables />} />
 						<Route path="changes" element={<RouteViewHoldChanges />} />
 					</Route>
 					<Route path="*" element={<Navigate to="/" />} />
