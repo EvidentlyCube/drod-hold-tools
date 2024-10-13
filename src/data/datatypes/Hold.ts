@@ -44,6 +44,12 @@ interface HoldConstructor {
 	startingLevelId: number;
 }
 
+interface DemoOrSavedGame {
+	id: number;
+	afterPlayerId: number;
+	content: string;
+}
+
 export class Hold {
 	public readonly id: number;
 	public readonly version: number;
@@ -73,7 +79,7 @@ export class Hold {
 	public readonly worldMaps = new OrderedMap<number, HoldWorldMap>();
 
 	/** Currently not used, stored only so it can be included during export */
-	public readonly demosAndSavedGames: string[] = [];
+	public readonly demosAndSavedGames: DemoOrSavedGame[] = [];
 
 	public readonly $holdReaderId: number;
 	public readonly $changes = new HoldChangeList();

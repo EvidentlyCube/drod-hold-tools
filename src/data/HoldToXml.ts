@@ -21,6 +21,7 @@ interface OutputRefs {
 	levelIds: Set<number>;
 	playerIds: Set<number>;
 	roomIds: Set<number>;
+	saveOrDemoIds: Set<number>;
 	speechIds: Set<number>;
 	varIds: Set<number>;
 	worldMapIds: Set<number>;
@@ -40,6 +41,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		levelIds: new Set(),
 		playerIds: new Set(),
 		roomIds: new Set(),
+		saveOrDemoIds: new Set(),
 		speechIds: new Set(),
 		varIds: new Set(),
 		worldMapIds: new Set(),
@@ -100,8 +102,10 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		await writeLevel(writer, refs, level)
 	}
 
-	for (const demoOrSavedGame of hold.demosAndSavedGames) {
-		writer.write(demoOrSavedGame);
+	for (const player of hold.players.values()) {
+		if (player.$hasSavesOrDemos) {
+			await writePlayer(writer, refs, player);
+		}
 	}
 
 	writer.end('drod');
@@ -132,6 +136,16 @@ async function writePlayer(writer: XMLWriter, refs: OutputRefs, player: HoldPlay
 		.attr('IsLocal', 0)
 		.attr('PlayerID', player.id)
 		.end();
+
+	for (const demoOrSavedGame of player.$hold.demosAndSavedGames) {
+		if (
+			demoOrSavedGame.afterPlayerId === player.id
+			&& !refs.saveOrDemoIds.has(demoOrSavedGame.id)
+		) {
+			writer.write(demoOrSavedGame.content);
+			refs.saveOrDemoIds.add(demoOrSavedGame.id);
+		}
+	}
 
 	await sleep();
 }

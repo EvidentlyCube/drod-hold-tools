@@ -304,12 +304,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		await sleep();
 	}
 
-
-	for (const demoOrSavedGameXml of xml.querySelectorAll('SavedGames,Demos')) {
-		hold.demosAndSavedGames.push(demoOrSavedGameXml.outerHTML);
-		await sleep();
-	}
-
+	await extractDemoAndSaveData(drodXml, hold);
 
 	/** Init dynamic data */
 	loadDynamicData(hold);
@@ -358,7 +353,7 @@ function loadDynamicData(hold: Hold) {
 function str(node: Element, attribute: string) {
 	const value = node.getAttribute(attribute);
 
-	assertNotNull(value, `Missing attribute ${attribute} in node ${node.tagName}`);
+	assertNotNull(value, `Missing attribute ${attribute} in node ${node.tagName}`, node);
 
 	return value;
 }
@@ -366,7 +361,7 @@ function str(node: Element, attribute: string) {
 function int(node: Element, attribute: string) {
 	const value = node.getAttribute(attribute);
 
-	assertNotNull(value, `Missing attribute ${attribute} in node ${node.tagName}`);
+	assertNotNull(value, `Missing attribute ${attribute} in node ${node.tagName}`, node);
 
 	return parseInt(value);
 }
@@ -377,6 +372,25 @@ function strU(node: Element, attribute: string) {
 
 function intU(node: Element, attribute: string) {
 	return node.hasAttribute(attribute) ? int(node, attribute) : undefined;
+}
+
+async function extractDemoAndSaveData(drodXml: Element, hold: Hold) {
+	let afterPlayerId = 0;
+	let counter = 1;
+
+	for (const child of drodXml.children) {
+		if (child.tagName === 'Players') {
+			afterPlayerId = int(child, 'PlayerID');
+		} else if (child.tagName === 'SavedGames' || child.tagName === 'Demos') {
+			hold.demosAndSavedGames.push({
+				id: counter++,
+				afterPlayerId,
+				content: child.outerHTML
+			});
+		}
+
+		await sleep();
+	}
 }
 
 let lastSleep = 0;
