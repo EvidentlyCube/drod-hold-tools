@@ -12,6 +12,7 @@ interface MonsterConstructor {
 	o: number;
 	processSequence?: number;
 	encExtraVars?: string;
+	isFirstTurn?: boolean;
 }
 interface MonsterPiece {
 	type: number;
@@ -28,6 +29,7 @@ export class HoldMonster {
 	public readonly o: number;
 	public readonly processSequence: number;
 	public readonly extraVars?: PackedVars;
+	public readonly isFirstTurn?: boolean;
 
 	public readonly pieces: MonsterPiece[] = [];
 
@@ -50,9 +52,16 @@ export class HoldMonster {
 		this.o = opts.o;
 		this.processSequence = opts.processSequence ?? DEFAULT_PROCESSING_SEQUENCE;
 		this.extraVars = readPackedVars(opts.encExtraVars);
+		this.isFirstTurn = opts.isFirstTurn;
 
 		if (this.extraVars && this.extraVars.hasVar('Commands')) {
 			this.$commandList = new CommandsList(room.$hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+		}
+	}
+
+	public repackCommandsIntoExtraVars() {
+		if (this.$commandList && this.extraVars) {
+			this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
 		}
 	}
 }

@@ -382,13 +382,16 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			.attr('Y', monster.y)
 			.attr('O', monster.o);
 
+		if (monster.isFirstTurn !== undefined) {
+			writer.attr('IsFirstTurn', monster.isFirstTurn)
+		}
+
 		if (monster.processSequence !== DEFAULT_PROCESSING_SEQUENCE) {
 			writer.attr('ProcessSequence', monster.processSequence);
 		}
 		if (monster.extraVars && monster.extraVars.hasAnyVar()) {
 			writer.attr('ExtraVars', monster.extraVars);
 		}
-
 		if (monster.pieces.length > 0) {
 			writer.nest();
 

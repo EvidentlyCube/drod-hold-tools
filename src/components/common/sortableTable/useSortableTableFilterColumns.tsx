@@ -1,16 +1,20 @@
 import { useCallback, useMemo } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCommons";
-import SuperJSON from "superjson";
+import { TurboJson } from "../../../utils/TurboJson";
 
 export default function useSortableTableFilterColumns<T extends SortableTableDataWithId>(
 	columns: readonly SortableTableColumn<T>[],
 	localStorageKey: string
 ) {
-	const [columnFilters, setColumnFilters] = useLocalStorageState(`${localStorageKey}-filter`, {
+	const [columnFilters, setColumnFilters] = useLocalStorageState(`${localStorageKey}-filter_v3`, {
 		defaultValue: new Map<string, string>(),
-		serializer: SuperJSON
+		serializer: TurboJson
 	});
+
+	if (!(columnFilters instanceof Map)) {
+		throw new Error("NOT A MAP");
+	}
 
 	const setColumnFilter = useCallback((column: string, filter: string) => {
 		const newColumnFilters = new Map(columnFilters);

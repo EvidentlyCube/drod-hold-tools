@@ -247,7 +247,8 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 				o: int(monsterXml, 'O'),
 				type: int(monsterXml, 'Type'),
 				processSequence: intU(monsterXml, 'ProcessSequence'),
-				encExtraVars: strU(monsterXml, 'ExtraVars')
+				encExtraVars: strU(monsterXml, 'ExtraVars'),
+				isFirstTurn: boolU(monsterXml, 'IsFirstTurn'),
 			});
 
 			for (const pieceXml of monsterXml.querySelectorAll('Pieces')) {
@@ -372,6 +373,10 @@ function strU(node: Element, attribute: string) {
 
 function intU(node: Element, attribute: string) {
 	return node.hasAttribute(attribute) ? int(node, attribute) : undefined;
+}
+
+function boolU(node: Element, attribute: string) {
+	return node.hasAttribute(attribute) ? int(node, attribute) === 1 : undefined;
 }
 
 async function extractDemoAndSaveData(drodXml: Element, hold: Hold) {

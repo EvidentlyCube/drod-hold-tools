@@ -1,5 +1,6 @@
 import { getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
+import { ScriptCommandType } from "./DrodEnums";
 import { HoldRefModel } from "./references/HoldReference";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
@@ -153,12 +154,25 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 			for (const command of monster.$commandList.$commandsWithSpeech) {
 				const { speechId, index } = command;
 				if (speechId && isMatch(speechId)) {
-					hold.speeches.getOrError(speechId).$location = {
-						hold,
-						model: HoldRefModel.MonsterCommand,
-						roomId: room.id,
-						monsterIndex: monster.$index,
-						commandIndex: index
+					try {
+						hold.speeches.getOrError(speechId).$location = {
+							hold,
+							model: HoldRefModel.MonsterCommand,
+							roomId: room.id,
+							monsterIndex: monster.$index,
+							commandIndex: index
+						}
+					} catch (e:unknown) {
+						console.log(`Removed invalid speech command (ID=${speechId}) in '${room.$level.name.newValue}' ${room.$coordsName} from character at (${monster.x}, ${monster.y}), command #${command.index}`);
+						command.type = ScriptCommandType.CC_MoveTo;
+						command.x = -99;
+						command.y = -99;
+						command.w = 0;
+						command.h = 0;
+						command.flags = 0;
+						command.speechId = 0;
+						command.label = '';
+						monster.repackCommandsIntoExtraVars();
 					}
 				}
 			}

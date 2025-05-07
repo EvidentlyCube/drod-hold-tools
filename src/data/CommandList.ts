@@ -1,4 +1,4 @@
-import { getCommandDataId } from "./CommandUtils";
+import { getCommandDataId, writeCommandsBuffer } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 
@@ -9,6 +9,11 @@ export class CommandsList {
 
 	private _commandsWithSpeech?: ReadonlyArray<ScriptCommand>;
 	private _commandsWithData?: ReadonlyArray<ScriptCommand>;
+
+	public clearCache() {
+		this._commandsWithData = undefined;
+		this._commandsWithSpeech = undefined;
+	}
 
 	public constructor(hold: Hold, commandList: ScriptCommand[]) {
 		this.hold = hold;
@@ -29,5 +34,9 @@ export class CommandsList {
 		}
 
 		return this._commandsWithData;
+	}
+
+	public toByteArray() {
+		return writeCommandsBuffer(this.commands);
 	}
 }

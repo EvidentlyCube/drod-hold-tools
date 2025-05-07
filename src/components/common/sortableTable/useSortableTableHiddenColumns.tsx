@@ -1,16 +1,20 @@
 import { useCallback, useMemo } from "react";
 import useLocalStorageState from "use-local-storage-state";
 import { SortableTableColumn, SortableTableDataWithId } from "./SortableTableCommons";
-import SuperJSON from "superjson";
+import { TurboJson } from "../../../utils/TurboJson";
 
 export default function useSortableTableHiddenColumns<T extends SortableTableDataWithId>(
 	columns: readonly SortableTableColumn<T>[],
 	localStorageKey: string
 ) {
-	const [hiddenColumns, setHiddenColumns] = useLocalStorageState(`${localStorageKey}-hidden`, {
+	const [hiddenColumns, setHiddenColumns] = useLocalStorageState(`${localStorageKey}-hidden_v3`, {
 		defaultValue: new Set<string>(),
-		serializer: SuperJSON
+		serializer: TurboJson
 	});
+
+	if (!(hiddenColumns instanceof Set)) {
+		throw new Error("NOT A SET");
+	}
 
 	const toggleHiddenColumn = useCallback((column: string) => {
 		const newHiddenColumns = new Set(hiddenColumns);

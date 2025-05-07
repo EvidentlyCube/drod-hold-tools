@@ -21,6 +21,7 @@ const MAX_STEP_TIME = 30;
 type HoldReaderStep = () => boolean | void;
 type HoldFileSource = { file: File }
 	| { xmlString: string }
+	| { fileBinary: Uint8Array }
 
 export class HoldReader {
 	public readonly id: number;
@@ -61,6 +62,19 @@ export class HoldReader {
 			];
 
 			this.name.value = `${truncate(source.file.name, 32)} (1 / ${this._steps.length})`;
+
+		} else if ('fileBinary' in source) {
+			this.sharedState.holdBinaryData = source.fileBinary;
+
+			this._steps = [
+				...getDecodeHoldStep(this),
+				...getUnpackHoldStep(this),
+				...getHoldBinaryToTextStep(this),
+				...getStringXmlToObjectStep(this),
+				...getXmlToData(this)
+			];
+
+			this.name.value = `${truncate(this.id, 32)} (1 / ${this._steps.length})`;
 
 		} else {
 			this.sharedState.holdXmlText = source.xmlString;

@@ -106,32 +106,33 @@ export function readCommandsBuffer(buffer: number[]) {
 		const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
 		const index = commands.length;
-		commands.push({ index, type, x, y, w, h, flags, speechId, label});
+		commands.push({ index, type, x, y, w, h, flags, speechId, label });
 	}
 
 	return commands;
 }
 
-/*
-	writeCommandsBuffer(commands: Command[]) {
-		const buffer: number[] = [];
+export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
+	const buffer: number[] = [];
 
-		const arr = new WrappedCommandBuffer(buffer);
-		for (const command of commands) {
-			arr.writeBpUint(command.command);
-			arr.writeBpUint(command.x);
-			arr.writeBpUint(command.y);
-			arr.writeBpUint(command.w);
-			arr.writeBpUint(command.h);
-			arr.writeBpUint(command.flags);
-			arr.writeBpUint(command.speechId);
-			arr.writeBpUint(command.label.length ? command.label.length * 2 : 0);
+	const arr = new WrappedCommandBuffer(buffer);
+	for (const command of commands) {
+		arr.writeBpUint(command.type);
+		arr.writeBpUint(command.x);
+		arr.writeBpUint(command.y);
+		arr.writeBpUint(command.w);
+		arr.writeBpUint(command.h);
+		arr.writeBpUint(command.flags);
+		arr.writeBpUint(command.speechId);
+		arr.writeBpUint(command.label.length ? command.label.length * 2 : 0);
+		if (command.label) {
 			arr.writeWChar(command.label);
 		}
+	}
 
-		return buffer;
-	},
-
+	return buffer;
+}
+/*
 	doesRequireSpeech(command: CharCommand) {
 		return command === CharCommand.CC_Speech
 			|| command === CharCommand.CC_FlashingText
@@ -143,8 +144,7 @@ export function readCommandsBuffer(buffer: number[]) {
 */
 
 function doesCommandHaveData(type: ScriptCommandType) {
-	switch (type)
-	{
+	switch (type) {
 		case ScriptCommandType.CC_AmbientSound:
 		case ScriptCommandType.CC_AmbientSoundAt:
 		case ScriptCommandType.CC_PlayVideo:
@@ -163,7 +163,7 @@ function isMusicCommand(type: ScriptCommandType) {
 }
 
 export function getCommandDataId(command: ScriptCommand): number {
-	const {type} = command;
+	const { type } = command;
 	if (!doesCommandHaveData(type)) {
 		return 0;
 
