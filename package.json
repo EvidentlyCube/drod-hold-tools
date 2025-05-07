@@ -1,55 +1,54 @@
 {
-  "name": "drod-hold-utils",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.101",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "bulma": "^1.0.1",
-    "fflate": "^0.8.2",
-    "jsdiff": "^1.1.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-h5-audio-player": "^3.9.3",
-    "react-image-size": "^2.4.0",
-    "react-router-dom": "^6.24.0",
-    "react-scripts": "5.0.1",
-    "react-textarea-autosize": "^8.5.3",
-    "superjson": "^2.2.1",
-    "typescript": "^4.9.5",
-    "use-debounce": "^10.0.1",
-    "use-local-storage-state": "^19.3.1",
-    "valtio": "^1.13.2",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "BUILD_PATH='./docs' react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "homepage": "https://evidentlycube.github.io/drod-hold-tools"
-}
+	"name": "drod-hold-utils",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+	  "bulma": "^1.0.1",
+	  "fflate": "^0.8.2",
+	  "jsdiff": "^1.1.1",
+	  "react": "^18.3.1",
+	  "react-dom": "^18.3.1",
+	  "react-h5-audio-player": "^3.9.3",
+	  "react-image-size": "^2.4.0",
+	  "react-router-dom": "^6.24.0",
+	  "react-textarea-autosize": "^8.5.3",
+	  "superjson": "^2.2.1",
+	  "use-debounce": "^10.0.1",
+	  "use-local-storage-state": "^19.3.1",
+	  "valtio": "^1.13.2"
+	},
+	"devDependencies": {
+	  "@types/jest": "^27.5.2",
+	  "@types/node": "^16.18.101",
+	  "@types/react": "^18.3.3",
+	  "@types/react-dom": "^18.3.0",
+	  "clean-webpack-plugin": "^4.0.0",
+	  "copy-webpack-plugin": "^11.0.0",
+	  "css-loader": "^6.8.1",
+	  "html-webpack-plugin": "^5.5.3",
+	  "mini-css-extract-plugin": "^2.7.6",
+	  "ts-loader": "^9.5.1",
+	  "typescript": "^4.9.5",
+	  "webpack": "^5.89.0",
+	  "webpack-cli": "^5.1.4",
+	  "webpack-dev-server": "^4.15.1"
+	},
+	"scripts": {
+	  "start": "webpack serve",
+	  "build": "NODE_ENV=production webpack",
+	  "test": "jest"
+	},
+	"browserslist": {
+	  "production": [
+		">0.2%",
+		"not dead",
+		"not op_mini all"
+	  ],
+	  "development": [
+		"last 1 chrome version",
+		"last 1 firefox version",
+		"last 1 safari version"
+	  ]
+	},
+	"homepage": "https://evidentlycube.github.io/drod-hold-tools"
+  }
