@@ -15,7 +15,7 @@ export const TurboJson = {
 	},
 	parse: (value: string): unknown => {
 		return JSON.parse(value, function(key, value) {
-			if (typeof value !== 'object' && !('$$$CLASS' in value)) {
+			if (typeof value !== 'object' || !('$$$CLASS' in value)) {
 				return value;
 			}
 
