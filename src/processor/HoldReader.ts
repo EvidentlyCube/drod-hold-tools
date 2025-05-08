@@ -1,5 +1,5 @@
 import { assertNotNull } from "../utils/Asserts";
-import { AsyncUnzlib, FlateError } from 'fflate';
+import { AsyncGunzip, AsyncUnzlib, FlateError } from 'fflate';
 import { truncate } from "../utils/StringUtils";
 import { SignalArray } from "../utils/SignalArray";
 import { xmlToHold } from "../data/xmlToHold";
@@ -7,6 +7,7 @@ import { Signal } from "../utils/Signals";
 import { Hold } from "../data/datatypes/Hold";
 import { parseXml } from "../utils/XmlParser";
 import { SignalValue } from "../utils/SignalValue";
+import { isGzippedNonDecodedHold } from "../data/Utils";
 
 interface HoldReaderState {
 	file?: File;
@@ -177,6 +178,7 @@ function getDecodeHoldStep(reader: HoldReader): HoldReaderStep[] {
 	let total = 0;
 	let bytesPerTick = 1024 * 1024;
 	let lastDuration = -1;
+	let skipDecoding = false;
 
 	return [
 		() => {
@@ -189,9 +191,15 @@ function getDecodeHoldStep(reader: HoldReader): HoldReaderStep[] {
 			if (total === 0) {
 				throw new Error("Decoding hold error - data is empty")
 			}
+
+			skipDecoding = isGzippedNonDecodedHold(holdBinaryData);
 		},
 		() => {
 			const { holdBinaryData } = reader.sharedState;
+
+			if (skipDecoding) {
+				return true;
+			}
 
 			assertNotNull(holdBinaryData, "Decoding hold error - missing binary data");
 
@@ -221,11 +229,12 @@ function getUnpackHoldStep(reader: HoldReader) {
 	let compressedSize = 0;
 	let error: Error | undefined;
 
-	const unzlib = new AsyncUnzlib();
+
+	let inflator: AsyncGunzip | AsyncUnzlib;
 
 	const onData = (flateError: FlateError | null, data: Uint8Array, final: boolean) => {
 		if (flateError) {
-			unzlib.terminate();
+			inflator.terminate();
 			isFinished = true;
 			error = flateError;
 			return;
@@ -247,8 +256,19 @@ function getUnpackHoldStep(reader: HoldReader) {
 	}
 
 	return [
-		() => unzlib.ondata = onData,
-		() => unzlib.ondrain = onDrain,
+		() => {
+			const { holdBinaryData } = reader.sharedState;
+
+			assertNotNull(holdBinaryData, "Decoding hold error - missing binary data");
+
+			if (isGzippedNonDecodedHold(holdBinaryData)) {
+				inflator = new AsyncGunzip();
+			} else {
+				inflator = new AsyncUnzlib();
+			}
+		},
+		() => inflator.ondata = onData,
+		() => inflator.ondrain = onDrain,
 		() => reader.logs.push("Inflating hold..."),
 		() => {
 			const { holdBinaryData } = reader.sharedState;
@@ -256,7 +276,7 @@ function getUnpackHoldStep(reader: HoldReader) {
 			assertNotNull(holdBinaryData, "Decoding hold error - missing binary data");
 
 			compressedSize = holdBinaryData.length;
-			unzlib.push(holdBinaryData, true);
+			inflator.push(holdBinaryData, true);
 		},
 		() => isFinished,
 		() => {

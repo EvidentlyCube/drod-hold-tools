@@ -4,6 +4,10 @@ import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptComm
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
 
+export function isGzippedNonDecodedHold(holdBinaryData: Uint8Array) {
+	return holdBinaryData[0] === 0x1F && holdBinaryData[1] == 0x8B;
+}
+
 export function wcharBase64ToString(encodedText: string) {
 	const decodedData = base64ToUint8(encodedText);
 
