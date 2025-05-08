@@ -51,7 +51,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 	writer.write(`<?xml version="1.0" encoding="ISO-8859-1" ?>\n`);
 
 	writer.tag('drod')
-		.attr('Version', 508)
+		.attr('Version', hold.version)
 		.nest();
 
 	await writePlayer(writer, refs, hold.players.getOrError(hold.playerId.newValue));
