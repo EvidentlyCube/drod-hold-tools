@@ -10,7 +10,7 @@ interface CharacterConstructor {
 	id: number;
 	encName: string;
 	type: number;
-	animationSpeed: number;
+	animationSpeed?: number;
 	encExtraVars?: string;
 	tilesDataId?: number
 	avatarDataId?: number
@@ -21,7 +21,7 @@ export class HoldCharacter {
 	public readonly id: number;
 	public readonly name: SignalUpdatableValue<string>;
 	public readonly type: number;
-	public readonly animationSpeed: number;
+	public readonly animationSpeed?: number;
 	public readonly extraVars?: PackedVars;
 	public readonly tilesDataId: SignalUpdatableValue<number | undefined>;
 	public readonly avatarDataId: SignalUpdatableValue<number | undefined>;

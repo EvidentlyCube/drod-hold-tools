@@ -1,4 +1,3 @@
-import { HoldIndexedStorage } from "../processor/HoldIndexedStorage";
 import { assertNotNull } from "../utils/Asserts";
 import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
@@ -7,6 +6,7 @@ import { regenerateHoldDataUses, regenerateHoldSpeechLocations } from "./HoldUti
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
+import { HoldChange } from "./datatypes/HoldChange";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldData } from "./datatypes/HoldData";
 import { HoldEntrance } from "./datatypes/HoldEntrance";
@@ -19,7 +19,12 @@ import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 import { HoldRefModel } from "./references/HoldReference";
 
-export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: string) => void): Promise<Hold> {
+export async function xmlToHold(
+	holdReaderId: number,
+	xml: Document,
+	storedChanges: HoldChange[],
+	log: (log: string) => void
+): Promise<Hold> {
 	const drodXml = xml.querySelector('drod');
 	const holdXml = xml.querySelector('Holds');
 
@@ -28,10 +33,12 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 
 	log("Parsing Hold");
 
-	const hold = new Hold({
+	const holdVersion = int(drodXml, 'Version');
+
+	const holdConstructor: ConstructorParameters<typeof Hold>[0] = {
 		$holdReaderId: holdReaderId,
 		id: int(holdXml, 'HoldID'),
-		version: int(drodXml, 'Version'),
+		version: holdVersion,
 		gidCreated: int(holdXml, 'GID_Created'),
 		gidNewLevelIndex: int(holdXml, 'GID_NewLevelIndex'),
 		playerId: int(holdXml, 'GID_PlayerID'),
@@ -43,14 +50,16 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		lastCharId: int(holdXml, 'CharID'),
 		lastScriptId: int(holdXml, 'ScriptID'),
 		lastVarId: int(holdXml, 'VarID'),
-		lastWorldMapId: int(holdXml, 'WorldMap'),
 		startingLevelId: int(holdXml, 'LevelID'),
 		status: int(holdXml, 'Status')
-	});
+	};
 
-	if (hold.version < 508) {
-		throw new Error("Hold was created with too old version of DROD.");
+
+	if (holdVersion >= 500) {
+		holdConstructor.lastWorldMapId = int(holdXml, 'WorldMap');
 	}
+
+	const hold = new Hold(holdConstructor);
 
 	await sleep();
 
@@ -143,7 +152,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 
 		const holdCharacter = new HoldCharacter(hold, {
 			id,
-			animationSpeed: int(characterXml, 'AnimationSpeed'),
+			animationSpeed: intU(characterXml, 'AnimationSpeed'),
 			encName: str(characterXml, 'CharNameText'),
 			type: int(characterXml, 'Type'),
 			encExtraVars: strU(characterXml, 'ExtraVars'),
@@ -331,12 +340,7 @@ export async function xmlToHold(holdReaderId: number, xml: Document, log: (log: 
 		)
 	}
 
-	// Wait for store to be ready
-	while (HoldIndexedStorage.isInitializing.value) {
-		await sleep(true);
-	}
-
-	hold.$changes.loadStored(HoldIndexedStorage.getChangesForHold(hold.$holdReaderId));
+	hold.$changes.loadStored(storedChanges);
 	applyHoldChanges(hold);
 
 	loadDynamicData(hold);
@@ -392,6 +396,8 @@ async function extractDemoAndSaveData(drodXml: Element, hold: Hold) {
 				afterPlayerId,
 				content: child.outerHTML
 			});
+		} else {
+			afterPlayerId = 0;
 		}
 
 		await sleep();

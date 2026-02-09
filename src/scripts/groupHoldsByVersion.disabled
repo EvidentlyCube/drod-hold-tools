@@ -1,0 +1,94 @@
+import { AsyncUnzlib } from "fflate";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { constants, copyFile, mkdir, readFile } from "node:fs/promises";
+import { join } from "node:path";
+
+const holdsPath = process.argv[2];
+
+if (!existsSync(holdsPath)) {
+	console.log(`Directory does not exist: ${holdsPath}`);
+	process.exit(1);
+}
+
+(async () => {
+	const versions = new Map();
+	const missingVersion = [];
+	const holds = readdirSync(holdsPath);
+	const promises = [];
+
+	for (const hold of holds) {
+		promises.push(new Promise(async resolve => {
+			try {
+				const holdXml = await decodeHold(join(holdsPath, hold));
+
+				const match = holdXml.match(/Version='(\d+)'/);
+				const version = match?.[1] ?? '100';
+				versions.set(version, (versions.get(version) ?? 0) + 1)
+
+				await mkdir(join(holdsPath, version), { recursive: true });
+				await copyFile(
+					join(holdsPath, hold),
+					join(holdsPath, version, hold),
+					constants.COPYFILE_EXCL
+				)
+
+				resolve();
+
+			} catch (e) {
+				console.log(` - ${hold} - ERROR:`);
+				console.log(e);
+				resolve();
+			}
+		}))
+	}
+
+	await Promise.all(promises);
+
+	console.log(versions);
+	console.log(missingVersion);
+})()
+
+
+async function decodeHold(holdPath) {
+	// 1: READ FILE
+	const holdBuffer = await readFile(holdPath);
+	const holdData = new Uint8Array(holdBuffer);
+
+	// 2: DECODE FILE
+	for (let i = 0; i < holdData.length; i++) {
+		holdData[i] = holdData[i] ^ 0xFF;
+	}
+
+	// 3: DEFLATE FILE
+	const holdDecoded = await deflate(holdData);
+
+	// 4: Read binary to text
+	return new TextDecoder().decode(holdDecoded);
+}
+
+async function deflate(holdData) {
+	return new Promise((resolve, reject) => {
+		const unzlib = new AsyncUnzlib();
+		unzlib.ondata = (flateError, data, final) => {
+			if (flateError) {
+				reject(new Error("Deflate error: " + String(flateError)));
+			}
+
+			if (!final) {
+				return;
+			}
+
+			resolve(data);
+		};
+
+		unzlib.push(holdData, true);
+	});
+}
+
+function decodeString(str) {
+	const buffer = Buffer.from(str, 'base64');
+	const arr = new Uint8Array(buffer);
+
+	return Array.from(arr).filter(x => x).map(x => String.fromCharCode(x)).join("");
+
+}

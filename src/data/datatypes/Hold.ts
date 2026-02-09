@@ -40,7 +40,7 @@ interface HoldConstructor {
 	lastScriptId: number;
 	lastVarId: number;
 	lastCharId: number;
-	lastWorldMapId: number;
+	lastWorldMapId?: number;
 	startingLevelId: number;
 }
 
@@ -65,7 +65,7 @@ export class Hold {
 	public readonly lastScriptId: number;
 	public readonly lastVarId: number;
 	public readonly lastCharId: number;
-	public readonly lastWorldMapId: number;
+	public readonly lastWorldMapId?: number;
 	public readonly startingLevelId: number;
 
 	public readonly players = new OrderedMap<number, HoldPlayer>();

@@ -1,3 +1,4 @@
+import { HoldChange } from "../data/datatypes/HoldChange";
 import { assertNotNull } from "../utils/Asserts";
 import { SignalArray } from "../utils/SignalArray";
 import { HoldReader } from "./HoldReader";
@@ -40,20 +41,18 @@ class HoldReaderManager {
 		this.holdReaders.removeBy(holdReader => holdReader.id === id);
 	}
 
-	public readHoldXmlString(xmlString: string, id?: number) {
-		id = id ?? Date.now();
-
-		const holdReader = new HoldReader(id, { xmlString });
+	public readHoldXmlString(xmlString: string, id: number, changes: HoldChange[]) {
+		const holdReader = new HoldReader(id, { xmlString }, changes);
 		this._unfinishedReaders.push(holdReader);
 		this.holdReaders.push(holdReader);
 
 		return holdReader;
 	}
 
-	public readHoldFile(file: File) {
+	public readHoldFile(file: File, changes: HoldChange[]) {
 		const id = Date.now();
 
-		const holdReader = new HoldReader(id, { file });
+		const holdReader = new HoldReader(id, { file }, changes);
 		this._unfinishedReaders.push(holdReader);
 		this.holdReaders.push(holdReader);
 

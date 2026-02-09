@@ -1,4 +1,4 @@
-import { OptGroup } from "../components/common/Select";
+import type { OptGroup } from "../components/common/Select";
 import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
 import { Hold } from "./datatypes/Hold";

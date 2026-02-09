@@ -1,0 +1,77 @@
+import { AsyncUnzlib } from "fflate";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
+const holdPath = process.argv[2];
+
+const OUT_DIR = join(process.cwd(), 'holdDatas');
+if (!existsSync(OUT_DIR)) {
+	mkdirSync(OUT_DIR, { recursive: true });
+}
+
+if (!holdPath) {
+	console.error("No file provided");
+	process.exit(1);
+
+} else if (!existsSync(holdPath)) {
+	console.error("Provided file does not exists");
+	process.exit(1);
+}
+
+decodeHold(holdPath);
+
+async function decodeHold(holdPath) {
+	// 1: READ FILE
+	const holdBuffer = readFileSync(holdPath);
+	const holdData = new Uint8Array(holdBuffer);
+
+	// 2: DECODE FILE
+	for (let i = 0; i < holdData.length; i++) {
+		holdData[i] = holdData[i] ^ 0xFF;
+	}
+
+	// 3: DEFLATE FILE
+	const holdDecoded = await deflate(holdData);
+
+	// 4: Read binary to text
+	const holdXmlString = new TextDecoder().decode(holdDecoded);
+
+	// 5: Get all datas
+	const matches = holdXmlString.match(/<Data .+?\/>/g);
+
+	for (const match of matches) {
+		const name = decodeString(match.match(/DataNameText='(.+?)'/)[1]);
+		const rawData = match.match(/RawData='(.+?)'/)[1];
+
+		console.log(`Writing ${name}`);
+		writeFileSync(join(OUT_DIR, name), Buffer.from(rawData, 'base64'))
+	}
+}
+
+async function deflate(holdData) {
+	return new Promise(resolve => {
+		const unzlib = new AsyncUnzlib();
+		unzlib.ondata = (flateError, data, final) => {
+			if (flateError) {
+				console.error("Deflate error: " + String(flateError));
+				process.exit(1);
+			}
+
+			if (!final) {
+				return;
+			}
+
+			resolve(data);
+		};
+
+		unzlib.push(holdData, true);
+	});
+}
+
+function decodeString(str) {
+	const buffer = Buffer.from(str, 'base64');
+	const arr = new Uint8Array(buffer);
+
+	return Array.from(arr).filter(x => x).map(x => String.fromCharCode(x)).join("");
+
+}

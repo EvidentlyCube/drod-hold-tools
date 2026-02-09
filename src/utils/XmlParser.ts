@@ -16,7 +16,7 @@ export async function parseXml(xmlString: string, updateCallback?: (log: string)
 	return xmlDoc;
 }
 
-async function readElement(parent: Element|XMLDocument, reader: XmlBufferReader) {
+async function readElement(parent: Element | XMLDocument, reader: XmlBufferReader) {
 	if (reader.isSleepTime) {
 		await reader.sleep();
 	}
@@ -90,8 +90,8 @@ class XmlBufferReader {
 		return new Promise<void>(resolve => {
 			if (this.isSleepTime) {
 				setTimeout(() => {
-		this._lastSleep = Date.now();
-		resolve();
+					this._lastSleep = Date.now();
+					resolve();
 				}, 1)
 			} else {
 				resolve();

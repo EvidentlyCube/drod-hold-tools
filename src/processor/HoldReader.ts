@@ -7,6 +7,7 @@ import { Signal } from "../utils/Signals";
 import { Hold } from "../data/datatypes/Hold";
 import { parseXml } from "../utils/XmlParser";
 import { SignalValue } from "../utils/SignalValue";
+import { HoldChange } from "../data/datatypes/HoldChange";
 import { isGzippedNonDecodedHold } from "../data/Utils";
 
 interface HoldReaderState {
@@ -34,7 +35,9 @@ export class HoldReader {
 
 	public logs = new SignalArray<string>();
 	public name = new SignalValue<string>("");
+	// @FIXME Combine the two
 	public error = new SignalValue<string>("");
+	public errorStackTrace = new SignalValue<string>("");
 
 	public onParsed = new Signal<HoldReader>();
 
@@ -42,7 +45,7 @@ export class HoldReader {
 		return !!this.error.value || this._currentStepIndex === this._steps.length;
 	}
 
-	public constructor(id: number, source: HoldFileSource) {
+	public constructor(id: number, source: HoldFileSource, changes: HoldChange[]) {
 		this.id = id;
 
 		this.logs.push("Initialized.");
@@ -59,7 +62,7 @@ export class HoldReader {
 				...getUnpackHoldStep(this),
 				...getHoldBinaryToTextStep(this),
 				...getStringXmlToObjectStep(this),
-				...getXmlToData(this)
+				...getXmlToData(this, changes)
 			];
 
 			this.name.value = `${truncate(source.file.name, 32)} (1 / ${this._steps.length})`;
@@ -72,7 +75,7 @@ export class HoldReader {
 				...getUnpackHoldStep(this),
 				...getHoldBinaryToTextStep(this),
 				...getStringXmlToObjectStep(this),
-				...getXmlToData(this)
+				...getXmlToData(this, changes)
 			];
 
 			this.name.value = `${truncate(this.id, 32)} (1 / ${this._steps.length})`;
@@ -82,7 +85,7 @@ export class HoldReader {
 
 			this._steps = [
 				...getStringXmlToObjectStep(this),
-				...getXmlToData(this)
+				...getXmlToData(this, changes)
 			];
 
 			this.name.value = `${truncate(this.id, 32)} (1 / ${this._steps.length})`;
@@ -119,6 +122,8 @@ export class HoldReader {
 			}
 		} catch (e) {
 			this.error.value = e instanceof Error ? e.message : String(e);
+			this.errorStackTrace.value = e instanceof Error ? (e.stack ?? "NO STACK") : "NO STACK";
+
 			this._currentStepIndex = this._steps.length;
 
 			this.name.value = `${truncate(baseName, 26)} Error!`;
@@ -356,7 +361,7 @@ function getStringXmlToObjectStep(reader: HoldReader) {
 	]
 }
 
-function getXmlToData(reader: HoldReader) {
+function getXmlToData(reader: HoldReader, changes: HoldChange[]): HoldReaderStep[] {
 	let isFinished = false;
 	let error: Error | undefined;
 
@@ -368,13 +373,18 @@ function getXmlToData(reader: HoldReader) {
 
 			reader.logs.push('Parsing XML');
 
-			xmlToHold(reader.id, holdXml, log => reader.logs.push(log))
-				.then(hold => {
-					reader.sharedState.hold = hold;
-					reader.logs.push("FINISHED");
-				})
-				.catch(e => error = e )
-				.finally(() => isFinished = true)
+			xmlToHold(
+				reader.id,
+				holdXml,
+				changes,
+				log => reader.logs.push(log),
+
+			).then(hold => {
+				reader.sharedState.hold = hold;
+				reader.logs.push("FINISHED");
+			})
+			.catch(e => error = e )
+			.finally(() => isFinished = true)
 		},
 		() => isFinished,
 		() => {

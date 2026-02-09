@@ -16,6 +16,7 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^27.5.2",
+		"@types/jsdom": "^21.1.7",
 		"@types/node": "^16.18.101",
 		"@types/react": "^18.3.3",
 		"@types/react-dom": "^18.3.0",
@@ -23,6 +24,7 @@
 		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.8.1",
 		"html-webpack-plugin": "^5.5.3",
+		"jsdom": "^26.1.0",
 		"mini-css-extract-plugin": "^2.7.6",
 		"ts-loader": "^9.5.1",
 		"typescript": "^4.9.5",

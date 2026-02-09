@@ -215,7 +215,7 @@ class HoldIndexedStorageClass {
 	private onDbOpenRequest_success(event: Event) {
 		this._db = this._dbOpenRequest.result;
 
-		this.loadHolds();
+		this.loadChanges();
 	}
 
 	private onDbOpenRequest_upgrade(e: IDBVersionChangeEvent) {
@@ -241,7 +241,7 @@ class HoldIndexedStorageClass {
 		let isCursorFinished = false;
 		let doFinish = () => {
 			if (counter === 0 && isCursorFinished) {
-				this.loadChanges();
+				this.isInitializing.value = false
 			}
 		}
 
@@ -263,7 +263,7 @@ class HoldIndexedStorageClass {
 			reader.onload = () => {
 				if (typeof reader.result === 'string') {
 					this._storedHoldReaderIds.add(holdId);
-					HoldReaders.readHoldXmlString(reader.result, holdId);
+					HoldReaders.readHoldXmlString(reader.result, holdId, HoldIndexedStorage.getChangesForHold(holdId));
 				} else {
 					console.error("Stored hold was not loaded as string");
 				}
@@ -285,7 +285,7 @@ class HoldIndexedStorageClass {
 		let isCursorFinished = false;
 		let doFinish = () => {
 			if (counter === 0 && isCursorFinished) {
-				this.isInitializing.value = false
+				this.loadHolds();
 			}
 		}
 

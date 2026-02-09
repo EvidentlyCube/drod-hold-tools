@@ -8,7 +8,7 @@ export default function AddHoldNavButton() {
 		const file = e.target.files ? e.target.files[0] : null;
 
 		if (file) {
-			const reader = HoldReaders.readHoldFile(file);
+			const reader = HoldReaders.readHoldFile(file, []);
 
 			navigate(`/hold/${reader.id}`);
 		}

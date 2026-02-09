@@ -82,7 +82,7 @@ async function compareElement(left: Element, right: Element, context: string, st
 	if (left.tagName !== right.tagName) {
 		console.log(left);
 		console.log(right);
-		throw new Error(`${context}: Tag Name '${left.tagName}'/'${right.tagName}'`);
+		throw new Error(`${context}: Tag Name mismatch '${left.tagName}'/'${right.tagName}'`);
 	}
 
 	context += "." + left.tagName;

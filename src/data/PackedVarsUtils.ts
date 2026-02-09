@@ -167,6 +167,9 @@ const PackedVarsUtils = {
 				case PackedVarType.Uint:
 					vars.writeUint(varName, arr.readUint());
 					break;
+				case PackedVarType.Int:
+					vars.writeInt(varName, arr.readInt());
+					break;
 				case PackedVarType.Bool:
 					vars.writeBool(varName, arr.readBool());
 					break;
@@ -202,6 +205,10 @@ const PackedVarsUtils = {
 				case PackedVarType.Uint:
 					buf.writeUint(4);
 					buf.writeUint(value);
+					break;
+				case PackedVarType.Int:
+					buf.writeUint(4);
+					buf.writeInt(value);
 					break;
 				case PackedVarType.Bool:
 					buf.writeUint(1);

@@ -72,7 +72,12 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		.attr('ScriptID', hold.lastScriptId)
 		.attr('VarID', hold.lastVarId)
 		.attr('CharID', hold.lastCharId)
-		.attr('WorldMap', hold.lastWorldMapId)
+
+	if (hold.lastWorldMapId !== undefined) {
+		writer.attr('WorldMap', hold.lastWorldMapId)
+	}
+
+	writer
 		.attr('HoldID', hold.id)
 		.nest();
 
@@ -105,6 +110,17 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 	for (const player of hold.players.values()) {
 		if (player.$hasSavesOrDemos) {
 			await writePlayer(writer, refs, player);
+		}
+	}
+
+	// Write remaining demos and saved games
+	for (const demoOrSavedGame of hold.demosAndSavedGames) {
+		if (
+			demoOrSavedGame.afterPlayerId === 0
+			&& !refs.saveOrDemoIds.has(demoOrSavedGame.id)
+		) {
+			writer.write(demoOrSavedGame.content);
+			refs.saveOrDemoIds.add(demoOrSavedGame.id);
 		}
 	}
 
@@ -470,7 +486,10 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 		.attr('CharID', character.id)
 		.attr('CharNameText', character.name)
 		.attr('Type', character.type)
-		.attr('AnimationSpeed', character.animationSpeed);
+
+	if (character.animationSpeed !== undefined) {
+		writer.attr('AnimationSpeed', character.animationSpeed);
+	}
 
 	if (character.extraVars) {
 		writer.attr('ExtraVars', character.extraVars);
