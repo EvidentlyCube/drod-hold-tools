@@ -1,8 +1,12 @@
+import { dir } from "console";
 import type { OptGroup } from "../components/common/Select";
 import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
-import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName } from "./DrodEnums";
+import { CommandsList } from "./CommandList";
+import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName, Speaker } from "./DrodEnums";
+import { TextUtils } from "./TextUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
+import { ScriptCommand } from "./datatypes/ScriptCommand";
 
 export function isGzippedNonDecodedHold(holdBinaryData: Uint8Array) {
 	return holdBinaryData[0] === 0x1F && holdBinaryData[1] == 0x8B;
@@ -105,6 +109,188 @@ export function getCommandName(type: ScriptCommandType): string {
 		?? `Unknown Command[${type}]`;
 }
 
+export function getCommandsToString(list: CommandsList | undefined): string {
+	if (!list) {
+		return "";
+	}
+
+	const lines: string[] = [];
+	let indent = 0;
+	let wasIf = false;
+
+	for (const command of list.commands) {
+		if (
+			command.type == ScriptCommandType.CC_IfElse
+			|| command.type == ScriptCommandType.CC_IfElseIf
+			|| command.type == ScriptCommandType.CC_IfEnd
+		) {
+			indent = Math.max(indent - 1, 0);
+		}
+
+		if (command.type === ScriptCommandType.CC_Label) {
+			lines.push(getCommandToString(command, list));
+
+		} else {
+			lines.push(
+				"  "
+				+ "    ".repeat(indent + (wasIf ? 1 : 0))
+				+ getCommandToString(command, list)
+			);
+		}
+
+		wasIf = command.type == ScriptCommandType.CC_If
+			|| command.type == ScriptCommandType.CC_IfElseIf;
+
+		if (
+			command.type == ScriptCommandType.CC_If
+			|| command.type == ScriptCommandType.CC_IfElseIf
+			|| command.type == ScriptCommandType.CC_IfElse
+		) {
+			indent++;
+		}
+	}
+
+	return lines.join("\n");
+}
+
+export function getCommandToString(c: ScriptCommand, context: CommandsList): string {
+	const speech = context.hold.speeches.get(c.speechId);
+	const label = context.getCommandWithLabel(c.x);
+	const {
+		appearanceMonster,
+		appearancePlayer,
+		attack,
+		dir,
+		displayFilter,
+		effect,
+		entity,
+		event,
+		hex,
+		input,
+		join,
+		music,
+		natTarget,
+		onOff,
+		openClose,
+		stealth,
+		stripNewline,
+		tile,
+		waitFlags,
+		waterTraversal,
+		weapon,
+		wh,
+		worldMapIcon,
+		worldMapImageFlag,
+		xy,
+		xywh,
+	} = TextUtils;
+
+	switch (c.type) {
+		case ScriptCommandType._CC_Missing: return "[MISSING COMMAND]";
+		case ScriptCommandType._CC_Invalid: return "[INVALID COMMAND]";
+		case ScriptCommandType.CC_ActivateItemAt: return `Active item at ${xy(c)}`;
+		case ScriptCommandType.CC_AmbientSound: return `Ambient sound ${wh(c)}`;
+		case ScriptCommandType.CC_AmbientSoundAt: return `Ambient sound at ${xy(c)},${wh(c)}`;
+		case ScriptCommandType.CC_AnswerOption: return `Answer option "${speech?.message.newValue ?? '?'}",${label?.label ?? '?'}`;
+		case ScriptCommandType.CC_Appear: return "Appear";
+		case ScriptCommandType.CC_AppearAt: return `Appear at ${xy(c)}`;
+		case ScriptCommandType.CC_AttackTile: return `Attack tile ${xy(c)},${attack(c.flags)}`;
+		case ScriptCommandType.CC_Build: return `Build ${tile(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_BuildMarker: return `Build Marker ${tile(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_ChallengeCompleted: return `Challenge completed ${c.label}`;
+		case ScriptCommandType.CC_CutScene: return `Cut scene ${c.x}`;
+		case ScriptCommandType.CC_DestroyTrapdoor: return `Destroy Trapdoor ${xywh(c)}`;
+		case ScriptCommandType.CC_Disappear: return `Disappear`;
+		case ScriptCommandType.CC_DisplayFilter: return `Display filter ${displayFilter(c.x)}`;
+		case ScriptCommandType.CC_EndScript: return `End`;
+		case ScriptCommandType.CC_EndScriptOnExit: return `End on room exit`;
+		case ScriptCommandType.CC_FaceDirection: return `Face direction ${dir(c.x)}`;
+		case ScriptCommandType.CC_FaceTowards:
+			return c.flags
+				? `Face towards ${waitFlags(c.flags)} ${c.w}`
+				: `face towards ${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_FlashingText: return join([
+			'Flashing message ',
+			c.h ? `(${hex(c.x)}${hex(c.y)}${hex(c.w)}),` : '',
+			`"${speech?.message.newValue ?? '?'}"`
+		]);
+		case ScriptCommandType.CC_FlushSpeech: return `Flush speech ${onOff(c.x)}`;
+		case ScriptCommandType.CC_GameEffect: return `Game effect ${dir(c.w)},${effect(c.h)},${xy(c)},${onOff(c.flags)}`;
+		case ScriptCommandType.CC_GenerateEntity: return `Generate entity ${entity(c.h)},${xy(c)},${dir(c.w)}`;
+		case ScriptCommandType.CC_GetEntityDirection: return `Get entity direction ${xy(c)}`;
+		case ScriptCommandType.CC_GetNaturalTarget: return `Get natural target ${natTarget(c.x)}`;
+		case ScriptCommandType.CC_GoSub: return `GoSub ${label?.label ?? '?'}`;
+		case ScriptCommandType.CC_GoTo: return `Go to ${label?.label ?? '?'}`;
+		case ScriptCommandType.CC_If: return `If ...`;
+		case ScriptCommandType.CC_IfElse: return `Else`;
+		case ScriptCommandType.CC_IfElseIf: return `Else If`;
+		case ScriptCommandType.CC_IfEnd: return `If End`;
+		case ScriptCommandType.CC_ImageOverlay: return `Image overlay ${c.w},${stripNewline(c.label)}`;
+		case ScriptCommandType.CC_Imperative: return `Imperative ${c.x}`;
+		case ScriptCommandType.CC_Label: return `${c.label}`;
+		case ScriptCommandType.CC_LevelEntrance: return `Level entrance ${xy(c)}`;
+		case ScriptCommandType.CC_MoveRel: return join(['Move ', !c.flags ? `${xy(c)},` : '', wh(c)]);
+		case ScriptCommandType.CC_MoveTo: return join(['Move to', waitFlags(c.flags), !c.flags ? `${xy(c)},` : '', wh(c)]);
+		case ScriptCommandType.CC_PlayerEquipsWeapon: return `Set player sword ${onOff(c.x)}`;
+		case ScriptCommandType.CC_PlayVideo: return `Play video ${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_Question: return `Question "${speech?.message.newValue ?? '?'}"`;
+		case ScriptCommandType.CC_Return: return `Return`;
+		case ScriptCommandType.CC_RoomLocationText: return `Room location text "${speech?.message.newValue ?? '?'}"`;
+		case ScriptCommandType.CC_SetMusic: return `Set music ${music(c)}`;
+		case ScriptCommandType.CC_SetNPCAppearance: return `Set appearance ${appearanceMonster(c.x)}`;
+		case ScriptCommandType.CC_SetPlayerAppearance: return `Set player appearance ${appearancePlayer(c.x)}`;
+		case ScriptCommandType.CC_SetPlayerStealth: return `Set player stealth ${stealth(c.x)}`;
+		case ScriptCommandType.CC_SetPlayerWeapon: return `Set player weapon ${weapon(c.x)}`;
+		case ScriptCommandType.CC_SetWaterTraversal: return `Set water traversal ${waterTraversal(c.x)}`;
+		case ScriptCommandType.CC_Speech: return !speech
+			? 'Speech ?'
+			: join([
+				`Speech "${speech.message.newValue ?? '?'}",`,
+				`${speech.$mood},`,
+				`${speech.$speaker},`,
+				speech.character === Speaker.Custom ? `${xy(c)},` : '',
+				`${speech.delay},`,
+				speech.$data?.name.newValue ?? '.'
+			]);
+		case ScriptCommandType.CC_StartGlobalScript: return `Start global script ${context.hold.characters.get(c.x)?.name.newValue ?? '?'}`;
+		case ScriptCommandType.CC_TeleportPlayerTo: return `Teleport player to ${xy(c)}`;
+		case ScriptCommandType.CC_TeleportTo: return `Teleport to ${xy(c)}`;
+		case ScriptCommandType.CC_TurnIntoMonster: return `Turn into monster`;
+		case ScriptCommandType.CC_VarSet: return TextUtils.varSet(c, context);
+		case ScriptCommandType.CC_Wait: return `Wait ${c.x}`;
+		case ScriptCommandType.CC_WaitForCleanLevel: return `Wait for clean level`;
+		case ScriptCommandType.CC_WaitForCleanRoom: return `Wait for clean room`;
+		case ScriptCommandType.CC_WaitForCueEvent: return `Wait for event ${event(c.x)}`;
+		case ScriptCommandType.CC_WaitForDoorTo: return `Wait for door to ${openClose(c.w)},${xy(c)}`;
+		case ScriptCommandType.CC_WaitForEntityType: return `Wait for entity type ${appearanceMonster(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForItem: return `Wait for item ${tile(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNoBuilding: return `Wait for no building marker ${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNotEntityType: return `Wait while entity type ${appearanceMonster(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNotRect: return `Wait while entity ${waitFlags(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForOpenMove: return `Wait for open move ${dir(c.x)}`;
+		case ScriptCommandType.CC_WaitForPlayerInput: return `Wait for player input ${input(c.x)}`;
+		case ScriptCommandType.CC_WaitForPlayerToFace: return `Wait for player to face ${dir(c.x)}`;
+		case ScriptCommandType.CC_WaitForPlayerToMove: return `Wait for player to move ${dir(c.x)}`;
+		case ScriptCommandType.CC_WaitForPlayerToTouchMe: return `Wait for player to touch me`;
+		case ScriptCommandType.CC_WaitForRect: return `Wait for entity ${waitFlags(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForSomeoneToPushMe: return `Wait for someone to push me`;
+		case ScriptCommandType.CC_WaitForTurn: return `Wait for turn ${c.x}`;
+		case ScriptCommandType.CC_WaitForVar: return TextUtils.waitForVar(c, context);
+		case ScriptCommandType.CC_WorldMapIcon: return `World map icon ${appearanceMonster(c.h)},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_WorldMapImage: return `World map image ${c.h},${worldMapImageFlag(c.flags)},${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_WorldMapMusic: return `World map music ${music(c)}`;
+		case ScriptCommandType.CC_WorldMapSelect: return `World map select ${c.x}`;
+
+		case ScriptCommandType.CC_GotoIf: return `[DEPRECATED - CC_GotoIf]`;
+		case ScriptCommandType.CC_WaitForCharacter: return `[DEPRECATED - CC_WaitForCharacter]`;
+		case ScriptCommandType.CC_WaitForHalph: return `[DEPRECATED - CC_WaitForHalph]`;
+		case ScriptCommandType.CC_WaitForMonster: return `[DEPRECATED - CC_WaitForMonster]`;
+		case ScriptCommandType.CC_WaitForNotCharacter: return `[DEPRECATED - CC_WaitForNotCharacter]`;
+		case ScriptCommandType.CC_WaitForNotHalph: return `[DEPRECATED - CC_WaitForNotHalph]`;
+		case ScriptCommandType.CC_WaitForNotMonster: return `[DEPRECATED - CC_WaitForNotMonster]`;
+	}
+}
+
 export function getFormatName(type: DataFormat): string {
 	return DataFormatToName.get(type)
 		?? `Wrong Format[${type}]`;
@@ -197,7 +383,7 @@ export function getBase64DecodedLength(data: string) {
 
 	let padding = data.endsWith('==') ? 2
 		: data.endsWith('=') ? 1
-		: 0;
+			: 0;
 
 	return (3 * data.length - 4 * padding) / 4;
 }

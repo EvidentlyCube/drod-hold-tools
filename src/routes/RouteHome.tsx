@@ -85,6 +85,10 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
+							<h5 className="subtitle is-6">v0.1.5{" "}<span className="is-muted">(2026-02-10)</span></h5>
+							<ul>
+								<li><Feat/>Added exporting all hold's scripts.</li>
+							</ul>
 							<h5 className="subtitle is-6">v0.1.4{" "}<span className="is-muted">(2024-10-13)</span></h5>
 							<ul>
 								<li><Bug/>Players who only own demos and not levels are now included in the exported Hold.</li>

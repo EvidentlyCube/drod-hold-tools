@@ -1,6 +1,7 @@
 import { getCommandDataId, writeCommandsBuffer } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
+import { ScriptCommandType } from "./DrodEnums";
 
 
 export class CommandsList {
@@ -18,6 +19,16 @@ export class CommandsList {
 	public constructor(hold: Hold, commandList: ScriptCommand[]) {
 		this.hold = hold;
 		this.commands = commandList;
+	}
+
+	public getCommandWithLabel(labelId: number): ScriptCommand | undefined {
+		for (const command of this.commands) {
+			if (command.type === ScriptCommandType.CC_Label && command.x === labelId) {
+				return command;
+			}
+		}
+
+		return undefined;
 	}
 
 	public get $commandsWithSpeech() {

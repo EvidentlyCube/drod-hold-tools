@@ -164,6 +164,13 @@ export enum MonsterType {
 	_CustomCharactersStart = 20000
 }
 
+export enum AttackTileFlag {
+	AT_Stab = 0,
+	AT_Explode = 1,
+	AT_Damage = 2,
+	AT_Kill = 3
+}
+
 export enum Speaker {
 	Beethro = 0,
 	Gunthro = 51,
@@ -236,6 +243,27 @@ export enum Mood {
 	Happy = 4,
 	Dying = 5,
 	Talking = 6,
+}
+
+export enum ScriptVarOperators {
+	Assign=0,
+	Inc=1,
+	Dec=2,
+	AssignText=3,
+	AppendText=4,
+	MultiplyBy=5,
+	DivideBy=6,
+	Mod=7
+}
+
+export enum ScriptVarComparators {
+	Equals=0,
+	Greater=1,
+	Less=2,
+	EqualsText=3,
+	LessThanOrEqual=8, //to avoid collision with Op values
+	GreaterThanOrEqual=9,
+	Inequal=10
 }
 
 export const MonsterIdToName: ReadonlyMap<number, string> = new Map([
@@ -337,8 +365,8 @@ export const ScriptCommandTypeToName: ReadonlyMap<number, string> = new Map([
 	[ScriptCommandType.CC_IfElse, 'IfElse'],
 	[ScriptCommandType.CC_IfEnd, 'IfEnd'],
 	[ScriptCommandType.CC_LevelEntrance, 'LevelEntrance'],
-	[ScriptCommandType.CC_VarSet, 'VarSet'],
-	[ScriptCommandType.CC_WaitForVar, 'WaitForVar'],
+	[ScriptCommandType.CC_VarSet, 'Var Set'],
+	[ScriptCommandType.CC_WaitForVar, 'Wait For Var'],
 	[ScriptCommandType.CC_SetPlayerAppearance, 'SetPlayerAppearance'],
 	[ScriptCommandType.CC_CutScene, 'CutScene'],
 	[ScriptCommandType.CC_MoveRel, 'MoveRel'],

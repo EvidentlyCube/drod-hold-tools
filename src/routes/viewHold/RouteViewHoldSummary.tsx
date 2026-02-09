@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { Hold } from "../../data/datatypes/Hold";
-import { ReactElement } from "react";
+import { ReactElement, useCallback, useMemo } from "react";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
+import { getCharacterName, getCommandsToString } from "../../data/Utils";
 
 type GetData = (hold: Hold) => ReactElement[] | ReactElement | string | number;
 
@@ -23,12 +24,41 @@ const DataPoints: Record<string, GetData> = {
 export default function RouteViewHoldSummary() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+	const handleDownloadAll = useCallback(() => {
+		const blobs: string[] = [];
+		for (const c of hold.characters.values()) {
+			blobs.push(`Custom Character ${c.name.newValue}:\n${getCommandsToString(c.$commandList)}`);
+		}
+		for (const room of hold.rooms.values()) {
+			for (const monster of room.monsters) {
+				if (monster.$commandList) {
+					blobs.push(
+						`${room.$level.name.newValue}: ${room.$coordsName}`
+						+ ` at (${monster.x}, ${monster.y})`
+						+ ` of ${getCharacterName(hold, monster.$characterTypeId)}`
+						+ `\n${getCommandsToString(monster.$commandList)}`
+					);
+				}
+			}
+		}
+
+		navigator.clipboard.writeText(blobs.join("\n\n"));
+		alert("Copied!");
+
+	}, [hold]);
 
 	return (
 		<table className="table is-fullwidth is-hoverable is-striped">
 			<tbody>
 				{Object.entries(DataPoints).map(([name, getData]) => <DataRow key={name} hold={hold} name={name} getData={getData} />)}
-
+				<tr>
+					<th>Actions</th>
+					<td>
+						<button className="button ml-3 is-primary" title="Rollback changes" onClick={handleDownloadAll}>
+							Download all Scripts
+						</button>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	);
