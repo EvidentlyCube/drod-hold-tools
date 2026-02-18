@@ -4,6 +4,7 @@ import { SortableTableColumn } from "../../components/common/sortableTable/Sorta
 import { HoldVariable } from "../../data/datatypes/HoldVariable";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
+import VariableUsesPreviewButton from "../../components/viewHold/preview/VariableUsesPreviewButton";
 
 const Columns: SortableTableColumn<HoldVariable>[] = [
 	{
@@ -25,7 +26,15 @@ const Columns: SortableTableColumn<HoldVariable>[] = [
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
 		filter: (variable, filter) => filterString(variable.name.newValue, filter),
 		filterDebounce: 500,
-	}
+	},
+	{
+		id: 'uses',
+		displayName: 'Uses',
+		widthPercent: 5,
+
+		render: variable => <VariableUsesPreviewButton variable={variable} />,
+		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
+	},
 ];
 
 export default function RouteViewHoldVariables() {

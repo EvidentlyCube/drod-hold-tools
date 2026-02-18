@@ -1,5 +1,6 @@
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
-import { ScriptCommandType } from "./DrodEnums";
+import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 
 class WrappedCommandBuffer {
@@ -175,4 +176,29 @@ export function getCommandDataId(command: ScriptCommand): number {
 	}
 
 	return command.w;
+}
+
+export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVariable): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_VarSet:
+			return command.x === variable.id
+				|| (command.y === ScriptVarOperators.AppendText && variable.isUsedInText(command.label))
+				|| (command.y === ScriptVarOperators.AssignText && variable.isUsedInText(command.label))
+				|| (
+					command.y !== ScriptVarOperators.AssignText
+					&& command.y !== ScriptVarOperators.AppendText
+					&& variable.isUsedInFormula(command.label)
+				);
+
+		case ScriptCommandType.CC_WaitForVar:
+			return command.x === variable.id
+				|| (command.y === ScriptVarComparators.EqualsText && variable.isUsedInText(command.label))
+				|| (command.y !== ScriptVarComparators.EqualsText && variable.isUsedInFormula(command.label));
+
+		case ScriptCommandType.CC_ImageOverlay:
+			return variable.isUsedInText(command.label);
+
+		default:
+			return false;
+	}
 }

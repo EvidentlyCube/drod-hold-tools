@@ -1,6 +1,7 @@
-import { getCommandDataId } from "./CommandUtils";
+import { escapeRegex } from "../utils/StringUtils";
+import { doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
-import { ScriptCommandType } from "./DrodEnums";
+import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
 import { HoldRefModel } from "./references/HoldReference";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
@@ -85,7 +86,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 		}
 
 		if (room.overheadDataId && isMatch(room.overheadDataId)) {
-			hold.datas.getOrError(room.overheadDataId).$uses.push({
+			hold.datas.get(room.overheadDataId)?.$uses.push({
 				hold,
 				model: HoldRefModel.RoomOverheadImage,
 				roomId: room.id
@@ -100,7 +101,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 			for (const command of monster.$commandList.$commandsWithData) {
 				const dataId = getCommandDataId(command);
 				if (dataId && isMatch(dataId)) {
-					hold.datas.getOrError(dataId).$uses.push({
+					hold.datas.get(dataId)?.$uses.push({
 						hold,
 						model: HoldRefModel.MonsterCommand,
 						roomId: room.id,
@@ -120,6 +121,94 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 				entranceId: entrance.id
 			});
 		}
+	}
+}
+
+export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
+	const variable = hold.variables.getOrError(variableId);
+
+	variable.$uses.length = 0;
+
+	// CHECK ALL CUSTOM CHARACTERS
+	for (const character of hold.characters.values()) {
+		if (!character.$commandList) {
+			continue;
+		}
+
+		for (const command of character.$commandList.commands) {
+			const { speechId, index } = command;
+
+			if (variable.isUsedInText(hold.speeches.get(speechId)?.message.newValue ?? "")) {
+				variable.$uses.push({
+					model: HoldRefModel.Speech,
+					hold, speechId
+				});
+			}
+
+			if (doesCommandUseVariable(command, variable)) {
+				variable.$uses.push({
+					model: HoldRefModel.CharacterCommand,
+					characterId: character.id,
+					commandIndex: index,
+					hold,
+				});
+			}
+		}
+	}
+
+	// ENTRANCES
+	for (const entrance of hold.entrances.values()) {
+		if (variable.isUsedInText(entrance.description.newValue)) {
+			variable.$uses.push({
+				model: HoldRefModel.Entrance,
+				entranceId: entrance.id,
+				hold,
+			})
+		}
+	}
+
+	// CHECK ROOMS - CHARACTERS & SCROLLS
+	for (const room of hold.rooms.values()) {
+		for (const scroll of hold.$scrolls) {
+			if (variable.isUsedInText(scroll.message.newValue)) {
+				variable.$uses.push(scroll.$scrollRef)
+			}
+		}
+
+		for (const monster of room.$monstersWithCommands) {
+			if (!monster.$commandList) {
+				continue;
+			}
+
+			for (const command of monster.$commandList.commands) {
+				const { speechId, index } = command;
+
+				if (variable.isUsedInText(hold.speeches.get(speechId)?.message.newValue ?? "")) {
+					variable.$uses.push({
+						model: HoldRefModel.Speech,
+						hold, speechId
+					});
+				}
+
+				if (doesCommandUseVariable(command, variable)) {
+					variable.$uses.push({
+						model: HoldRefModel.MonsterCommand,
+						roomId: room.id,
+						monsterIndex: monster.$index,
+						commandIndex: index,
+						hold,
+					});
+				}
+			}
+		}
+	}
+
+	// HOLD ENDING
+	if (variable.isUsedInText(hold.endHoldMessage.newValue)) {
+		variable.$uses.push({
+			model: HoldRefModel.HoldEndMessage,
+			hold
+		})
 	}
 }
 
@@ -162,7 +251,7 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 							monsterIndex: monster.$index,
 							commandIndex: index
 						}
-					} catch (e:unknown) {
+					} catch (e: unknown) {
 						console.log(`Removed invalid speech command (ID=${speechId}) in '${room.$level.name.newValue}' ${room.$coordsName} from character at (${monster.x}, ${monster.y}), command #${command.index}`);
 						command.type = ScriptCommandType.CC_MoveTo;
 						command.x = -99;

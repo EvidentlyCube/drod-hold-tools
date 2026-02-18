@@ -20,7 +20,12 @@ function validateFormat(format: DataFormat, file: File): void {
 			throw new Error(`Data format is an image one but received an unsupported file type: ${file.type}`);
 		}
 	} else if (isAudioFormat(format)) {
-		if (file.type !== 'audio/ogg' && file.type !== 'audio/wav' && file.type !== 'audio/x-wav') {
+		if (
+			file.type !== 'audio/ogg'
+			&& file.type !== 'application/ogg'
+			&& file.type !== 'audio/wav'
+			&& file.type !== 'audio/x-wav'
+		) {
 			throw new Error(`Data format is an audio one but received an unsupported file type: ${file.type}`);
 		}
 	}
@@ -64,6 +69,7 @@ async function mimeTypeToFormat(file: File) {
 		case 'audio/wav': return DataFormat.WAV;
 		case 'audio/x-wav': return DataFormat.WAV;
 		case 'audio/ogg': return DataFormat.OGG;
+		case 'application/ogg': return DataFormat.OGG;
 		default:
 			throw new Error(`Attempted to guess data format from mimetype but it was not supported: ${file.type}`);
 	}

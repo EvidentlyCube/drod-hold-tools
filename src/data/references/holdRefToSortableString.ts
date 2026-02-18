@@ -50,6 +50,7 @@ function toSortableString(ref?: HoldRef): string {
 		case HoldRefModel.RoomOverheadImage: return toSortableRoomName(ref.hold, ref.roomId) + "::OverheadImage";
 		case HoldRefModel.Scroll: return toSortableRoomName(ref.hold, ref.roomId) + `::Scroll(${ref.x},${ref.y})`;
 		case HoldRefModel.Hold: return ref.hold.name.newValue;
+		case HoldRefModel.HoldEndMessage: return `${ref.hold.name.newValue}::EndMessage`;
 		case HoldRefModel.Level: return toSortableLevelName(ref.hold, ref.levelId);
 		case HoldRefModel.NotApplicable: return "Not Applicable";
 		case HoldRefModel.Player: return toSortablePlayerName(ref.hold, ref.playerId);
@@ -69,8 +70,8 @@ function toSortableCharCommand(ref: HoldRefCharacterCommand) {
 	return `${getCharacterName(hold, characterId)} #${commandIndex}::${getCommandName(command.type)}`
 }
 
-function toSortableLevelName(hold: Hold, leveLid: number) {
-	const level = hold.levels.getOrError(leveLid);
+function toSortableLevelName(hold: Hold, levelId: number) {
+	const level = hold.levels.getOrError(levelId);
 
 	return level.name.newValue;
 }

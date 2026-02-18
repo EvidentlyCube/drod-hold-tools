@@ -1,6 +1,6 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
-import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefModel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
@@ -28,6 +28,7 @@ export default function HoldRefView({ holdRef }: Props) {
 		case HoldRefModel.EntranceVoiceOver: return <ViewEntranceVoiceOver r={holdRef} />
 
 		case HoldRefModel.Hold: return <ViewHold r={holdRef} />;
+		case HoldRefModel.HoldEndMessage: return <ViewHoldEndMessage r={holdRef} />;
 		case HoldRefModel.Level: return <ViewLevel hold={holdRef.hold} levelId={holdRef.levelId} />;
 
 		case HoldRefModel.MonsterCommand: return <ViewMonsterCommand r={holdRef} />;
@@ -130,6 +131,15 @@ function ViewHold({ r }: { r: HoldRefHold }) {
 			<i className="fas fa-house-chimney"></i>
 		</span>
 		{" "}<strong title="The Hold Itself">The Hold Itself</strong>
+	</>
+}
+
+function ViewHoldEndMessage({ r }: { r: HoldRefHoldEndMessage }) {
+	return <>
+		<span className="icon" title="Hold">
+			<i className="fas fa-house-chimney"></i>
+		</span>
+		{" "}<strong title="Hold end message">Hold end message</strong>
 	</>
 }
 

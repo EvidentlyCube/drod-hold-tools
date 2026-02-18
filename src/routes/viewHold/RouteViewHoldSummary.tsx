@@ -5,6 +5,8 @@ import { ReactElement, useCallback, useMemo } from "react";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
 import { getCharacterName, getCommandsToString } from "../../data/Utils";
+import { Zippable, zipSync } from 'fflate';
+import { base64ToUint8 } from "../../utils/StringUtils";
 
 type GetData = (hold: Hold) => ReactElement[] | ReactElement | string | number;
 
@@ -24,7 +26,7 @@ const DataPoints: Record<string, GetData> = {
 export default function RouteViewHoldSummary() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
-	const handleDownloadAll = useCallback(() => {
+	const handleDownloadScripts = useCallback(() => {
 		const blobs: string[] = [];
 		for (const c of hold.characters.values()) {
 			blobs.push(`Custom Character ${c.name.newValue}:\n${getCommandsToString(c.$commandList)}`);
@@ -46,6 +48,31 @@ export default function RouteViewHoldSummary() {
 		alert("Copied!");
 
 	}, [hold]);
+	const handleDownloadData = useCallback(() => {
+		const z = {} as Zippable;
+
+		for (const data of hold.datas.values()) {
+			z[data.name.newValue] = base64ToUint8(data.details.newValue.rawEncodedData);
+		}
+
+		const zip = zipSync(z);
+
+		// Create a blob from the zip bytes and trigger a download
+		const blob = new Blob([zip], { type: 'application/zip' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		// sanitize filename: allow common safe characters
+		const safeName = (hold.name && hold.name.newValue)
+			? String(hold.name.newValue).replace(/[^\w\-_. ]+/g, '')
+			: 'hold-data';
+		a.download = `${safeName}.zip`;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(url);
+
+	}, [hold]);
 
 	return (
 		<table className="table is-fullwidth is-hoverable is-striped">
@@ -54,8 +81,11 @@ export default function RouteViewHoldSummary() {
 				<tr>
 					<th>Actions</th>
 					<td>
-						<button className="button ml-3 is-primary" title="Rollback changes" onClick={handleDownloadAll}>
+						<button className="button ml-3 is-primary" title="Download scripts" onClick={handleDownloadScripts}>
 							Download all Scripts
+						</button>
+						<button className="button ml-3 is-primary" title="Download data" onClick={handleDownloadData}>
+							Download all Data
 						</button>
 					</td>
 				</tr>

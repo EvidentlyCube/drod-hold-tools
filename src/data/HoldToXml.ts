@@ -516,9 +516,8 @@ async function writeCommandData(writer: XMLWriter, refs: OutputRefs, commandList
 
 		const dataId = getCommandDataId(command);
 
-		if (dataId) {
-			// @FIXME null data
-			await writeData(writer, refs, commandList.hold.datas.get(dataId)!);
+		if (dataId && commandList.hold.datas.has(dataId)) {
+			await writeData(writer, refs, commandList.hold.datas.getOrError(dataId));
 		}
 	}
 }

@@ -2,15 +2,17 @@ import type { Hold } from "../datatypes/Hold";
 
 export enum HoldRefModel {
 	Character = 'character',
-	CharacterCommand = 'charCommand',
 	CharacterAvatar = 'charAvatar',
+	CharacterCommand = 'charCommand',
 	CharacterTiles = 'charTiles',
 	Data = 'data',
 	Entrance = 'entrance',
 	EntranceVoiceOver = 'entranceVoiceOver',
 	Hold = 'hold',
+	HoldEndMessage = 'holdEndMessage',
 	Level = 'level',
 	MonsterCommand = 'monsterCommand',
+	NotApplicable = 'notApplicable',
 	Player = 'player',
 	Room = 'room',
 	RoomImage = 'roomImage',
@@ -18,7 +20,6 @@ export enum HoldRefModel {
 	Scroll = 'scroll',
 	Speech = 'speech',
 	WorldMap = 'worldMap',
-	NotApplicable = 'notApplicable',
 }
 
 export interface HoldRefCharacter {
@@ -67,6 +68,11 @@ export interface HoldRefEntranceVoiceOver {
 export interface HoldRefHold {
 	hold: Hold;
 	model: HoldRefModel.Hold;
+}
+
+export interface HoldRefHoldEndMessage {
+	hold: Hold;
+	model: HoldRefModel.HoldEndMessage;
 }
 
 export interface HoldRefLevel {
@@ -134,13 +140,14 @@ export interface HoldRefNotApplicable {
 
 export type HoldRef = HoldRefNotApplicable
 	| HoldRefCharacter
-	| HoldRefCharacterCommand
 	| HoldRefCharacterAvatar
+	| HoldRefCharacterCommand
 	| HoldRefCharacterTiles
 	| HoldRefData
 	| HoldRefEntrance
 	| HoldRefEntranceVoiceOver
 	| HoldRefHold
+	| HoldRefHoldEndMessage
 	| HoldRefLevel
 	| HoldRefMonsterCommand
 	| HoldRefPlayer

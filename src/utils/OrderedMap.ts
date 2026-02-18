@@ -75,7 +75,7 @@ export class OrderedMap<TKey, TValue> {
 	}
 
 	public get(key: TKey): TValue | undefined {
-		return this._map.get(key);
+		return key !== undefined ? this._map.get(key) : undefined;
 	}
 
 	public getOrError(key: TKey): TValue {
