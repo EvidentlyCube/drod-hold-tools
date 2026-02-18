@@ -100,7 +100,9 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 	writer.end('Holds');
 
 	for (const data of hold.datas.values()) {
-		await writeData(writer, refs, data)
+		if (data.$isDeleted.newValue === false) {
+			await writeData(writer, refs, data)
+		}
 	}
 
 	for (const level of hold.levels.values()) {

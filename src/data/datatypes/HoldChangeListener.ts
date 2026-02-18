@@ -1,7 +1,17 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
-import { HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName, HoldChangeCharacterTilesDataId, HoldChangeDataFile, HoldChangeDataName, HoldChangeEntranceDataId, HoldChangeEntranceDescription, HoldChangeEntranceShowDescription, HoldChangeHoldPlayer, HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId, HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName, HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage, HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapDataId, HoldChangeWorldMapName } from "./HoldChange";
+import {
+	HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName,
+	HoldChangeCharacterTilesDataId, HoldChangeDataDeletion, HoldChangeDataFile, HoldChangeDataName,
+	HoldChangeEntranceDataId, HoldChangeEntranceDescription,
+	HoldChangeEntranceShowDescription, HoldChangeHoldPlayer,
+	HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId,
+	HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName,
+	HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage,
+	HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapDataId,
+	HoldChangeWorldMapName
+} from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
@@ -23,6 +33,7 @@ export class HoldChangeListener {
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
 			this.registerDataFileChange(data);
+			this.registerDataDeletion(data);
 		});
 		hold.entrances.forEach(entrance => {
 			this.registerEntranceDataIdChange(entrance);
@@ -136,6 +147,19 @@ export class HoldChangeListener {
 		registerTextChange($hold, change, details);
 	}
 
+	private registerDataDeletion(data: HoldData) {
+		const { $hold, id, $isDeleted } = data;
+
+		const change = $hold.$changes.create<HoldChangeDataDeletion>({
+			type: HoldChangeType.DataDeletion,
+			location: { dataId: id },
+			hasChange: false,
+			value: $isDeleted.newValue
+		});
+
+		registerTextChange($hold, change, $isDeleted);
+	}
+
 	private registerEntranceDataIdChange(entrance: HoldEntrance) {
 		const { $hold, id, dataId } = entrance;
 
@@ -228,7 +252,6 @@ export class HoldChangeListener {
 
 		registerTextChange($hold, change, $isDeleted);
 	}
-
 
 	private registerPlayerInsertion(player: HoldPlayer) {
 		const { $hold, id, $isDeleted, name } = player;

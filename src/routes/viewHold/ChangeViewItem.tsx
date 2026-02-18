@@ -367,6 +367,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
+		case HoldChangeType.DataDeletion: {
+			const data = hold.datas.get(change.location.dataId);
+
+			if (!data) {
+				return invalid(id, "Data deletion", "Cannot find data");
+			}
+
+			return {
+				id,
+				type: 'Data Deletion',
+				location: { hold, model: HoldRefModel.Data, dataId: data.id},
+				before: "-",
+				after: "Deleting data!"
+			};
+		}
+
 		default:
 			shouldBeUnreachable(changeType);
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));

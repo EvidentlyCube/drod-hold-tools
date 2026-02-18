@@ -25,6 +25,7 @@ export enum HoldChangeType {
 	LevelCreated = 18,
 	HoldPlayer = 19,
 	WorldMapDataId = 20,
+	DataDeletion = 21,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -199,6 +200,14 @@ export interface HoldChangeWorldMapName {
 	value: string;
 }
 
+export type HoldChangeDataDeletion = {
+	type: HoldChangeType.DataDeletion,
+	location: { dataId: number };
+
+	hasChange: boolean;
+	value: boolean;
+}
+
 export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeCharacterName
 	| HoldChangeCharacterTilesDataId
@@ -220,6 +229,7 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeSpeechMood
 	| HoldChangeWorldMapDataId
 	| HoldChangeWorldMapName
+	| HoldChangeDataDeletion
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

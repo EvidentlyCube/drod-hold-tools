@@ -101,6 +101,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.worldMaps.getOrError(change.location.worldMapId).name.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.DataDeletion:
+				hold.datas.getOrError(change.location.dataId).$isDeleted.set(change.hasChange, change.value);
+				break;
+
 			default:
 				shouldBeUnreachable(changeType);
 				break;

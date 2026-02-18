@@ -15,6 +15,7 @@ function DeleteCell({player}: {player: HoldPlayer}) {
 
 	if (player.$uses.length > 0) {
 		return <PlayerUsesPreviewButton player={player} />
+
 	} else if (!player.$isNewlyAdded) {
 		return <span className="is-muted">
 			Deleted on export

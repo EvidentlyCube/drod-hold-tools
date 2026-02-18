@@ -28,6 +28,7 @@ export class HoldData {
 	public readonly $replacingFile = new SignalNullable<File>();
 	public readonly $lastReplaceError = new SignalNullable<string>();
 
+	public readonly $isDeleted: SignalUpdatableValue<boolean>;
 	public readonly $uses: HoldRef[] = [];
 
 	public get $size() {
@@ -44,6 +45,7 @@ export class HoldData {
 			format: opts.format,
 			rawEncodedData: opts.encRawData ?? ""
 		});
+		this.$isDeleted = new SignalUpdatableValue(false);
 
 		if (!this.details.oldValue.rawEncodedData) {
 			hold.$problems.push({

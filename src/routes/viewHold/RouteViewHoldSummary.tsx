@@ -74,6 +74,14 @@ export default function RouteViewHoldSummary() {
 
 	}, [hold]);
 
+	const handleDeleteAllUnusedData = useCallback(() => {
+		for (const data of hold.datas.values()) {
+			if (data.$uses.length === 0) {
+				data.$isDeleted.newValue = true;
+			}
+		}
+	}, [hold]);
+
 	return (
 		<table className="table is-fullwidth is-hoverable is-striped">
 			<tbody>
@@ -86,6 +94,9 @@ export default function RouteViewHoldSummary() {
 						</button>
 						<button className="button ml-3 is-primary" title="Download data" onClick={handleDownloadData}>
 							Download all Data
+						</button>
+						<button className="button ml-3 is-primary" title="Delete all unused data" onClick={handleDeleteAllUnusedData}>
+							Delete all unused Data
 						</button>
 					</td>
 				</tr>

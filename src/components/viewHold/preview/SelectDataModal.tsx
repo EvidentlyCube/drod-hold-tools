@@ -16,7 +16,9 @@ export default function SelectDataModal(props: Props) {
 
 	const [filter, setFilter] = useState("");
 	const baseDatas = useMemo(() => {
-		const datas = hold.datas.filterToArray(data => formats.includes(data.details.newValue.format));
+		const datas = hold.datas.filterToArray(data => formats.includes(data.details.newValue.format))
+			.filter(data => data.$isDeleted.newValue == false);
+
 		datas.sort((l, r) => sortCompareString(true, l.name.newValue, r.name.newValue));
 
 		return datas;

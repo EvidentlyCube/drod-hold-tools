@@ -22,6 +22,29 @@ function HoldDataSize({ data }: { data: HoldData }) {
 	</span>;
 }
 
+function DeleteCell({data}: {data: HoldData}) {
+	const isDeleted = useSignalUpdatableValue(data.$isDeleted, true);
+
+	const onClick = () => {
+		data.$isDeleted.newValue = !data.$isDeleted.newValue;
+	};
+
+	if (data.$uses.length > 0) {
+		return <DataUsesPreviewButton data={data} />;
+
+	} else if (isDeleted) {
+		return <button
+			className="button is-danger"
+			onClick={onClick}
+		>Deleted! Restore?</button>;
+	} else {
+		return <button
+			className="button is-info"
+			onClick={onClick}
+		>Delete</button>;
+	}
+}
+
 function PreviewCell({ data }: { data: HoldData}) {
 	const [oldDetails, isChanged, newDetails] = useSignalUpdatableValue(data.details);
 
@@ -114,10 +137,10 @@ const Columns: SortableTableColumn<HoldData>[] = [
 	},
 	{
 		id: 'uses',
-		displayName: 'Uses',
+		displayName: 'Uses / Delete',
 		widthPercent: 5,
 
-		render: data => <DataUsesPreviewButton data={data} />,
+		render: data => <DeleteCell data={data} />,
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
 	},
 ];
