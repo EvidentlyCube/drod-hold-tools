@@ -176,8 +176,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 	refs.entranceIds.add(entrance.id);
 
 	if (entrance.dataId.newValue) {
-		// @FIXME handle null data
-		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue)!);
+		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue));
 	}
 
 	writer.tag('Entrances')
@@ -198,8 +197,11 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 	await sleep();
 }
 
-async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
-	if (refs.dataIds.has(data.id)) {
+async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData | undefined) {
+	if (
+		!data
+		|| refs.dataIds.has(data.id)
+	) {
 		return;
 	}
 
@@ -222,16 +224,19 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData) {
 	await sleep();
 }
 
-async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpeech) {
-	if (refs.speechIds.has(speech.id)) {
+async function writeSpeech(writer: XMLWriter, refs: OutputRefs, speech: HoldSpeech | undefined) {
+
+	if (
+		speech === undefined
+		|| refs.speechIds.has(speech.id)
+	) {
 		return;
 	}
 
 	refs.speechIds.add(speech.id);
 
 	if (speech.dataId.newValue) {
-		// @FIXME null data check
-		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId.newValue)!);
+		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId.newValue));
 	}
 
 	writer.tag('Speech')
@@ -271,8 +276,7 @@ async function writeWorldMap(writer: XMLWriter, refs: OutputRefs, worldMap: Hold
 	}
 
 	if (worldMap.dataId.newValue) {
-		// @FIXME - Null Data handler
-		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId.newValue)!)
+		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId.newValue))
 	}
 
 	refs.worldMapIds.add(worldMap.id);
@@ -327,18 +331,16 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 	refs.roomIds.add(room.id);
 
 	if (room.dataId) {
-		// @FIXME - Null Data handler
-		await writeData(writer, refs, room.$hold.datas.get(room.dataId)!)
+		await writeData(writer, refs, room.$hold.datas.get(room.dataId))
 	}
 
 	if (room.overheadDataId) {
-		// @FIXME - Null Data handler
-		await writeData(writer, refs, room.$hold.datas.get(room.overheadDataId)!)
+		await writeData(writer, refs, room.$hold.datas.get(room.overheadDataId))
 	}
 
 	for (const monster of room.monsters) {
 		if (monster.$commandList) {
-			await writeCommandData(writer, refs, monster.$commandList);
+			await writeCommandDataAndSpeech(writer, refs, monster.$commandList);
 		}
 	}
 
@@ -408,7 +410,13 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			writer.attr('ProcessSequence', monster.processSequence);
 		}
 		if (monster.extraVars && monster.extraVars.hasAnyVar()) {
-			writer.attr('ExtraVars', monster.extraVars);
+			if (monster.$commandList && monster.$commandList.wasModified) {
+				const extraVars = monster.extraVars.clone();
+				extraVars.writeByteBuffer('Commands', monster.$commandList.toByteArray());
+				writer.attr('ExtraVars', extraVars);
+			} else {
+				writer.attr('ExtraVars', monster.extraVars);
+			}
 		}
 		if (monster.pieces.length > 0) {
 			writer.nest();
@@ -472,16 +480,14 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 	refs.characterIds.add(character.id);
 
 	if (character.avatarDataId.newValue) {
-		// @FIXME handle null data
-		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId.newValue)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId.newValue))
 	}
 	if (character.tilesDataId.newValue) {
-		// @FIXME handle null data
-		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId.newValue)!)
+		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId.newValue))
 	}
 
 	if (character.$commandList) {
-		await writeCommandData(writer, refs, character.$commandList);
+		await writeCommandDataAndSpeech(writer, refs, character.$commandList);
 	}
 
 	writer.tag('Characters')
@@ -494,12 +500,20 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 	}
 
 	if (character.extraVars) {
-		writer.attr('ExtraVars', character.extraVars);
+		if (character.$commandList && character.$commandList.wasModified) {
+			const extraVars = character.extraVars.clone();
+			extraVars.writeByteBuffer('Commands', character.$commandList.toByteArray());
+			writer.attr('ExtraVars', extraVars);
+
+		} else {
+			writer.attr('ExtraVars', character.extraVars);
+		}
 	}
 
 	if (character.avatarDataId.newValue) {
 		writer.attr('DataID', character.avatarDataId.newValue);
 	}
+
 	if (character.tilesDataId.newValue) {
 		writer.attr('DataIDTiles', character.tilesDataId.newValue);
 	}
@@ -509,11 +523,17 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 	await sleep();
 }
 
-async function writeCommandData(writer: XMLWriter, refs: OutputRefs, commandList: CommandsList) {
+async function writeCommandDataAndSpeech(writer: XMLWriter, refs: OutputRefs, commandList: CommandsList) {
 	for (const command of commandList.commands) {
 		if (command.speechId) {
-			// @FIXME null data
-			await writeSpeech(writer, refs, commandList.hold.speeches.get(command.speechId)!);
+			const speech = commandList.hold.speeches.get(command.speechId);
+
+			if (speech && speech.$isDeleted.newValue) {
+				commandList.wasModified = true;
+				command.overrideSpeechId = 0;
+			} else {
+				await writeSpeech(writer, refs, speech);
+			}
 		}
 
 		const dataId = getCommandDataId(command);

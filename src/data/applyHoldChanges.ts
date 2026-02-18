@@ -105,6 +105,10 @@ export function applyHoldChanges(hold: Hold) {
 				hold.datas.getOrError(change.location.dataId).$isDeleted.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.SpeechDeletion:
+				hold.speeches.getOrError(change.location.speechId).$isDeleted.set(change.hasChange, change.value);
+				break;
+
 			default:
 				shouldBeUnreachable(changeType);
 				break;

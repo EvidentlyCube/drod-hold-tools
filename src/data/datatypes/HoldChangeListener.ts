@@ -8,7 +8,7 @@ import {
 	HoldChangeEntranceShowDescription, HoldChangeHoldPlayer,
 	HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId,
 	HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName,
-	HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechMessage,
+	HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechDeletion, HoldChangeSpeechMessage,
 	HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapDataId,
 	HoldChangeWorldMapName
 } from "./HoldChange";
@@ -53,6 +53,7 @@ export class HoldChangeListener {
 			this.registerSpeechDataIdChange(speech);
 			this.registerSpeechMessageChange(speech);
 			this.registerSpeechMoodChange(speech);
+			this.registerSpeechDeletion(speech);
 		});
 		hold.worldMaps.forEach(worldMap => {
 			this.registerWorldMapDataIdChange(worldMap);
@@ -348,6 +349,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, mood);
+	}
+
+	private registerSpeechDeletion(speech: HoldSpeech) {
+		const { $hold, id, $isDeleted } = speech;
+
+		const change = $hold.$changes.create<HoldChangeSpeechDeletion>({
+			type: HoldChangeType.SpeechDeletion,
+			location: { speechId: id },
+			hasChange: false,
+			value: $isDeleted.newValue
+		});
+
+		registerTextChange($hold, change, $isDeleted);
 	}
 
 	private registerWorldMapDataIdChange(worldMap: HoldWorldMap) {

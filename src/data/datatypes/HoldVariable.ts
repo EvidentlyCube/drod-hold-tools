@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { escapeRegex } from "../../utils/StringUtils";
-import { HoldRef, HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/HoldReference";
+import { HoldRef } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 

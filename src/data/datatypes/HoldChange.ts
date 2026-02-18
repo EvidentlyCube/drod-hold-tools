@@ -26,6 +26,7 @@ export enum HoldChangeType {
 	HoldPlayer = 19,
 	WorldMapDataId = 20,
 	DataDeletion = 21,
+	SpeechDeletion = 22,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -208,6 +209,14 @@ export type HoldChangeDataDeletion = {
 	value: boolean;
 }
 
+export type HoldChangeSpeechDeletion = {
+	type: HoldChangeType.SpeechDeletion,
+	location: { speechId: number };
+
+	hasChange: boolean;
+	value: boolean;
+}
+
 export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeCharacterName
 	| HoldChangeCharacterTilesDataId
@@ -230,6 +239,7 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeWorldMapDataId
 	| HoldChangeWorldMapName
 	| HoldChangeDataDeletion
+	| HoldChangeSpeechDeletion
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

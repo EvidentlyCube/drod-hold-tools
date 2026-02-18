@@ -26,6 +26,16 @@ export class PackedVars {
 		this._vars = [];
 	}
 
+	clone(): PackedVars {
+		const newVars = new PackedVars();
+
+		for (const packedVar of this._vars) {
+			newVars._vars.push(structuredClone(packedVar));
+		}
+
+		return newVars;
+	}
+
 	writeInt(name: string, value: number) {
 		const [isFound, packedVar] = this.getVar(name);
 

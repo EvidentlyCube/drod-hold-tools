@@ -4,6 +4,12 @@ import { HoldRef } from "../data/references/HoldReference";
 import { holdRefToSortableString } from "../data/references/holdRefToSortableString";
 import { escapeFilterToRegex } from "./StringUtils";
 
+export function sortCompareBool(isAsc: boolean, left: boolean, right: boolean) {
+	return isAsc
+		? Number(left) - Number(right)
+		: Number(right) - Number(left);
+}
+
 export function sortCompareString(isAsc: boolean, left: string, right: string) {
 	return isAsc
 		? left.localeCompare(right)
@@ -20,7 +26,7 @@ export function sortCompareStringOptional(isAsc: boolean, left: string | undefin
 		: right.localeCompare(left);
 }
 
-export function sortCompareWithUndefined<T>(isAsc: boolean, left: T|undefined, right: T|undefined) {
+export function sortCompareWithUndefined<T>(isAsc: boolean, left: T | undefined, right: T | undefined) {
 	if (left && right) {
 		return 0;
 

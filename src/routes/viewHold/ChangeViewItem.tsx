@@ -383,6 +383,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			};
 		}
 
+		case HoldChangeType.SpeechDeletion: {
+			const speech = hold.speeches.get(change.location.speechId);
+
+			if (!speech) {
+				return invalid(id, "Speech deletion", "Cannot find speech");
+			}
+
+			return {
+				id,
+				type: 'Speech Deletion',
+				location: { hold, model: HoldRefModel.Speech, speechId: speech.id},
+				before: "-",
+				after: "Deleting speech!"
+			};
+		}
+
 		default:
 			shouldBeUnreachable(changeType);
 			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));

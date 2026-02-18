@@ -1,5 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { HoldRefCharacterCommand, HoldRefMonsterCommand } from "../references/HoldReference";
+import { doesCommandUseSpeech } from "../CommandUtils";
+import { HoldRefCharacterCommand, HoldRefMonsterCommand, resolveReference } from "../references/HoldReference";
 import { getCharacterName, getSpeakerMood, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldData } from "./HoldData";
@@ -22,6 +23,7 @@ export class HoldSpeech {
 	public readonly delay: number;
 	public readonly message: SignalUpdatableValue<string>;
 
+	public readonly $isDeleted: SignalUpdatableValue<boolean>;
 	public $location?: HoldRefCharacterCommand | HoldRefMonsterCommand;
 
 	public get $speaker(): string {
@@ -36,6 +38,18 @@ export class HoldSpeech {
 		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
 	}
 
+	/**
+	 * Check if this speech can be deleted - this is only allowed if it's used
+	 * by a command that does not use speech.
+	 */
+	public get $canDelete(): boolean {
+		if (!this.$location) {
+			return true;
+		}
+
+		return !doesCommandUseSpeech(resolveReference(this.$location).type);
+	}
+
 	public constructor(hold: Hold, opts: SpeechConstructor) {
 		this.$hold = hold;
 
@@ -45,5 +59,7 @@ export class HoldSpeech {
 		this.mood = new SignalUpdatableValue(opts.mood);
 		this.delay = opts.delay
 		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
+
+		this.$isDeleted = new SignalUpdatableValue(false);
 	}
 }

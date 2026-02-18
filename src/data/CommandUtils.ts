@@ -124,7 +124,7 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 		arr.writeBpUint(command.w);
 		arr.writeBpUint(command.h);
 		arr.writeBpUint(command.flags);
-		arr.writeBpUint(command.speechId);
+		arr.writeBpUint(command.overrideSpeechId ?? command.speechId);
 		arr.writeBpUint(command.label.length ? command.label.length * 2 : 0);
 		if (command.label) {
 			arr.writeWChar(command.label);
@@ -133,16 +133,6 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 
 	return buffer;
 }
-/*
-	doesRequireSpeech(command: CharCommand) {
-		return command === CharCommand.CC_Speech
-			|| command === CharCommand.CC_FlashingText
-			|| command === CharCommand.CC_AnswerOption
-			|| command === CharCommand.CC_Question
-			|| command === CharCommand.CC_RoomLocationText;
-	},
-};
-*/
 
 function doesCommandHaveData(type: ScriptCommandType) {
 	switch (type) {
@@ -200,5 +190,104 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 
 		default:
 			return false;
+	}
+}
+
+export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
+	// To be forward compatible we use a blacklist of known commands that don't
+	// use speech to make sure we don't accidentally allow deleting speech
+	// from commands that require it.
+
+	switch (commandType) {
+
+		case ScriptCommandType.CC_ActivateItemAt:
+		case ScriptCommandType.CC_AmbientSound:
+		case ScriptCommandType.CC_AmbientSoundAt:
+		case ScriptCommandType.CC_Appear:
+		case ScriptCommandType.CC_AppearAt:
+		case ScriptCommandType.CC_AttackTile:
+		case ScriptCommandType.CC_Build:
+		case ScriptCommandType.CC_BuildMarker:
+		case ScriptCommandType.CC_ChallengeCompleted:
+		case ScriptCommandType.CC_CutScene:
+		case ScriptCommandType.CC_DestroyTrapdoor:
+		case ScriptCommandType.CC_Disappear:
+		case ScriptCommandType.CC_DisplayFilter:
+		case ScriptCommandType.CC_EndScript:
+		case ScriptCommandType.CC_EndScriptOnExit:
+		case ScriptCommandType.CC_FaceDirection:
+		case ScriptCommandType.CC_FaceTowards:
+		case ScriptCommandType.CC_FlushSpeech:
+		case ScriptCommandType.CC_GameEffect:
+		case ScriptCommandType.CC_GenerateEntity:
+		case ScriptCommandType.CC_GetEntityDirection:
+		case ScriptCommandType.CC_GetNaturalTarget:
+		case ScriptCommandType.CC_GoSub:
+		case ScriptCommandType.CC_GoTo:
+		case ScriptCommandType.CC_GotoIf:
+		case ScriptCommandType.CC_If:
+		case ScriptCommandType.CC_IfElse:
+		case ScriptCommandType.CC_IfElseIf:
+		case ScriptCommandType.CC_IfEnd:
+		case ScriptCommandType.CC_ImageOverlay:
+		case ScriptCommandType.CC_Imperative:
+		case ScriptCommandType.CC_Label:
+		case ScriptCommandType.CC_LevelEntrance:
+		case ScriptCommandType.CC_MoveRel:
+		case ScriptCommandType.CC_MoveTo:
+		case ScriptCommandType.CC_PlayerEquipsWeapon:
+		case ScriptCommandType.CC_PlayVideo:
+		case ScriptCommandType.CC_Return:
+		case ScriptCommandType.CC_SetMusic:
+		case ScriptCommandType.CC_SetNPCAppearance:
+		case ScriptCommandType.CC_SetPlayerAppearance:
+		case ScriptCommandType.CC_SetPlayerStealth:
+		case ScriptCommandType.CC_SetPlayerWeapon:
+		case ScriptCommandType.CC_SetWaterTraversal:
+		case ScriptCommandType.CC_StartGlobalScript:
+		case ScriptCommandType.CC_TeleportPlayerTo:
+		case ScriptCommandType.CC_TeleportTo:
+		case ScriptCommandType.CC_TurnIntoMonster:
+		case ScriptCommandType.CC_VarSet:
+		case ScriptCommandType.CC_Wait:
+		case ScriptCommandType.CC_WaitForCharacter:
+		case ScriptCommandType.CC_WaitForCleanLevel:
+		case ScriptCommandType.CC_WaitForCleanRoom:
+		case ScriptCommandType.CC_WaitForCueEvent:
+		case ScriptCommandType.CC_WaitForDoorTo:
+		case ScriptCommandType.CC_WaitForEntityType:
+		case ScriptCommandType.CC_WaitForHalph:
+		case ScriptCommandType.CC_WaitForItem:
+		case ScriptCommandType.CC_WaitForMonster:
+		case ScriptCommandType.CC_WaitForNoBuilding:
+		case ScriptCommandType.CC_WaitForNotCharacter:
+		case ScriptCommandType.CC_WaitForNotEntityType:
+		case ScriptCommandType.CC_WaitForNotHalph:
+		case ScriptCommandType.CC_WaitForNotMonster:
+		case ScriptCommandType.CC_WaitForNotRect:
+		case ScriptCommandType.CC_WaitForOpenMove:
+		case ScriptCommandType.CC_WaitForPlayerInput:
+		case ScriptCommandType.CC_WaitForPlayerToFace:
+		case ScriptCommandType.CC_WaitForPlayerToMove:
+		case ScriptCommandType.CC_WaitForPlayerToTouchMe:
+		case ScriptCommandType.CC_WaitForRect:
+		case ScriptCommandType.CC_WaitForSomeoneToPushMe:
+		case ScriptCommandType.CC_WaitForTurn:
+		case ScriptCommandType.CC_WaitForVar:
+		case ScriptCommandType.CC_WorldMapIcon:
+		case ScriptCommandType.CC_WorldMapImage:
+		case ScriptCommandType.CC_WorldMapMusic:
+		case ScriptCommandType.CC_WorldMapSelect:
+			return false;
+
+
+		// ScriptCommandType.CC_Speech
+		// ScriptCommandType.CC_FlashingText
+		// ScriptCommandType.CC_AnswerOption
+		// ScriptCommandType.CC_Question
+		// ScriptCommandType.CC_RoomLocationText;
+		// And any new command that gets added
+		default:
+			return true
 	}
 }

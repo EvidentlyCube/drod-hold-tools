@@ -82,6 +82,14 @@ export default function RouteViewHoldSummary() {
 		}
 	}, [hold]);
 
+	const handleDeleteAllUnusedSpeech = useCallback(() => {
+		for (const speech of hold.speeches.values()) {
+			if (speech.$canDelete) {
+				speech.$isDeleted.newValue = true;
+			}
+		}
+	}, [hold]);
+
 	return (
 		<table className="table is-fullwidth is-hoverable is-striped">
 			<tbody>
@@ -97,6 +105,9 @@ export default function RouteViewHoldSummary() {
 						</button>
 						<button className="button ml-3 is-primary" title="Delete all unused data" onClick={handleDeleteAllUnusedData}>
 							Delete all unused Data
+						</button>
+						<button className="button ml-3 is-primary" title="Delete all unusable speeches" onClick={handleDeleteAllUnusedSpeech}>
+							Delete all unusable Speeches
 						</button>
 					</td>
 				</tr>

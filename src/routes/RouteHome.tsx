@@ -89,6 +89,7 @@ export default function RouteHome() {
 							<ul>
 								<li><Feat/>Allow listing variable uses.</li>
 								<li><Feat/>Allow deleting data.</li>
+								<li><Feat/>Allow deleting unused speech.</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.5{" "}<span className="is-muted">(2026-02-10)</span></h5>
 							<ul>

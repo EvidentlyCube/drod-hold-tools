@@ -1,4 +1,6 @@
 import type { Hold } from "../datatypes/Hold";
+import { HoldRoom } from "../datatypes/HoldRoom";
+import { ScriptCommand } from "../datatypes/ScriptCommand";
 
 export enum HoldRefModel {
 	Character = 'character',
@@ -156,4 +158,24 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefRoomOverheadImage
 	| HoldRefScroll
 	| HoldRefSpeech
-	| HoldRefWorldMap
+	| HoldRefWorldMap;
+
+
+export function resolveReference(ref: HoldRefMonsterCommand): ScriptCommand;
+export function resolveReference(ref: HoldRefCharacterCommand): ScriptCommand;
+export function resolveReference(ref: HoldRefMonsterCommand | HoldRefCharacterCommand): ScriptCommand;
+export function resolveReference(ref: HoldRefRoom): HoldRoom;
+export function resolveReference(
+	ref: HoldRefRoom | HoldRefMonsterCommand | HoldRefCharacterCommand
+): ScriptCommand | HoldRoom {
+	const { hold } = ref;
+	switch (ref.model) {
+		case HoldRefModel.MonsterCommand:
+			return hold.rooms.getOrError(ref.roomId).monsters[ref.monsterIndex].$commandList!.commands[ref.commandIndex];
+		case HoldRefModel.CharacterCommand:
+			return hold.characters.getOrError(ref.characterId).$commandList!.commands[ref.commandIndex]!;
+		case HoldRefModel.Room:
+			return hold.rooms.getOrError(ref.roomId);
+	}
+}
+

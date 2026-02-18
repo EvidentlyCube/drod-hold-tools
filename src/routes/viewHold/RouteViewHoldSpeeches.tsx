@@ -12,7 +12,8 @@ import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
+import { filterString, sortCompareBool, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
+import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 
 const MoodOptions: Option[] = [
 	{ id: 0, value: Mood.Normal, label: MoodIdToName.get(Mood.Normal)! },
@@ -23,6 +24,31 @@ const MoodOptions: Option[] = [
 	{ id: 0, value: Mood.Dying, label: MoodIdToName.get(Mood.Dying)! },
 	{ id: 0, value: Mood.Talking, label: MoodIdToName.get(Mood.Talking)! },
 ]
+
+function DeleteCell({ speech }: { speech: HoldSpeech }) {
+	const isDeleted = useSignalUpdatableValue(speech.$isDeleted, true);
+
+	const onClick = () => {
+		speech.$isDeleted.newValue = !speech.$isDeleted.newValue;
+	};
+
+	if (speech.$canDelete) {
+		if (isDeleted) {
+			return <button
+				className="button is-danger"
+				onClick={onClick}
+			>Deleting!</button>;
+		} else {
+			return <button
+				className="button is-info"
+				onClick={onClick}
+			>Delete</button>;
+		}
+
+	} else {
+		return <></>;
+	}
+}
 
 const Columns: SortableTableColumn<HoldSpeech>[] = [
 	{
@@ -42,7 +68,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		widthPercent: 15,
 		canHide: true,
 
-		render: speech => <HoldRefView holdRef={speech.$location} /> ,
+		render: speech => <HoldRefView holdRef={speech.$location} />,
 		sort: (isAsc, l, r) => sortCompareRefs(isAsc, l.$location, r.$location),
 		filter: (speech, filter) => filterString(holdRefToSortableString(speech.$location), filter),
 		filterDebounce: 500,
@@ -92,7 +118,14 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.message.newValue, r.message.newValue),
 		filter: (speech, filter) => filterString(speech.message.newValue, filter),
 		filterDebounce: 500,
-	}
+	},
+	{
+		id: 'delete',
+		displayName: 'Delete',
+		widthPercent: 5,
+		render: speech => <DeleteCell speech={speech} />,
+		sort: (isAsc, l, r) => sortCompareBool(isAsc, l.$isDeleted.newValue, r.$isDeleted.newValue),
+	},
 ];
 
 export default function RouteViewHoldSpeeches() {

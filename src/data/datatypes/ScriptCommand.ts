@@ -10,4 +10,6 @@ export interface ScriptCommand {
 	flags: number;
 	speechId: number;
 	label: string;
+
+	overrideSpeechId?: number;
 }

@@ -8,6 +8,8 @@ export class CommandsList {
 	public readonly hold: Hold;
 	public readonly commands: ReadonlyArray<ScriptCommand>;
 
+	public wasModified: boolean = false;
+
 	private _commandsWithSpeech?: ReadonlyArray<ScriptCommand>;
 	private _commandsWithData?: ReadonlyArray<ScriptCommand>;
 
