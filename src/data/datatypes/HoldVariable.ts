@@ -25,7 +25,7 @@ export class HoldVariable {
 	}
 
 	private get isUsedInFormulaRegexp() {
-		return new RegExp(`\b${escapeRegex(this.name.newValue)}\b`, 'i');
+		return new RegExp(`\\b${escapeRegex(this.name.newValue)}\\b`, 'i');
 	}
 
 	private get isUsedInTextRegexp() {
