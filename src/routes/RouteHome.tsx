@@ -71,9 +71,9 @@ export default function RouteHome() {
 							<h3>Roadmap</h3>
 							<h5 className="is-muted">a.k.a planned features</h5>
 							<ul>
-								<li>Variable list and renaming them</li>
+								<li>Variable renaming</li>
 								<li>&hellip;with optional auto-changing it in all scripts</li>
-								<li>Adding and removing data</li>
+								<li>Adding data</li>
 							</ul>
 						</div>
 					</div>
