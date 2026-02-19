@@ -1,7 +1,6 @@
-import { escapeRegex } from "../utils/StringUtils";
-import { doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
+import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
-import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { ScriptCommandType } from "./DrodEnums";
 import { HoldRefModel } from "./references/HoldReference";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
@@ -120,6 +119,68 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 				model: HoldRefModel.EntranceVoiceOver,
 				entranceId: entrance.id
 			});
+		}
+	}
+}
+
+export function regenerateHoldCharacterUses(hold: Hold, characterId: number) {
+	const regeneratedCharacter = hold.characters.getOrError(characterId);
+
+	regeneratedCharacter.$uses.length = 0;
+
+	for (const speech of hold.speeches.values()) {
+		if (speech.character === characterId) {
+			regeneratedCharacter.$uses.push({
+				hold,
+				model: HoldRefModel.Speech,
+				speechId: speech.id
+			});
+		}
+	}
+
+	for (const character of hold.characters.values()) {
+		if (!character.$commandList) {
+			continue;
+		}
+
+		for (const command of character.$commandList.commands) {
+			if (doesCommandUseCharacter(command, regeneratedCharacter)) {
+				regeneratedCharacter.$uses.push({
+					hold,
+					model: HoldRefModel.CharacterCommand,
+					characterId: character.id,
+					commandIndex: command.index
+				});
+			}
+		}
+	}
+
+	for (const room of hold.rooms.values()) {
+		for (const monster of room.monsters) {
+			if (monster.$characterTypeId === characterId) {
+				regeneratedCharacter.$uses.push({
+					hold,
+					model: HoldRefModel.MonsterCharacterType,
+					roomId: room.id,
+					monsterIndex: monster.$index
+				});
+			}
+
+			if (!monster.$commandList) {
+				continue;
+			}
+
+			for (const command of monster.$commandList.commands) {
+				if (doesCommandUseCharacter(command, regeneratedCharacter)) {
+					regeneratedCharacter.$uses.push({
+						hold,
+						model: HoldRefModel.MonsterCommand,
+						roomId: room.id,
+						monsterIndex: monster.$index,
+						commandIndex: command.index
+					});
+				}
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ import { CommandsList } from "../CommandList";
 import { readCommandsBuffer } from "../CommandUtils";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
+import { HoldRef } from "../references/HoldReference";
 import { getCharacterName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
@@ -27,6 +28,8 @@ export class HoldCharacter {
 	public readonly avatarDataId: SignalUpdatableValue<number | undefined>;
 
 	public readonly $commandList?: CommandsList;
+
+	public readonly $uses: HoldRef[] = [];
 
 	public get $baseTypeName() {
 		return getCharacterName(this.$hold, this.type);

@@ -1,5 +1,6 @@
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 
@@ -193,13 +194,33 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 	}
 }
 
+export function doesCommandUseCharacter(command: ScriptCommand, character: HoldCharacter): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_GenerateEntity:
+		case ScriptCommandType.CC_WorldMapIcon:
+			return command.h === character.id;
+
+		case ScriptCommandType.CC_SetNPCAppearance:
+		case ScriptCommandType.CC_SetPlayerAppearance:
+		case ScriptCommandType.CC_StartGlobalScript:
+		case ScriptCommandType.CC_WaitForEntityType:
+			return command.x === character.id;
+
+		case ScriptCommandType.CC_WaitForEntityType:
+		case ScriptCommandType.CC_WaitForNotEntityType:
+			return command.flags === character.id;
+
+		default:
+			return false;
+	}
+}
+
 export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
 	// To be forward compatible we use a blacklist of known commands that don't
 	// use speech to make sure we don't accidentally allow deleting speech
 	// from commands that require it.
 
 	switch (commandType) {
-
 		case ScriptCommandType.CC_ActivateItemAt:
 		case ScriptCommandType.CC_AmbientSound:
 		case ScriptCommandType.CC_AmbientSoundAt:

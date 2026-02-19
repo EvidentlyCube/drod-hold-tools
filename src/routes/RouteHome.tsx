@@ -85,9 +85,10 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
-							<h5 className="subtitle is-6">v0.1.6{" "}<span className="is-muted">(Unreleased)</span></h5>
+							<h5 className="subtitle is-6">v0.1.6{" "}<span className="is-muted">(2026-02-19)</span></h5>
 							<ul>
 								<li><Feat/>Allow listing variable uses.</li>
+								<li><Feat/>Allow listing character uses.</li>
 								<li><Feat/>Allow deleting data.</li>
 								<li><Feat/>Allow deleting unused speech.</li>
 								<li><Bug/>Fix speaker display in speech to show proper values.</li>

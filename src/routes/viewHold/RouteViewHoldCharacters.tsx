@@ -4,11 +4,12 @@ import { SortableTableColumn } from "../../components/common/sortableTable/Sorta
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { HoldCharacter } from "../../data/datatypes/HoldCharacter";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareString, sortData } from "../../utils/SortUtils";
+import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
 import { DataFormat } from "../../data/DrodEnums";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
+import CharacterUsesPreviewButton from "../../components/viewHold/preview/CharacterUsesPreviewButton";
 
 const Columns: SortableTableColumn<HoldCharacter>[] = [
 	{
@@ -69,7 +70,15 @@ const Columns: SortableTableColumn<HoldCharacter>[] = [
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
 		filter: (character, filter) => filterString(character.name.newValue, filter),
 		filterDebounce: 500,
-	}
+	},
+	{
+		id: 'uses',
+		displayName: 'Uses',
+		widthPercent: 5,
+
+		render: character => <CharacterUsesPreviewButton character={character} />,
+		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
+	},
 ];
 
 export default function RouteViewHoldCharacters() {

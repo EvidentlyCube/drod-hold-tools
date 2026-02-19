@@ -13,6 +13,7 @@ export enum HoldRefModel {
 	Hold = 'hold',
 	HoldEndMessage = 'holdEndMessage',
 	Level = 'level',
+	MonsterCharacterType = 'monsterCharacterType',
 	MonsterCommand = 'monsterCommand',
 	NotApplicable = 'notApplicable',
 	Player = 'player',
@@ -83,6 +84,13 @@ export interface HoldRefLevel {
 	levelId: number;
 }
 
+export interface HoldRefMonsterCharacterType {
+	hold: Hold;
+	model: HoldRefModel.MonsterCharacterType,
+	roomId: number;
+	monsterIndex: number;
+};
+
 export interface HoldRefMonsterCommand {
 	hold: Hold;
 	model: HoldRefModel.MonsterCommand,
@@ -151,6 +159,7 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefHold
 	| HoldRefHoldEndMessage
 	| HoldRefLevel
+	| HoldRefMonsterCharacterType
 	| HoldRefMonsterCommand
 	| HoldRefPlayer
 	| HoldRefRoom

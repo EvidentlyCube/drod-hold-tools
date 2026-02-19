@@ -2,7 +2,7 @@ import { shouldBeUnreachable } from "../../utils/Interfaces";
 import { formatString } from "../../utils/StringUtils";
 import { getCharacterName, getCommandName } from "../Utils";
 import { Hold } from "../datatypes/Hold";
-import { HoldRef, HoldRefCharacterCommand, HoldRefModel, HoldRefMonsterCommand } from "./HoldReference";
+import { HoldRef, HoldRefCharacterCommand, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand } from "./HoldReference";
 
 let cacheClearTimeout: undefined | number;
 const refsCache = new Map<HoldRef, string>();
@@ -44,6 +44,7 @@ function toSortableString(ref?: HoldRef): string {
 		case HoldRefModel.Data: return ref.hold.datas.getOrError(ref.dataId).name.newValue;
 		case HoldRefModel.Entrance: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
 		case HoldRefModel.EntranceVoiceOver: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
+		case HoldRefModel.MonsterCharacterType: return toSortableMonsterCharacterType(ref);
 		case HoldRefModel.MonsterCommand: return toSortableMonsterCommand(ref);
 		case HoldRefModel.Room: return toSortableRoomName(ref.hold, ref.roomId);
 		case HoldRefModel.RoomImage: return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
@@ -109,5 +110,19 @@ function toSortableMonsterCommand(ref: HoldRefMonsterCommand) {
 		monster.x, monster.y,
 		commandIndex,
 		getCommandName(command.type)
+	);
+}
+
+function toSortableMonsterCharacterType(ref: HoldRefMonsterCharacterType) {
+	const { hold, roomId, monsterIndex } = ref;
+
+	const room = hold.rooms.getOrError(roomId);
+	const monster = room.monsters[monsterIndex];
+
+	return formatString(
+		'%, % (%,%)',
+		toSortableRoomName(hold, roomId),
+		getCharacterName(hold, monster.$characterTypeId),
+		monster.x, monster.y
 	);
 }

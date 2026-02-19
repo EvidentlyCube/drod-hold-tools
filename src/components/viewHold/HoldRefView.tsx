@@ -1,6 +1,6 @@
 import { getCharacterName, getCommandName } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
-import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
@@ -31,6 +31,7 @@ export default function HoldRefView({ holdRef }: Props) {
 		case HoldRefModel.HoldEndMessage: return <ViewHoldEndMessage r={holdRef} />;
 		case HoldRefModel.Level: return <ViewLevel hold={holdRef.hold} levelId={holdRef.levelId} />;
 
+		case HoldRefModel.MonsterCharacterType: return <ViewMonsterCharacterType r={holdRef} />;
 		case HoldRefModel.MonsterCommand: return <ViewMonsterCommand r={holdRef} />;
 
 		case HoldRefModel.Player: return <ViewPlayer r={holdRef} />;
@@ -79,7 +80,7 @@ function CharacterCommand({ r }: { r: HoldRefCharacterCommand }) {
 	return <>
 		<ViewCharacter hold={hold} characterId={characterId} />
 		{" "}&rarr;
-		<span className="icon icon-ref" title="Character">
+		<span className="icon icon-ref" title="Command index and type">
 			<i className="fas fa-terminal"></i>
 		</span>
 		{" "}<em title="Command Index and Type">#{commandIndex}::{getCommandName(command.type)}</em>
@@ -140,6 +141,32 @@ function ViewHoldEndMessage({ r }: { r: HoldRefHoldEndMessage }) {
 			<i className="fas fa-house-chimney"></i>
 		</span>
 		{" "}<strong title="Hold end message">Hold end message</strong>
+	</>
+}
+
+function ViewMonsterCharacterType({ r }: { r: HoldRefMonsterCharacterType }) {
+	const { hold, roomId, monsterIndex } = r;
+
+	const room = hold.rooms.getOrError(roomId);
+	const monster = room.monsters[monsterIndex];
+
+	return <>
+		<ViewRoom hold={hold} roomId={roomId} />
+		{" "}&rarr;
+		<span className="icon icon-ref" title="Monster Character">
+			<i className="fas fa-person-walking"></i>
+		</span>
+		{" "}<em title="Name of the Character Type Used">{getCharacterName(hold, monster.$characterTypeId)}</em>
+		{" "}&rarr;
+		<span className="icon icon-ref" title="Position">
+			<i className="fas fa-location-dot"></i>
+		</span>
+		{" "}<em title="Coordinates of the Monster in the Room">({monster.x},{monster.y})</em>
+		{" "}&rarr;
+		<span className="icon icon-ref" title="Character">
+			<i className="fas fa-terminal"></i>
+		</span>
+		{" "}<em title="Command Index and Type">Character type</em>
 	</>
 }
 

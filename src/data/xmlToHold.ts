@@ -2,7 +2,7 @@ import { assertNotNull } from "../utils/Asserts";
 import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { holdToXml } from "./HoldToXml";
-import { regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses } from "./HoldUtils";
+import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses } from "./HoldUtils";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
@@ -356,6 +356,9 @@ function loadDynamicData(hold: Hold) {
 
 	for (const variableId of hold.variables.keys()) {
 		regenerateHoldVariableUses(hold, variableId);
+	}
+	for (const characterId of hold.characters.keys()) {
+		regenerateHoldCharacterUses(hold, characterId);
 	}
 }
 
