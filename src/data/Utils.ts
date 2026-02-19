@@ -2,7 +2,7 @@ import { dir } from "console";
 import type { OptGroup } from "../components/common/Select";
 import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { CommandsList } from "./CommandList";
-import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName, Speaker } from "./DrodEnums";
+import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName, Speaker, SpeakerIdToName } from "./DrodEnums";
 import { TextUtils } from "./TextUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
@@ -101,7 +101,17 @@ export function getCoordinateName(x: number, y: number) {
 export function getCharacterName(hold: Hold, characterId: number): string {
 	return MonsterIdToName.get(characterId)
 		?? hold.characters.get(characterId)?.name.newValue
-		?? `Unknown Character[${characterId}]`;
+		?? `Unknown Character [ID=${characterId}]`;
+}
+
+export function getSpeakerName(hold: Hold, speakerId: number, x: number = 0, y: number = 0): string {
+	if (speakerId === Speaker.Custom) {
+		return `${SpeakerIdToName.get(speakerId)} (${x},${y})`;
+	}
+
+	return SpeakerIdToName.get(speakerId)
+		?? hold.characters.get(speakerId)?.name.newValue
+		?? `Unknown Speaker [ID=${speakerId}]`;
 }
 
 export function getCommandName(type: ScriptCommandType): string {

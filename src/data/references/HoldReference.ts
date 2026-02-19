@@ -161,13 +161,19 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefWorldMap;
 
 
+export function resolveReference(ref: undefined): undefined;
 export function resolveReference(ref: HoldRefMonsterCommand): ScriptCommand;
 export function resolveReference(ref: HoldRefCharacterCommand): ScriptCommand;
 export function resolveReference(ref: HoldRefMonsterCommand | HoldRefCharacterCommand): ScriptCommand;
+export function resolveReference(ref?: HoldRefMonsterCommand | HoldRefCharacterCommand): ScriptCommand | undefined;
 export function resolveReference(ref: HoldRefRoom): HoldRoom;
 export function resolveReference(
-	ref: HoldRefRoom | HoldRefMonsterCommand | HoldRefCharacterCommand
-): ScriptCommand | HoldRoom {
+	ref: HoldRefRoom | HoldRefMonsterCommand | HoldRefCharacterCommand | undefined
+): ScriptCommand | HoldRoom | undefined {
+	if (!ref) {
+		return undefined;
+	}
+
 	const { hold } = ref;
 	switch (ref.model) {
 		case HoldRefModel.MonsterCommand:
