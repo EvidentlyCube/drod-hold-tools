@@ -35,7 +35,7 @@ export function isValidVariableSubsequentCharacter(char: string): boolean {
  * command formulas.
  */
 export function getVariableInFormulaRegexp(variableName: string, globalFlag: boolean = false) {
-	return new RegExp(`\\b${escapeRegex(variableName)}\\b`, `i${globalFlag ? 'g' : ''}`);
+	return new RegExp(`(?<![a-z0-9\\._])${escapeRegex(variableName)}(?![a-z0-9_])`, `i${globalFlag ? 'g' : ''}`);
 }
 
 /**

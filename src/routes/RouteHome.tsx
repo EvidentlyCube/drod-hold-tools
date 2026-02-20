@@ -83,6 +83,14 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
+							<h5 className="subtitle is-6">v0.1.8{" "}<span className="is-muted">(2026-02-20)</span></h5>
+							<ul>
+								<li>
+									<Bug/>Fixed a case where variable use would not be caught if the variable had no
+									spacing around it; which would be also anytime a variable "touched" the start or
+									end of the formula. Nasty, especially for variable rename.
+								</li>
+							</ul>
 							<h5 className="subtitle is-6">v0.1.7{" "}<span className="is-muted">(2026-02-20)</span></h5>
 							<ul>
 								<li><Feat/>Detect and list problems with the hold.</li>
