@@ -1,5 +1,8 @@
 
-export function areObjectsSame(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
-	return Object.keys(left).length === Object.keys(right).length
-		&& Object.keys(left).every(key => left[key] === right[key]);
+export function areObjectsSame<T extends object>(left: T, right: T): boolean {
+	const leftKeys = Object.keys(left) as (keyof T)[];
+	const rightKeys = Object.keys(right);
+
+	return leftKeys.length === rightKeys.length
+		&& leftKeys.every(key => left[key] === right[key]);
 }

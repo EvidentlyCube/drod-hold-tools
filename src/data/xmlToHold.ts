@@ -351,8 +351,8 @@ export async function xmlToHold(
 }
 
 function loadDynamicData(hold: Hold) {
-	regenerateHoldDataUses(hold);
 	regenerateHoldSpeechLocations(hold);
+	regenerateHoldDataUses(hold);
 
 	for (const variableId of hold.variables.keys()) {
 		regenerateHoldVariableUses(hold, variableId);

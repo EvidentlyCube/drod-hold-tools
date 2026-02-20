@@ -85,6 +85,11 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
+							<h5 className="subtitle is-6">v0.1.7{" "}<span className="is-muted">(????-??-??)</span></h5>
+							<ul>
+								<li><Feat/>Detect and list problems with the hold.</li>
+								<li><Bug/>Fix error on import in a few places caused by references to non-existent data.</li>
+							</ul>
 							<h5 className="subtitle is-6">v0.1.6{" "}<span className="is-muted">(2026-02-19)</span></h5>
 							<ul>
 								<li><Feat/>Allow listing variable uses.</li>

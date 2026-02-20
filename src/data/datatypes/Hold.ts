@@ -1,7 +1,7 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { stringToWCharBase64, wcharBase64ToString } from "../Utils";
-import type { HoldRef } from "../references/HoldReference";
+import { areReferencesIdentical, type HoldRef } from "../references/HoldReference";
 import { HoldChangeList } from "./HoldChange";
 import { HoldChangeListener } from "./HoldChangeListener";
 import type { HoldCharacter } from "./HoldCharacter";
@@ -133,6 +133,20 @@ export class Hold {
 
 		this.players.set(id, player);
 		this.$changeListener.registerNewPlayer(player);
+	}
+
+	public registerProblem(newProblem: HoldProblem): void {
+		for (const existingProblem of this.$problems) {
+			// Do not allow duplicate problems to be registered
+			if (
+				areReferencesIdentical(newProblem.ref, existingProblem.ref)
+				&& newProblem.problem === existingProblem.problem
+			) {
+				return;
+			}
+		}
+
+		this.$problems.push(newProblem);
 	}
 
 	private nextAvailablePlayerId() {

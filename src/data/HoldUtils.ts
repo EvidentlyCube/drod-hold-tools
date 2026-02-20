@@ -1,7 +1,7 @@
 import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommandType } from "./DrodEnums";
-import { HoldRefModel } from "./references/HoldReference";
+import { HoldRef, HoldRefModel } from "./references/HoldReference";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
 	return hold.rooms.filterToArray(room => room.levelId === levelId).map(room => room.id);
@@ -14,48 +14,63 @@ export function getMainEntranceId(hold: Hold, levelId: number) {
 }
 
 export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
+	const logMissingData = (dataId: number | undefined, problem: string, ref: HoldRef) => {
+		if (dataId && !hold.datas.has(dataId)) {
+			hold.registerProblem({ problem, ref });
+		}
+	}
 	if (dataId) {
 		hold.datas.getOrError(dataId).$uses.length = 0;
 	} else {
 		hold.datas.forEach(data => data.$uses.length = 0);
 	}
 
-	const isMatch = (inputDataId: number) => !dataId || inputDataId === dataId;
+	const isMatch = (inputDataId: number) => inputDataId === dataId || (dataId && hold.datas.has(dataId));
 
 	for (const worldMap of hold.worldMaps.values()) {
+		const ref: HoldRef = {
+			hold,
+			model: HoldRefModel.WorldMap,
+			worldMapId: worldMap.id
+		};
+
+		logMissingData(worldMap.dataId.newValue, `World map image data points to a data that does not exist.`, ref);
 		if (worldMap.dataId.newValue && isMatch(worldMap.dataId.newValue)) {
-			hold.datas.getOrError(worldMap.dataId.newValue).$uses.push({
-				hold,
-				model: HoldRefModel.WorldMap,
-				worldMapId: worldMap.id
-			});
+			hold.datas.getOrError(worldMap.dataId.newValue).$uses.push(ref);
 		}
 	}
 
 	for (const speech of hold.speeches.values()) {
+		const ref: HoldRef = {
+			hold,
+			model: HoldRefModel.Speech,
+			speechId: speech.id
+		};
+		logMissingData(speech.dataId.newValue, `Speech voice line uses data that does not exist.`, ref);
 		if (speech.dataId.newValue && isMatch(speech.dataId.newValue)) {
-			hold.datas.getOrError(speech.dataId.newValue).$uses.push({
-				hold,
-				model: HoldRefModel.Speech,
-				speechId: speech.id
-			});
+			hold.datas.getOrError(speech.dataId.newValue).$uses.push(ref);
 		}
 	}
 
 	for (const character of hold.characters.values()) {
+		let avatarRef: HoldRef = {
+			hold,
+			model: HoldRefModel.CharacterAvatar,
+			characterId: character.id
+		};
+		logMissingData(character.avatarDataId.newValue, `Character avatar uses data that does not exist.`, avatarRef);
 		if (character.avatarDataId.newValue && isMatch(character.avatarDataId.newValue)) {
-			hold.datas.getOrError(character.avatarDataId.newValue).$uses.push({
-				hold,
-				model: HoldRefModel.CharacterAvatar,
-				characterId: character.id
-			});
+			hold.datas.getOrError(character.avatarDataId.newValue).$uses.push(avatarRef);
 		}
+
+		const tilesRef: HoldRef = {
+			hold,
+			model: HoldRefModel.CharacterTiles,
+			characterId: character.id
+		}
+		logMissingData(character.tilesDataId.newValue, `Character tiles use data that does not exist.`, tilesRef);
 		if (character.tilesDataId.newValue && isMatch(character.tilesDataId.newValue)) {
-			hold.datas.getOrError(character.tilesDataId.newValue).$uses.push({
-				hold,
-				model: HoldRefModel.CharacterTiles,
-				characterId: character.id
-			});
+			hold.datas.getOrError(character.tilesDataId.newValue).$uses.push(tilesRef);
 		}
 
 		if (!character.$commandList) {
@@ -64,32 +79,39 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 
 		for (const command of character.$commandList.$commandsWithData) {
 			const dataId = getCommandDataId(command);
+			const ref: HoldRef = {
+				hold,
+				model: HoldRefModel.CharacterCommand,
+				characterId: character.id,
+				commandIndex: command.index
+			};
+			logMissingData(dataId, `Character command uses data that does not exist.`, ref);
+
 			if (dataId && isMatch(dataId)) {
-				hold.datas.getOrError(dataId).$uses.push({
-					hold,
-					model: HoldRefModel.CharacterCommand,
-					characterId: character.id,
-					commandIndex: command.index
-				});
+				hold.datas.getOrError(dataId).$uses.push(ref);
 			}
 		}
 	}
 
 	for (const room of hold.rooms.values()) {
+		const imageRef: HoldRef = {
+			hold,
+			model: HoldRefModel.RoomImage,
+			roomId: room.id
+		};
+		logMissingData(room.dataId, `Room image uses data that does not exist.`, imageRef);
 		if (room.dataId && isMatch(room.dataId)) {
-			hold.datas.getOrError(room.dataId).$uses.push({
-				hold,
-				model: HoldRefModel.RoomImage,
-				roomId: room.id
-			});
+			hold.datas.getOrError(room.dataId).$uses.push(imageRef);
 		}
 
+		const overheadRef: HoldRef = {
+			hold,
+			model: HoldRefModel.RoomOverheadImage,
+			roomId: room.id
+		};
+		logMissingData(room.dataId, `Room overhead image uses data that does not exist.`, overheadRef);
 		if (room.overheadDataId && isMatch(room.overheadDataId)) {
-			hold.datas.get(room.overheadDataId)?.$uses.push({
-				hold,
-				model: HoldRefModel.RoomOverheadImage,
-				roomId: room.id
-			});
+			hold.datas.getOrError(room.overheadDataId).$uses.push(overheadRef);
 		}
 
 		for (const monster of room.$monstersWithDataCommand) {
@@ -99,26 +121,30 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 
 			for (const command of monster.$commandList.$commandsWithData) {
 				const dataId = getCommandDataId(command);
+				const ref: HoldRef = {
+					hold,
+					model: HoldRefModel.MonsterCommand,
+					roomId: room.id,
+					monsterIndex: monster.$index,
+					commandIndex: command.index
+				};
+				logMissingData(dataId, `Monster command uses data that does not exist.`, ref);
 				if (dataId && isMatch(dataId)) {
-					hold.datas.get(dataId)?.$uses.push({
-						hold,
-						model: HoldRefModel.MonsterCommand,
-						roomId: room.id,
-						monsterIndex: monster.$index,
-						commandIndex: command.index
-					});
+					hold.datas.get(dataId)?.$uses.push(ref);
 				}
 			}
 		}
 	}
 
 	for (const entrance of hold.entrances.values()) {
+		const ref: HoldRef = {
+			hold,
+			model: HoldRefModel.EntranceVoiceOver,
+			entranceId: entrance.id
+		};
+		logMissingData(dataId, `Entrance voice line uses data that does not exist.`, ref);
 		if (entrance.dataId.newValue && isMatch(entrance.dataId.newValue)) {
-			hold.datas.getOrError(entrance.dataId.newValue).$uses.push({
-				hold,
-				model: HoldRefModel.EntranceVoiceOver,
-				entranceId: entrance.id
-			});
+			hold.datas.getOrError(entrance.dataId.newValue).$uses.push(ref);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import { areObjectsSame } from "../../utils/ObjectUtils";
 import type { Hold } from "../datatypes/Hold";
 import { HoldRoom } from "../datatypes/HoldRoom";
 import { ScriptCommand } from "../datatypes/ScriptCommand";
@@ -169,6 +170,9 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefSpeech
 	| HoldRefWorldMap;
 
+export function areReferencesIdentical(left: HoldRef, right: HoldRef) {
+	return areObjectsSame(left, right);
+}
 
 export function resolveReference(ref: undefined): undefined;
 export function resolveReference(ref: HoldRefMonsterCommand): ScriptCommand;

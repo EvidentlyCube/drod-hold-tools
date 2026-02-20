@@ -7,6 +7,7 @@ import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefVie
 import { getCharacterName, getCommandsToString } from "../../data/Utils";
 import { Zippable, zipSync } from 'fflate';
 import { base64ToUint8 } from "../../utils/StringUtils";
+import HoldProblems from "../../components/viewHold/summary/HoldProblems";
 
 type GetData = (hold: Hold) => ReactElement[] | ReactElement | string | number;
 
@@ -110,6 +111,10 @@ export default function RouteViewHoldSummary() {
 							Delete all unusable Speeches
 						</button>
 					</td>
+				</tr>
+				<tr>
+					<th>Problems:</th>
+					<td className="content"><HoldProblems hold={hold} /></td>
 				</tr>
 			</tbody>
 		</table>
