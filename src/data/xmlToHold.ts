@@ -2,7 +2,7 @@ import { assertNotNull } from "../utils/Asserts";
 import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { holdToXml } from "./HoldToXml";
-import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses } from "./HoldUtils";
+import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, scanHoldForIssues } from "./HoldUtils";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
@@ -346,6 +346,8 @@ export async function xmlToHold(
 	loadDynamicData(hold);
 
 	hold.$changeListener.register(hold);
+
+	scanHoldForIssues(hold);
 
 	return hold;
 }

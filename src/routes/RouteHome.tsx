@@ -87,7 +87,11 @@ export default function RouteHome() {
 							<ul>
 								<li><Feat/>Detect and list problems with the hold.</li>
 								<li><Feat/>Variable renaming.</li>
+								<li><Feat/>Scanning hold for known issues.</li>
 								<li><Bug/>Fix error on import in a few places caused by references to non-existent data.</li>
+								<li><Bug/>Fix error which prevented Data usage to be recorded.</li>
+								<li><Bug/>DROD-style newlines (carriage return character) now display properly in changes list.</li>
+								<li><Bug/>Fix variable usage not being properly recognized in text.</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.6{" "}<span className="is-muted">(2026-02-19)</span></h5>
 							<ul>

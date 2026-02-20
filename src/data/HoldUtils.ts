@@ -1,6 +1,7 @@
 import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
+import { CUSTOM_CHARACTER_FIRST, UINT_MINUS_1 } from "./DrodCommonTypes";
 import { Mood, ScriptCommandType, Speaker } from "./DrodEnums";
 import { HoldRef, HoldRefModel } from "./references/HoldReference";
 import { stringToWCharBase64 } from "./Utils";
@@ -15,19 +16,19 @@ export function getMainEntranceId(hold: Hold, levelId: number) {
 	return hold.entrances.find(entrance => entrance.isMainEntrance && roomIds.has(entrance.roomId))?.id;
 }
 
-export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
+export function regenerateHoldDataUses(hold: Hold, filteredByDataId?: number) {
 	const logMissingData = (dataId: number | undefined, problem: string, ref: HoldRef) => {
 		if (dataId && !hold.datas.has(dataId)) {
 			hold.registerProblem({ problem, ref });
 		}
 	}
-	if (dataId) {
-		hold.datas.getOrError(dataId).$uses.length = 0;
+	if (filteredByDataId) {
+		hold.datas.getOrError(filteredByDataId).$uses.length = 0;
 	} else {
 		hold.datas.forEach(data => data.$uses.length = 0);
 	}
 
-	const isMatch = (inputDataId: number) => inputDataId === dataId || (dataId && hold.datas.has(dataId));
+	const isMatch = (inputDataId: number) => inputDataId === filteredByDataId || (inputDataId && hold.datas.has(inputDataId));
 
 	for (const worldMap of hold.worldMaps.values()) {
 		const ref: HoldRef = {
@@ -144,7 +145,7 @@ export function regenerateHoldDataUses(hold: Hold, dataId?: number) {
 			model: HoldRefModel.EntranceVoiceOver,
 			entranceId: entrance.id
 		};
-		logMissingData(dataId, `Entrance voice line uses data that does not exist.`, ref);
+		logMissingData(filteredByDataId, `Entrance voice line uses data that does not exist.`, ref);
 		if (entrance.dataId.newValue && isMatch(entrance.dataId.newValue)) {
 			hold.datas.getOrError(entrance.dataId.newValue).$uses.push(ref);
 		}
@@ -362,4 +363,27 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 			}
 		}
 	}
+}
+
+export function scanHoldForIssues(hold: Hold) {
+	hold.rooms.forEach(room => {
+		for (const monster of room.monsters) {
+			const { $characterTypeId } = monster;
+			if (
+				$characterTypeId !== UINT_MINUS_1
+				&& $characterTypeId >= CUSTOM_CHARACTER_FIRST
+				&& !hold.characters.has($characterTypeId)
+			) {
+				hold.registerProblem({
+					problem: `References character ID ${$characterTypeId} that does not exist.`,
+					ref: {
+						hold,
+						model: HoldRefModel.MonsterCharacterType,
+						roomId: room.id,
+						monsterIndex: monster.$index
+					}
+				});
+			}
+		}
+	});
 }

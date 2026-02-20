@@ -43,7 +43,7 @@ export function getVariableInFormulaRegexp(variableName: string, globalFlag: boo
  * texts (ie. surrounded by dollar signs).
  */
 export function getVariableInTextRegexp(variableName: string, globalFlag: boolean = false) {
-	return new RegExp(`\$${escapeRegex(variableName)}\$`, `i${globalFlag ? 'g' : ''}`);
+	return new RegExp(`${escapeRegex('$' + variableName + '$')}`, `i${globalFlag ? 'g' : ''}`);
 }
 
 export function validateVariableRenaming(hold: Hold, oldName: string, newName: string): string | false {
@@ -61,7 +61,7 @@ export function validateVariableRenaming(hold: Hold, oldName: string, newName: s
 		return "A variable name must start with a digit or a letter (uppercase or lowercase) or a period.";
 
 	} else {
-		for (let i = 0; i < newName.length; i++) {
+		for (let i = 1; i < newName.length; i++) {
 			if (!isValidVariableSubsequentCharacter(newName[i])) {
 				return `Invalid character "${newName[i]}" at position ${i + 1}.`;
 			}

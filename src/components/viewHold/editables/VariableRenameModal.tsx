@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useMemo, useState } from "react";
 import { HoldVariable } from "../../../data/datatypes/HoldVariable";
 import { validateVariableRenaming } from "../../../data/VariableUtils";
 
@@ -14,6 +14,13 @@ export default function VariableRenameModal(props: Props) {
 	const error = useMemo(() => {
 		return validateVariableRenaming(variable.hold, variable.name.newValue, newName)
 	}, [newName, variable.hold, variable.name.newValue]);
+
+	const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setNewName(e.target.value), [setNewName]);
+	const handleKeyDown = useCallback((e: KeyboardEvent) => {
+		if (!error && e.key === 'Enter' && !e.altKey && !e.shiftKey && !e.ctrlKey) {
+			onRename(newName);
+		}
+	}, [newName, onRename, error]);
 
 	return (
 		<div className="modal is-active">
@@ -32,11 +39,13 @@ export default function VariableRenameModal(props: Props) {
 						<label className="label">New Variable Name</label>
 						<div className="control is-inline-block">
 							<input
+								autoFocus={true}
 								className="input is-medium has-text-centered"
 								type="text"
 								placeholder="Enter new variable name"
 								value={newName}
-								onChange={e => setNewName(e.target.value)}
+								onKeyDown={handleKeyDown}
+								onChange={handleChange}
 							/>
 						</div>
 					</div>

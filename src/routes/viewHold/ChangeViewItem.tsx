@@ -422,8 +422,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					characterId: change.location.characterId,
 					commandIndex: change.location.commandIndex
 				},
-				before: command.label.oldValue,
-				after: command.label.newValue
+				before: command.label.oldValue.rDrodFix(),
+				after: command.label.newValue.rDrodFix()
 			};
 		}
 
@@ -456,8 +456,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					monsterIndex: change.location.monsterIndex,
 					commandIndex: change.location.commandIndex
 				},
-				before: command.label.oldValue,
-				after: command.label.newValue
+				before: command.label.oldValue.rDrodFix(),
+				after: command.label.newValue.rDrodFix()
 			};
 		}
 

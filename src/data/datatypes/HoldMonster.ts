@@ -36,7 +36,7 @@ export class HoldMonster {
 	public readonly $commandList?: CommandsList;
 
 	/**
-	 * ID of the selected character typ if this is a character, 0 otherwise
+	 * ID of the selected character typ if this is a character, (UINT)-1 otherwise
 	 */
 	public get $characterTypeId(): number {
 		return this.extraVars?.readUint('id', UINT_MINUS_1) ?? UINT_MINUS_1;
