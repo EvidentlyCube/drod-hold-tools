@@ -45,6 +45,7 @@ export default function HoldRefView({ holdRef }: Props) {
 
 		case HoldRefModel.NotApplicable: return <span className="is-muted">Not Applicable</span>
 		case HoldRefModel.WorldMap: return <ViewWorldMap hold={holdRef.hold} worldMapId={holdRef.worldMapId} />
+		case HoldRefModel.Variable: return <ViewVariable hold={holdRef.hold} variableId={holdRef.variableId} />
 
 
 		default:
@@ -315,9 +316,20 @@ function ViewWorldMap({ hold, worldMapId }: { hold: Hold, worldMapId: number }) 
 	const worldMap = hold.worldMaps.getOrError(worldMapId);
 
 	return <>
-		<span className="icon icon-ref" title="Entrance">
+		<span className="icon icon-ref" title="World Map">
 			<i className="fas fa-map"></i>
 		</span>
 		{" "}<strong title="World Map Name">{worldMap.name.newValue}</strong>
+	</>
+}
+
+function ViewVariable({ hold, variableId }: { hold: Hold, variableId: number }) {
+	const variable = hold.variables.getOrError(variableId);
+
+	return <>
+		<span className="icon icon-ref" title="Variable">
+			<i className="fas fa-xmark"></i>
+		</span>
+		{" "}<strong title="Variable Name">{variable.name.newValue}</strong>
 	</>
 }

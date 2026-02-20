@@ -27,6 +27,9 @@ export enum HoldChangeType {
 	WorldMapDataId = 20,
 	DataDeletion = 21,
 	SpeechDeletion = 22,
+	CharacterCommandLabel = 23,
+	MonsterCommandLabel = 24,
+	VariableName = 25,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -51,6 +54,22 @@ export type HoldChangeCharacterTilesDataId = {
 
 	hasChange: boolean;
 	value?: number;
+}
+
+export type HoldChangeCharacterCommandLabel = {
+	type: HoldChangeType.CharacterCommandLabel,
+	location: { characterId: number, commandIndex: number };
+
+	hasChange: boolean;
+	value: string;
+}
+
+export type HoldChangeMonsterCommandLabel = {
+	type: HoldChangeType.MonsterCommandLabel,
+	location: { roomId: number, monsterIndex: number, commandIndex: number };
+
+	hasChange: boolean;
+	value: string;
 }
 
 export type HoldChangeDataName = {
@@ -217,11 +236,21 @@ export type HoldChangeSpeechDeletion = {
 	value: boolean;
 }
 
+export type HoldChangeVariableName = {
+	type: HoldChangeType.VariableName,
+	location: { variableId: number };
+
+	hasChange: boolean;
+	value: string;
+}
+
 export type HoldChange = HoldChangeCharacterAvatarDataId
+	| HoldChangeCharacterCommandLabel
 	| HoldChangeCharacterName
 	| HoldChangeCharacterTilesDataId
-	| HoldChangeDataName
+	| HoldChangeDataDeletion
 	| HoldChangeDataFile
+	| HoldChangeDataName
 	| HoldChangeEntranceDataId
 	| HoldChangeEntranceDescription
 	| HoldChangeEntranceShowDescription
@@ -229,17 +258,18 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeLevelCreated
 	| HoldChangeLevelName
 	| HoldChangeLevelPlayerId
+	| HoldChangeMonsterCommandLabel
 	| HoldChangePlayerDeletion
 	| HoldChangePlayerInsertion
 	| HoldChangePlayerName
 	| HoldChangeScrollMessage
 	| HoldChangeSpeechDataId
+	| HoldChangeSpeechDeletion
 	| HoldChangeSpeechMessage
 	| HoldChangeSpeechMood
 	| HoldChangeWorldMapDataId
 	| HoldChangeWorldMapName
-	| HoldChangeDataDeletion
-	| HoldChangeSpeechDeletion
+	| HoldChangeVariableName;
 
 function match(left: HoldChange, right: HoldChange) {
 	return left.type === right.type && areObjectsSame(left.location, right.location);

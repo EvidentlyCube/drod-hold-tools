@@ -377,7 +377,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Data Deletion',
-				location: { hold, model: HoldRefModel.Data, dataId: data.id},
+				location: { hold, model: HoldRefModel.Data, dataId: data.id },
 				before: "-",
 				after: "Deleting data!"
 			};
@@ -393,9 +393,90 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			return {
 				id,
 				type: 'Speech Deletion',
-				location: { hold, model: HoldRefModel.Speech, speechId: speech.id},
+				location: { hold, model: HoldRefModel.Speech, speechId: speech.id },
 				before: "-",
 				after: "Deleting speech!"
+			};
+		}
+
+		case HoldChangeType.CharacterCommandLabel: {
+			const character = hold.characters.get(change.location.characterId);
+
+			if (!character) {
+				return invalid(id, "Character Command Label", "Cannot find character");
+			} else if (!character.$commandList) {
+				return invalid(id, "Character Command Label", "Character has no commands");
+			}
+
+			const command = character.$commandList.commands[change.location.commandIndex];
+			if (!command) {
+				return invalid(id, "Character Command Label", "Command not found");
+			}
+
+			return {
+				id,
+				type: 'Character Command Label',
+				location: {
+					hold,
+					model: HoldRefModel.CharacterCommand,
+					characterId: change.location.characterId,
+					commandIndex: change.location.commandIndex
+				},
+				before: command.label.oldValue,
+				after: command.label.newValue
+			};
+		}
+
+		case HoldChangeType.MonsterCommandLabel: {
+			const room = hold.rooms.get(change.location.roomId);
+
+			if (!room) {
+				return invalid(id, "Monster Command Label", "Cannot find monster's room");
+			}
+
+			const monster = room.monsters[change.location.monsterIndex];
+			if (!monster) {
+				return invalid(id, "Monster Command Label", "Monster not found in the room");
+			} else if (!monster.$commandList) {
+				return invalid(id, "Monster Command Label", "Monster has no commands");
+			}
+
+			const command = monster.$commandList.commands[change.location.commandIndex];
+			if (!command) {
+				return invalid(id, "Monster Command Label", "Command not found");
+			}
+
+			return {
+				id,
+				type: 'Monster Command Label',
+				location: {
+					hold,
+					model: HoldRefModel.MonsterCommand,
+					roomId: change.location.roomId,
+					monsterIndex: change.location.monsterIndex,
+					commandIndex: change.location.commandIndex
+				},
+				before: command.label.oldValue,
+				after: command.label.newValue
+			};
+		}
+
+		case HoldChangeType.VariableName: {
+			const { variableId } = change.location;
+			const variable = hold.variables.get(variableId);
+
+			if (!variable) {
+				return invalid(id, "Variable Name", "Cannot find variable");
+			}
+
+			return {
+				id,
+				type: 'Variable Name',
+				location: {
+					model: HoldRefModel.Variable, hold, variableId,
+				},
+				before: variable.name.oldValue,
+				after: variable.name.newValue
 			};
 		}
 

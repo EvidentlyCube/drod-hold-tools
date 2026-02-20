@@ -56,7 +56,8 @@ function toSortableString(ref?: HoldRef): string {
 		case HoldRefModel.NotApplicable: return "Not Applicable";
 		case HoldRefModel.Player: return toSortablePlayerName(ref.hold, ref.playerId);
 		case HoldRefModel.Speech: return toSortableSpeech(ref.hold, ref.speechId);
-		case HoldRefModel.WorldMap: return "";
+		case HoldRefModel.WorldMap: return `World Map: ${ref.hold.worldMaps.get(ref.worldMapId)?.name.newValue ?? "<INVALID WORLD MAP ID>"}`;
+		case HoldRefModel.Variable: return `Variable: ${ref.hold.variables.get(ref.variableId)?.name.newValue ?? "<INVALID VARIABLE ID>"}`;
 
 		default:
 			shouldBeUnreachable(model);

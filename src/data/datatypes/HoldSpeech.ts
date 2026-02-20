@@ -1,7 +1,7 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { doesCommandUseSpeech } from "../CommandUtils";
 import { HoldRefCharacterCommand, HoldRefMonsterCommand, resolveReference } from "../references/HoldReference";
-import { getCharacterName, getSpeakerMood, getSpeakerName, wcharBase64ToString } from "../Utils";
+import { getSpeakerMood, getSpeakerName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldData } from "./HoldData";
 

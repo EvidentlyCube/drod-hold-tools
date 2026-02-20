@@ -132,6 +132,16 @@ export class HoldRoom {
 		return getCoordinateName(x, y);
 	}
 
+	public getScroll(ref: {x: number, y: number}): HoldScroll | undefined;
+	public getScroll(x: number, y: number): HoldScroll | undefined;
+	public getScroll(refOrX: {x: number, y: number} | number, y?: number): HoldScroll | undefined {
+		if (typeof refOrX !== "number") {
+			return this.getScroll(refOrX.x, refOrX.y);
+		}
+
+		return this.scrolls.find(scroll => scroll.x === refOrX && scroll.y === y);
+	}
+
 	public constructor(hold: Hold, opts: RoomConstructor) {
 		this.$hold = hold;
 

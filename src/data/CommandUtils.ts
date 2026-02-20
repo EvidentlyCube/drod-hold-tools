@@ -1,6 +1,8 @@
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { isValidVariableFirstCharacter, isValidVariableSubsequentCharacter } from "./VariableUtils";
+import { Hold } from "./datatypes/Hold";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
@@ -131,7 +133,7 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 		arr.writeBpUint(command.h);
 		arr.writeBpUint(command.flags);
 		arr.writeBpUint(command.speechId.newValue);
-		arr.writeBpUint(command.label.newValue.length * 2 );
+		arr.writeBpUint(command.label.newValue.length * 2);
 		if (command.label.newValue) {
 			arr.writeWChar(command.label.newValue);
 		}
@@ -172,6 +174,43 @@ export function getCommandDataId(command: ScriptCommand): number {
 	}
 
 	return command.w;
+}
+
+/**
+ * @returns True if the command stores text in `label` that can be expanded
+ * by variables.
+ */
+export function doesCommandStoreExpandableTextInLabel(command: ScriptCommand): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_VarSet:
+			return command.y === ScriptVarOperators.AppendText || command.y === ScriptVarOperators.AssignText;
+
+		case ScriptCommandType.CC_WaitForVar:
+			return command.y === ScriptVarComparators.EqualsText;
+
+		case ScriptCommandType.CC_ImageOverlay:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * @returns True if the command stores a mathematical formula in `label` that
+ * can be use variables.
+ */
+export function doesCommandStoreFormulaInLabel(command: ScriptCommand): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_VarSet:
+			return command.y !== ScriptVarOperators.AppendText && command.y !== ScriptVarOperators.AssignText;
+
+		case ScriptCommandType.CC_WaitForVar:
+			return command.y !== ScriptVarComparators.EqualsText;
+
+		default:
+			return false;
+	}
 }
 
 export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVariable): boolean {

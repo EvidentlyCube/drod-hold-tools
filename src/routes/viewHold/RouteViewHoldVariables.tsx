@@ -5,6 +5,8 @@ import { HoldVariable } from "../../data/datatypes/HoldVariable";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
 import VariableUsesPreviewButton from "../../components/viewHold/preview/VariableUsesPreviewButton";
+import VariableRenameButton from "../../components/viewHold/editables/VariableRenameButton";
+import DrodTextView from "../../components/viewHold/DrodTextView";
 
 const Columns: SortableTableColumn<HoldVariable>[] = [
 	{
@@ -22,7 +24,7 @@ const Columns: SortableTableColumn<HoldVariable>[] = [
 		id: 'name',
 		displayName: 'Name',
 		widthPercent: 30,
-		render: variable => variable.name.newValue,
+		render: variable => <DrodTextView text={variable.name}/>,
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
 		filter: (variable, filter) => filterString(variable.name.newValue, filter),
 		filterDebounce: 500,
@@ -34,6 +36,13 @@ const Columns: SortableTableColumn<HoldVariable>[] = [
 
 		render: variable => <VariableUsesPreviewButton variable={variable} />,
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$uses.length, r.$uses.length),
+	},
+	{
+		id: 'rename',
+		displayName: 'Rename',
+		widthPercent: 5,
+
+		render: variable => <VariableRenameButton variable={variable} />,
 	},
 ];
 

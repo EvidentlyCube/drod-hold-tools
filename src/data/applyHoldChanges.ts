@@ -109,6 +109,26 @@ export function applyHoldChanges(hold: Hold) {
 				hold.speeches.getOrError(change.location.speechId).$isDeleted.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.CharacterCommandLabel:
+				hold.characters.getOrError(change.location.characterId)
+					.$commandList!
+					.commands[change.location.commandIndex].label
+					.set(change.hasChange, change.value);
+				break;
+
+
+			case HoldChangeType.MonsterCommandLabel:
+				hold.rooms.getOrError(change.location.roomId)
+					.monsters[change.location.monsterIndex]
+					.$commandList!
+					.commands[change.location.commandIndex].label
+					.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.VariableName:
+				hold.variables.getOrError(change.location.variableId).name.set(change.hasChange, change.value);
+				break;
+
 			default:
 				shouldBeUnreachable(changeType);
 				break;

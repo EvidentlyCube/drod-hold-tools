@@ -71,8 +71,6 @@ export default function RouteHome() {
 							<h3>Roadmap</h3>
 							<h5 className="is-muted">a.k.a planned features</h5>
 							<ul>
-								<li>Variable renaming</li>
-								<li>&hellip;with optional auto-changing it in all scripts</li>
 								<li>Adding data</li>
 							</ul>
 						</div>
@@ -88,6 +86,7 @@ export default function RouteHome() {
 							<h5 className="subtitle is-6">v0.1.7{" "}<span className="is-muted">(????-??-??)</span></h5>
 							<ul>
 								<li><Feat/>Detect and list problems with the hold.</li>
+								<li><Feat/>Variable renaming.</li>
 								<li><Bug/>Fix error on import in a few places caused by references to non-existent data.</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.6{" "}<span className="is-muted">(2026-02-19)</span></h5>

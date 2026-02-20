@@ -2,34 +2,47 @@ import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import { Hold } from "./Hold";
 import {
-	HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterName,
+	HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterCommandLabel, HoldChangeCharacterName,
 	HoldChangeCharacterTilesDataId, HoldChangeDataDeletion, HoldChangeDataFile, HoldChangeDataName,
 	HoldChangeEntranceDataId, HoldChangeEntranceDescription,
 	HoldChangeEntranceShowDescription, HoldChangeHoldPlayer,
 	HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId,
+	HoldChangeMonsterCommandLabel,
 	HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName,
 	HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechDeletion, HoldChangeSpeechMessage,
-	HoldChangeSpeechMood, HoldChangeType, HoldChangeWorldMapDataId,
+	HoldChangeSpeechMood, HoldChangeType, HoldChangeVariableName, HoldChangeWorldMapDataId,
 	HoldChangeWorldMapName
 } from "./HoldChange";
 import { HoldCharacter } from "./HoldCharacter";
 import { HoldData } from "./HoldData";
 import { HoldEntrance } from "./HoldEntrance";
 import { HoldLevel } from "./HoldLevel";
+import { HoldMonster } from "./HoldMonster";
 import { HoldPlayer } from "./HoldPlayer";
 import { HoldScroll } from "./HoldRoom";
 import { HoldSpeech } from "./HoldSpeech";
+import { HoldVariable } from "./HoldVariable";
 import { HoldWorldMap } from "./HoldWorldMap";
 
 export class HoldChangeListener {
 	public register(hold: Hold) {
 		this.registerHoldPlayerChange(hold);
 
+		hold.variables.forEach(variable => {
+			this.registerVariableNameChange(variable);
+		})
+
 		hold.characters.forEach(character => {
 			this.registerCharacterAvatarDataIdChange(character);
 			this.registerCharacterNameChange(character);
 			this.registerCharacterTilesDataIdChange(character);
+			this.registerCharacterCommandLabelChange(character);
 		});
+		hold.rooms.forEach(room => {
+			for (const monster of room.monsters) {
+				this.registerMonsterCommandLabelChange(monster);
+			}
+		})
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
 			this.registerDataFileChange(data);
@@ -73,7 +86,7 @@ export class HoldChangeListener {
 	private registerHoldPlayerChange(hold: Hold) {
 		const change = hold.$changes.create<HoldChangeHoldPlayer>({
 			type: HoldChangeType.HoldPlayer,
-			location: { },
+			location: {},
 			hasChange: false,
 			value: hold.playerId.newValue
 		});
@@ -93,6 +106,19 @@ export class HoldChangeListener {
 		});
 
 		registerTextChange($hold, change, avatarDataId);
+	}
+
+	private registerVariableNameChange(variable: HoldVariable) {
+		const { hold, id, name } = variable;
+
+		const change = hold.$changes.create<HoldChangeVariableName>({
+			type: HoldChangeType.VariableName,
+			location: { variableId: id },
+			hasChange: false,
+			value: name.newValue
+		});
+
+		registerTextChange(hold, change, name);
 	}
 
 	private registerCharacterNameChange(character: HoldCharacter) {
@@ -120,6 +146,47 @@ export class HoldChangeListener {
 
 		registerTextChange($hold, change, tilesDataId);
 		registerDataChange($hold, tilesDataId);
+	}
+
+	private registerCharacterCommandLabelChange(character: HoldCharacter) {
+		if (!character.$commandList) {
+			return;
+		}
+
+		for (const command of character.$commandList.commands) {
+			const { label, index } = command;
+			const { $hold, id } = character;
+
+			const change = $hold.$changes.create<HoldChangeCharacterCommandLabel>({
+				type: HoldChangeType.CharacterCommandLabel,
+				location: { characterId: id, commandIndex: index },
+				hasChange: false,
+				value: label.newValue
+			});
+
+			registerTextChange($hold, change, label);
+		}
+	}
+
+	private registerMonsterCommandLabelChange(monster: HoldMonster) {
+		if (!monster.$commandList) {
+			return;
+		}
+
+		for (const command of monster.$commandList.commands) {
+			const { label } = command;
+			const { $room } = monster;
+			const { $hold } = $room;
+
+			const change = $hold.$changes.create<HoldChangeMonsterCommandLabel>({
+				type: HoldChangeType.MonsterCommandLabel,
+				location: { roomId: $room.id, monsterIndex: monster.$index, commandIndex: command.index },
+				hasChange: false,
+				value: label.newValue
+			});
+
+			registerTextChange($hold, change, label);
+		}
 	}
 
 	private registerDataNameChange(data: HoldData) {
@@ -269,7 +336,7 @@ export class HoldChangeListener {
 			}
 		});
 
-		name.onChange.add(({value}) => {
+		name.onChange.add(({ value }) => {
 			change.value.name = value;
 			$hold.$changes.add(change);
 		});

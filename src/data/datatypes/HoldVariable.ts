@@ -1,8 +1,16 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { escapeRegex } from "../../utils/StringUtils";
-import { HoldRef } from "../references/HoldReference";
+import { HoldRefCharacterCommand, HoldRefEntrance, HoldRefHoldEndMessage, HoldRefMonsterCommand, HoldRefScroll, HoldRefSpeech } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
+import { getVariableInFormulaRegexp, getVariableInTextRegexp } from "../VariableUtils";
 import type { Hold } from "./Hold";
+
+type HoldVariableUseRef = HoldRefCharacterCommand
+	| HoldRefEntrance
+	| HoldRefHoldEndMessage
+	| HoldRefMonsterCommand
+	| HoldRefScroll
+	| HoldRefSpeech;
 
 interface VariableConstructor {
 	id: number;
@@ -14,22 +22,14 @@ export class HoldVariable {
 	public readonly id: number;
 	public readonly name: SignalUpdatableValue<string>;
 
-	public readonly $uses: HoldRef[] = [];
+	public readonly $uses: HoldVariableUseRef[] = [];
 
 	public isUsedInFormula(formula: string) {
-		return this.isUsedInFormulaRegexp.test(formula);
+		return getVariableInFormulaRegexp(this.name.newValue).test(formula);
 	}
 
 	public isUsedInText(text: string) {
-		return this.isUsedInTextRegexp.test(text);
-	}
-
-	private get isUsedInFormulaRegexp() {
-		return new RegExp(`\\b${escapeRegex(this.name.newValue)}\\b`, 'i');
-	}
-
-	private get isUsedInTextRegexp() {
-		return new RegExp(`\$${escapeRegex(this.name.newValue)}\$`, 'i');
+		return getVariableInTextRegexp(this.name.newValue).test(text);
 	}
 
 	public constructor(hold: Hold, opts: VariableConstructor) {
