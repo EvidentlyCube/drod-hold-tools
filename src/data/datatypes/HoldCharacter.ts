@@ -58,4 +58,10 @@ export class HoldCharacter {
 			this.$commandList = new CommandsList(hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
 		}
 	}
+
+	public repackCommandsIntoExtraVars() {
+		if (this.$commandList && this.extraVars) {
+			this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
+		}
+	}
 }

@@ -35,7 +35,7 @@ export class CommandsList {
 
 	public get $commandsWithSpeech() {
 		if (!this._commandsWithSpeech) {
-			this._commandsWithSpeech = this.commands.filter(command => command.speechId);
+			this._commandsWithSpeech = this.commands.filter(command => command.speechId.newValue);
 		}
 
 		return this._commandsWithSpeech;

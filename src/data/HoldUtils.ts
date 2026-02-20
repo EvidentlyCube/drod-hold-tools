@@ -1,7 +1,9 @@
 import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
-import { ScriptCommandType } from "./DrodEnums";
+import { HoldSpeech } from "./datatypes/HoldSpeech";
+import { Mood, ScriptCommandType, Speaker } from "./DrodEnums";
 import { HoldRef, HoldRefModel } from "./references/HoldReference";
+import { stringToWCharBase64 } from "./Utils";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
 	return hold.rooms.filterToArray(room => room.levelId === levelId).map(room => room.id);
@@ -225,10 +227,11 @@ export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
 		for (const command of character.$commandList.commands) {
 			const { speechId, index } = command;
 
-			if (variable.isUsedInText(hold.speeches.get(speechId)?.message.newValue ?? "")) {
+			if (variable.isUsedInText(hold.speeches.get(speechId.newValue)?.message.newValue ?? "")) {
 				variable.$uses.push({
 					model: HoldRefModel.Speech,
-					hold, speechId
+					speechId: speechId.newValue,
+					hold
 				});
 			}
 
@@ -270,10 +273,11 @@ export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
 			for (const command of monster.$commandList.commands) {
 				const { speechId, index } = command;
 
-				if (variable.isUsedInText(hold.speeches.get(speechId)?.message.newValue ?? "")) {
+				if (variable.isUsedInText(hold.speeches.get(speechId.newValue)?.message.newValue ?? "")) {
 					variable.$uses.push({
 						model: HoldRefModel.Speech,
-						hold, speechId
+						speechId: speechId.newValue,
+						hold
 					});
 				}
 
@@ -302,7 +306,6 @@ export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
 export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?: number) {
 	const isMatch = (inputSpeechId: number) => !speechIdToRegenerate || inputSpeechId === speechIdToRegenerate;
 
-
 	for (const character of hold.characters.values()) {
 		if (!character.$commandList) {
 			continue;
@@ -310,8 +313,8 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 
 		for (const command of character.$commandList.$commandsWithSpeech) {
 			const { speechId, index } = command;
-			if (speechId && isMatch(speechId)) {
-				hold.speeches.getOrError(speechId).$location = {
+			if (speechId.newValue && isMatch(speechId.newValue)) {
+				hold.speeches.getOrError(speechId.newValue).$location = {
 					hold,
 					model: HoldRefModel.CharacterCommand,
 					characterId: character.id,
@@ -329,26 +332,31 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 
 			for (const command of monster.$commandList.$commandsWithSpeech) {
 				const { speechId, index } = command;
-				if (speechId && isMatch(speechId)) {
+				const ref: HoldRef = {
+					hold,
+					model: HoldRefModel.MonsterCommand,
+					roomId: room.id,
+					monsterIndex: monster.$index,
+					commandIndex: index
+				};
+
+				if (speechId.newValue && isMatch(speechId.newValue)) {
 					try {
-						hold.speeches.getOrError(speechId).$location = {
-							hold,
-							model: HoldRefModel.MonsterCommand,
-							roomId: room.id,
-							monsterIndex: monster.$index,
-							commandIndex: index
-						}
+						hold.speeches.getOrError(speechId.newValue).$location = ref;
 					} catch (e: unknown) {
-						console.log(`Removed invalid speech command (ID=${speechId}) in '${room.$level.name.newValue}' ${room.$coordsName} from character at (${monster.x}, ${monster.y}), command #${command.index}`);
-						command.type = ScriptCommandType.CC_MoveTo;
-						command.x = -99;
-						command.y = -99;
-						command.w = 0;
-						command.h = 0;
-						command.flags = 0;
-						command.speechId = 0;
-						command.label = '';
-						monster.repackCommandsIntoExtraVars();
+						hold.registerProblem({
+							problem: "Speech referenced by the command did not exist. A new, empty one was created",
+							ref,
+						});
+
+						const speech = new HoldSpeech(hold, {
+							id: speechId.newValue,
+							character: Speaker.None,
+							delay: 0,
+							encMessage: stringToWCharBase64(""),
+							mood: Mood.Normal,
+						});
+						hold.speeches.set(speechId.newValue, speech);
 					}
 				}
 			}

@@ -1,3 +1,4 @@
+import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
@@ -108,7 +109,11 @@ export function readCommandsBuffer(buffer: number[]) {
 		const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
 
 		const index = commands.length;
-		commands.push({ index, type, x, y, w, h, flags, speechId, label });
+		commands.push({
+			index, type, x, y, w, h, flags,
+			speechId: new SignalUpdatableValue(speechId),
+			label: new SignalUpdatableValue(label)
+		});
 	}
 
 	return commands;
@@ -125,10 +130,10 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 		arr.writeBpUint(command.w);
 		arr.writeBpUint(command.h);
 		arr.writeBpUint(command.flags);
-		arr.writeBpUint(command.overrideSpeechId ?? command.speechId);
-		arr.writeBpUint(command.label.length ? command.label.length * 2 : 0);
-		if (command.label) {
-			arr.writeWChar(command.label);
+		arr.writeBpUint(command.speechId.newValue);
+		arr.writeBpUint(command.label.newValue.length * 2 );
+		if (command.label.newValue) {
+			arr.writeWChar(command.label.newValue);
 		}
 	}
 
@@ -173,21 +178,21 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 	switch (command.type) {
 		case ScriptCommandType.CC_VarSet:
 			return command.x === variable.id
-				|| (command.y === ScriptVarOperators.AppendText && variable.isUsedInText(command.label))
-				|| (command.y === ScriptVarOperators.AssignText && variable.isUsedInText(command.label))
+				|| (command.y === ScriptVarOperators.AppendText && variable.isUsedInText(command.label.newValue))
+				|| (command.y === ScriptVarOperators.AssignText && variable.isUsedInText(command.label.newValue))
 				|| (
 					command.y !== ScriptVarOperators.AssignText
 					&& command.y !== ScriptVarOperators.AppendText
-					&& variable.isUsedInFormula(command.label)
+					&& variable.isUsedInFormula(command.label.newValue)
 				);
 
 		case ScriptCommandType.CC_WaitForVar:
 			return command.x === variable.id
-				|| (command.y === ScriptVarComparators.EqualsText && variable.isUsedInText(command.label))
-				|| (command.y !== ScriptVarComparators.EqualsText && variable.isUsedInFormula(command.label));
+				|| (command.y === ScriptVarComparators.EqualsText && variable.isUsedInText(command.label.newValue))
+				|| (command.y !== ScriptVarComparators.EqualsText && variable.isUsedInFormula(command.label.newValue));
 
 		case ScriptCommandType.CC_ImageOverlay:
-			return variable.isUsedInText(command.label);
+			return variable.isUsedInText(command.label.newValue);
 
 		default:
 			return false;

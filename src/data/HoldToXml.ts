@@ -410,13 +410,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom) {
 			writer.attr('ProcessSequence', monster.processSequence);
 		}
 		if (monster.extraVars && monster.extraVars.hasAnyVar()) {
-			if (monster.$commandList && monster.$commandList.wasModified) {
-				const extraVars = monster.extraVars.clone();
-				extraVars.writeByteBuffer('Commands', monster.$commandList.toByteArray());
-				writer.attr('ExtraVars', extraVars);
-			} else {
-				writer.attr('ExtraVars', monster.extraVars);
-			}
+			monster.repackCommandsIntoExtraVars();
+			writer.attr('ExtraVars', monster.extraVars);
 		}
 		if (monster.pieces.length > 0) {
 			writer.nest();
@@ -500,14 +495,8 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 	}
 
 	if (character.extraVars) {
-		if (character.$commandList && character.$commandList.wasModified) {
-			const extraVars = character.extraVars.clone();
-			extraVars.writeByteBuffer('Commands', character.$commandList.toByteArray());
-			writer.attr('ExtraVars', extraVars);
-
-		} else {
-			writer.attr('ExtraVars', character.extraVars);
-		}
+		character.repackCommandsIntoExtraVars();
+		writer.attr('ExtraVars', character.extraVars);
 	}
 
 	if (character.avatarDataId.newValue) {
@@ -525,12 +514,12 @@ async function writeCharacter(writer: XMLWriter, refs: OutputRefs, character: Ho
 
 async function writeCommandDataAndSpeech(writer: XMLWriter, refs: OutputRefs, commandList: CommandsList) {
 	for (const command of commandList.commands) {
-		if (command.speechId) {
-			const speech = commandList.hold.speeches.get(command.speechId);
+		if (command.speechId.newValue) {
+			const speech = commandList.hold.speeches.get(command.speechId.newValue);
 
 			if (speech && speech.$isDeleted.newValue) {
 				commandList.wasModified = true;
-				command.overrideSpeechId = 0;
+				command.speechId.newValue = 0;
 			} else {
 				await writeSpeech(writer, refs, speech);
 			}

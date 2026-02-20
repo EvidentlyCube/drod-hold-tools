@@ -153,8 +153,8 @@ export class TextUtils {
 			'Set var ',
 			`"${context.hold.variables.get(c.x)?.name.newValue ?? '?'}" `,
 			`${TextUtils.scriptVarOp(c.y)} `,
-			c.label,
-			c.label ? '' : c.w.toString()
+			c.label.newValue,
+			c.label.newValue ? '' : c.w.toString()
 		])
 	}
 
@@ -163,14 +163,14 @@ export class TextUtils {
 			'Wait until var ',
 			`"${context.hold.variables.get(c.x)?.name.newValue ?? '?'}" `,
 			`${TextUtils.scriptVarComp(c.y)} `,
-			c.label,
-			c.label ? '' : c.w.toString()
+			c.label.newValue,
+			c.label.newValue ? '' : c.w.toString()
 		])
 	}
 
 	public static music(c: ScriptCommand) {
-		return c.label.length > 0
-			? `0,${c.y},${c.label}`
+		return c.label.newValue.length > 0
+			? `0,${c.y},${c.label.newValue}`
 			: `${TextUtils.xy(c)}`
 	}
 }

@@ -164,8 +164,8 @@ export function getCommandsToString(list: CommandsList | undefined): string {
 }
 
 export function getCommandToString(c: ScriptCommand, context: CommandsList): string {
-	const speech = context.hold.speeches.get(c.speechId);
-	const label = context.getCommandWithLabel(c.x);
+	const speech = context.hold.speeches.get(c.speechId.newValue);
+	const labelCommand = context.getCommandWithLabel(c.x);
 	const {
 		appearanceMonster,
 		appearancePlayer,
@@ -201,13 +201,13 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_ActivateItemAt: return `Active item at ${xy(c)}`;
 		case ScriptCommandType.CC_AmbientSound: return `Ambient sound ${wh(c)}`;
 		case ScriptCommandType.CC_AmbientSoundAt: return `Ambient sound at ${xy(c)},${wh(c)}`;
-		case ScriptCommandType.CC_AnswerOption: return `Answer option "${speech?.message.newValue ?? '?'}",${label?.label ?? '?'}`;
+		case ScriptCommandType.CC_AnswerOption: return `Answer option "${speech?.message.newValue ?? '?'}",${labelCommand?.label.newValue ?? '?'}`;
 		case ScriptCommandType.CC_Appear: return "Appear";
 		case ScriptCommandType.CC_AppearAt: return `Appear at ${xy(c)}`;
 		case ScriptCommandType.CC_AttackTile: return `Attack tile ${xy(c)},${attack(c.flags)}`;
 		case ScriptCommandType.CC_Build: return `Build ${tile(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_BuildMarker: return `Build Marker ${tile(c.flags)},${xywh(c)}`;
-		case ScriptCommandType.CC_ChallengeCompleted: return `Challenge completed ${c.label}`;
+		case ScriptCommandType.CC_ChallengeCompleted: return `Challenge completed ${c.label.newValue}`;
 		case ScriptCommandType.CC_CutScene: return `Cut scene ${c.x}`;
 		case ScriptCommandType.CC_DestroyTrapdoor: return `Destroy Trapdoor ${xywh(c)}`;
 		case ScriptCommandType.CC_Disappear: return `Disappear`;
@@ -229,15 +229,15 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_GenerateEntity: return `Generate entity ${entity(c.h)},${xy(c)},${dir(c.w)}`;
 		case ScriptCommandType.CC_GetEntityDirection: return `Get entity direction ${xy(c)}`;
 		case ScriptCommandType.CC_GetNaturalTarget: return `Get natural target ${natTarget(c.x)}`;
-		case ScriptCommandType.CC_GoSub: return `GoSub ${label?.label ?? '?'}`;
-		case ScriptCommandType.CC_GoTo: return `Go to ${label?.label ?? '?'}`;
+		case ScriptCommandType.CC_GoSub: return `GoSub ${labelCommand?.label.newValue ?? '?'}`;
+		case ScriptCommandType.CC_GoTo: return `Go to ${labelCommand?.label.newValue ?? '?'}`;
 		case ScriptCommandType.CC_If: return `If ...`;
 		case ScriptCommandType.CC_IfElse: return `Else`;
 		case ScriptCommandType.CC_IfElseIf: return `Else If`;
 		case ScriptCommandType.CC_IfEnd: return `If End`;
-		case ScriptCommandType.CC_ImageOverlay: return `Image overlay ${c.w},${stripNewline(c.label)}`;
+		case ScriptCommandType.CC_ImageOverlay: return `Image overlay ${c.w},${stripNewline(c.label.newValue)}`;
 		case ScriptCommandType.CC_Imperative: return `Imperative ${c.x}`;
-		case ScriptCommandType.CC_Label: return `${c.label}`;
+		case ScriptCommandType.CC_Label: return `${c.label.newValue}`;
 		case ScriptCommandType.CC_LevelEntrance: return `Level entrance ${xy(c)}`;
 		case ScriptCommandType.CC_MoveRel: return join(['Move ', !c.flags ? `${xy(c)},` : '', wh(c)]);
 		case ScriptCommandType.CC_MoveTo: return join(['Move to', waitFlags(c.flags), !c.flags ? `${xy(c)},` : '', wh(c)]);

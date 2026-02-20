@@ -1,3 +1,4 @@
+import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { ScriptCommandType } from "../DrodEnums";
 
 export interface ScriptCommand {
@@ -8,8 +9,6 @@ export interface ScriptCommand {
 	w: number;
 	h: number;
 	flags: number;
-	speechId: number;
-	label: string;
-
-	overrideSpeechId?: number;
+	speechId: SignalUpdatableValue<number>;
+	label: SignalUpdatableValue<string>;
 }
