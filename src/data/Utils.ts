@@ -2,11 +2,13 @@ import { dir } from "console";
 import type { OptGroup } from "../components/common/Select";
 import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { CommandsList } from "./CommandList";
-import { DataFormat, DataFormatToName, MonsterIdToName, MoodIdToName, ScriptCommandType, ScriptCommandTypeToName, Speaker, SpeakerIdToName } from "./DrodEnums";
 import { TextUtils } from "./TextUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
+import { DataFormatToName, MonsterIdToName, MoodToName, ScriptCommandTypeToName, SpeakerToName } from "./DrodEnumToName";
+import { DataFormat, ScriptCommandType, Speaker } from "./DrodEnums";
+import { shouldBeUnreachable } from "../utils/Interfaces";
 
 export function isGzippedNonDecodedHold(holdBinaryData: Uint8Array) {
 	return holdBinaryData[0] === 0x1F && holdBinaryData[1] == 0x8B;
@@ -51,7 +53,7 @@ export function stringToUint8(str: string) {
 }
 
 export function downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
-	const blob = new Blob([data], {
+	const blob = new Blob([data as any], {
 		type: mimeType
 	});
 
@@ -106,10 +108,10 @@ export function getCharacterName(hold: Hold, characterId: number): string {
 
 export function getSpeakerName(hold: Hold, speakerId: number, x: number = 0, y: number = 0): string {
 	if (speakerId === Speaker.Custom) {
-		return `${SpeakerIdToName.get(speakerId)} (${x},${y})`;
+		return `${SpeakerToName.get(speakerId)} (${x},${y})`;
 	}
 
-	return SpeakerIdToName.get(speakerId)
+	return SpeakerToName.get(speakerId)
 		?? hold.characters.get(speakerId)?.name.newValue
 		?? `Unknown Speaker [ID=${speakerId}]`;
 }
@@ -171,6 +173,7 @@ export function getCommandsToString(list: CommandsList | undefined, baseIndent: 
 export function getCommandToString(c: ScriptCommand, context: CommandsList): string {
 	const speech = context.hold.speeches.get(c.speechId.newValue);
 	const labelCommand = context.getCommandWithLabel(c.x);
+	const { hold } = context;
 	const {
 		appearanceMonster,
 		appearancePlayer,
@@ -195,14 +198,11 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		weapon,
 		wh,
 		worldMapIcon,
-		worldMapImageFlag,
 		xy,
 		xywh,
 	} = TextUtils;
 
 	switch (c.type) {
-		case ScriptCommandType._CC_Missing: return "[MISSING COMMAND]";
-		case ScriptCommandType._CC_Invalid: return "[INVALID COMMAND]";
 		case ScriptCommandType.CC_ActivateItemAt: return `Active item at ${xy(c)}`;
 		case ScriptCommandType.CC_AmbientSound: return `Ambient sound ${wh(c)}`;
 		case ScriptCommandType.CC_AmbientSoundAt: return `Ambient sound at ${xy(c)},${wh(c)}`;
@@ -231,7 +231,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		]);
 		case ScriptCommandType.CC_FlushSpeech: return `Flush speech ${onOff(c.x)}`;
 		case ScriptCommandType.CC_GameEffect: return `Game effect ${dir(c.w)},${effect(c.h)},${xy(c)},${onOff(c.flags)}`;
-		case ScriptCommandType.CC_GenerateEntity: return `Generate entity ${entity(c.h)},${xy(c)},${dir(c.w)}`;
+		case ScriptCommandType.CC_GenerateEntity: return `Generate entity ${entity(c.h, hold)},${xy(c)},${dir(c.w)}`;
 		case ScriptCommandType.CC_GetEntityDirection: return `Get entity direction ${xy(c)}`;
 		case ScriptCommandType.CC_GetNaturalTarget: return `Get natural target ${natTarget(c.x)}`;
 		case ScriptCommandType.CC_GoSub: return `GoSub ${labelCommand?.label.newValue ?? '?'}`;
@@ -252,8 +252,8 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_Return: return `Return`;
 		case ScriptCommandType.CC_RoomLocationText: return `Room location text "${speech?.message.newValue ?? '?'}"`;
 		case ScriptCommandType.CC_SetMusic: return `Set music ${music(c)}`;
-		case ScriptCommandType.CC_SetNPCAppearance: return `Set appearance ${appearanceMonster(c.x)}`;
-		case ScriptCommandType.CC_SetPlayerAppearance: return `Set player appearance ${appearancePlayer(c.x)}`;
+		case ScriptCommandType.CC_SetNPCAppearance: return `Set appearance ${appearanceMonster(c.x, hold)}`;
+		case ScriptCommandType.CC_SetPlayerAppearance: return `Set player appearance ${appearancePlayer(c.x, hold)}`;
 		case ScriptCommandType.CC_SetPlayerStealth: return `Set player stealth ${stealth(c.x)}`;
 		case ScriptCommandType.CC_SetPlayerWeapon: return `Set player weapon ${weapon(c.x)}`;
 		case ScriptCommandType.CC_SetWaterTraversal: return `Set water traversal ${waterTraversal(c.x)}`;
@@ -277,10 +277,10 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_WaitForCleanRoom: return `Wait for clean room`;
 		case ScriptCommandType.CC_WaitForCueEvent: return `Wait for event ${event(c.x)}`;
 		case ScriptCommandType.CC_WaitForDoorTo: return `Wait for door to ${openClose(c.w)},${xy(c)}`;
-		case ScriptCommandType.CC_WaitForEntityType: return `Wait for entity type ${appearanceMonster(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForEntityType: return `Wait for entity type ${appearanceMonster(c.flags, hold)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForItem: return `Wait for item ${tile(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForNoBuilding: return `Wait for no building marker ${xywh(c)}`;
-		case ScriptCommandType.CC_WaitForNotEntityType: return `Wait while entity type ${appearanceMonster(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNotEntityType: return `Wait while entity type ${appearanceMonster(c.flags, hold)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForNotRect: return `Wait while entity ${waitFlags(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForOpenMove: return `Wait for open move ${dir(c.x)}`;
 		case ScriptCommandType.CC_WaitForPlayerInput: return `Wait for player input ${input(c.x)}`;
@@ -291,8 +291,8 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_WaitForSomeoneToPushMe: return `Wait for someone to push me`;
 		case ScriptCommandType.CC_WaitForTurn: return `Wait for turn ${c.x}`;
 		case ScriptCommandType.CC_WaitForVar: return TextUtils.waitForVar(c, context);
-		case ScriptCommandType.CC_WorldMapIcon: return `World map icon ${appearanceMonster(c.h)},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
-		case ScriptCommandType.CC_WorldMapImage: return `World map image ${c.h},${worldMapImageFlag(c.flags)},${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_WorldMapIcon: return `World map icon ${appearanceMonster(c.h, hold)},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_WorldMapImage: return `World map image ${c.h},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
 		case ScriptCommandType.CC_WorldMapMusic: return `World map music ${music(c)}`;
 		case ScriptCommandType.CC_WorldMapSelect: return `World map select ${c.x}`;
 
@@ -303,6 +303,9 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_WaitForNotCharacter: return `[DEPRECATED - CC_WaitForNotCharacter]`;
 		case ScriptCommandType.CC_WaitForNotHalph: return `[DEPRECATED - CC_WaitForNotHalph]`;
 		case ScriptCommandType.CC_WaitForNotMonster: return `[DEPRECATED - CC_WaitForNotMonster]`;
+		default:
+			shouldBeUnreachable(c.type);
+			return "";
 	}
 }
 
@@ -321,7 +324,7 @@ export function getShowDescriptionName(type: number): string {
 }
 
 export function getSpeakerMood(mood: number): string {
-	return MoodIdToName.get(mood) ?? 'Unknown';
+	return MoodToName.get(mood) ?? 'Unknown';
 }
 
 export function filterDataFormat(format: DataFormat | undefined, filter: string): boolean {
@@ -414,3 +417,4 @@ export function isAudioFormat(format: DataFormat) {
 		|| format === DataFormat.OGG
 		|| format === DataFormat.WAV;
 }
+

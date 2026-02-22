@@ -4,9 +4,9 @@ import { Hold } from "../../data/datatypes/Hold";
 import { HoldRef, HoldRefModel } from "../../data/references/HoldReference";
 import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
 import { formatBytes } from "../../utils/Language";
-import { MoodIdToName } from "../../data/DrodEnums";
 import { DataRefViewById } from "../../components/viewHold/DataRefView";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
+import { MoodToName } from "../../data/DrodEnumToName";
 
 export interface ChangeViewItem {
 	id: string;
@@ -330,8 +330,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				id,
 				type: 'Speech Mood',
 				location: speech.$location,
-				before: MoodIdToName.get(speech.mood.oldValue) ?? `Invalid mood ${speech.mood.oldValue}`,
-				after: MoodIdToName.get(speech.mood.newValue) ?? `Invalid mood ${speech.mood.newValue}`,
+				before: MoodToName.get(speech.mood.oldValue) ?? `Invalid mood ${speech.mood.oldValue}`,
+				after: MoodToName.get(speech.mood.newValue) ?? `Invalid mood ${speech.mood.newValue}`,
 			};
 		}
 

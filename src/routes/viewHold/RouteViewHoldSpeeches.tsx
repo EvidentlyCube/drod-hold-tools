@@ -7,22 +7,23 @@ import HoldRefView from "../../components/viewHold/HoldRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
-import { DataFormat, Mood, MoodIdToName } from "../../data/DrodEnums";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareBool, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
+import { DataFormat, Mood } from "../../data/DrodEnums";
+import { MoodToName } from "../../data/DrodEnumToName";
 
 const MoodOptions: Option[] = [
-	{ id: 0, value: Mood.Normal, label: MoodIdToName.get(Mood.Normal)! },
-	{ id: 0, value: Mood.Aggressive, label: MoodIdToName.get(Mood.Aggressive)! },
-	{ id: 0, value: Mood.Nervous, label: MoodIdToName.get(Mood.Nervous)! },
-	{ id: 0, value: Mood.Strike, label: MoodIdToName.get(Mood.Strike)! },
-	{ id: 0, value: Mood.Happy, label: MoodIdToName.get(Mood.Happy)! },
-	{ id: 0, value: Mood.Dying, label: MoodIdToName.get(Mood.Dying)! },
-	{ id: 0, value: Mood.Talking, label: MoodIdToName.get(Mood.Talking)! },
+	{ id: 0, value: Mood.Normal, label: MoodToName.get(Mood.Normal)! },
+	{ id: 0, value: Mood.Aggressive, label: MoodToName.get(Mood.Aggressive)! },
+	{ id: 0, value: Mood.Nervous, label: MoodToName.get(Mood.Nervous)! },
+	{ id: 0, value: Mood.Strike, label: MoodToName.get(Mood.Strike)! },
+	{ id: 0, value: Mood.Happy, label: MoodToName.get(Mood.Happy)! },
+	{ id: 0, value: Mood.Dying, label: MoodToName.get(Mood.Dying)! },
+	{ id: 0, value: Mood.Talking, label: MoodToName.get(Mood.Talking)! },
 ]
 
 function DeleteCell({ speech }: { speech: HoldSpeech }) {

@@ -1,74 +1,104 @@
 import { CommandsList } from "./CommandList";
+import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
-import { AttackTileFlag, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { AttackTileType, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, MonsterIdToName, NaturalTargetTypeToName, OrbAgentTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
 
-export class TextUtils {
-	public static appearancePlayer(id: number): string {
-		return `[@TODO:APPEARANCE_PLAYER:${id}]`;
+function bitMask(bitField: number, callback: (id: number) => string): string[] {
+	const results: string[] = [];
+	let bitMask = 1;
+	for (let bit = 0; bit < 32; ++bit, bitMask *= 2) {
+		if ((bitField & bitMask) == bitMask) {
+			results.push(callback(bitMask));
+		}
 	}
 
-	public static appearanceMonster(id: number): string {
-		return `[@TODO:APPEARANCE_MONSTER:${id}]`;
+	return results;
+}
+
+export class TextUtils {
+	public static appearancePlayer(id: number, hold: Hold): string {
+		return TextUtils.entity(id, hold);
+	}
+
+	public static appearanceMonster(id: number, hold: Hold): string {
+		return TextUtils.entity(id, hold);
 	}
 
 	public static tile(id: number): string {
-		return `[@TODO:TILE:${id}]`;
+		return TileTypeToName.get(id)
+			?? `UnknownTileType_${id}`;
 	}
 
-	public static entity(id: number): string {
-		return `[@TODO:ENTITY:${id}]`;
+	public static entity(id: number, hold: Hold): string {
+		return MonsterIdToName.get(id)
+			?? hold.characters.get(id)?.name.newValue
+			?? `UnknownEntity_${id}`;
 	}
 
 	public static displayFilter(id: number): string {
-		return `[@TODO:DISPLAY_FILTER:${id}]`;
+		return ScreenFilterToName.get(id)
+			?? `UnknownScreenFilter_${id}`;
 	}
 
 	public static dir(id: number): string {
-		return `[@TODO:DIRECTION:${id}]`;
+		return OrientationToName.get(id)
+			?? `UnknownDirection_${id}`;
 	}
 
 	public static effect(id: number): string {
-		return `[@TODO:EFFECT:${id}]`;
+		return GameEffectTypeToName.get(id)
+			?? `UnknownGameEffect_${id}`;
 	}
 
 	public static wait(id: number): string {
-		return `[@TODO:WAIT_FLAG:${id}]`;
+		return WaitForFlagToName.get(id)
+			?? `UnknownWaitForTarget_${id}`;
 	}
 
 	public static natTarget(id: number): string {
-		return `[@TODO:NATURAL_TARGET:${id}]`;
+		return NaturalTargetTypeToName.get(id)
+			?? `UnknownNaturalTargetType_${id}`;
 	}
 
 	public static openClose(id: number): string {
-		return `[@TODO:OPEN_CLOSE:${id}]`;
+		if (id === OrbAgentType.Open) {
+			return "Open";
+		} else if (id === OrbAgentType.Close) {
+			return "Close";
+		} else {
+			return `UnknownOpenCloseFlag_${id}`;
+		}
 	}
 
 	public static stealth(id: number): string {
-		return `[@TODO:STEALTH:${id}]`;
+		return StealthTypeToName.get(id)
+			?? `UnknownStealthType_${id}`;
 	}
 
 	public static waterTraversal(id: number): string {
-		return `[@TODO:wATER_TRAVERSAL:${id}]`;
+		return WaterTraversalToName.get(id)
+			?? `UnknownWaterTraversalType_${id}`;
 	}
 
 	public static weapon(id: number): string {
-		return `[@TODO:WEAPON:${id}]`;
+		return WeaponTypeToName.get(id)
+			?? `UnknownWeaponType_${id}`;
 	}
 
 	public static event(id: number): string {
-		return `[@TODO:EVENT:${id}]`;
+		return CueEventTypeToName.get(id)
+			?? `UnknownCueEvent_${id}`;
 	}
 
 	public static input(id: number): string {
-		return `[@TODO:INPUT:${id}]`;
+		return CommandInputToName.get(id)
+			?? `UnknownCommandInput_${id}`;
 	}
 
 	public static worldMapIcon(id: number): string {
-		return `[@TODO:WORLD_MAP_ICON:${id}]`;
-	}
-
-	public static worldMapImageFlag(id: number): string {
-		return `[@TODO:WORLD_MAP_IMAGE_FLAG:${id}]`;
+		return WorldMapIconToName.get(id)
+			?? `UnknownWorldMapIcon_${id}`;
 	}
 
 	public static stripNewline(text: string): string {
@@ -80,25 +110,12 @@ export class TextUtils {
 	}
 
 	public static waitFlags(id: number): string {
-		const result: string[] = [];
-		let bitMask = 1;
-		for (let bit = 0; bit < 32; ++bit, bitMask *= 2) {
-			if ((id & bitMask) == bitMask) {
-				result.push(TextUtils.wait(bitMask));
-			}
-		}
-
-		return result.join("");
+		return bitMask(id, TextUtils.wait).join(" ");
 	}
 
-	public static attack(id: AttackTileFlag): string {
-		switch (id) {
-			case AttackTileFlag.AT_Stab: return 'Stab';
-			case AttackTileFlag.AT_Explode: return 'Explode';
-			case AttackTileFlag.AT_Damage: return 'Damage';
-			case AttackTileFlag.AT_Kill: return 'Kill';
-			default: return '[UNKNOWN]';
-		}
+	public static attack(id: AttackTileType): string {
+		return AttackTileTypeToName.get(id)
+			?? `UnknownAttackTileType_${id}`;
 	}
 
 	public static xy(command: ScriptCommand): string {
@@ -120,6 +137,13 @@ export class TextUtils {
 	public static hex(value: number): string {
 		return value.toString(16).padStart(2, '0');
 	}
+
+	public static variable(id: number, hold: Hold) {
+		return PredefinedVariableToName.get(id)
+			?? hold.variables.get(id)?.name.newValue
+			?? `UnknownVariable_${id}`;
+	}
+
 
 	public static scriptVarOp(op: ScriptVarOperators): string {
 		switch (op) {
@@ -151,7 +175,7 @@ export class TextUtils {
 	public static varSet(c: ScriptCommand, context: CommandsList) {
 		return TextUtils.join([
 			'Set var ',
-			`"${context.hold.variables.get(c.x)?.name.newValue ?? '?'}" `,
+			`"${TextUtils.variable(c.x, context.hold)}" `,
 			`${TextUtils.scriptVarOp(c.y)} `,
 			c.label.newValue,
 			c.label.newValue ? '' : c.w.toString()
@@ -161,7 +185,7 @@ export class TextUtils {
 	public static waitForVar(c: ScriptCommand, context: CommandsList) {
 		return TextUtils.join([
 			'Wait until var ',
-			`"${context.hold.variables.get(c.x)?.name.newValue ?? '?'}" `,
+			`"${TextUtils.variable(c.x, context.hold)}" `,
 			`${TextUtils.scriptVarComp(c.y)} `,
 			c.label.newValue,
 			c.label.newValue ? '' : c.w.toString()

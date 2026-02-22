@@ -86,6 +86,14 @@ export default function RouteHome() {
 							<h5 className="subtitle is-6">v0.1.8{" "}<span className="is-muted">(2026-02-20)</span></h5>
 							<ul>
 								<li>
+									<Feat />Added indents for script export to improve readability, especially
+									in editors that automatically support sticky headers based on indentation.
+								</li>
+								<li><Feat />Added missing enumerations for script export.</li>
+							</ul>
+							<h5 className="subtitle is-6">v0.1.8{" "}<span className="is-muted">(2026-02-20)</span></h5>
+							<ul>
+								<li>
 									<Bug/>Fixed a case where variable use would not be caught if the variable had no
 									spacing around it; which would be also anytime a variable "touched" the start or
 									end of the formula. Nasty, especially for variable rename.
