@@ -119,13 +119,14 @@ export function getCommandName(type: ScriptCommandType): string {
 		?? `Unknown Command[${type}]`;
 }
 
-export function getCommandsToString(list: CommandsList | undefined): string {
+export function getCommandsToString(list: CommandsList | undefined, baseIndent: number = 0): string {
 	if (!list) {
 		return "";
 	}
 
 	const lines: string[] = [];
-	let indent = 0;
+	const indent = "    ";
+	let indentLevel = baseIndent;
 	let wasIf = false;
 
 	for (const command of list.commands) {
@@ -134,16 +135,20 @@ export function getCommandsToString(list: CommandsList | undefined): string {
 			|| command.type == ScriptCommandType.CC_IfElseIf
 			|| command.type == ScriptCommandType.CC_IfEnd
 		) {
-			indent = Math.max(indent - 1, 0);
+			indentLevel = Math.max(indentLevel - 1, baseIndent);
 		}
 
 		if (command.type === ScriptCommandType.CC_Label) {
-			lines.push(getCommandToString(command, list));
+			lines.push(
+				indent.repeat(baseIndent)
+				+ getCommandToString(command, list)
+				+ ":"
+			);
 
 		} else {
 			lines.push(
 				"  "
-				+ "    ".repeat(indent + (wasIf ? 1 : 0))
+				+ indent.repeat(indentLevel + (wasIf ? 1 : 0))
 				+ getCommandToString(command, list)
 			);
 		}
@@ -156,7 +161,7 @@ export function getCommandsToString(list: CommandsList | undefined): string {
 			|| command.type == ScriptCommandType.CC_IfElseIf
 			|| command.type == ScriptCommandType.CC_IfElse
 		) {
-			indent++;
+			indentLevel++;
 		}
 	}
 

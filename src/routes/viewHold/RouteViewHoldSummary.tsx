@@ -30,7 +30,7 @@ export default function RouteViewHoldSummary() {
 	const handleDownloadScripts = useCallback(() => {
 		const blobs: string[] = [];
 		for (const c of hold.characters.values()) {
-			blobs.push(`Custom Character ${c.name.newValue}:\n${getCommandsToString(c.$commandList)}`);
+			blobs.push(`Custom Character ${c.name.newValue}:\n${getCommandsToString(c.$commandList, 1)}`);
 		}
 		for (const room of hold.rooms.values()) {
 			for (const monster of room.monsters) {
@@ -39,7 +39,7 @@ export default function RouteViewHoldSummary() {
 						`${room.$level.name.newValue}: ${room.$coordsName}`
 						+ ` at (${monster.x}, ${monster.y})`
 						+ ` of ${getCharacterName(hold, monster.$characterTypeId)}`
-						+ `\n${getCommandsToString(monster.$commandList)}`
+						+ `\n${getCommandsToString(monster.$commandList, 1)}`
 					);
 				}
 			}
