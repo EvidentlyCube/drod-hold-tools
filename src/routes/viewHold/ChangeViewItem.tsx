@@ -7,6 +7,7 @@ import { formatBytes } from "../../utils/Language";
 import { DataRefViewById } from "../../components/viewHold/DataRefView";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 import { MoodToName } from "../../data/DrodEnumToName";
+import { fixCarriageReturnForDisplay } from "../../utils/StringUtils";
 
 export interface ChangeViewItem {
 	id: string;
@@ -422,8 +423,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					characterId: change.location.characterId,
 					commandIndex: change.location.commandIndex
 				},
-				before: command.label.oldValue.rDrodFix(),
-				after: command.label.newValue.rDrodFix()
+				before: fixCarriageReturnForDisplay(command.label.oldValue),
+				after: fixCarriageReturnForDisplay(command.label.newValue),
 			};
 		}
 
@@ -456,8 +457,8 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 					monsterIndex: change.location.monsterIndex,
 					commandIndex: change.location.commandIndex
 				},
-				before: command.label.oldValue.rDrodFix(),
-				after: command.label.newValue.rDrodFix()
+				before: fixCarriageReturnForDisplay(command.label.oldValue),
+				after: fixCarriageReturnForDisplay(command.label.newValue),
 			};
 		}
 

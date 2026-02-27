@@ -53,3 +53,14 @@ export function escapeFilterToRegex(str: string) {
 			return escapeRegexToGlob(str);
 	}
 }
+
+/**
+ * Only use it for displaying things!
+ */
+export function fixCarriageReturnForDisplay(s: string): string {
+	return s.replace(/\r/g, '\n');
+}
+
+export function fixCarriageReturnForStorage(s: string): string {
+	return s.replace(/\n/g, '\r');
+}
