@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { ChangeEvent, useCallback, useRef } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
 import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 import { formatDateTimeForInput } from "../../../utils/DateUtils";
@@ -27,9 +27,8 @@ export default function DateTimeEditor({datetime}: Props) {
 		}
 	}, [datetime, isEdited])
 
-	// Using any to avoid typescript complaints about type
-	const onType = useCallback((e: any) => {
-		datetime.set(true, (new Date(e.target.value).getTime()));
+	const onType = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		datetime.set(true, new Date(e.target.value).getTime());
 	}, [datetime]);
 
 	const title = isEdited

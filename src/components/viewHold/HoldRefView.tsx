@@ -56,7 +56,7 @@ export default function HoldRefView({ holdRef }: Props) {
 					<i className="fas fa-question"></i>
 				</span>
 				{" "}<strong>Unknown ref</strong>
-				{" "}<code>{(holdRef as any).model}</code>
+				{" "}<code>{(holdRef as HoldRef).model}</code>
 			</>
 	}
 }

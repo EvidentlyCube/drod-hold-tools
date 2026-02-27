@@ -127,7 +127,7 @@ export function getCommandsToString(list: CommandsList | undefined, baseIndent: 
 	}
 
 	const lines: string[] = [];
-	const indent = "    ";
+	const indent = "  ";
 	let indentLevel = baseIndent;
 	let wasIf = false;
 
@@ -149,8 +149,7 @@ export function getCommandsToString(list: CommandsList | undefined, baseIndent: 
 
 		} else {
 			lines.push(
-				"  "
-				+ indent.repeat(indentLevel + (wasIf ? 1 : 0))
+				indent.repeat(1 + indentLevel + (wasIf ? 1 : 0))
 				+ getCommandToString(command, list)
 			);
 		}

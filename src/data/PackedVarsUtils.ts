@@ -1,5 +1,5 @@
 import { bytesArrToBase64 } from "../utils/StringUtils";
-import {PackedVars, PackedVarType} from "./PackedVars";
+import { PackedVars, PackedVarType } from "./PackedVars";
 
 class WrappedArray {
 	private readonly _array: number[];
@@ -112,8 +112,8 @@ class WrappedArray {
 }
 
 export function readPackedVars(base64ExtraVars: string): PackedVars;
-export function readPackedVars(base64ExtraVars?: string): PackedVars|undefined;
-export function readPackedVars(base64ExtraVars?: string): PackedVars|undefined {
+export function readPackedVars(base64ExtraVars?: string): PackedVars | undefined;
+export function readPackedVars(base64ExtraVars?: string): PackedVars | undefined {
 	if (!base64ExtraVars) {
 		return undefined;
 	}
@@ -191,33 +191,54 @@ const PackedVarsUtils = {
 		const buf = new WrappedArray(new Uint8Array());
 
 		for (const packedVar of packedVars.vars) {
-			const {name, type, value} = packedVar;
+			const { name, type, value } = packedVar;
 
 			buf.writeUint(name.length + 1);
 			buf.writeString(name);
 			buf.writeInt(type);
 
 			switch (type) {
-				case PackedVarType.ByteBuffer:
-					buf.writeUint(value.length);
-					buf.writeRaw(value);
+				case PackedVarType.ByteBuffer: {
+					if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
+						throw new Error(`Expected ByteBuffer value to be number[] or Uint8Array for variable "${name}"`);
+					}
+					const raw = Array.isArray(value) ? value : Array.from(value);
+					buf.writeUint(raw.length);
+					buf.writeRaw(raw);
 					break;
-				case PackedVarType.Uint:
+				}
+				case PackedVarType.Uint: {
+					if (typeof value !== 'number' || !Number.isFinite(value)) {
+						throw new Error(`Expected Uint value to be a number for variable "${name}"`);
+					}
 					buf.writeUint(4);
-					buf.writeUint(value);
+					buf.writeUint(value >>> 0);
 					break;
-				case PackedVarType.Int:
+				}
+				case PackedVarType.Int: {
+					if (typeof value !== 'number' || !Number.isFinite(value)) {
+						throw new Error(`Expected Int value to be a finite number for variable "${name}"`);
+					}
 					buf.writeUint(4);
-					buf.writeInt(value);
+					buf.writeInt(value | 0);
 					break;
-				case PackedVarType.Bool:
+				}
+				case PackedVarType.Bool: {
+					if (typeof value !== 'boolean') {
+						throw new Error(`Expected Bool value to be boolean for variable "${name}"`);
+					}
 					buf.writeUint(1);
 					buf.writeBool(value);
 					break;
-				case PackedVarType.WcharString:
+				}
+				case PackedVarType.WcharString: {
+					if (typeof value !== 'string') {
+						throw new Error(`Expected WcharString value to be string for variable "${name}"`);
+					}
 					buf.writeUint(value.length * 2 + 2);
 					buf.writeWCharString(value);
 					break;
+				}
 				default:
 					console.error(name, type, value);
 					throw new Error(`Unknown packed var type ${type}`);

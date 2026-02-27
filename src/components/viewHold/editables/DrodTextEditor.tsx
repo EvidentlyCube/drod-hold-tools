@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { ChangeEvent, useCallback, useRef } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
@@ -29,7 +29,7 @@ export default function DrodTextEditor({text, tag}: Props) {
 	}, [text, isEdited])
 
 	// Using any to avoid typescript complaints about type
-	const onType = useCallback((e: any) => {
+	const onType = useCallback((e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLTextAreaElement>) => {
 		text.set(true, e.target.value);
 	}, [text]);
 

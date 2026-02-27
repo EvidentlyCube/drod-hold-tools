@@ -9,10 +9,12 @@ export enum PackedVarType {
 	Unknown = 9
 }
 
+type PackedVarValue = boolean | number | string | Uint8Array | number[];
+
 interface PackedVar {
 	name: string;
 	type: PackedVarType;
-	value: any;
+	value: PackedVarValue;
 }
 
 export class PackedVars {
@@ -81,15 +83,15 @@ export class PackedVars {
 		!isFound && this._vars.push(packedVar);
 	}
 
-	readByteBuffer(name: string, def?: number[]) {
+	readByteBuffer(name: string, def: number[]) {
 		return this.readVar(name, PackedVarType.ByteBuffer, def) as number[];
 	}
 
-	readBool(name: string, def?: boolean) {
+	readBool(name: string, def: boolean) {
 		return this.readVar(name, PackedVarType.Bool, def) as boolean;
 	}
 
-	readUint(name: string, def?: number) {
+	readUint(name: string, def: number) {
 		return this.readVar(name, PackedVarType.Uint, def) as number;
 	}
 
@@ -101,7 +103,7 @@ export class PackedVars {
 		return this._vars.find(packedVar => packedVar.name === name) !== undefined;
 	}
 
-	private readVar(name: string, expectedType: PackedVarType, def: any) {
+	private readVar(name: string, expectedType: PackedVarType, def: PackedVarValue): PackedVarValue {
 		const [isFound, packedVar] = this.getVar(name);
 
 		if (!isFound || packedVar.type !== expectedType) {

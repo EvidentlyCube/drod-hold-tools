@@ -1,3 +1,4 @@
+import { Constants } from "../Constants";
 import { assertNotNull } from "../utils/Asserts";
 import { diffXml } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
@@ -329,7 +330,10 @@ export async function xmlToHold(
 		});
 
 	} catch (e) {
-		console.error(e);
+		if (Constants.isDev) {
+			(window as any).lastDiffXmlError = e;
+			console.error("Diff error details stored in `lastDiffXmlError`")
+		}
 		throw new Error(
 			"Stability check failed. When attempting to export\n"
 			+ "the hold without any changes the resulting output was\n"

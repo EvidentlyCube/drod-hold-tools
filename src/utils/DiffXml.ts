@@ -17,6 +17,19 @@ interface DiffState {
 	skips: Skip[];
 }
 
+export class DiffXmlError extends Error {
+	public readonly contextLeft: Node;
+	public readonly contextRight: Node;
+
+	public constructor(left: Node, right: Node, message: string) {
+		super(message);
+
+		this.contextLeft = left;
+		this.contextRight = right;
+		this.message = message;
+	}
+}
+
 export async function diffXml(
 	left: string | XMLDocument,
 	right: string | XMLDocument,
@@ -39,26 +52,29 @@ function flattenDom(document: XMLDocument): Element[] {
 	const elements: Element[] = [];
 
 	function traverse(element: Element) {
-        elements.push(element);
+		elements.push(element);
 
-        for (const child of element.children) {
+		for (const child of element.children) {
 			traverse(child);
 		}
-    }
+	}
 
-    // Start traversal from the document body
-    for (const child of document.children) {
+	// Start traversal from the document body
+	for (const child of document.children) {
 		traverse(child);
 	}
 
-    return elements;
+	return elements;
 }
 
 async function compareNode(left: Node, right: Node, context: string, state: DiffState) {
 	await sleep();
 
 	if (left.nodeType !== right.nodeType) {
-		throw new Error(`${context}: Node Type '${left.nodeType}'/'${right.nodeType}'`);
+		throw new DiffXmlError(
+			left, right,
+			`${context}: Node Type '${left.nodeType}'/'${right.nodeType}'`
+		);
 	}
 
 	switch (left.nodeType) {
@@ -70,7 +86,10 @@ async function compareNode(left: Node, right: Node, context: string, state: Diff
 			break;
 
 		default:
-			throw new Error(`Unknown node type: ${left.nodeType}`);
+			throw new DiffXmlError(
+				left, right,
+				`Unknown node type: ${left.nodeType}`
+			);
 	}
 }
 
@@ -80,9 +99,10 @@ async function compareElement(left: Element, right: Element, context: string, st
 		state.onProgress(index, state.flatDom.length);
 	}
 	if (left.tagName !== right.tagName) {
-		console.log(left);
-		console.log(right);
-		throw new Error(`${context}: Tag Name mismatch '${left.tagName}'/'${right.tagName}'`);
+		throw new DiffXmlError(
+			left, right,
+			`${context}: Tag Name mismatch '${left.tagName}'/'${right.tagName}'`
+		)
 	}
 
 	context += "." + left.tagName;
@@ -92,7 +112,10 @@ async function compareElement(left: Element, right: Element, context: string, st
 	const diffNames = diffArrays(leftAttributeNames, rightAttributeNames);
 
 	if (diffNames.length > 0) {
-		throw new Error(`${context}: Attributes names diff '${diffNames.join("','")}'`);
+		throw new DiffXmlError(
+			left, right,
+			`${context}: Attributes names diff '${diffNames.join("','")}'`
+		);
 	}
 
 	for (let i = 0; i < left.attributes.length; i++) {
@@ -100,22 +123,28 @@ async function compareElement(left: Element, right: Element, context: string, st
 		const rAttr = right.attributes.item(i)!;
 
 		if (lAttr.name !== rAttr.name) {
-			throw new Error(`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`);
+
+			throw new DiffXmlError(
+				left, right,
+				`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`
+			);
 
 		} else if (skipAttribute(left.tagName, lAttr.name, state)) {
 			continue;
 
 		} else if (lAttr.value !== rAttr.value) {
-			console.log(left);
-			console.log(right);
-			throw new Error(`${context}.@${i}#${lAttr.name}: Attribute value mismatch ${getStringDiff(lAttr.value, rAttr.value, 32)}`);
+			throw new DiffXmlError(
+				left, right,
+				`${context}.@${i}#${lAttr.name}: Attribute value mismatch ${getStringDiff(lAttr.value, rAttr.value, 32)}`
+			);
 		}
 	}
 
 	if (left.children.length !== right.children.length) {
-		(window as any)._l = left;
-		(window as any)._r = right;
-		throw new Error(`${context}: Different children number ${left.children.length} / ${right.children.length}`);
+		throw new DiffXmlError(
+			left, right,
+			`${context}: Different children number ${left.children.length} / ${right.children.length}`
+		)
 	}
 
 	for (let i = 0; i < left.children.length; i++) {
@@ -127,7 +156,10 @@ async function compareDocuments(left: Document, right: Document, context: string
 	context += ".document";
 
 	if (left.children.length !== right.children.length) {
-		throw new Error(`${context}: Different children number ${left.children.length} / ${right.children.length}`);
+		throw new DiffXmlError(
+			left, right,
+			`${context}: Different children number ${left.children.length} / ${right.children.length}`
+		);
 	}
 
 	for (let i = 0; i < left.children.length; i++) {

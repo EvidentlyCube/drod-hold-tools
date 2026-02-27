@@ -247,7 +247,8 @@ class HoldIndexedStorageClass {
 
 		const holdsStore = this.db.transaction(STORE_HOLDS).objectStore(STORE_HOLDS);
 		holdsStore.openCursor().onsuccess = (event) => {
-			const cursor = (event as any).target.result as IDBCursorWithValue;
+			const request = event.target as IDBRequest;
+			const cursor = request.result as IDBCursorWithValue;
 
 			if (!cursor) {
 				isCursorFinished = true;
@@ -291,7 +292,8 @@ class HoldIndexedStorageClass {
 
 		const changesStore = this.db.transaction(STORE_CHANGES).objectStore(STORE_CHANGES);
 		changesStore.openCursor().onsuccess = (event) => {
-			const cursor = (event as any).target.result as IDBCursorWithValue;
+			const request = event.target as IDBRequest;
+			const cursor = request.result as IDBCursorWithValue;
 
 			if (!cursor) {
 				isCursorFinished = true;
