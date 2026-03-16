@@ -1,5 +1,5 @@
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
-import { AttackTileType, CommandInput, CueEventType, DataFormat, GameEffectType, MonsterType, Mood, NaturalTargetType, OrbAgentType, Orientation, PredefinedVariable, ScreenFilter, ScriptCommandType, Speaker, StealthType, TileType, WaitForFlag, WaterTraversalType, WeaponType, WorldMapIcon } from "./DrodEnums";
+import { AttackTileType, CommandInput, CueEventType, DataFormat, GameEffectType, Imperative, MonsterType, Mood, NaturalTargetType, OrbAgentType, Orientation, PredefinedVariable, ScreenFilter, ScriptCommandType, Speaker, StealthType, TileType, WaitForFlag, WaterTraversalType, WeaponType, WorldMapIcon } from "./DrodEnums";
 
 type EnumToNameMap = ReadonlyMap<number, string>;
 
@@ -527,7 +527,7 @@ export const TileTypeToName: EnumToNameMap = new Map([
 	[TileType.Token, "Token"],
 	[TileType.TunnelN, "Tunnel N"],
 	[TileType.TunnelS, "Tunnel S"],
-	[TileType.Mirro, "Mirro"],
+	[TileType.Mirror, "Mirror"],
 	[TileType.PotionClone, "Potion Clone"],
 	[TileType.PotionDecoy, "Potion Decoy"],
 	[TileType.PlatformOnWater, "Platform On Water"],
@@ -709,4 +709,43 @@ export const PredefinedVariableToName: EnumToNameMap = new Map([
 	[PredefinedVariable.MonsterHue, "_MyHue"],
 	[PredefinedVariable.MonsterSaturation, "_MySaturation"],
 
+])
+
+export const ImperativeToName: EnumToNameMap = new Map([
+	[Imperative.Vulnerable, "Vulnerable"],
+	[Imperative.Invulnerable, "Invulnerable"],
+	[Imperative.MissionCritical, "Mission Critical"],
+	[Imperative.RequiredToConquer, "Required To Conquer"],
+	[Imperative.Die, "Die"],
+	[Imperative.DieSpecial, "Die Special"],
+	[Imperative.Safe, "Safe"],
+	[Imperative.Deadly, "Deadly"],
+	[Imperative.SwordSafeToPlayer, "Sword Safe To Player"],
+	[Imperative.EndWhenKilled, "End When Killed"],
+	[Imperative.FlexibleBeelining, "Flexible Beelining"],
+	[Imperative.DirectBeelining, "Direct Beelining"],
+	[Imperative.NoGhostDisplay, "No Ghost Display"],
+	[Imperative.GhostDisplay, "Ghost Display"],
+	[Imperative.NotPushable, "Not Pushable"],
+	[Imperative.PushableByBody, "Pushable By Body"],
+	[Imperative.PushableByWeapon, "Pushable By Weapon"],
+	[Imperative.PushableByBoth, "Pushable By Both"],
+	[Imperative.Stunnable, "Stunnable"],
+	[Imperative.NotStunnable, "Not Stunnable"],
+	[Imperative.GhostDisplayOverhead, "Ghost Display Overhead"],
+	[Imperative.DefaultPushability, "Default Pushability"],
+	[Imperative.Pathfinding, "Pathfinding"],
+	[Imperative.BrainPathmapObstacle, "Brain Pathmap Obstacle"],
+	[Imperative.NotBrainPathmapObstacle, "Not Brain Pathmap Obstacle"],
+	[Imperative.NPCPathmapObstacle, "NPC Pathmap Obstacle"],
+	[Imperative.NotNPCPathmapObstacle, "Not NPC Pathmap Obstacle"],
+	[Imperative.NormalBeelining, "Normal Beelining"],
+	[Imperative.SmartBeelining, "Smart Beelining"],
+	[Imperative.PathfindingOpenOnly, "Pathfinding Open Only"],
+	[Imperative.InvisibleInspectable, "Invisible Inspectable"],
+	[Imperative.InvisibleNotInspectable, "Invisible Not Inspectable"],
+	[Imperative.InvisibleCountMoveOrder, "Invisible Count Move Order"],
+	[Imperative.InvisibleNotCountMoveOrder, "Invisible Not Count Move Order"],
+	[Imperative.Friendly, "Friendly"],
+	[Imperative.Unfriendly, "Unfriendly"]
 ])

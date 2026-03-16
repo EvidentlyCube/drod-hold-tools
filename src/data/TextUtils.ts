@@ -2,7 +2,7 @@ import { CommandsList } from "./CommandList";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 import { AttackTileType, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, MonsterIdToName, NaturalTargetTypeToName, OrbAgentTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
+import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, NaturalTargetTypeToName, OrbAgentTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];
@@ -101,6 +101,12 @@ export class TextUtils {
 			?? `UnknownWorldMapIcon_${id}`;
 	}
 
+
+	public static imperative(id: number): string {
+		return ImperativeToName.get(id)
+			?? `UnknownImperative_${id}`;
+	}
+
 	public static stripNewline(text: string): string {
 		return text.replace(/\n|\r/g, ' ');
 	}
@@ -167,7 +173,7 @@ export class TextUtils {
 			case ScriptVarComparators.EqualsText: return '=';
 			case ScriptVarComparators.LessThanOrEqual: return '<=';
 			case ScriptVarComparators.GreaterThanOrEqual: return '>=';
-			case ScriptVarComparators.Inequal: return '!=';
+			case ScriptVarComparators.Unequal: return '!=';
 			default: return '?';
 		}
 	}

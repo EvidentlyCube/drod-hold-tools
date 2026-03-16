@@ -400,7 +400,7 @@ export enum ScriptVarComparators {
 	EqualsText = 3,
 	LessThanOrEqual = 8, //to avoid collision with Op values
 	GreaterThanOrEqual = 9,
-	Inequal = 10
+	Unequal = 10
 }
 
 export enum ScreenFilter {
@@ -553,7 +553,7 @@ export enum TileType {
 	Token = 46,
 	TunnelN = 47,
 	TunnelS = 48,
-	Mirro = 49,
+	Mirror = 49,
 	PotionClone = 50,
 	PotionDecoy = 51,
 	PlatformOnWater = 52,
@@ -744,4 +744,43 @@ export enum PredefinedVariable {
 	Combo = UINT(-41),
 	MonsterHue = UINT(-42),
 	MonsterSaturation = UINT(-43),
+}
+
+export enum Imperative {
+	Vulnerable = 0,
+	Invulnerable = 1,
+	MissionCritical = 2,
+	RequiredToConquer = 3,
+	Die = 4,
+	DieSpecial = 5,
+	Safe = 6,
+	Deadly = 7,
+	SwordSafeToPlayer = 8,
+	EndWhenKilled = 9,
+	FlexibleBeelining = 10,
+	DirectBeelining = 11,
+	NoGhostDisplay = 12,
+	GhostDisplay = 13,
+	NotPushable = 14,
+	PushableByBody = 15,
+	PushableByWeapon = 16,
+	PushableByBoth = 17,
+	Stunnable = 18,
+	NotStunnable = 19,
+	GhostDisplayOverhead = 20,
+	DefaultPushability = 21,
+	Pathfinding = 22,
+	BrainPathmapObstacle = 23,
+	NotBrainPathmapObstacle = 24,
+	NPCPathmapObstacle = 25,
+	NotNPCPathmapObstacle = 26,
+	NormalBeelining = 27,
+	SmartBeelining = 28,
+	PathfindingOpenOnly = 29,
+	InvisibleInspectable = 30,
+	InvisibleNotInspectable = 31,
+	InvisibleCountMoveOrder = 32,
+	InvisibleNotCountMoveOrder = 33,
+	Friendly = 34,
+	Unfriendly = 35
 }

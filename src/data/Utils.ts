@@ -183,6 +183,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		entity,
 		event,
 		hex,
+		imperative,
 		input,
 		join,
 		music,
@@ -240,7 +241,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_IfElseIf: return `Else If`;
 		case ScriptCommandType.CC_IfEnd: return `If End`;
 		case ScriptCommandType.CC_ImageOverlay: return `Image overlay ${c.w},${stripNewline(c.label.newValue)}`;
-		case ScriptCommandType.CC_Imperative: return `Imperative ${c.x}`;
+		case ScriptCommandType.CC_Imperative: return `Imperative ${imperative(c.x)}`;
 		case ScriptCommandType.CC_Label: return `${c.label.newValue}`;
 		case ScriptCommandType.CC_LevelEntrance: return `Level entrance ${xy(c)}`;
 		case ScriptCommandType.CC_MoveRel: return join(['Move ', !c.flags ? `${xy(c)},` : '', wh(c)]);

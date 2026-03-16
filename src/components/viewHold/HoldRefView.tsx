@@ -1,5 +1,7 @@
-import { getCharacterName, getCommandName } from "../../data/Utils";
+import { CommandsList } from "../../data/CommandList";
+import { getCharacterName, getCommandName, getCommandToString } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
+import { ScriptCommand } from "../../data/datatypes/ScriptCommand";
 import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 
@@ -85,7 +87,13 @@ function CharacterCommand({ r }: { r: HoldRefCharacterCommand }) {
 			<i className="fas fa-terminal"></i>
 		</span>
 		{" "}<em title="Command Index and Type">#{commandIndex}::{getCommandName(command.type)}</em>
+		{" "}&mdash;{" "}
+		{CommandLine({command, list: character.$commandList! })}
 	</>
+}
+
+function CommandLine({ command, list }: {command: ScriptCommand, list: CommandsList}) {
+	return <code>{getCommandToString(command, list)}</code>
 }
 
 function ViewCharacterAvatar({ r }: { r: HoldRefCharacterAvatar }) {
@@ -195,6 +203,8 @@ function ViewMonsterCommand({ r }: { r: HoldRefMonsterCommand }) {
 			<i className="fas fa-terminal"></i>
 		</span>
 		{" "}<em title="Command Index and Type">#{commandIndex}::{getCommandName(command.type)}</em>
+		{" "}&mdash;{" "}
+		{CommandLine({command, list: monster.$commandList! })}
 	</>
 }
 
