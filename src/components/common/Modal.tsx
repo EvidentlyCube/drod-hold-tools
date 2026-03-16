@@ -3,13 +3,14 @@ import { ReactNode } from "react"
 interface Props {
 	children: ReactNode;
 	onClose: () => void;
+	canClose?: boolean;
 }
-export default function Modal({children, onClose}: Props) {
+export default function Modal({children, onClose, canClose = true}: Props) {
 	return <div className="modal is-active">
-		<div className="modal-background" onClick={onClose}></div>
+		{canClose && <div className="modal-background" onClick={onClose}></div>}
 		<div className="modal-content">
 			{children}
 		</div>
-		<button className="modal-close is-large" onClick={onClose}></button>
+		{canClose && <button className="modal-close is-large" onClick={onClose}></button>}
 	</div>
 }

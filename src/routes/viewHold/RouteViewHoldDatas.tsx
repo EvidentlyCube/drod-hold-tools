@@ -13,6 +13,7 @@ import { filterString, sortCompareNumber, sortCompareString, sortCompareWithUnde
 import ReplaceButton from "../../components/viewHold/preview/ReplaceButton";
 import DataUsesPreviewButton from "../../components/viewHold/preview/DataUsesPreviewButton";
 import { useCallback } from "react";
+import BulkReplaceButton from "../../components/viewHold/actions/BulkDataReplaceButton";
 
 function HoldDataSize({ data }: { data: HoldData }) {
 	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
@@ -152,6 +153,10 @@ export default function RouteViewHoldDatas() {
 	const datas = hold.datas.values();
 
 	return <>
+		<div className="buttons section p-4 mb-0">
+			<strong>Actions:</strong>
+			<BulkReplaceButton hold={hold} />
+		</div>
 		<SortableTable
 			tableId={`data::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"

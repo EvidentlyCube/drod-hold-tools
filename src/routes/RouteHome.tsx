@@ -86,6 +86,7 @@ export default function RouteHome() {
 							<h5 className="subtitle is-6">v0.1.9{" "}<span className="is-muted">(Unreleased)</span></h5>
 							<ul>
 								<li><Feat />Script export displays imperatives by name</li>
+								<li><Feat />Mechanism to replace data files in bulk.</li>
 							</ul>
 							<h5 className="subtitle is-6">v0.1.8{" "}<span className="is-muted">(2026-02-20)</span></h5>
 							<ul>

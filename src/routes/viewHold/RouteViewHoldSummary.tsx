@@ -59,7 +59,7 @@ export default function RouteViewHoldSummary() {
 		const zip = zipSync(z);
 
 		// Create a blob from the zip bytes and trigger a download
-		const blob = new Blob([zip], { type: 'application/zip' });
+		const blob = new Blob([zip.slice()], { type: 'application/zip' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
