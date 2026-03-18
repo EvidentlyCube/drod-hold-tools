@@ -2,6 +2,7 @@
 	"name": "drod-hold-utils",
 	"version": "0.1.0",
 	"private": true,
+	"type": "module",
 	"dependencies": {
 		"bulma": "^1.0.1",
 		"fflate": "^0.8.2",
@@ -27,6 +28,7 @@
 		"jsdom": "^26.1.0",
 		"mini-css-extract-plugin": "^2.7.6",
 		"ts-loader": "^9.5.1",
+		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"webpack": "^5.89.0",
 		"webpack-cli": "^5.1.4",
