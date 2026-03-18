@@ -2,7 +2,7 @@ import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { CommandsList } from "./CommandList";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { PackedVars } from "./PackedVars";
+import { PackedVars, PackedVarType } from "./PackedVars";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
@@ -147,6 +147,11 @@ export function unpackJtrhCommands(packedVars: PackedVars): ScriptCommand[] {
 	const commands: ScriptCommand[] = [];
 
 	for (let i = 0; i < numCommands; i++) {
+		let speechIdType = packedVars.getType(`${i}s`);
+		let speechId = speechIdType === PackedVarType.deprecated_DWord
+			? packedVars.readDWord_deprecated(`${i}s`, 0)
+			: packedVars.readUint(`${i}s`, 0)
+
 		commands.push({
 			index: i,
 			type: packedVars.readUint(`${i}c`, 0),
@@ -156,7 +161,8 @@ export function unpackJtrhCommands(packedVars: PackedVars): ScriptCommand[] {
 			h: packedVars.readUint(`${i}h`, 0),
 			flags: packedVars.readUint(`${i}f`, 0),
 			label: new SignalUpdatableValue(packedVars.readWCharString(`${i}l`, '')),
-			speechId: new SignalUpdatableValue(packedVars.readDWord_deprecated(`${i}s`, 0))
+			speechId: new SignalUpdatableValue(speechId),
+			__speechIdType: speechIdType
 		});
 	}
 
@@ -187,7 +193,11 @@ export function packJtrhCommands(commandList: CommandsList, packedVars: PackedVa
 			packedVars.writeUint(`${i}w`, command.w);
 			packedVars.writeUint(`${i}h`, command.h);
 			packedVars.writeWcharString(`${i}l`, command.label.newValue);
-			packedVars.writeUint(`${i}s`, command.speechId.newValue);
+			if (command.__speechIdType === PackedVarType.Uint) {
+				packedVars.writeUint(`${i}s`, command.speechId.newValue);
+			} else {
+				packedVars.writeDWord_deprecated(`${i}s`, command.speechId.newValue);
+			}
 		}
 		// packedVars.writeUint(`${i}f`, command.flags);
 	}

@@ -15,8 +15,15 @@ interface SavedGameConstructor {
 	startRoomO: number;
 	exploredRooms: number[];
 	conqueredRooms: number[];
+	completedScripts: number[];
 	created: number;
 	encCommands: string;
+	levelDeaths: number;
+	levelKills: number;
+	levelMoves: number;
+	levelTime: number;
+	encStats: string;
+	version: number;
 }
 export class HoldSavedGame {
 	public readonly $hold: Hold;
@@ -34,8 +41,15 @@ export class HoldSavedGame {
 	public readonly startRoomO: number;
 	public readonly exploredRooms: number[];
 	public readonly conqueredRooms: number[];
+	public readonly completedScripts: number[];
 	public readonly created: number;
 	public readonly encCommands: string;
+	public readonly levelDeaths: number;
+	public readonly levelKills: number;
+	public readonly levelMoves: number;
+	public readonly levelTime: number;
+	public readonly encStats: string;
+	public readonly version: number;
 
 	public constructor(hold: Hold, opts: SavedGameConstructor) {
 		this.$hold = hold;
@@ -53,7 +67,14 @@ export class HoldSavedGame {
 		this.startRoomO = opts.startRoomO;
 		this.exploredRooms = opts.exploredRooms;
 		this.conqueredRooms = opts.conqueredRooms;
+		this.completedScripts = opts.completedScripts;
 		this.created = opts.created;
 		this.encCommands = opts.encCommands;
+		this.levelDeaths = opts.levelDeaths;
+		this.levelKills = opts.levelKills;
+		this.levelMoves = opts.levelMoves;
+		this.levelTime = opts.levelTime;
+		this.encStats = opts.encStats;
+		this.version = opts.version;
 	}
 }

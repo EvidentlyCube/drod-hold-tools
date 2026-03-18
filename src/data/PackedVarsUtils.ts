@@ -168,7 +168,7 @@ const PackedVarsUtils = {
 					vars.writeUint(varName, arr.readUint());
 					break;
 				case PackedVarType.deprecated_DWord:
-					vars.writeDWord(varName, arr.readUint());
+					vars.writeDWord_deprecated(varName, arr.readUint());
 					break;
 				case PackedVarType.Int:
 					vars.writeInt(varName, arr.readInt());

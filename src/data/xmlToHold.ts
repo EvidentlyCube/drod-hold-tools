@@ -4,7 +4,7 @@ import { diffXml, DiffXmlError } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { EntranceShowDescription } from "./DrodEnums";
 import { holdToXml } from "./HoldToXml";
-import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, scanHoldForIssues } from "./HoldUtils";
+import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, removeOtherHoldsFromHoldXML, scanHoldForIssues } from "./HoldUtils";
 import { HoldVersion } from "./HoldVersion";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
@@ -30,6 +30,8 @@ export async function xmlToHold(
 	storedChanges: HoldChange[],
 	log: (log: string) => void
 ): Promise<Hold> {
+	removeOtherHoldsFromHoldXML(originalXml);
+
 	const drodXml = originalXml.querySelector('drod');
 	const holdXml = originalXml.querySelector('Holds');
 
@@ -87,7 +89,7 @@ export async function xmlToHold(
 
 			const holdData = new HoldData(hold, {
 				id,
-				holdId: int(dataXml, 'HoldID'),
+				holdId: intU(dataXml, 'HoldID') ?? 0,
 				format: int(dataXml, 'DataFormat'),
 				encName: str(dataXml, 'DataNameText'),
 				encRawData: strU(dataXml, 'RawData')
@@ -233,6 +235,7 @@ export async function xmlToHold(
 				encStyleName: strU(roomXml, 'StyleName'),
 				encTileLights: strU(roomXml, 'TileLights'),
 				encExtraVars: strU(roomXml, 'ExtraVars'),
+				isNestedInLevel: roomXml.parentElement?.tagName === 'Levels',
 			});
 
 			log(`Parsing Room ${roomId} -> Orbs`);
@@ -341,24 +344,22 @@ export async function xmlToHold(
 				startRoomX: int(savedGameXml, 'StartRoomX'),
 				startRoomY: int(savedGameXml, 'StartRoomY'),
 				startRoomO: int(savedGameXml, 'StartRoomO'),
-				exploredRooms: (strU(savedGameXml, 'ExploredRooms') ?? '')
-					.trim()
-					.split(" ")
-					.filter(Boolean)
-					.map(x => parseInt(x)),
-				conqueredRooms: (strU(savedGameXml, 'ConqueredRooms') ?? '')
-					.trim()
-					.split(" ")
-					.filter(Boolean)
-					.map(x => parseInt(x)),
+				exploredRooms: intArrayU(savedGameXml, 'ExploredRooms') ?? [],
+				conqueredRooms: intArrayU(savedGameXml, 'ConqueredRooms') ?? [],
+				completedScripts: intArrayU(savedGameXml, 'CompletedScripts') ?? [],
 				created: int(savedGameXml, 'Created'),
 				encCommands: str(savedGameXml, 'Commands'),
+				levelDeaths: intU(savedGameXml, 'LevelDeaths') ?? -1,
+				levelKills: intU(savedGameXml, 'LevelKills') ?? -1,
+				levelMoves: intU(savedGameXml, 'LevelMoves') ?? -1,
+				levelTime: intU(savedGameXml, 'LevelTime') ?? -1,
+				encStats: strU(savedGameXml, 'Stats') ?? '',
+				version: intU(savedGameXml, 'Version') ?? -1,
 			});
 
 			hold.savedGames.set(holdSavedGame.id, holdSavedGame);
 			await sleep();
 		}
-
 
 		for (const demoXml of originalXml.querySelectorAll('Demos')) {
 			const id = int(demoXml, 'DemoID');
@@ -372,7 +373,7 @@ export async function xmlToHold(
 				showSequenceNo: int(demoXml, 'ShowSequenceNo'),
 				beginTurnNo: int(demoXml, 'BeginTurnNo'),
 				endTurnNo: int(demoXml, 'EndTurnNo'),
-				nextDemoId: int(demoXml, 'NextDemoID'),
+				nextDemoId: intU(demoXml, 'NextDemoID') ?? 0,
 				checksum: int(demoXml, 'Checksum'),
 			});
 
@@ -469,6 +470,18 @@ function intU(node: Element, attribute: string) {
 
 function boolU(node: Element, attribute: string) {
 	return node.hasAttribute(attribute) ? int(node, attribute) === 1 : undefined;
+}
+
+function intArray(node: Element, attribute: string) {
+	return str(node, attribute)
+		.trim()
+		.split(" ")
+		.filter(Boolean)
+		.map(x => parseInt(x));
+}
+
+function intArrayU(node: Element, attribute: string) {
+	return node.hasAttribute(attribute) ? intArray(node, attribute) : undefined;
 }
 
 let lastSleep = 0;

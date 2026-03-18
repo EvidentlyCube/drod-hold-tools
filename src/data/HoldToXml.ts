@@ -80,9 +80,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		.attrIf('ScriptID', hold.lastScriptId, version.hasScripting)
 		.attrIf('VarID', hold.lastVarId, version.holdAttr_varId)
 		.attrIf('CharID', hold.lastCharId, version.holdAttr_charId)
-		.attrIf('WorldMap', hold.lastWorldMapId, version.hasWorldMaps);
-
-	writer
+		.attrIf('WorldMap', hold.lastWorldMapId, version.hasWorldMaps)
 		.attr('HoldID', hold.id)
 		.nest();
 
@@ -99,16 +97,18 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 	}
 
 	for (const worldMap of hold.worldMaps.values()) {
-		await writeWorldMap(writer, refs, worldMap)
+		await writeWorldMap(writer, refs, worldMap, version)
 	}
 
 	if (!version.holdNestsEverything) {
 		writer.end('Holds');
 	}
 
-	for (const data of hold.datas.values()) {
-		if (data.$isDeleted.newValue === false) {
-			await writeData(writer, refs, data)
+	if (version.frontLoadedData) {
+		for (const data of hold.datas.values()) {
+			if (data.$isDeleted.newValue === false) {
+				await writeData(writer, refs, data, version)
+			}
 		}
 	}
 
@@ -118,6 +118,15 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 
 	for (const demo of hold.demos.values()) {
 		await writeDemo(writer, refs, demo, version);
+	}
+
+	if (!version.frontLoadedData) {
+		// In version
+		for (const data of hold.datas.values()) {
+			if (data.$isDeleted.newValue === false) {
+				await writeData(writer, refs, data, version)
+			}
+		}
 	}
 
 	if (version.holdNestsEverything) {
@@ -165,7 +174,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 	refs.entranceIds.add(entrance.id);
 
 	if (entrance.dataId.newValue) {
-		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue));
+		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue), holdVersion);
 	}
 
 	writer.tag('Entrances')
@@ -186,7 +195,12 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 	await sleep();
 }
 
-async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData | undefined) {
+async function writeData(
+	writer: XMLWriter,
+	refs: OutputRefs,
+	data: HoldData | undefined,
+	holdVersion: HoldVersion
+) {
 	if (
 		!data
 		|| refs.dataIds.has(data.id)
@@ -198,15 +212,13 @@ async function writeData(writer: XMLWriter, refs: OutputRefs, data: HoldData | u
 
 	writer.tag('Data')
 		.attr('DataFormat', data.details.newValue.format)
-		.attr('DataNameText', data.name);
+		.attr('DataNameText', data.name)
 
-	// TSS hold file has <Data> with no RawData so I guess this is something to support??
-	if (data.details.newValue.rawEncodedData) {
-		writer.attr('RawData', { _safeString: data.details.newValue.rawEncodedData })
-	}
-
-	writer
-		.attr('HoldID', data.holdId)
+		// TSS hold file has <Data> with no RawData so I guess this is something to support??
+		.attrIf('RawData', { _safeString: data.details.newValue.rawEncodedData },
+			!!data.details.newValue.rawEncodedData
+		)
+		.attrIf('HoldID', data.holdId, !!data.holdId)
 		.attr('DataID', data.id)
 		.end();
 
@@ -229,7 +241,7 @@ async function writeSpeech(
 	refs.speechIds.add(speech.id);
 
 	if (speech.dataId.newValue) {
-		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId.newValue));
+		await writeData(writer, refs, speech.$hold.datas.get(speech.dataId.newValue), holdVersion);
 	}
 
 	writer.tag('Speech')
@@ -260,13 +272,18 @@ async function writeVariable(writer: XMLWriter, refs: OutputRefs, variable: Hold
 	await sleep();
 }
 
-async function writeWorldMap(writer: XMLWriter, refs: OutputRefs, worldMap: HoldWorldMap) {
+async function writeWorldMap(
+	writer: XMLWriter,
+	refs: OutputRefs,
+	worldMap: HoldWorldMap,
+	holdVersion: HoldVersion
+) {
 	if (refs.worldMapIds.has(worldMap.id)) {
 		return;
 	}
 
 	if (worldMap.dataId.newValue) {
-		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId.newValue))
+		await writeData(writer, refs, worldMap.$hold.datas.get(worldMap.dataId.newValue), holdVersion)
 	}
 
 	refs.worldMapIds.add(worldMap.id);
@@ -288,9 +305,9 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel,
 		return;
 	}
 
-	await writePlayer(writer, refs, level.$hold.players.getOrError(level.playerId.newValue), holdVersion);
-
 	refs.levelIds.add(level.id);
+
+	await writePlayer(writer, refs, level.$hold.players.getOrError(level.playerId.newValue), holdVersion);
 
 	writer.tag('Levels')
 		.attr('HoldID', level.$hold.id)
@@ -306,22 +323,26 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel,
 		.attr('Created', (level.createdTimestamp.newValue / 1000) | 0)
 		.attr('LastUpdated', level.lastUpdated)
 		.attrU('IsRequired', level.isRequired)
-		.attr('LevelID', level.id)
+		.attr('LevelID', level.id);
 
-	if (!holdVersion.levelNestsRooms) {
+	const rooms = level.$hold.rooms.values().filter(room => room.levelId === level.id);
+	const nestedRooms = rooms.filter(room => room.isNestedInLevel);
+	const notNestedRooms = rooms.filter(room => !room.isNestedInLevel);
+
+	if (nestedRooms.length === 0) {
 		writer.end();
 	} else {
 		writer.nest();
-	}
 
-	const rooms = level.$hold.rooms.values().filter(room => room.levelId === level.id);
+		for (const room of nestedRooms) {
+			await writeRoom(writer, refs, room, holdVersion);
+		}
 
-	for (const room of rooms) {
-		await writeRoom(writer, refs, room, holdVersion);
-	}
-
-	if (holdVersion.levelNestsRooms) {
 		writer.end('Levels');
+	}
+
+	for (const room of notNestedRooms) {
+		await writeRoom(writer, refs, room, holdVersion);
 	}
 
 	await sleep();
@@ -332,20 +353,20 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 		return;
 	}
 
-	if (holdVersion.exportSpeechesBeforeRoom) {
-		for (const speech of room.$speeches) {
-			writeSpeech(writer, refs, speech, holdVersion);
-		}
-	}
-
 	refs.roomIds.add(room.id);
 
 	if (room.dataId) {
-		await writeData(writer, refs, room.$hold.datas.get(room.dataId))
+		await writeData(writer, refs, room.$hold.datas.get(room.dataId), holdVersion)
 	}
 
 	if (room.overheadDataId) {
-		await writeData(writer, refs, room.$hold.datas.get(room.overheadDataId))
+		await writeData(writer, refs, room.$hold.datas.get(room.overheadDataId), holdVersion)
+	}
+
+	if (holdVersion.exportSpeechesBeforeRoom) {
+		for (const speech of room.$speeches) {
+			await writeSpeech(writer, refs, speech, holdVersion);
+		}
 	}
 
 	for (const monster of room.monsters) {
@@ -492,10 +513,10 @@ async function writeCharacter(
 	refs.characterIds.add(character.id);
 
 	if (character.avatarDataId.newValue) {
-		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId.newValue))
+		await writeData(writer, refs, character.$hold.datas.get(character.avatarDataId.newValue), holdVersion)
 	}
 	if (character.tilesDataId.newValue) {
-		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId.newValue))
+		await writeData(writer, refs, character.$hold.datas.get(character.tilesDataId.newValue), holdVersion)
 	}
 
 	if (character.$commandList) {
@@ -550,7 +571,7 @@ async function writeCommandDataAndSpeech(
 		const dataId = getCommandDataId(command);
 
 		if (dataId && commandList.hold.datas.has(dataId)) {
-			await writeData(writer, refs, commandList.hold.datas.getOrError(dataId));
+			await writeData(writer, refs, commandList.hold.datas.getOrError(dataId), holdVersion);
 		}
 	}
 }
@@ -567,7 +588,7 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attr('PlayerID', savedGame.playerId)
 		.attr('RoomID', savedGame.roomId)
 		.attr('Type', savedGame.type)
-		.attr('SavedGameID', savedGame.id)
+		.attrIf('SavedGameID', savedGame.id, holdVersion.saveAttr_idEarly)
 		.attr('CheckpointX', savedGame.checkpointX)
 		.attr('CheckpointY', savedGame.checkpointY)
 		.attr('IsHidden', savedGame.isHidden)
@@ -575,21 +596,36 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attr('StartRoomX', savedGame.startRoomX)
 		.attr('StartRoomY', savedGame.startRoomY)
 		.attr('StartRoomO', savedGame.startRoomO)
+		.attrIf('SavedGameID', savedGame.id, !holdVersion.saveAttr_idEarly)
 		.attrIf('ExploredRooms',
 			{ _safeString: savedGame.exploredRooms.join(" ") + " " },
 			savedGame.exploredRooms.length > 0)
 		.attrIf('ConqueredRooms',
 			{ _safeString: savedGame.conqueredRooms.join(" ") + " " },
 			savedGame.conqueredRooms.length > 0)
+		.attrIf('CompletedScripts',
+			{ _safeString: savedGame.completedScripts.join(" ") + " " },
+			savedGame.completedScripts.length > 0)
 		.attr('Created', savedGame.created)
-		.attr('Commands', { _safeString: savedGame.encCommands });
+		.attr('Commands', { _safeString: savedGame.encCommands })
+		.attrIf('LevelDeaths', savedGame.levelDeaths, savedGame.levelDeaths !== -1)
+		.attrIf('LevelKills', savedGame.levelKills, savedGame.levelKills !== -1)
+		.attrIf('LevelMoves', savedGame.levelMoves, savedGame.levelMoves !== -1)
+		.attrIf('LevelTime', savedGame.levelTime, savedGame.levelTime !== -1)
+		.attrIf('Stats', { _safeString: savedGame.encStats }, !!savedGame.encStats)
+		.attrIf('Version', savedGame.version, savedGame.version !== -1)
 
 	writer.end();
 
 	await sleep();
 }
 
-async function writeDemo(writer: XMLWriter, refs: OutputRefs, demo: HoldDemo, holdVersion: HoldVersion) {
+async function writeDemo(
+	writer: XMLWriter,
+	refs: OutputRefs,
+	demo: HoldDemo,
+	holdVersion: HoldVersion
+) {
 	if (refs.demoIds.has(demo.id)) {
 		return;
 	}
@@ -613,7 +649,7 @@ async function writeDemo(writer: XMLWriter, refs: OutputRefs, demo: HoldDemo, ho
 		.attr('ShowSequenceNo', demo.showSequenceNo)
 		.attr('BeginTurnNo', demo.beginTurnNo)
 		.attr('EndTurnNo', demo.endTurnNo)
-		.attr('NextDemoID', demo.nextDemoId)
+		.attrIf('NextDemoID', demo.nextDemoId, holdVersion.demoAttr_NextDemoId)
 		.attr('Checksum', demo.checksum)
 		.attr('DemoID', demo.id)
 

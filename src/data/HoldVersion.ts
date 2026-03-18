@@ -11,10 +11,6 @@ export class HoldVersion {
 		return this.version <= VERSION_JTRH;
 	}
 
-	public get levelNestsRooms() {
-		return this.version <= VERSION_JTRH;
-	}
-
 	public get isVersionPrinted() {
 		return this.version > VERSION_AE;
 	}
@@ -32,8 +28,9 @@ export class HoldVersion {
 	}
 
 	/**
-	 * Speeches were linked to a room and not character/monster in JtRH
-	 * because there were no custom characters back then.
+	 * In JtRH speeches were included before <Rooms> rather than before the
+	 * <Monster> or <Character> because back then there were no custom
+	 * characters, only the monster type.
 	 */
 	public get exportSpeechesBeforeRoom() {
 		return this.version === VERSION_JTRH;
@@ -95,6 +92,21 @@ export class HoldVersion {
 	}
 
 	/**
+	 * In JtRH Data did not have HoldID attribute.
+	 */
+	public get dataAttr_holdId() {
+		return this.version >= VERSION_TCB_301;
+	}
+
+	/**
+	 * In JtRH Datas were included before use, afterwards all <Data> tags
+	 * are front loaded
+	 */
+	public get frontLoadedData() {
+		return this.version >= VERSION_TCB_301;
+	}
+
+	/**
 	 * JtRH has introduced scripting
 	 */
 	public get hasScripting() {
@@ -113,5 +125,20 @@ export class HoldVersion {
 	 */
 	public get entranceAttr_ShowDescription() {
 		return this.version >= VERSION_TCB_301;
+	}
+
+	/**
+	 * In JtRH demos did not contain the next demo ID
+	 */
+	public get demoAttr_NextDemoId() {
+		return this.version >= VERSION_TCB_301;
+	}
+
+	/**
+	 * In AE <SavedGames> attribute "SavedGameID" was stored after "Type"
+	 * but in later versions of the engine are stored after "StartRoomO"
+	 */
+	public get saveAttr_idEarly() {
+		return this.version === VERSION_AE;
 	}
 }

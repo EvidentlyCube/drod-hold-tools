@@ -387,3 +387,31 @@ export function scanHoldForIssues(hold: Hold) {
 		}
 	});
 }
+
+/**
+ * There is at least one hold published (The Prison) which contains a second
+ * hold stub record in the file along with a bunch of level and room stubs;
+ * those are for rooms which appear in some of the (valid) SavedGames'
+ * ExploredRooms field.
+ */
+export function removeOtherHoldsFromHoldXML(xml: XMLDocument) {
+	for (const hold of xml.querySelectorAll('Holds')) {
+		// Is this the real hold entry
+		if (hold.hasAttribute('NameMessage')) {
+			continue;
+		}
+
+		const holdId = hold.getAttribute('HoldID');
+		for (const level of xml.querySelectorAll(`Levels[HoldID="${holdId}"]`)) {
+			const levelId = level.getAttribute('LevelID');
+
+			for (const room of xml.querySelectorAll(`Rooms[LevelID="${levelId}"]`)) {
+				room.remove();
+			}
+
+			level.remove();
+		}
+
+		hold.remove();
+	}
+}

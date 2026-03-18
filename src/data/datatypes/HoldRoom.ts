@@ -28,6 +28,7 @@ interface RoomConstructor {
 	style: number | undefined;
 	encTileLights: string | undefined;
 	encExtraVars?: string;
+	isNestedInLevel: boolean;
 }
 interface Checkpoint {
 	x: number;
@@ -88,6 +89,11 @@ export class HoldRoom {
 	/** @version 301+ */
 	public readonly encTileLights: string | undefined; // @FIXME don't use undefined
 	public readonly extraVars?: PackedVars;
+	/**
+	 * @version 201 In JtRH some holds contain room tags in Levels node and
+	 * some in Holds node; some even have a mixture of both.
+	 */
+	public readonly isNestedInLevel: boolean;
 
 	public readonly checkpoints: Checkpoint[] = [];
 	public readonly monsters: HoldMonster[] = [];
@@ -197,5 +203,6 @@ export class HoldRoom {
 			: undefined;
 		this.encTileLights = opts.encTileLights
 		this.extraVars = readPackedVars(opts.encExtraVars);
+		this.isNestedInLevel = opts.isNestedInLevel;
 	}
 }

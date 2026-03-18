@@ -57,7 +57,7 @@ export class PackedVars {
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeDWord(name: string, value: number) {
+	writeDWord_deprecated(name: string, value: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.deprecated_DWord;
@@ -124,6 +124,10 @@ export class PackedVars {
 
 	readDWord_deprecated(name: string, def: number) {
 		return this.readVar(name, PackedVarType.deprecated_DWord, def) as number;
+	}
+
+	getType(name: string) {
+		return this.getVar(name)[1].type;
 	}
 
 	delete(name: string) {

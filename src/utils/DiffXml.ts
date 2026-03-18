@@ -1,7 +1,7 @@
 import { Constants } from "../Constants";
-import { PackedVars } from "../data/PackedVars";
+import { PackedVarType } from "../data/PackedVars";
 import { readPackedVars } from "../data/PackedVarsUtils";
-import { diffArrays, diffArraysOneWay } from "./ArrayUtils";
+import { diffArraysOneWay } from "./ArrayUtils";
 import { parseXml } from "./XmlParser";
 
 type ProgressCallback = (index: number, total: number) => void;
@@ -109,7 +109,7 @@ async function compareElement(original: Element, generated: Element, context: st
 		)
 	}
 
-	context += "." + original.tagName;
+	context += "" + original.tagName;
 
 	const originalAttributeNames = Array.from(original.attributes).map(node => node.name);
 	const generatedAttributeNames = Array.from(generated.attributes).map(node => node.name);
@@ -169,16 +169,14 @@ async function compareElement(original: Element, generated: Element, context: st
 					const original = originalExtraVars[ii];
 					const generated = generatedExtraVars[ii];
 
-					if (original.name !== generated.name) {
-						extraContexts.push(`\n - Variable at ${ii} has different name, original is '${original.name}' while generated is '${generated.name}'`);
-						break;
+					const hasWrongName = original.name !== generated.name;
+					const hasWrongValue = original.value !== generated.value;
+					const hasWrongType = original.type !== generated.type;
 
-					} else if (original.value !== generated.value) {
-						extraContexts.push(`\n - Variable at ${ii} has different value, original is '${original.value}' while generated is '${generated.value}'`);
-						break;
-
-					} else if (original.type !== generated.type) {
-						extraContexts.push(`\n - Variable at ${ii} has different type, original is '${original.type}' while generated is '${generated.type}'`);
+					if (hasWrongName || hasWrongValue || hasWrongType) {
+						extraContexts.push(`\n - Difference between variables at ${ii}:`);
+						extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${JSON.stringify(original.value)}`);
+						extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${JSON.stringify(generated.value)}`);
 						break;
 					}
 				}
@@ -202,7 +200,7 @@ async function compareElement(original: Element, generated: Element, context: st
 	if (original.children.length !== generated.children.length) {
 		throw new DiffXmlError(
 			original, generated,
-			`${context}: Different children number ${original.children.length} / ${generated.children.length}`
+			`${context}: Different children number original=${original.children.length}, generated=${generated.children.length}`
 		)
 	}
 
