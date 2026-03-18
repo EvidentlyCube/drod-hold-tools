@@ -28,10 +28,6 @@ export class HoldPlayer {
 		return this.name.isChanged;
 	}
 
-	public get $hasSavesOrDemos() {
-		return !!this.$hold.demosAndSavedGames.find(row => row.afterPlayerId === this.id);
-	}
-
 	public get $uses(): ReadonlyArray<HoldRef> {
 		return usesMemoizer.grab(this.id, () => {
 			const uses: HoldRef[] = [];

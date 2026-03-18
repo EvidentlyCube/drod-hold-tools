@@ -4,6 +4,12 @@ import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldRoom } from "./HoldRoom";
 
+interface LevelAE_EntranceDetails {
+	roomId: number;
+	x: number;
+	y: number;
+	o: number;
+}
 interface LevelConstructor {
 	id: number;
 	holdId: number;
@@ -13,7 +19,10 @@ interface LevelConstructor {
 	encName: string;
 	created: number;
 	lastUpdated: number;
-	isRequired: boolean;
+	isRequired: boolean | undefined;
+
+	encDescription: string;
+	entranceDetails: LevelAE_EntranceDetails;
 }
 export class HoldLevel {
 	public readonly $hold: Hold;
@@ -22,11 +31,22 @@ export class HoldLevel {
 	public readonly holdId: number;
 	public readonly playerId: SignalUpdatableValue<number>;
 	public readonly gidLevelIndex: number;
+	/**
+	 * @version 201+ Added in JtRH, previous versions just used the order
+	 * of declaration.
+	 */
 	public readonly orderIndex: number;
 	public readonly name: SignalUpdatableValue<string>;
 	public readonly createdTimestamp: SignalUpdatableValue<number>;
 	public readonly lastUpdated: number;
-	public readonly isRequired: boolean;
+	public readonly isRequired: boolean | undefined;
+
+	// Outdated properties
+	/** @version 100 - Replaced by Entrances in JtRH */
+	public readonly description: SignalUpdatableValue<string>;
+
+	/** @version 100 - Replaced by Entrances in JtRH*/
+	public readonly entranceDetails: LevelAE_EntranceDetails;
 
 	private $_primaryEntranceIdCache?: number;
 	private $_roomsCache?: readonly HoldRoom[];
@@ -66,6 +86,8 @@ export class HoldLevel {
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.description = new SignalUpdatableValue(wcharBase64ToString(opts.encDescription));
+		this.entranceDetails = opts.entranceDetails;
 		this.createdTimestamp = new SignalUpdatableValue(opts.created * 1000);
 		this.lastUpdated = opts.lastUpdated;
 		this.isRequired = opts.isRequired;

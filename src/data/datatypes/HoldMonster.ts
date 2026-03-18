@@ -1,5 +1,5 @@
 import { CommandsList } from "../CommandList";
-import { readCommandsBuffer } from "../CommandUtils";
+import { packJtrhCommands, readCommandsBuffer, unpackJtrhCommands } from "../CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE, UINT_MINUS_1 } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
@@ -35,6 +35,10 @@ export class HoldMonster {
 
 	public readonly $commandList?: CommandsList;
 
+	public get $hold() {
+		return this.$room.$hold;
+	}
+
 	/**
 	 * ID of the selected character typ if this is a character, (UINT)-1 otherwise
 	 */
@@ -54,14 +58,28 @@ export class HoldMonster {
 		this.extraVars = readPackedVars(opts.encExtraVars);
 		this.isFirstTurn = opts.isFirstTurn;
 
-		if (this.extraVars && this.extraVars.hasVar('Commands')) {
-			this.$commandList = new CommandsList(room.$hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+		if (this.extraVars) {
+			if (this.$hold.version.characterCommandsStoredInMultipleVars) {
+				const commands = unpackJtrhCommands(this.extraVars);
+
+				this.$commandList = commands.length > 0
+					? new CommandsList(this.$hold, commands)
+					: undefined;
+
+			} else if (this.$hold.version.characterCommandsStoredInCommands && this.extraVars.hasVar('Commands')) {
+				this.$commandList = new CommandsList(this.$hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+			}
 		}
 	}
 
 	public repackCommandsIntoExtraVars() {
 		if (this.$commandList && this.extraVars) {
-			this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
+			if (this.$hold.version.characterCommandsStoredInMultipleVars) {
+				packJtrhCommands(this.$commandList, this.extraVars);
+
+			} else {
+				this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
+			}
 		}
 	}
 }

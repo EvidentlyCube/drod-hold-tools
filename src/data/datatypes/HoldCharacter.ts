@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { CommandsList } from "../CommandList";
-import { readCommandsBuffer } from "../CommandUtils";
+import { packJtrhCommands, readCommandsBuffer, unpackJtrhCommands } from "../CommandUtils";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
 import { HoldRef } from "../references/HoldReference";
@@ -54,14 +54,29 @@ export class HoldCharacter {
 		this.tilesDataId = new SignalUpdatableValue(options.tilesDataId);
 		this.avatarDataId = new SignalUpdatableValue(options.avatarDataId);
 
-		if (this.extraVars && this.extraVars.hasVar('Commands')) {
-			this.$commandList = new CommandsList(hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+		if (this.extraVars) {
+			if (this.$hold.version.characterCommandsStoredInMultipleVars) {
+				const commands = unpackJtrhCommands(this.extraVars);
+
+				this.$commandList = commands.length > 0
+					? new CommandsList(this.$hold, commands)
+					: undefined;
+			}
+
+			if (this.$hold.version.characterCommandsStoredInCommands && this.extraVars.hasVar('Commands')) {
+				this.$commandList = new CommandsList(this.$hold, readCommandsBuffer(this.extraVars.readByteBuffer('Commands', [])));
+			}
 		}
 	}
 
 	public repackCommandsIntoExtraVars() {
 		if (this.$commandList && this.extraVars) {
-			this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
+			if (this.$hold.version.characterCommandsStoredInMultipleVars) {
+				packJtrhCommands(this.$commandList, this.extraVars);
+
+			} else {
+				this.extraVars.writeByteBuffer('Commands', this.$commandList.toByteArray());
+			}
 		}
 	}
 }

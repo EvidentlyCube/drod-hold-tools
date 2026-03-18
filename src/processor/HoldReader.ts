@@ -38,6 +38,7 @@ export class HoldReader {
 	// @FIXME Combine the two
 	public error = new SignalValue<string>("");
 	public errorStackTrace = new SignalValue<string>("");
+	public errorInstance = new SignalValue<Error | undefined>(undefined);
 
 	public onParsed = new Signal<HoldReader>();
 
@@ -123,6 +124,7 @@ export class HoldReader {
 		} catch (e) {
 			this.error.value = e instanceof Error ? e.message : String(e);
 			this.errorStackTrace.value = e instanceof Error ? (e.stack ?? "NO STACK") : "NO STACK";
+			this.errorInstance.value = e instanceof Error ? e : undefined;
 
 			this._currentStepIndex = this._steps.length;
 

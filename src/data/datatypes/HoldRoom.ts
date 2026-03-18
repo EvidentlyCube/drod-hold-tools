@@ -6,6 +6,7 @@ import { getCoordinateName, wcharBase64ToString } from "../Utils";
 import { HoldRefScroll } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
+import { HoldSpeech } from "./HoldSpeech";
 
 interface RoomConstructor {
 	id: number;
@@ -13,7 +14,7 @@ interface RoomConstructor {
 	dataId?: number;
 	overheadDataId?: number;
 	isRequired: boolean;
-	isSecret: boolean;
+	isSecret: boolean | undefined;
 	roomX: number;
 	roomY: number;
 	roomCols: number;
@@ -23,8 +24,9 @@ interface RoomConstructor {
 	overheadImageStartX?: number;
 	overheadImageStartY?: number;
 	encSquares: string;
-	encStyleName: string;
-	encTileLights: string;
+	encStyleName: string | undefined;
+	style: number | undefined;
+	encTileLights: string | undefined;
 	encExtraVars?: string;
 }
 interface Checkpoint {
@@ -45,13 +47,17 @@ export interface HoldOrbAgent {
 	y: number;
 }
 export interface HoldOrb {
-	type: number;
+	/** @version 301+ */
+	type: number | undefined;
 	x: number;
 	y: number;
 	agents: HoldOrbAgent[];
 }
 export interface HoldExit {
+	/** @version 201+ */
 	entranceId: number;
+	/** @version 100 */
+	levelId: number;
 	left: number;
 	right: number;
 	top: number;
@@ -65,7 +71,7 @@ export class HoldRoom {
 	public readonly dataId?: number;
 	public readonly overheadDataId?: number;
 	public readonly isRequired: boolean;
-	public readonly isSecret: boolean;
+	public readonly isSecret: boolean | undefined; // @FIXME don't use undefined
 	public readonly roomX: number;
 	public readonly roomY: number;
 	public readonly roomCols: number;
@@ -75,8 +81,12 @@ export class HoldRoom {
 	public readonly overheadImageStartX?: number;
 	public readonly overheadImageStartY?: number;
 	public readonly encSquares: string;
-	public readonly styleName: SignalUpdatableValue<string>;
-	public readonly encTileLights: string;
+	/** @version 301+, before used `style`*/
+	public readonly styleName: SignalUpdatableValue<string> | undefined; // @FIXME don't use undefined
+	/** @version 100,201, afterwards replaced by `styleName` */
+	public readonly style: number | undefined; // @FIXME don't use undefined
+	/** @version 301+ */
+	public readonly encTileLights: string | undefined; // @FIXME don't use undefined
 	public readonly extraVars?: PackedVars;
 
 	public readonly checkpoints: Checkpoint[] = [];
@@ -88,6 +98,7 @@ export class HoldRoom {
 	private _monstersWithCommands?: ReadonlyArray<HoldMonster>;
 	private _monstersWithSpeechCommand?: ReadonlyArray<HoldMonster>;
 	private _monstersWithDataCommand?: ReadonlyArray<HoldMonster>;
+	private _speeches?: ReadonlyArray<HoldSpeech>;
 
 	public get $monstersWithCommands() {
 		if (!this._monstersWithCommands) {
@@ -113,6 +124,26 @@ export class HoldRoom {
 		return this._monstersWithDataCommand;
 	}
 
+	public get $speeches() {
+		if (!this._speeches) {
+			this._speeches = this.$monstersWithSpeechCommand.reduce(
+				(speeches, monster) => {
+					for (const command of monster.$commandList?.$commandsWithSpeech ?? []) {
+						const speech = this.$hold.speeches.get(command.speechId.newValue);
+
+						if (speech) {
+							speeches.push(speech);
+						}
+					}
+					return speeches;
+				},
+				[] as HoldSpeech[]
+			)
+		}
+
+		return this._speeches;
+	}
+
 	public get $level() {
 		return this.$hold.levels.getOrError(this.levelId);
 	}
@@ -132,9 +163,9 @@ export class HoldRoom {
 		return getCoordinateName(x, y);
 	}
 
-	public getScroll(ref: {x: number, y: number}): HoldScroll | undefined;
+	public getScroll(ref: { x: number, y: number }): HoldScroll | undefined;
 	public getScroll(x: number, y: number): HoldScroll | undefined;
-	public getScroll(refOrX: {x: number, y: number} | number, y?: number): HoldScroll | undefined {
+	public getScroll(refOrX: { x: number, y: number } | number, y?: number): HoldScroll | undefined {
 		if (typeof refOrX !== "number") {
 			return this.getScroll(refOrX.x, refOrX.y);
 		}
@@ -160,7 +191,10 @@ export class HoldRoom {
 		this.overheadImageStartX = opts.overheadImageStartX;
 		this.overheadImageStartY = opts.overheadImageStartY;
 		this.encSquares = opts.encSquares
-		this.styleName = new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName));
+		this.style = opts.style;
+		this.styleName = opts.encStyleName
+			? new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName))
+			: undefined;
 		this.encTileLights = opts.encTileLights
 		this.extraVars = readPackedVars(opts.encExtraVars);
 	}

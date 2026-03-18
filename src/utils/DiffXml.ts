@@ -1,4 +1,7 @@
-import { diffArrays } from "./ArrayUtils";
+import { Constants } from "../Constants";
+import { PackedVars } from "../data/PackedVars";
+import { readPackedVars } from "../data/PackedVarsUtils";
+import { diffArrays, diffArraysOneWay } from "./ArrayUtils";
 import { parseXml } from "./XmlParser";
 
 type ProgressCallback = (index: number, total: number) => void;
@@ -18,34 +21,34 @@ interface DiffState {
 }
 
 export class DiffXmlError extends Error {
-	public readonly contextLeft: Node;
-	public readonly contextRight: Node;
+	public readonly contextOriginal: Node;
+	public readonly contextGenerated: Node;
 
-	public constructor(left: Node, right: Node, message: string) {
+	public constructor(original: Node, generated: Node, message: string) {
 		super(message);
 
-		this.contextLeft = left;
-		this.contextRight = right;
+		this.contextOriginal = original;
+		this.contextGenerated = generated;
 		this.message = message;
 	}
 }
 
 export async function diffXml(
-	left: string | XMLDocument,
-	right: string | XMLDocument,
+	original: string | XMLDocument,
+	generated: string | XMLDocument,
 	onProgress: ProgressCallback,
 	skips: Skip[] = [],
 ) {
-	left = await toDocument(left);
-	right = await toDocument(right);
+	original = await toDocument(original);
+	generated = await toDocument(generated);
 
 	const state: DiffState = {
 		onProgress,
 		skips,
-		flatDom: flattenDom(left)
+		flatDom: flattenDom(original)
 	}
 
-	await compareNode(left, right, "ROOT", state);
+	await compareNode(original, generated, "ROOT", state);
 }
 
 function flattenDom(document: XMLDocument): Element[] {
@@ -67,103 +70,159 @@ function flattenDom(document: XMLDocument): Element[] {
 	return elements;
 }
 
-async function compareNode(left: Node, right: Node, context: string, state: DiffState) {
+async function compareNode(original: Node, generated: Node, context: string, state: DiffState) {
 	await sleep();
 
-	if (left.nodeType !== right.nodeType) {
+	if (original.nodeType !== generated.nodeType) {
 		throw new DiffXmlError(
-			left, right,
-			`${context}: Node Type '${left.nodeType}'/'${right.nodeType}'`
+			original, generated,
+			`${context}: Node type in original is '${original.nodeType}' but generated has '${generated.nodeType}'.`
 		);
 	}
 
-	switch (left.nodeType) {
+	switch (original.nodeType) {
 		case Node.ELEMENT_NODE:
-			await compareElement(left as Element, right as Element, context, state);
+			await compareElement(original as Element, generated as Element, context, state);
 			break;
+
 		case Node.DOCUMENT_NODE:
-			await compareDocuments(left as Document, right as Document, context, state);
+			await compareDocuments(original as Document, generated as Document, context, state);
 			break;
 
 		default:
 			throw new DiffXmlError(
-				left, right,
-				`Unknown node type: ${left.nodeType}`
+				original, generated,
+				`Unknown node type '${original.nodeType}' in original`
 			);
 	}
 }
 
-async function compareElement(left: Element, right: Element, context: string, state: DiffState) {
-	const index = state.flatDom.indexOf(left);
+async function compareElement(original: Element, generated: Element, context: string, state: DiffState) {
+	const index = state.flatDom.indexOf(original);
 	if (index !== -1) {
 		state.onProgress(index, state.flatDom.length);
 	}
-	if (left.tagName !== right.tagName) {
+	if (original.tagName !== generated.tagName) {
 		throw new DiffXmlError(
-			left, right,
-			`${context}: Tag Name mismatch '${left.tagName}'/'${right.tagName}'`
+			original, generated,
+			`${context}: Tag Name mismatch, original is '${original.tagName}' but generated is '${generated.tagName}'`
 		)
 	}
 
-	context += "." + left.tagName;
+	context += "." + original.tagName;
 
-	const leftAttributeNames = Array.from(left.attributes).map(node => node.name);
-	const rightAttributeNames = Array.from(right.attributes).map(node => node.name);
-	const diffNames = diffArrays(leftAttributeNames, rightAttributeNames);
+	const originalAttributeNames = Array.from(original.attributes).map(node => node.name);
+	const generatedAttributeNames = Array.from(generated.attributes).map(node => node.name);
 
-	if (diffNames.length > 0) {
+	// Special hack for v100 because some holds there had this attribute in the wrong place
+	if (original.tagName === 'Demos' && original.attributes[0].name === 'DemoID') {
+		const value = original.getAttribute('DemoID');
+		original.removeAttribute('DemoID');
+		original.setAttribute('DemoID', value ?? '');
+	}
+
+	const originalUniqueAttributes = diffArraysOneWay(originalAttributeNames, generatedAttributeNames);
+	if (originalUniqueAttributes.length > 0) {
 		throw new DiffXmlError(
-			left, right,
-			`${context}: Attributes names diff '${diffNames.join("','")}'`
+			original, generated,
+			`${context}: Original contains attributes '${originalUniqueAttributes.join("','")}' that are not present in the generated.`
 		);
 	}
 
-	for (let i = 0; i < left.attributes.length; i++) {
-		const lAttr = left.attributes.item(i)!;
-		const rAttr = right.attributes.item(i)!;
+	const generatedUniqueAttributes = diffArraysOneWay(generatedAttributeNames, originalAttributeNames);
+	if (generatedUniqueAttributes.length > 0) {
+		throw new DiffXmlError(
+			generated, generated,
+			`${context}: Generated contains attributes '${generatedUniqueAttributes.join("','")}' that are not present in the original.`
+		);
+	}
 
-		if (lAttr.name !== rAttr.name) {
+	for (let i = 0; i < original.attributes.length; i++) {
+		const originalAttr = original.attributes.item(i)!;
+		const generatedAttr = generated.attributes.item(i)!;
 
+		if (originalAttr.name !== generatedAttr.name) {
 			throw new DiffXmlError(
-				left, right,
-				`${context}.@${i}: Attribute name mismatch '${lAttr.name}' / '${rAttr.name}'`
+				original, generated,
+				`${context}.@${i}: Attribute name mismatch, in original is '${originalAttr.name}'  but in generated is '${generatedAttr.name}'`
 			);
 
-		} else if (skipAttribute(left.tagName, lAttr.name, state)) {
+		} else if (skipAttribute(original.tagName, originalAttr.name, state)) {
 			continue;
 
-		} else if (lAttr.value !== rAttr.value) {
+		} else if (originalAttr.value !== generatedAttr.value) {
+			let extraContexts: string[] = [];
+			if (originalAttr.name === 'ExtraVars') {
+				const originalExtraVars = readPackedVars(originalAttr.value).vars;
+				const generatedExtraVars = readPackedVars(generatedAttr.value).vars;
+
+				if (originalExtraVars.length < generatedExtraVars.length) {
+					extraContexts.push(`\n - More generated extra vars by ${generatedExtraVars.length - originalExtraVars.length}`);
+
+				} else if (originalExtraVars.length > generatedExtraVars.length) {
+					extraContexts.push(`\n - Fewer generated extra vars by ${originalExtraVars.length - generatedExtraVars.length}`);
+				}
+
+				const length = Math.max(originalExtraVars.length, generatedExtraVars.length);
+
+				for (var ii = 0; ii < length; ii++) {
+					const original = originalExtraVars[ii];
+					const generated = generatedExtraVars[ii];
+
+					if (original.name !== generated.name) {
+						extraContexts.push(`\n - Variable at ${ii} has different name, original is '${original.name}' while generated is '${generated.name}'`);
+						break;
+
+					} else if (original.value !== generated.value) {
+						extraContexts.push(`\n - Variable at ${ii} has different value, original is '${original.value}' while generated is '${generated.value}'`);
+						break;
+
+					} else if (original.type !== generated.type) {
+						extraContexts.push(`\n - Variable at ${ii} has different type, original is '${original.type}' while generated is '${generated.type}'`);
+						break;
+					}
+				}
+
+				if (ii === length) {
+					extraContexts.push(`\n - Extra vars encode to different strings for no discernable reason.`);
+					extraContexts.push(`\n - Original = ${base64ToHex(originalAttr.value)}`);
+					extraContexts.push(`\n - Generated = ${base64ToHex(generatedAttr.value)}`);
+				}
+			}
+
 			throw new DiffXmlError(
-				left, right,
-				`${context}.@${i}#${lAttr.name}: Attribute value mismatch ${getStringDiff(lAttr.value, rAttr.value, 32)}`
+				original, generated,
+				`${context}.@${i}#${originalAttr.name}: Attribute value mismatch:`
+				+ getStringDiff(originalAttr.value, generatedAttr.value, 32)
+				+ extraContexts.join('')
 			);
 		}
 	}
 
-	if (left.children.length !== right.children.length) {
+	if (original.children.length !== generated.children.length) {
 		throw new DiffXmlError(
-			left, right,
-			`${context}: Different children number ${left.children.length} / ${right.children.length}`
+			original, generated,
+			`${context}: Different children number ${original.children.length} / ${generated.children.length}`
 		)
 	}
 
-	for (let i = 0; i < left.children.length; i++) {
-		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`, state)
+	for (let i = 0; i < original.children.length; i++) {
+		await compareNode(original.children[i], generated.children[i], `${context}.[${i}]`, state)
 	}
 }
 
-async function compareDocuments(left: Document, right: Document, context: string, state: DiffState) {
+async function compareDocuments(original: Document, generated: Document, context: string, state: DiffState) {
 	context += ".document";
 
-	if (left.children.length !== right.children.length) {
+	if (original.children.length !== generated.children.length) {
 		throw new DiffXmlError(
-			left, right,
-			`${context}: Different children number ${left.children.length} / ${right.children.length}`
+			original, generated,
+			`${context}: Different children number, original has ${original.children.length} but generated has ${generated.children.length}`
 		);
 	}
 
-	for (let i = 0; i < left.children.length; i++) {
-		await compareNode(left.children[i], right.children[i], `${context}.[${i}]`, state)
+	for (let i = 0; i < original.children.length; i++) {
+		await compareNode(original.children[i], generated.children[i], `${context}.[${i}]`, state)
 	}
 }
 
@@ -175,13 +234,13 @@ async function toDocument(source: string | Document) {
 	return parseXml(source);
 }
 
-function getStringDiff(left: string, right: string, context: number) {
-	for (let i = 0; i < Math.max(left.length, right.length); i++) {
-		if (left.charAt(i) !== right.charAt(i)) {
-			let error = `Failure at char #${i}/${left.length},${right.length}:\n`;
+function getStringDiff(original: string, generated: string, context: number) {
+	for (let i = 0; i < Math.max(original.length, generated.length); i++) {
+		if (original.charAt(i) !== generated.charAt(i)) {
+			let error = `Failure at char #${i}/${original.length},${generated.length}:\n`;
 
-			error += `Left:  ${left.slice(Math.max(0, i - context), Math.min(left.length, i + context))}\n`;
-			error += `Right: ${right.slice(Math.max(0, i - context), Math.min(right.length, i + context))}`;;
+			error += `Original:  ${original.slice(Math.max(0, i - context), Math.min(original.length, i + context))}\n`;
+			error += `Generated: ${generated.slice(Math.max(0, i - context), Math.min(generated.length, i + context))}`;;
 
 			return error;
 		}
@@ -197,7 +256,7 @@ async function sleep(forced = false) {
 			setTimeout(() => {
 				lastSleep = Date.now();
 				resolve();
-			}, 100)
+			}, Constants.diffXmlSleep)
 		} else {
 			resolve();
 		}
@@ -211,4 +270,17 @@ function skipAttribute(tagName: string, attributeName: string, state: DiffState)
 		}
 	}
 	return (tagName === 'Holds' && attributeName === 'LastUpdated');
+}
+
+function base64ToHex(base64string: string): string {
+	const result = [];
+	const str = window.atob(base64string);
+
+	for (let i = 0; i < str.length; i++) {
+		result.push(
+			str.charCodeAt(i).toString(16).padStart(2, '0')
+		);
+	}
+
+	return result.join(' ');
 }

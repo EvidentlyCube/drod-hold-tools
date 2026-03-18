@@ -1,8 +1,8 @@
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
+import { CommandsList } from "./CommandList";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { isValidVariableFirstCharacter, isValidVariableSubsequentCharacter } from "./VariableUtils";
-import { Hold } from "./datatypes/Hold";
+import { PackedVars } from "./PackedVars";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
@@ -140,6 +140,57 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 	}
 
 	return buffer;
+}
+
+export function unpackJtrhCommands(packedVars: PackedVars): ScriptCommand[] {
+	const numCommands = packedVars.readUint('NumCommands', 0);
+	const commands: ScriptCommand[] = [];
+
+	for (let i = 0; i < numCommands; i++) {
+		commands.push({
+			index: i,
+			type: packedVars.readUint(`${i}c`, 0),
+			x: packedVars.readUint(`${i}x`, 0),
+			y: packedVars.readUint(`${i}y`, 0),
+			w: packedVars.readUint(`${i}w`, 0),
+			h: packedVars.readUint(`${i}h`, 0),
+			flags: packedVars.readUint(`${i}f`, 0),
+			label: new SignalUpdatableValue(packedVars.readWCharString(`${i}l`, '')),
+			speechId: new SignalUpdatableValue(packedVars.readDWord_deprecated(`${i}s`, 0))
+		});
+	}
+
+	return commands;
+}
+
+export function packJtrhCommands(commandList: CommandsList, packedVars: PackedVars): void {
+	const { version } = commandList.hold;
+
+	// First remove the existing commands
+	const existingCommands = packedVars.vars
+		.map(v => v.name)
+		.filter(n => n.match(/^\d+[cxywhlsf]$/));
+
+	for (const name of existingCommands) {
+		packedVars.delete(name);
+	}
+
+	// And then pack them again
+	packedVars.writeUint('NumCommands', commandList.commands.length)
+	for (let i = 0; i < commandList.commands.length; i++) {
+		const command = commandList.commands[i];
+
+		if (version.characterCommandsStoredInMultipleVars_normalOrdering) {
+			packedVars.writeUint(`${i}c`, command.type);
+			packedVars.writeUint(`${i}x`, command.x);
+			packedVars.writeUint(`${i}y`, command.y);
+			packedVars.writeUint(`${i}w`, command.w);
+			packedVars.writeUint(`${i}h`, command.h);
+			packedVars.writeWcharString(`${i}l`, command.label.newValue);
+			packedVars.writeUint(`${i}s`, command.speechId.newValue);
+		}
+		// packedVars.writeUint(`${i}f`, command.flags);
+	}
 }
 
 function doesCommandHaveData(type: ScriptCommandType) {

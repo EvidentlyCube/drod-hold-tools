@@ -3,6 +3,10 @@ export function range(from: number, to: number, step: number = 1) {
 	return Array(len).fill(0).map((_, idx) => from + (idx * step))
 }
 
+/**
+ * Return elements from left array that are not present in the right array
+ * AND elements from the right array not present in the left array.
+ */
 export function diffArrays<T extends (string|number)>(left: T[], right: T[]): T[] {
 	const leftSet = new Set(left);
 	const rightSet = new Set(right);
@@ -16,6 +20,24 @@ export function diffArrays<T extends (string|number)>(left: T[], right: T[]): T[
 
 	for (const item of right) {
 		if (!leftSet.has(item)) {
+			diff.add(item);
+		}
+	}
+
+	return Array.from(diff);
+}
+
+/**
+ * Return elements from left array that are not present in the right array
+ * but NOT the other way around.
+ */
+export function diffArraysOneWay<T extends (string|number)>(left: T[], right: T[]): T[] {
+	const leftSet = new Set(left);
+	const rightSet = new Set(right);
+	const diff = new Set<T>();
+
+	for (const item of left) {
+		if (!rightSet.has(item)) {
 			diff.add(item);
 		}
 	}

@@ -167,6 +167,9 @@ const PackedVarsUtils = {
 				case PackedVarType.Uint:
 					vars.writeUint(varName, arr.readUint());
 					break;
+				case PackedVarType.deprecated_DWord:
+					vars.writeDWord(varName, arr.readUint());
+					break;
 				case PackedVarType.Int:
 					vars.writeInt(varName, arr.readInt());
 					break;
@@ -210,6 +213,14 @@ const PackedVarsUtils = {
 				case PackedVarType.Uint: {
 					if (typeof value !== 'number' || !Number.isFinite(value)) {
 						throw new Error(`Expected Uint value to be a number for variable "${name}"`);
+					}
+					buf.writeUint(4);
+					buf.writeUint(value >>> 0);
+					break;
+				}
+				case PackedVarType.deprecated_DWord: {
+					if (typeof value !== 'number' || !Number.isFinite(value)) {
+						throw new Error(`Expected deprecated_DWord value to be a number for variable "${name}"`);
 					}
 					buf.writeUint(4);
 					buf.writeUint(value >>> 0);

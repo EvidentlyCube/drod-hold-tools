@@ -1,15 +1,18 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { HoldVersion } from "../HoldVersion";
 import { stringToWCharBase64, wcharBase64ToString } from "../Utils";
 import { areReferencesIdentical, type HoldRef } from "../references/HoldReference";
 import { HoldChangeList } from "./HoldChange";
 import { HoldChangeListener } from "./HoldChangeListener";
 import type { HoldCharacter } from "./HoldCharacter";
 import type { HoldData } from "./HoldData";
+import { HoldDemo } from "./HoldDemo";
 import type { HoldEntrance } from "./HoldEntrance";
 import type { HoldLevel } from "./HoldLevel";
 import { HoldPlayer } from "./HoldPlayer";
 import type { HoldRoom, HoldScroll } from "./HoldRoom";
+import { HoldSavedGame } from "./HoldSavedGame";
 import type { HoldSpeech } from "./HoldSpeech";
 import type { HoldVariable } from "./HoldVariable";
 import { HoldWorldMap } from "./HoldWorldMap";
@@ -22,7 +25,7 @@ interface HoldConstructor {
 	$holdReaderId: number;
 
 	id: number;
-	version: number;
+	version: HoldVersion;
 
 	gidCreated: number;
 	gidNewLevelIndex: number;
@@ -31,7 +34,7 @@ interface HoldConstructor {
 
 	playerId: number;
 	lastUpdated: number;
-	status: number;
+	status: number | undefined;
 	encName: string;
 
 	encDescriptionMessage: string;
@@ -40,32 +43,26 @@ interface HoldConstructor {
 	lastScriptId: number;
 	lastVarId: number;
 	lastCharId: number;
-	lastWorldMapId?: number;
+	lastWorldMapId: number;
 	startingLevelId: number;
-}
-
-interface DemoOrSavedGame {
-	id: number;
-	afterPlayerId: number;
-	content: string;
 }
 
 export class Hold {
 	public readonly id: number;
-	public readonly version: number;
+	public readonly version: HoldVersion;
 	public readonly gidCreated: number;
 	public readonly gidNewLevelIndex: number;
 	public readonly editingPrivileges: number;
 	public readonly playerId: SignalUpdatableValue<number>;
 	public readonly lastUpdated: number;
-	public readonly status: number;
+	public readonly status: number | undefined;
 	public readonly name: SignalUpdatableValue<string>;
 	public readonly descriptionMessage: SignalUpdatableValue<string>;
 	public readonly endHoldMessage: SignalUpdatableValue<string>;
 	public readonly lastScriptId: number;
 	public readonly lastVarId: number;
 	public readonly lastCharId: number;
-	public readonly lastWorldMapId?: number;
+	public readonly lastWorldMapId: number;
 	public readonly startingLevelId: number;
 
 	public readonly players = new OrderedMap<number, HoldPlayer>();
@@ -77,9 +74,8 @@ export class Hold {
 	public readonly levels = new OrderedMap<number, HoldLevel>();
 	public readonly rooms = new OrderedMap<number, HoldRoom>();
 	public readonly worldMaps = new OrderedMap<number, HoldWorldMap>();
-
-	/** Currently not used, stored only so it can be included during export */
-	public readonly demosAndSavedGames: DemoOrSavedGame[] = [];
+	public readonly demos = new OrderedMap<number, HoldDemo>();
+	public readonly savedGames = new OrderedMap<number, HoldSavedGame>();
 
 	public readonly $holdReaderId: number;
 	public readonly $changes = new HoldChangeList();

@@ -3,6 +3,8 @@ import { PackedVars } from "./PackedVars";
 import { writePackedVars } from "./PackedVarsUtils";
 import { stringToWCharBase64 } from "./Utils";
 
+type AttrValue = number|SignalUpdatableValue<string>|boolean|PackedVars|{_safeString: string};
+
 export class XMLWriter {
 	private _xml = "";
 
@@ -20,8 +22,32 @@ export class XMLWriter {
 		return this;
 	}
 
-	public attr(name: string, value: number|SignalUpdatableValue<string>|boolean|PackedVars|{_safeString: string}) {
-		this._xml += ` ${name}="`;
+	/**
+	 * Write an attribute to the XML unless value is undefined, in which case it's skipped.
+	 */
+	public attrU(name: string, value: AttrValue | {_safeString: undefined} | undefined) {
+		if (value === undefined) {
+			return this;
+		} else if (typeof value === 'object' && '_safeString' in value && value._safeString === undefined) {
+			return this;
+		}
+
+		return this.attr(name, value);
+	}
+
+	public attrIf(name: string, value: AttrValue, isPrinted: boolean) {
+		if (isPrinted) {
+			return this.attr(name, value);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Write an attribute to the XML.
+	 */
+	public attr(name: string, value: AttrValue) {
+		this._xml += ` ${name}='`;
 
 		if (value instanceof PackedVars) {
 			this._xml += writePackedVars(value);
@@ -38,7 +64,7 @@ export class XMLWriter {
 		} else if (typeof value === 'object' && '_safeString' in value) {
 			this._xml += value._safeString;
 		}
-		this._xml += '"';
+		this._xml += "'";
 
 		return this;
 	}
