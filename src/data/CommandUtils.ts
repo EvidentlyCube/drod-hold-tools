@@ -1,8 +1,9 @@
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
-import { CommandsList } from "./CommandList";
+import { CommandListPackingType, CommandsList } from "./CommandList";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
 import { PackedVars, PackedVarType } from "./PackedVars";
+import { Hold } from "./datatypes/Hold";
 import { HoldCharacter } from "./datatypes/HoldCharacter";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
@@ -91,7 +92,55 @@ class WrappedCommandBuffer {
 	}
 }
 
-export function readCommandsBuffer(buffer: number[]) {
+export function unpackCommands(hold: Hold, vars: PackedVars): CommandsList | undefined {
+	if (vars.hasVar('Commands')) {
+		return new CommandsList(
+			hold,
+			readCommandsBuffer(vars.readByteBuffer('Commands', [])),
+			CommandListPackingType.SerializedIntoCommands
+		);
+
+	} else if (vars.hasVar('SerializedCommands')) {
+		return new CommandsList(
+			hold,
+			readCommandsBuffer(vars.readByteBuffer('SerializedCommands', [])),
+			CommandListPackingType.SerializedIntoCommands
+		);
+	} else {
+		const commands = unpackCommands_spreadInExtraVars(vars);
+
+		if (commands.length) {
+			/** @see CommandListPackingType */
+			const isSortedAlphabetically = vars.getVarIndex('0x') > vars.getVarIndex('0c');
+			return new CommandsList(
+				hold,
+				commands,
+				isSortedAlphabetically
+					 ? CommandListPackingType.SeparateVarsAlphabeticallySorted
+					 : CommandListPackingType.SeparateVarsIndexSorted
+			);
+		}
+	}
+
+	return undefined;
+}
+
+export function packCommands(vars: PackedVars, commandList: CommandsList) {
+	switch (commandList.packingType) {
+		case CommandListPackingType.SerializedIntoCommands:
+			vars.writeByteBuffer('Commands', commandList.toByteArray());
+			break;
+		case CommandListPackingType.SerializedIntoSerializedCommands:
+			vars.writeByteBuffer('SerializedCommands', commandList.toByteArray());
+			break;
+		case CommandListPackingType.SeparateVarsAlphabeticallySorted:
+		case CommandListPackingType.SeparateVarsIndexSorted:
+			packCommands_spreadInExtraVars(commandList, vars);
+			break;
+	}
+}
+
+function readCommandsBuffer(buffer: number[]) {
 	const commands: ScriptCommand[] = [];
 	if (buffer.length === 0) {
 		return commands;
@@ -142,7 +191,7 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 	return buffer;
 }
 
-export function unpackJtrhCommands(packedVars: PackedVars): ScriptCommand[] {
+function unpackCommands_spreadInExtraVars(packedVars: PackedVars): ScriptCommand[] {
 	const numCommands = packedVars.readUint('NumCommands', 0);
 	const commands: ScriptCommand[] = [];
 
@@ -162,44 +211,37 @@ export function unpackJtrhCommands(packedVars: PackedVars): ScriptCommand[] {
 			flags: packedVars.readUint(`${i}f`, 0),
 			label: new SignalUpdatableValue(packedVars.readWCharString(`${i}l`, '')),
 			speechId: new SignalUpdatableValue(speechId),
-			__speechIdType: speechIdType
+			$speechIdType: speechIdType
 		});
 	}
 
 	return commands;
 }
 
-export function packJtrhCommands(commandList: CommandsList, packedVars: PackedVars): void {
+function packCommands_spreadInExtraVars(commandList: CommandsList, packedVars: PackedVars): void {
 	const { version } = commandList.hold;
 
-	// First remove the existing commands
-	const existingCommands = packedVars.vars
-		.map(v => v.name)
-		.filter(n => n.match(/^\d+[cxywhlsf]$/));
+	// This assumes it's impossible to add/remove commands in the holds that use this mechanism
 
-	for (const name of existingCommands) {
-		packedVars.delete(name);
-	}
-
-	// And then pack them again
 	packedVars.writeUint('NumCommands', commandList.commands.length)
 	for (let i = 0; i < commandList.commands.length; i++) {
 		const command = commandList.commands[i];
 
-		if (version.characterCommandsStoredInMultipleVars_normalOrdering) {
-			packedVars.writeUint(`${i}c`, command.type);
-			packedVars.writeUint(`${i}x`, command.x);
-			packedVars.writeUint(`${i}y`, command.y);
-			packedVars.writeUint(`${i}w`, command.w);
-			packedVars.writeUint(`${i}h`, command.h);
-			packedVars.writeWcharString(`${i}l`, command.label.newValue);
-			if (command.__speechIdType === PackedVarType.Uint) {
-				packedVars.writeUint(`${i}s`, command.speechId.newValue);
-			} else {
-				packedVars.writeDWord_deprecated(`${i}s`, command.speechId.newValue);
-			}
+		packedVars.writeUint(`${i}c`, command.type);
+		packedVars.writeUint(`${i}x`, command.x);
+		packedVars.writeUint(`${i}y`, command.y);
+		packedVars.writeUint(`${i}w`, command.w);
+		packedVars.writeUint(`${i}h`, command.h);
+		packedVars.writeWcharString(`${i}l`, command.label.newValue);
+		if (command.$speechIdType === PackedVarType.Uint) {
+			packedVars.writeUint(`${i}s`, command.speechId.newValue);
+		} else {
+			packedVars.writeDWord_deprecated(`${i}s`, command.speechId.newValue);
 		}
-		// packedVars.writeUint(`${i}f`, command.flags);
+
+		if (version.characterCommandsSupportFlags) {
+			packedVars.writeUint(`${i}f`, command.flags);
+		}
 	}
 }
 

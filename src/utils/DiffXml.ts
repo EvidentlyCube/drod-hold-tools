@@ -109,7 +109,7 @@ async function compareElement(original: Element, generated: Element, context: st
 		)
 	}
 
-	context += "" + original.tagName;
+	context += "=" + original.tagName;
 
 	const originalAttributeNames = Array.from(original.attributes).map(node => node.name);
 	const generatedAttributeNames = Array.from(generated.attributes).map(node => node.name);
@@ -169,14 +169,38 @@ async function compareElement(original: Element, generated: Element, context: st
 					const original = originalExtraVars[ii];
 					const generated = generatedExtraVars[ii];
 
-					const hasWrongName = original.name !== generated.name;
-					const hasWrongValue = original.value !== generated.value;
-					const hasWrongType = original.type !== generated.type;
+					const hasWrongName = original?.name !== generated?.name;
+					const hasWrongValue = original?.value !== generated?.value;
+					const hasWrongType = original?.type !== generated?.type;
 
 					if (hasWrongName || hasWrongValue || hasWrongType) {
 						extraContexts.push(`\n - Difference between variables at ${ii}:`);
-						extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${JSON.stringify(original.value)}`);
-						extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${JSON.stringify(generated.value)}`);
+						if (original) {
+							extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${JSON.stringify(original.value)}`);
+						} else {
+							extraContexts.push(`\n   - Original has no field`);
+						}
+						if (generated) {
+							extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${JSON.stringify(generated.value)}`);
+						} else {
+							extraContexts.push(`\n   - Generated has no field`);
+						}
+
+						const sliceStart = Math.max(0, ii - 5);
+						const originalSliceEnd = Math.min(originalExtraVars.length, ii + 5);
+						const generatedSliceEnd = Math.min(generatedExtraVars.length, ii + 5);
+
+						const originalNames =
+							(sliceStart > 0 ? '..., ' : '')
+							+ originalExtraVars.slice(sliceStart, originalSliceEnd).map(v => v.name).join(', ')
+							+ (originalSliceEnd < originalExtraVars.length ? ', ...' : '');
+						const generatedNames =
+							(sliceStart > 0 ? '..., ' : '')
+							+ generatedExtraVars.slice(sliceStart, generatedSliceEnd).map(v => v.name).join(', ')
+							+ (generatedSliceEnd < generatedExtraVars.length ? ', ...' : '');
+
+						extraContexts.push(`\n   - Original variables: ${originalNames}`);
+						extraContexts.push(`\n   - Generated variables: ${generatedNames}`);
 						break;
 					}
 				}

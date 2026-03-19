@@ -344,6 +344,8 @@ export async function xmlToHold(
 				startRoomX: int(savedGameXml, 'StartRoomX'),
 				startRoomY: int(savedGameXml, 'StartRoomY'),
 				startRoomO: int(savedGameXml, 'StartRoomO'),
+				startRoomAppearance: intU(savedGameXml, 'StartRoomAppearance') ?? -1,
+				startRoomSwordOff: intU(savedGameXml, 'StartRoomSwordOff') ?? -1,
 				exploredRooms: intArrayU(savedGameXml, 'ExploredRooms') ?? [],
 				conqueredRooms: intArrayU(savedGameXml, 'ConqueredRooms') ?? [],
 				completedScripts: intArrayU(savedGameXml, 'CompletedScripts') ?? [],
@@ -373,8 +375,9 @@ export async function xmlToHold(
 				showSequenceNo: int(demoXml, 'ShowSequenceNo'),
 				beginTurnNo: int(demoXml, 'BeginTurnNo'),
 				endTurnNo: int(demoXml, 'EndTurnNo'),
-				nextDemoId: intU(demoXml, 'NextDemoID') ?? 0,
+				nextDemoId: intU(demoXml, 'NextDemoID') ?? -1,
 				checksum: int(demoXml, 'Checksum'),
+				flags: intU(demoXml, 'Flags') ?? -1,
 			});
 
 			hold.demos.set(holdDemo.id, holdDemo);

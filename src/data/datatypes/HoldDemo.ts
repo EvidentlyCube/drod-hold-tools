@@ -11,6 +11,7 @@ interface DemoConstructor {
 	endTurnNo: number;
 	nextDemoId: number;
 	checksum: number;
+	flags: number;
 
 }
 export class HoldDemo {
@@ -25,6 +26,7 @@ export class HoldDemo {
 	public readonly endTurnNo: number;
 	public readonly nextDemoId: number;
 	public readonly checksum: number;
+	public readonly flags: number;
 
 	public constructor(hold: Hold, opts: DemoConstructor) {
 		this.$hold = hold;
@@ -38,5 +40,6 @@ export class HoldDemo {
 		this.endTurnNo = opts.endTurnNo;
 		this.nextDemoId = opts.nextDemoId;
 		this.checksum = opts.checksum;
+		this.flags = opts.flags;
 	}
 }

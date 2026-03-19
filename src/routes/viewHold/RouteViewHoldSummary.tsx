@@ -4,7 +4,7 @@ import { Hold } from "../../data/datatypes/Hold";
 import { ReactElement, useCallback, useMemo } from "react";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
-import { getCharacterName, getCommandsToString } from "../../data/Utils";
+import { getHoldCommandsExport } from "../../data/Utils";
 import { Zippable, zipSync } from 'fflate';
 import { base64ToUint8 } from "../../utils/StringUtils";
 import HoldProblems from "../../components/viewHold/summary/HoldProblems";
@@ -28,24 +28,7 @@ export default function RouteViewHoldSummary() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 	const handleDownloadScripts = useCallback(() => {
-		const blobs: string[] = [];
-		for (const c of hold.characters.values()) {
-			blobs.push(`Custom Character ${c.name.newValue}:\n${getCommandsToString(c.$commandList, 1)}`);
-		}
-		for (const room of hold.rooms.values()) {
-			for (const monster of room.monsters) {
-				if (monster.$commandList) {
-					blobs.push(
-						`${room.$level.name.newValue}: ${room.$coordsName}`
-						+ ` at (${monster.x}, ${monster.y})`
-						+ ` of ${getCharacterName(hold, monster.$characterTypeId)}`
-						+ `\n${getCommandsToString(monster.$commandList, 1)}`
-					);
-				}
-			}
-		}
-
-		navigator.clipboard.writeText(blobs.join("\n\n"));
+		navigator.clipboard.writeText(getHoldCommandsExport(hold));
 		alert("Copied!");
 
 	}, [hold]);

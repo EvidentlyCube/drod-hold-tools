@@ -13,6 +13,8 @@ interface SavedGameConstructor {
 	startRoomX: number;
 	startRoomY: number;
 	startRoomO: number;
+	startRoomAppearance: number;
+	startRoomSwordOff: number;
 	exploredRooms: number[];
 	conqueredRooms: number[];
 	completedScripts: number[];
@@ -39,6 +41,8 @@ export class HoldSavedGame {
 	public readonly startRoomX: number;
 	public readonly startRoomY: number;
 	public readonly startRoomO: number;
+	public readonly startRoomAppearance: number;
+	public readonly startRoomSwordOff: number;
 	public readonly exploredRooms: number[];
 	public readonly conqueredRooms: number[];
 	public readonly completedScripts: number[];
@@ -65,6 +69,8 @@ export class HoldSavedGame {
 		this.startRoomX = opts.startRoomX;
 		this.startRoomY = opts.startRoomY;
 		this.startRoomO = opts.startRoomO;
+		this.startRoomAppearance = opts.startRoomAppearance;
+		this.startRoomSwordOff = opts.startRoomSwordOff;
 		this.exploredRooms = opts.exploredRooms;
 		this.conqueredRooms = opts.conqueredRooms;
 		this.completedScripts = opts.completedScripts;

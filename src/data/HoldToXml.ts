@@ -582,6 +582,11 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		return;
 	}
 
+	const player = savedGame.$hold.players.get(savedGame.playerId);
+	if (player) {
+		await writePlayer(writer, refs, player, holdVersion);
+	}
+
 	refs.savedGameIds.add(savedGame.id);
 
 	writer.tag('SavedGames')
@@ -596,6 +601,8 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attr('StartRoomX', savedGame.startRoomX)
 		.attr('StartRoomY', savedGame.startRoomY)
 		.attr('StartRoomO', savedGame.startRoomO)
+		.attrIf('StartRoomAppearance', savedGame.startRoomAppearance, savedGame.startRoomAppearance !== -1)
+		.attrIf('StartRoomSwordOff', savedGame.startRoomSwordOff, savedGame.startRoomSwordOff !== -1)
 		.attrIf('SavedGameID', savedGame.id, !holdVersion.saveAttr_idEarly)
 		.attrIf('ExploredRooms',
 			{ _safeString: savedGame.exploredRooms.join(" ") + " " },
@@ -649,8 +656,9 @@ async function writeDemo(
 		.attr('ShowSequenceNo', demo.showSequenceNo)
 		.attr('BeginTurnNo', demo.beginTurnNo)
 		.attr('EndTurnNo', demo.endTurnNo)
-		.attrIf('NextDemoID', demo.nextDemoId, holdVersion.demoAttr_NextDemoId)
+		.attrIf('NextDemoID', demo.nextDemoId, demo.nextDemoId !== -1)
 		.attr('Checksum', demo.checksum)
+		.attrIf('Flags', demo.flags, demo.flags !== -1)
 		.attr('DemoID', demo.id)
 
 	writer.end();

@@ -10,7 +10,7 @@ export function truncate(str: string | number, maxLength: number): string {
 }
 
 export function bytesArrToBase64(bytes: number[]) {
-	return btoa(String.fromCharCode.apply(null, bytes));
+	return btoa(bytes.map(i => String.fromCharCode(i)).join(''));
 }
 
 export function base64ToUint8(base64: string) {

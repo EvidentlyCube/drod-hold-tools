@@ -146,6 +146,10 @@ export class PackedVars {
 		return this._vars.find(packedVar => packedVar.name === name) !== undefined;
 	}
 
+	getVarIndex(name: string) {
+		return this._vars.findIndex(v => v.name === name);
+	}
+
 	private readVar(name: string, expectedType: PackedVarType, def: PackedVarValue): PackedVarValue {
 		const [isFound, packedVar] = this.getVar(name);
 

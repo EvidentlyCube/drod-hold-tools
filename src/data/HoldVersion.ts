@@ -1,4 +1,4 @@
-import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507 } from "../Constants";
+import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TCB_302, VERSION_TSS_507 } from "../Constants";
 
 export class HoldVersion {
 	public readonly version: number;
@@ -42,14 +42,14 @@ export class HoldVersion {
 	 * `<number><field>`, eg. `0x 0y 0w 0h 0f 0l 0s`
 	 */
 	public get characterCommandsStoredInMultipleVars() {
-		return this.version === VERSION_JTRH;
+		return [VERSION_JTRH, VERSION_TCB_301].includes(this.version);
 	}
 
 	/**
-	 * Extension of characterCommandsStoredInMultipleVars -
+	 * Flags field for commands was only introduced in TCB
 	 */
-	public get characterCommandsStoredInMultipleVars_normalOrdering() {
-		return this.version === VERSION_JTRH;
+	public get characterCommandsSupportFlags() {
+		return this.version >= VERSION_TCB_301;
 	}
 
 	/**
@@ -57,7 +57,7 @@ export class HoldVersion {
 	 * extra var.
 	 */
 	public get characterCommandsStoredInCommands() {
-		return this.version >= VERSION_TCB_301;
+		return this.version >= VERSION_TCB_302;
 	}
 
 	/**
@@ -124,13 +124,6 @@ export class HoldVersion {
 	 * TCB added support for controlling how entrance descriptions are displayed.
 	 */
 	public get entranceAttr_ShowDescription() {
-		return this.version >= VERSION_TCB_301;
-	}
-
-	/**
-	 * In JtRH demos did not contain the next demo ID
-	 */
-	public get demoAttr_NextDemoId() {
 		return this.version >= VERSION_TCB_301;
 	}
 

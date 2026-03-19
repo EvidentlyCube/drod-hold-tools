@@ -16,5 +16,5 @@ export interface ScriptCommand {
 	/**
 	 * @version 201 In some JtRH holds SpeechID is stored not as DWord but as UINT
 	 */
-	__speechIdType?: PackedVarType;
+	$speechIdType?: PackedVarType;
 }

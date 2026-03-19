@@ -1,12 +1,13 @@
-import { readdir, readFile, stat } from "node:fs/promises";
-import { lstatSync, writeFileSync } from "node:fs";
-import path, { basename, join, sep } from "node:path";
 import { JSDOM } from 'jsdom';
-import { HoldReader } from "../processor/HoldReader";
+import { lstatSync, writeFileSync } from "node:fs";
+import { readdir, readFile, stat } from "node:fs/promises";
+import path, { basename, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Constants } from "../Constants";
 import { holdToXml } from "../data/HoldToXml";
+import { getHoldCommandsExport } from "../data/Utils";
 import { XmlToHoldError } from "../data/xmlToHold";
-import { fileURLToPath } from "node:url";
+import { HoldReader } from "../processor/HoldReader";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -60,6 +61,8 @@ if (!givenPath) {
 		if (reader.errorInstance.value instanceof XmlToHoldError) {
 			console.log(` - Decoded exported hold in: ${__dirname}/validateHolds.log.exported`)
 			writeFileSync(`${__dirname}/validateHolds.log.exported`, await holdToXml(reader.errorInstance.value.hold), 'utf-8');
+			console.log(` - Hold scripts exported to: ${__dirname}/validateHolds.log.scripts`)
+			writeFileSync(`${__dirname}/validateHolds.log.scripts`, getHoldCommandsExport(reader.errorInstance.value.hold));
 
 			const rootError = reader.errorInstance.value.rootError;
 			if (rootError) {
@@ -67,8 +70,18 @@ if (!givenPath) {
 			}
 		}
 
+
 		console.log(` - Error message: ${reader.error.value}`);
 		console.log(` - Error stack trace: ${reader.errorStackTrace.value}`);
+
+		let instance: any = reader.errorInstance.value;
+		while (instance) {
+			console.log(' - Caused by:');
+			console.log(`   - ${instance.constructor.name}`)
+			console.log(`   - Message: ${instance.message}`)
+			console.log(`   - Stack: ${instance.stack}`)
+			instance = instance.cause;
+		}
 
 		break;
 	}
