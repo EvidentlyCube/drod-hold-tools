@@ -8,6 +8,7 @@ import { HoldLevel } from "../datatypes/HoldLevel";
 import { HoldMonster } from "../datatypes/HoldMonster";
 import { HoldPlayer } from "../datatypes/HoldPlayer";
 import { HoldRoom, HoldScroll } from "../datatypes/HoldRoom";
+import { HoldSavedGameWorldMapIcon } from "../datatypes/HoldSavedGame";
 import { HoldSpeech } from "../datatypes/HoldSpeech";
 import { HoldVariable } from "../datatypes/HoldVariable";
 import { HoldWorldMap } from "../datatypes/HoldWorldMap";
@@ -31,6 +32,7 @@ export enum HoldRefModel {
 	Room = 'room',
 	RoomImage = 'roomImage',
 	RoomOverheadImage = 'roomOverheadImage',
+	SavedGameWorldMapIcon = 'savedGameWorldMapIcon',
 	Scroll = 'scroll',
 	Speech = 'speech',
 	WorldMap = 'worldMap',
@@ -135,6 +137,13 @@ export interface HoldRefRoomOverheadImage {
 	roomId: number;
 }
 
+export interface HoldRefSavedGameWorldMapIcon {
+	hold: Hold;
+	model: HoldRefModel.SavedGameWorldMapIcon,
+	savedGameId: number;
+	worldMapIconIndex: number;
+};
+
 export interface HoldRefScroll {
 	hold: Hold;
 	model: HoldRefModel.Scroll,
@@ -183,10 +192,11 @@ export type HoldRef = HoldRefNotApplicable
 	| HoldRefRoom
 	| HoldRefRoomImage
 	| HoldRefRoomOverheadImage
+	| HoldRefSavedGameWorldMapIcon
 	| HoldRefScroll
 	| HoldRefSpeech
-	| HoldRefWorldMap
-	| HoldRefVariable;
+	| HoldRefVariable
+	| HoldRefWorldMap;
 
 export function areReferencesIdentical(left: HoldRef, right: HoldRef) {
 	return areObjectsSame(left, right);
@@ -199,6 +209,7 @@ export function resolveReference(ref: HoldRefMonsterCommand | HoldRefCharacterCo
 export function resolveReference(ref?: HoldRefMonsterCommand | HoldRefCharacterCommand): ScriptCommand | undefined;
 export function resolveReference(ref: HoldRefRoom): HoldRoom;
 export function resolveReference(ref: HoldRefEntrance): HoldEntrance;
+export function resolveReference(ref: HoldRefSavedGameWorldMapIcon): HoldSavedGameWorldMapIcon;
 export function resolveReference(ref: HoldRefScroll): HoldScroll;
 export function resolveReference(ref: HoldRefSpeech): HoldSpeech;
 export function resolveReference(ref: HoldRefHoldEndMessage): Hold;
@@ -217,6 +228,7 @@ export function resolveReference(
 	| HoldPlayer
 	| HoldScroll
 	| HoldSpeech
+	| HoldSavedGameWorldMapIcon
 	| HoldWorldMap
 	| HoldVariable
 	| undefined
@@ -267,6 +279,9 @@ export function resolveReference(
 		case HoldRefModel.RoomImage:
 		case HoldRefModel.RoomOverheadImage:
 			return hold.rooms.getOrError(ref.roomId);
+
+		case HoldRefModel.SavedGameWorldMapIcon:
+			return hold.savedGames.getOrError(ref.savedGameId).worldMapIcons[ref.worldMapIconIndex];
 
 		case HoldRefModel.Scroll:
 			return hold.rooms.getOrError(ref.roomId).getScroll(ref);

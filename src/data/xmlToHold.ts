@@ -234,9 +234,9 @@ export async function xmlToHold(
 				overheadImageStartX: intU(roomXml, 'OverheadImageStartX'),
 				overheadImageStartY: intU(roomXml, 'OverheadImageStartY'),
 				encSquares: str(roomXml, 'Squares'),
-				style: intU(roomXml, 'Style'),
-				encStyleName: strU(roomXml, 'StyleName'),
-				encTileLights: strU(roomXml, 'TileLights'),
+				style: intU(roomXml, 'Style') ?? -1,
+				encStyleName: strU(roomXml, 'StyleName') ?? "",
+				encTileLights: strU(roomXml, 'TileLights') ?? "-1",
 				encExtraVars: strU(roomXml, 'ExtraVars'),
 				isNestedInLevel: roomXml.parentElement?.tagName === 'Levels',
 			});

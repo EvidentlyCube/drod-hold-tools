@@ -381,8 +381,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 		.attr('RoomID', room.id)
 		.attr('RoomCols', room.roomCols)
 		.attr('RoomRows', room.roomRows)
-		.attrU('Style', room.style)
-		.attrU('StyleName', room.styleName)
+		.attrIf('Style', room.style, room.style !== -1)
+		.attrIf('StyleName', room.styleName, room.style === -1)
 		.attr('IsRequired', room.isRequired)
 		.attrU('IsSecret', room.isSecret);
 
@@ -399,7 +399,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 	}
 
 	writer.attr('Squares', { _safeString: room.encSquares })
-		.attrU('TileLights', { _safeString: room.encTileLights });
+		.attrIf('TileLights', { _safeString: room.encTileLights }, room.encTileLights !== '-1');
 
 	if (room.extraVars) {
 		writer.attr('ExtraVars', room.extraVars)

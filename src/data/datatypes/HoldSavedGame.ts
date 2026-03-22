@@ -1,7 +1,7 @@
 import type { Hold } from "./Hold";
 
 /** @version 508+ */
-interface SavedGameWorldMapIcon {
+export interface HoldSavedGameWorldMapIcon {
 	worldMap: number;
 	entranceId: number;
 	x: number;
@@ -11,7 +11,7 @@ interface SavedGameWorldMapIcon {
 	flags: number;
 }
 
-interface SavedGameConstructor {
+interface HoldSavedGameConstructor {
 	id: number;
 	playerId: number;
 	roomId: number;
@@ -77,9 +77,9 @@ export class HoldSavedGame {
 	public readonly encStats: string;
 	public readonly version: number;
 	/** @version 508+ */
-	public readonly worldMapIcons: SavedGameWorldMapIcon[] = [];
+	public readonly worldMapIcons: HoldSavedGameWorldMapIcon[] = [];
 
-	public constructor(hold: Hold, opts: SavedGameConstructor) {
+	public constructor(hold: Hold, opts: HoldSavedGameConstructor) {
 		this.$hold = hold;
 
 		this.id = opts.id

@@ -24,9 +24,9 @@ interface RoomConstructor {
 	overheadImageStartX?: number;
 	overheadImageStartY?: number;
 	encSquares: string;
-	encStyleName: string | undefined;
-	style: number | undefined;
-	encTileLights: string | undefined;
+	encStyleName: string;
+	style: number;
+	encTileLights: string;
 	encExtraVars?: string;
 	isNestedInLevel: boolean;
 }
@@ -72,7 +72,7 @@ export class HoldRoom {
 	public readonly dataId?: number;
 	public readonly overheadDataId?: number;
 	public readonly isRequired: boolean;
-	public readonly isSecret: boolean | undefined; // @FIXME don't use undefined
+	public readonly isSecret: boolean | undefined;
 	public readonly roomX: number;
 	public readonly roomY: number;
 	public readonly roomCols: number;
@@ -83,11 +83,11 @@ export class HoldRoom {
 	public readonly overheadImageStartY?: number;
 	public readonly encSquares: string;
 	/** @version 301+, before used `style`*/
-	public readonly styleName: SignalUpdatableValue<string> | undefined; // @FIXME don't use undefined
+	public readonly styleName: SignalUpdatableValue<string>;
 	/** @version 100,201, afterwards replaced by `styleName` */
-	public readonly style: number | undefined; // @FIXME don't use undefined
+	public readonly style: number;
 	/** @version 301+ */
-	public readonly encTileLights: string | undefined; // @FIXME don't use undefined
+	public readonly encTileLights: string;
 	public readonly extraVars?: PackedVars;
 	/**
 	 * @version 201 In JtRH some holds contain room tags in Levels node and
@@ -198,9 +198,7 @@ export class HoldRoom {
 		this.overheadImageStartY = opts.overheadImageStartY;
 		this.encSquares = opts.encSquares
 		this.style = opts.style;
-		this.styleName = opts.encStyleName
-			? new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName))
-			: undefined;
+		this.styleName = new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName));
 		this.encTileLights = opts.encTileLights
 		this.extraVars = readPackedVars(opts.encExtraVars);
 		this.isNestedInLevel = opts.isNestedInLevel;

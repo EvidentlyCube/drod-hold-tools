@@ -39,25 +39,26 @@ function toSortableString(ref?: HoldRef): string {
 	switch (model) {
 		case HoldRefModel.Character: return getCharacterName(ref.hold, ref.characterId);
 		case HoldRefModel.CharacterAvatar: return getCharacterName(ref.hold, ref.characterId) + "::Avatar";
-		case HoldRefModel.CharacterTiles: return getCharacterName(ref.hold, ref.characterId) + "::Tiles";
 		case HoldRefModel.CharacterCommand: return toSortableCharCommand(ref);
+		case HoldRefModel.CharacterTiles: return getCharacterName(ref.hold, ref.characterId) + "::Tiles";
 		case HoldRefModel.Data: return ref.hold.datas.getOrError(ref.dataId).name.newValue;
 		case HoldRefModel.Entrance: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
 		case HoldRefModel.EntranceVoiceOver: return ref.hold.entrances.getOrError(ref.entranceId).$level.name.newValue;
-		case HoldRefModel.MonsterCharacterType: return toSortableMonsterCharacterType(ref);
-		case HoldRefModel.MonsterCommand: return toSortableMonsterCommand(ref);
-		case HoldRefModel.Room: return toSortableRoomName(ref.hold, ref.roomId);
-		case HoldRefModel.RoomImage: return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
-		case HoldRefModel.RoomOverheadImage: return toSortableRoomName(ref.hold, ref.roomId) + "::OverheadImage";
-		case HoldRefModel.Scroll: return toSortableRoomName(ref.hold, ref.roomId) + `::Scroll(${ref.x},${ref.y})`;
 		case HoldRefModel.Hold: return ref.hold.name.newValue;
 		case HoldRefModel.HoldEndMessage: return `${ref.hold.name.newValue}::EndMessage`;
 		case HoldRefModel.Level: return toSortableLevelName(ref.hold, ref.levelId);
+		case HoldRefModel.MonsterCharacterType: return toSortableMonsterCharacterType(ref);
+		case HoldRefModel.MonsterCommand: return toSortableMonsterCommand(ref);
 		case HoldRefModel.NotApplicable: return "Not Applicable";
 		case HoldRefModel.Player: return toSortablePlayerName(ref.hold, ref.playerId);
+		case HoldRefModel.Room: return toSortableRoomName(ref.hold, ref.roomId);
+		case HoldRefModel.RoomImage: return toSortableRoomName(ref.hold, ref.roomId) + "::Image";
+		case HoldRefModel.RoomOverheadImage: return toSortableRoomName(ref.hold, ref.roomId) + "::OverheadImage";
+		case HoldRefModel.SavedGameWorldMapIcon: return `Saved game ${ref.savedGameId}, world map icon ${ref.worldMapIconIndex}`;
+		case HoldRefModel.Scroll: return toSortableRoomName(ref.hold, ref.roomId) + `::Scroll(${ref.x},${ref.y})`;
 		case HoldRefModel.Speech: return toSortableSpeech(ref.hold, ref.speechId);
-		case HoldRefModel.WorldMap: return `World Map: ${ref.hold.worldMaps.get(ref.worldMapId)?.name.newValue ?? "<INVALID WORLD MAP ID>"}`;
 		case HoldRefModel.Variable: return `Variable: ${ref.hold.variables.get(ref.variableId)?.name.newValue ?? "<INVALID VARIABLE ID>"}`;
+		case HoldRefModel.WorldMap: return `World Map: ${ref.hold.worldMaps.get(ref.worldMapId)?.name.newValue ?? "<INVALID WORLD MAP ID>"}`;
 
 		default:
 			shouldBeUnreachable(model);

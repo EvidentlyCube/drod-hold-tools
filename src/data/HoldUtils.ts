@@ -152,7 +152,18 @@ export function regenerateHoldDataUses(hold: Hold, filteredByDataId?: number) {
 	}
 
 	for (const savedGame of hold.savedGames.values()) {
-		// @fixme - Add reference to world map icons
+		for (let i = 0; i < savedGame.worldMapIcons.length; i++) {
+			const icon = savedGame.worldMapIcons[i];
+
+			if (isMatch(icon.imageId)) {
+				hold.datas.getOrError(icon.imageId).$uses.push({
+					hold,
+					model: HoldRefModel.SavedGameWorldMapIcon,
+					savedGameId: savedGame.id,
+					worldMapIconIndex: i
+				});
+			}
+		}
 	}
 }
 
@@ -217,7 +228,21 @@ export function regenerateHoldCharacterUses(hold: Hold, characterId: number) {
 		}
 	}
 
-	// @Fixme add usage in saved games
+
+	for (const savedGame of hold.savedGames.values()) {
+		for (let i = 0; i < savedGame.worldMapIcons.length; i++) {
+			const icon = savedGame.worldMapIcons[i];
+
+			if (characterId === icon.charId) {
+				regeneratedCharacter.$uses.push({
+					hold,
+					model: HoldRefModel.SavedGameWorldMapIcon,
+					savedGameId: savedGame.id,
+					worldMapIconIndex: i
+				});
+			}
+		}
+	}
 }
 
 export function regenerateHoldVariableUses(hold: Hold, variableId: number) {

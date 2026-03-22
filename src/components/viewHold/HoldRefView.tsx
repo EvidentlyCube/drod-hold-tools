@@ -2,7 +2,7 @@ import { CommandsList } from "../../data/CommandList";
 import { getCharacterName, getCommandName, getCommandToString } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
 import { ScriptCommand } from "../../data/datatypes/ScriptCommand";
-import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefScroll } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefSavedGameWorldMapIcon, HoldRefScroll } from "../../data/references/HoldReference";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
@@ -42,6 +42,7 @@ export default function HoldRefView({ holdRef }: Props) {
 		case HoldRefModel.RoomImage: return <ViewRoomImage r={holdRef} />;
 		case HoldRefModel.RoomOverheadImage: return <ViewRoomOverheadImage r={holdRef} />;
 
+		case HoldRefModel.SavedGameWorldMapIcon: return <ViewSavedGameWorldMapIcon r={holdRef} />;
 		case HoldRefModel.Scroll: return <ViewScroll r={holdRef} />;
 		case HoldRefModel.Speech: return <ViewSpeech hold={holdRef.hold} speechId={holdRef.speechId} />;
 
@@ -259,6 +260,18 @@ function ViewRoomOverheadImage({ r }: { r: HoldRefRoomOverheadImage }) {
 	</>
 }
 
+function ViewSavedGameWorldMapIcon({ r }: { r: HoldRefSavedGameWorldMapIcon }) {
+	const { hold, savedGameId, worldMapIconIndex } = r;
+
+	return <>
+		<RefIcon icon="floppy-disk" title="Saved Game"/>
+		{" "}ID={savedGameId}
+		{" "}&rarr;
+		<RefIcon icon="list-ol" title="Index of the save (1 indexed)"/>
+		{" "}{worldMapIconIndex + 1}
+	</>;
+}
+
 function ViewScroll({ r }: { r: HoldRefScroll }) {
 	const { hold, roomId, x, y } = r;
 
@@ -337,9 +350,17 @@ function ViewVariable({ hold, variableId }: { hold: Hold, variableId: number }) 
 	const variable = hold.variables.getOrError(variableId);
 
 	return <>
-		<span className="icon icon-ref" title="Variable">
-			<i className="fas fa-xmark"></i>
-		</span>
+		<RefIcon icon="xmark" title="Variable"/>
 		{" "}<strong title="Variable Name">{variable.name.newValue}</strong>
 	</>
+}
+
+interface RefIconProps {
+	icon: string;
+	title: string;
+}
+function RefIcon({ icon, title }: RefIconProps) {
+	return <span className="icon icon-ref" title={title}>
+		<i className={`fas fa-${icon}`}></i>
+	</span>
 }

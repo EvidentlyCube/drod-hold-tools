@@ -202,12 +202,11 @@ const PackedVarsUtils = {
 
 			switch (type) {
 				case PackedVarType.ByteBuffer: {
-					if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
+					if (!Array.isArray(value)) {
 						throw new Error(`Expected ByteBuffer value to be number[] or Uint8Array for variable "${name}"`);
 					}
-					const raw = Array.isArray(value) ? value : Array.from(value);
-					buf.writeUint(raw.length);
-					buf.writeRaw(raw);
+					buf.writeUint(value.length);
+					buf.writeRaw(value);
 					break;
 				}
 				case PackedVarType.Uint: {
