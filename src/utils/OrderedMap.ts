@@ -120,4 +120,23 @@ export class OrderedMap<TKey, TValue> {
 
 		return items;
 	}
+
+	public [Symbol.iterator](): Iterator<[TKey, TValue, number]> {
+		let index = 0;
+		const keys = this._orderedKeys;
+		const map = this._map;
+
+		return {
+			next(): IteratorResult<[TKey, TValue, number]> {
+				if (index < keys.length) {
+					const key = keys[index];
+					return {
+						value: [key, map.get(key)!, index++],
+						done: false,
+					};
+				}
+				return { value: undefined as any, done: true };
+			},
+		};
+	}
 }

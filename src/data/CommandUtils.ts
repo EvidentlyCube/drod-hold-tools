@@ -27,11 +27,15 @@ class WrappedCommandBuffer {
 
 	public readWChar(characters: number): string {
 		const chars = [];
-		while (characters-- > 0 && this._index < this._buffer.length) {
-			chars.push(String.fromCharCode(this._buffer[this._index++]));
+		while (characters > 0 && this._index < this._buffer.length) {
+        	const codeUnit = this._buffer[this._index] | (this._buffer[this._index + 1] << 8);
+			chars.push(String.fromCharCode(codeUnit));
+
+			this._index += 2;
+			characters -= 2;
 		}
 
-		return chars.filter(x => x !== '\u0000').join('');
+		return chars.join('');
 	}
 
 	public readBpUint() {
@@ -78,12 +82,8 @@ class WrappedCommandBuffer {
 	public writeWChar(s: string) {
 		for (let i = 0; i < s.length; i++) {
 			const charCode = s.charCodeAt(i);
-			if (charCode > 128) {
-				throw new Error(`CommandBuffer Writing WChar: Unsupported wchar with code ${charCode}`);
-			}
-
-			this._buffer[this._index++] = charCode;
-			this._buffer[this._index++] = 0;
+			this._buffer[this._index++] = charCode & 0xFF;
+			this._buffer[this._index++] = (charCode >> 8) & 0xFF;
 		}
 	}
 
@@ -140,7 +140,7 @@ export function packCommands(vars: PackedVars, commandList: CommandsList) {
 	}
 }
 
-function readCommandsBuffer(buffer: number[]) {
+export function readCommandsBuffer(buffer: number[]) {
 	const commands: ScriptCommand[] = [];
 	if (buffer.length === 0) {
 		return commands;
@@ -458,4 +458,16 @@ export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
 		default:
 			return true
 	}
+}
+
+
+export function areCommandsSame(left: ScriptCommand, right: ScriptCommand) {
+	return left.type === right.type
+		&& left.x === right.x
+		&& left.y === right.y
+		&& left.w === right.w
+		&& left.h === right.h
+		&& left.flags === right.flags
+		&& left.label.newValue === right.label.newValue
+		&& left.speechId.newValue === right.speechId.newValue;
 }

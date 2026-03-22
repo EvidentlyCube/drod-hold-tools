@@ -34,7 +34,7 @@ interface OutputRefs {
 interface HoldToXmlOptions {
 	updateHoldDate?: boolean;
 }
-export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> = {}) {
+export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> = {}): Promise<string> {
 	const finalOptions: HoldToXmlOptions = {
 		updateHoldDate: options.updateHoldDate ?? false
 	};
@@ -60,6 +60,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 
 	writer.tag('drod')
 		.attrIf('Version', version.version, version.isVersionPrinted)
+		.attrIf('Info', { _safeString: hold.encDrodInfo }, !!hold.encDrodInfo)
 		.nest();
 
 	await writePlayer(writer, refs, hold.players.getOrError(hold.playerId.newValue), version);
@@ -104,7 +105,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		writer.end('Holds');
 	}
 
-	if (version.frontLoadedData) {
+	if (hold.$isDataFrontLoaded) {
 		for (const data of hold.datas.values()) {
 			if (data.$isDeleted.newValue === false) {
 				await writeData(writer, refs, data, version)
@@ -120,12 +121,10 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		await writeDemo(writer, refs, demo, version);
 	}
 
-	if (!version.frontLoadedData) {
-		// In version
-		for (const data of hold.datas.values()) {
-			if (data.$isDeleted.newValue === false) {
-				await writeData(writer, refs, data, version)
-			}
+	// Print any remaining data that wasn't yet included
+	for (const data of hold.datas.values()) {
+		if (data.$isDeleted.newValue === false) {
+			await writeData(writer, refs, data, version)
 		}
 	}
 
@@ -592,6 +591,7 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 	writer.tag('SavedGames')
 		.attr('PlayerID', savedGame.playerId)
 		.attr('RoomID', savedGame.roomId)
+		.attrIf('WorldMap', savedGame.worldMap, savedGame.worldMap !== -1)
 		.attr('Type', savedGame.type)
 		.attrIf('SavedGameID', savedGame.id, holdVersion.saveAttr_idEarly)
 		.attr('CheckpointX', savedGame.checkpointX)
@@ -603,6 +603,8 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attr('StartRoomO', savedGame.startRoomO)
 		.attrIf('StartRoomAppearance', savedGame.startRoomAppearance, savedGame.startRoomAppearance !== -1)
 		.attrIf('StartRoomSwordOff', savedGame.startRoomSwordOff, savedGame.startRoomSwordOff !== -1)
+		.attrIf('StartRoomWaterTraversal', savedGame.startRoomWaterTraversal, savedGame.startRoomWaterTraversal !== -1)
+		.attrIf('StartRoomWeaponType', savedGame.startRoomWeaponType, savedGame.startRoomWeaponType !== -1)
 		.attrIf('SavedGameID', savedGame.id, !holdVersion.saveAttr_idEarly)
 		.attrIf('ExploredRooms',
 			{ _safeString: savedGame.exploredRooms.join(" ") + " " },
@@ -615,6 +617,9 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 			savedGame.completedScripts.length > 0)
 		.attr('Created', savedGame.created)
 		.attr('Commands', { _safeString: savedGame.encCommands })
+		.attrIf('EntrancesExplored',
+			{ _safeString: savedGame.entrancesExplored.join(" ") + " " },
+			savedGame.entrancesExplored.length > 0)
 		.attrIf('LevelDeaths', savedGame.levelDeaths, savedGame.levelDeaths !== -1)
 		.attrIf('LevelKills', savedGame.levelKills, savedGame.levelKills !== -1)
 		.attrIf('LevelMoves', savedGame.levelMoves, savedGame.levelMoves !== -1)
@@ -622,7 +627,26 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attrIf('Stats', { _safeString: savedGame.encStats }, !!savedGame.encStats)
 		.attrIf('Version', savedGame.version, savedGame.version !== -1)
 
-	writer.end();
+	if (savedGame.worldMapIcons.length > 0) {
+		writer.nest();
+
+		for (const icon of savedGame.worldMapIcons) {
+			writer.tag('WorldMapIcons')
+				.attr('WorldMap', icon.worldMap)
+				.attr('EntranceID', icon.entranceId)
+				.attr('X', icon.x)
+				.attr('Y', icon.y)
+				.attrIf('ImageID', icon.imageId, icon.imageId !== -1)
+				.attrIf('CharID', icon.charId, icon.charId !== -1)
+				.attr('Flags', icon.flags)
+				.end();
+		}
+
+		writer.end('SavedGames');
+
+	} else {
+		writer.end();
+	}
 
 	await sleep();
 }

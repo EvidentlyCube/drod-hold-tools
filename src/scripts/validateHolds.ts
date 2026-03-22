@@ -17,6 +17,7 @@ global.window = (dom.window as any);
 global.document = dom.window.document;
 global.Document = dom.window.Document;
 global.Node = dom.window.Node;
+global.XMLSerializer = dom.window.XMLSerializer;
 
 const givenPath = process.argv[2];
 
@@ -30,6 +31,9 @@ if (!givenPath) {
 
 	Constants.isDev = true;
 	Constants.diffXmlSleep = 1;
+	Constants.xmlReaderFrameDuration = 1000;
+	Constants.xmlToHoldSleep = 1;
+	Constants.xmlToHoldFrameDuration = 1000;
 
 	for (const holdFullPath of holds) {
 		const hold = basename(holdFullPath);
@@ -44,10 +48,17 @@ if (!givenPath) {
 		const holdBuffer = await readFile(holdFullPath);
 
 		const reader = new HoldReader(1, { fileBinary: new Uint8Array(holdBuffer) }, []);
+		let lastLogs = 0;
 
 		while (!reader.isFinished) {
 			reader.update();
 			await nextFrame();
+
+			if (reader.logs.length > lastLogs) {
+				// Uncomment to view logs
+				// console.log(reader.logs.array.slice())
+				lastLogs = reader.logs.length;
+			}
 		}
 
 		if (!reader.error.value) {
@@ -56,11 +67,12 @@ if (!givenPath) {
 
 		console.log('## Error found: ##')
 		console.log(` - Decoded imported hold in: ${__dirname}/validateHolds.log.imported`)
-		writeFileSync(`${__dirname}/validateHolds.log.imported`, reader.sharedState.holdXmlText ?? "", 'utf-8');
+		const originalHoldXml = new XMLSerializer().serializeToString(reader.sharedState.holdXml!);
+		writeFileSync(`${__dirname}/validateHolds.log.imported`, truncateHold(originalHoldXml), 'utf-8');
 
 		if (reader.errorInstance.value instanceof XmlToHoldError) {
 			console.log(` - Decoded exported hold in: ${__dirname}/validateHolds.log.exported`)
-			writeFileSync(`${__dirname}/validateHolds.log.exported`, await holdToXml(reader.errorInstance.value.hold), 'utf-8');
+			writeFileSync(`${__dirname}/validateHolds.log.exported`, truncateHold(await holdToXml(reader.errorInstance.value.hold)), 'utf-8');
 			console.log(` - Hold scripts exported to: ${__dirname}/validateHolds.log.scripts`)
 			writeFileSync(`${__dirname}/validateHolds.log.scripts`, getHoldCommandsExport(reader.errorInstance.value.hold));
 
@@ -105,4 +117,14 @@ async function getHolds(path: string): Promise<string[]> {
 		return [ path ];
 	}
 
+}
+
+function truncateHold(holdXml: string) {
+	return holdXml
+		.replace(/"/g, "'")
+		.replace(/RawData='(.*?)'/g, (a, b) => `RawData='[TRUNCATED ${b.length} bytes]'`)
+		.replace(/ExtraVars='(.*?)'/g, (a, b) => `ExtraVars='[TRUNCATED ${b.length} bytes]'`)
+		.replace(/Squares='(.*?)'/g, (a, b) => `Squares='[TRUNCATED ${b.length} bytes]'`)
+		.replace(/Message='(.*?)'/g, (a, b) => `Message='[TRUNCATED ${b.length} bytes]'`)
+		.replace(/TileLights='(.*?)'/g, (a, b) => `TileLights='[TRUNCATED ${b.length} bytes]'`)
 }

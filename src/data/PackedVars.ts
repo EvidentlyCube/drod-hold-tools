@@ -10,9 +10,9 @@ export enum PackedVarType {
 	Unknown = 9
 }
 
-type PackedVarValue = boolean | number | string | Uint8Array | number[];
+type PackedVarValue = boolean | number | string | number[];
 
-interface PackedVar {
+export interface PackedVar {
 	name: string;
 	type: PackedVarType;
 	value: PackedVarValue;

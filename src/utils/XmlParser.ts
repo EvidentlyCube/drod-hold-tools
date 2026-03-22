@@ -1,3 +1,4 @@
+import { Constants } from "../Constants";
 
 export async function parseXml(xmlString: string, updateCallback?: (log: string) => void): Promise<XMLDocument> {
 	const reader = new XmlBufferReader(xmlString, updateCallback);
@@ -83,12 +84,14 @@ class XmlBufferReader {
 	private _lastSleep: number = Date.now();
 
 	public get isSleepTime() {
-		return Date.now() > this._lastSleep + 100;
+		return Date.now() > this._lastSleep + Constants.xmlReaderFrameDuration;
 	}
 
 	public async sleep() {
 		return new Promise<void>(resolve => {
 			if (this.isSleepTime) {
+				this._log();
+
 				setTimeout(() => {
 					this._lastSleep = Date.now();
 					resolve();
@@ -123,8 +126,6 @@ class XmlBufferReader {
 	}
 
 	public consumeTagOpen() {
-		this._log();
-
 		if (this._xml.charAt(this._pos) === '<') {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
@@ -135,8 +136,6 @@ class XmlBufferReader {
 	}
 
 	public consumeTagClose() {
-		this._log();
-
 		if (this._xml[this._pos] === '>') {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
@@ -147,8 +146,6 @@ class XmlBufferReader {
 	}
 
 	public consumeSlash() {
-		this._log();
-
 		if (this._xml[this._pos] === '/') {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
@@ -159,8 +156,6 @@ class XmlBufferReader {
 	}
 
 	public consumeTagName() {
-		this._log();
-
 		let i = this._pos;
 		for (; i < this._length; i++) {
 			const code = this._xml.charCodeAt(i);
@@ -188,8 +183,6 @@ class XmlBufferReader {
 	}
 
 	private getWhitespaceEnd(from: number) {
-		this._log();
-
 		while (Whitespace.has(this._xml[from])) {
 			from++;
 		}
@@ -249,8 +242,6 @@ class XmlBufferReader {
 	}
 
 	public consumeAttrs(): Attr[] {
-		this._log();
-
 		const attrs: Attr[] = [];
 
 		let attr = this.consumeAttr();
@@ -263,8 +254,6 @@ class XmlBufferReader {
 	}
 
 	public lookaheadTagClose() {
-		this._log();
-
 		let i = this._pos;
 		if (this._xml[i++] !== '<') {
 			return false;

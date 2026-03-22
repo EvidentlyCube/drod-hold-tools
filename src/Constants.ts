@@ -12,4 +12,7 @@ export const VERSION_TSS_508 = 508;
 export const Constants = {
 	isDev: process.env.NODE_ENV === 'development',
 	diffXmlSleep: 100,
+	xmlReaderFrameDuration: 100,
+	xmlToHoldSleep: 100,
+	xmlToHoldFrameDuration: 16
 };

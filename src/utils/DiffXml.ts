@@ -1,5 +1,6 @@
 import { Constants } from "../Constants";
-import { PackedVarType } from "../data/PackedVars";
+import { areCommandsSame, readCommandsBuffer } from "../data/CommandUtils";
+import { PackedVar, PackedVarType } from "../data/PackedVars";
 import { readPackedVars } from "../data/PackedVarsUtils";
 import { diffArraysOneWay } from "./ArrayUtils";
 import { parseXml } from "./XmlParser";
@@ -163,6 +164,9 @@ async function compareElement(original: Element, generated: Element, context: st
 					extraContexts.push(`\n - Fewer generated extra vars by ${originalExtraVars.length - generatedExtraVars.length}`);
 				}
 
+				extraContexts.push(`\n - Original value:  ${originalAttr.value}`);
+				extraContexts.push(`\n - Generated value: ${generatedAttr.value}`);
+
 				const length = Math.max(originalExtraVars.length, generatedExtraVars.length);
 
 				for (var ii = 0; ii < length; ii++) {
@@ -176,12 +180,12 @@ async function compareElement(original: Element, generated: Element, context: st
 					if (hasWrongName || hasWrongValue || hasWrongType) {
 						extraContexts.push(`\n - Difference between variables at ${ii}:`);
 						if (original) {
-							extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${JSON.stringify(original.value)}`);
+							extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${previewPackedVar(original)}`);
 						} else {
 							extraContexts.push(`\n   - Original has no field`);
 						}
 						if (generated) {
-							extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${JSON.stringify(generated.value)}`);
+							extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${previewPackedVar(generated)}`);
 						} else {
 							extraContexts.push(`\n   - Generated has no field`);
 						}
@@ -305,4 +309,12 @@ function base64ToHex(base64string: string): string {
 	}
 
 	return result.join(' ');
+}
+
+function previewPackedVar(val: PackedVar) {
+	if (Array.isArray(val.value) && val.type === PackedVarType.ByteBuffer) {
+		return val.value.map(x => x.toString(16).padStart(2, '0')).join(' ');
+	}
+
+	return JSON.stringify(val.value.toString());
 }

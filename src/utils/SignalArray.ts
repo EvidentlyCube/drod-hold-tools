@@ -23,6 +23,10 @@ export class SignalArray<TElement> {
 		return this._array.concat();
 	}
 
+	public get length() {
+		return this._array.length;
+	}
+
 	public add(element: TElement) {
 		const index = this._array.indexOf(element);
 

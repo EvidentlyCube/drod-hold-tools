@@ -4,7 +4,7 @@ import { diffXml, DiffXmlError } from "../utils/DiffXml";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { EntranceShowDescription } from "./DrodEnums";
 import { holdToXml } from "./HoldToXml";
-import { regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, removeOtherHoldsFromHoldXML, scanHoldForIssues } from "./HoldUtils";
+import { fixKnownIssuesInKnownHolds, isDataFrontLoaded, regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, removeOtherHoldsFromHoldXML, scanHoldForIssues } from "./HoldUtils";
 import { HoldVersion } from "./HoldVersion";
 import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
@@ -31,6 +31,7 @@ export async function xmlToHold(
 	log: (log: string) => void
 ): Promise<Hold> {
 	removeOtherHoldsFromHoldXML(originalXml);
+	fixKnownIssuesInKnownHolds(originalXml);
 
 	const drodXml = originalXml.querySelector('drod');
 	const holdXml = originalXml.querySelector('Holds');
@@ -59,7 +60,9 @@ export async function xmlToHold(
 		lastVarId: intU(holdXml, 'VarID') ?? 0,
 		startingLevelId: int(holdXml, 'LevelID'),
 		status: intU(holdXml, 'Status'),
-		lastWorldMapId: intU(holdXml, 'WorldMap') ?? 0
+		lastWorldMapId: intU(holdXml, 'WorldMap') ?? 0,
+		encDrodInfo: strU(drodXml, 'Info') ?? "",
+		$isDataFrontLoaded: isDataFrontLoaded(originalXml)
 	};
 
 	const hold = new Hold(holdConstructor);
@@ -336,6 +339,7 @@ export async function xmlToHold(
 				id,
 				playerId: int(savedGameXml, 'PlayerID'),
 				roomId: int(savedGameXml, 'RoomID'),
+				worldMap: intU(savedGameXml, 'WorldMap') ?? -1,
 				type: int(savedGameXml, 'Type'),
 				checkpointX: int(savedGameXml, 'CheckpointX'),
 				checkpointY: int(savedGameXml, 'CheckpointY'),
@@ -346,9 +350,12 @@ export async function xmlToHold(
 				startRoomO: int(savedGameXml, 'StartRoomO'),
 				startRoomAppearance: intU(savedGameXml, 'StartRoomAppearance') ?? -1,
 				startRoomSwordOff: intU(savedGameXml, 'StartRoomSwordOff') ?? -1,
+				startRoomWaterTraversal: intU(savedGameXml, 'StartRoomWaterTraversal') ?? -1,
+				startRoomWeaponType: intU(savedGameXml, 'StartRoomWeaponType') ?? -1,
 				exploredRooms: intArrayU(savedGameXml, 'ExploredRooms') ?? [],
 				conqueredRooms: intArrayU(savedGameXml, 'ConqueredRooms') ?? [],
 				completedScripts: intArrayU(savedGameXml, 'CompletedScripts') ?? [],
+				entrancesExplored: intArrayU(savedGameXml, 'EntrancesExplored') ?? [],
 				created: int(savedGameXml, 'Created'),
 				encCommands: str(savedGameXml, 'Commands'),
 				levelDeaths: intU(savedGameXml, 'LevelDeaths') ?? -1,
@@ -361,11 +368,25 @@ export async function xmlToHold(
 
 			hold.savedGames.set(holdSavedGame.id, holdSavedGame);
 			await sleep();
+
+			for (const worldMapIconXml of savedGameXml.querySelectorAll('WorldMapIcons')) {
+				holdSavedGame.worldMapIcons.push({
+					worldMap: int(worldMapIconXml, 'WorldMap'),
+					entranceId: int(worldMapIconXml, 'EntranceID'),
+					x: int(worldMapIconXml, 'X'),
+					y: int(worldMapIconXml, 'Y'),
+					imageId: intU(worldMapIconXml, 'ImageID') ?? -1,
+					charId: intU(worldMapIconXml, 'CharID') ?? -1,
+					flags: int(worldMapIconXml, 'Flags'),
+				});
+			}
+
+			await sleep();
 		}
 
 		for (const demoXml of originalXml.querySelectorAll('Demos')) {
 			const id = int(demoXml, 'DemoID');
-			log(`Parsing Saved Game ${id}`);
+			log(`Parsing Demo ${id}`);
 
 			const holdDemo = new HoldDemo(hold, {
 				id,
@@ -384,8 +405,10 @@ export async function xmlToHold(
 			await sleep();
 		}
 
+		log("Initializing dynamic data");
+
 		/** Init dynamic data */
-		loadDynamicData(hold);
+		loadDynamicData(hold, log);
 
 		log("Stability check: Exporting XML")
 		const exportedXml = await holdToXml(hold);
@@ -415,7 +438,7 @@ export async function xmlToHold(
 		hold.$changes.loadStored(storedChanges);
 		applyHoldChanges(hold);
 
-		loadDynamicData(hold);
+		loadDynamicData(hold, log);
 
 		hold.$changeListener.register(hold);
 
@@ -427,15 +450,24 @@ export async function xmlToHold(
 	return hold;
 }
 
-function loadDynamicData(hold: Hold) {
+async function loadDynamicData(hold: Hold, log: (log: string) => void) {
+	log("Regenerating speech locations");
 	regenerateHoldSpeechLocations(hold);
-	regenerateHoldDataUses(hold);
+	await sleep();
 
-	for (const variableId of hold.variables.keys()) {
+	log("Regenerating Data usage");
+	regenerateHoldDataUses(hold);
+	await sleep();
+
+	for (const [variableId, variable, index] of hold.variables) {
+		log(`Regenerating hold variable usage ${variable.name.newValue} (${index + 1} / ${hold.variables.size})`);
 		regenerateHoldVariableUses(hold, variableId);
+		await sleep();
 	}
-	for (const characterId of hold.characters.keys()) {
+	for (const [characterId, character, index] of hold.characters) {
+		log(`Regenerating hold character usage ${character.name.newValue} (${index + 1} / ${hold.characters.size})`);
 		regenerateHoldCharacterUses(hold, characterId);
+		await sleep();
 	}
 }
 
@@ -490,11 +522,11 @@ function intArrayU(node: Element, attribute: string) {
 let lastSleep = 0;
 async function sleep(forced = false) {
 	return new Promise<void>(resolve => {
-		if (Date.now() > lastSleep + 16 || forced) {
+		if (Date.now() > lastSleep + Constants.xmlToHoldFrameDuration || forced) {
 			setTimeout(() => {
 				lastSleep = Date.now();
 				resolve();
-			}, 100)
+			}, Constants.xmlToHoldSleep)
 		} else {
 			resolve();
 		}

@@ -23,6 +23,7 @@ interface HoldProblem {
 }
 interface HoldConstructor {
 	$holdReaderId: number;
+	$isDataFrontLoaded: boolean;
 
 	id: number;
 	version: HoldVersion;
@@ -39,6 +40,7 @@ interface HoldConstructor {
 
 	encDescriptionMessage: string;
 	encEndHoldMessage: string;
+	encDrodInfo: string;
 
 	lastScriptId: number;
 	lastVarId: number;
@@ -64,6 +66,8 @@ export class Hold {
 	public readonly lastCharId: number;
 	public readonly lastWorldMapId: number;
 	public readonly startingLevelId: number;
+	/** Should NOT be here but there is at least one official hold that has it */
+	public readonly encDrodInfo: string;
 
 	public readonly players = new OrderedMap<number, HoldPlayer>();
 	public readonly variables = new OrderedMap<number, HoldVariable>();
@@ -78,6 +82,12 @@ export class Hold {
 	public readonly savedGames = new OrderedMap<number, HoldSavedGame>();
 
 	public readonly $holdReaderId: number;
+	/**
+	 * There is no consistency in whether all data is front loaded at the start
+	 * of the hold file or listed right before being used so we detect that on
+	 * import and follow the detected convention.
+	 */
+	public readonly $isDataFrontLoaded: boolean;
 	public readonly $changes = new HoldChangeList();
 
 	public readonly $problems: HoldProblem[] = [];
@@ -98,6 +108,7 @@ export class Hold {
 
 	public constructor(options: HoldConstructor) {
 		this.$holdReaderId = options.$holdReaderId;
+		this.$isDataFrontLoaded = options.$isDataFrontLoaded;
 
 		this.id = options.id;
 		this.version = options.version;
@@ -115,6 +126,7 @@ export class Hold {
 		this.lastCharId = options.lastCharId;
 		this.lastWorldMapId = options.lastWorldMapId;
 		this.startingLevelId = options.startingLevelId;
+		this.encDrodInfo = options.encDrodInfo;
 	}
 
 	public addNewPlayer(source?: {id: number, name: string, gidOriginalName: string, gidCreated: number}) {

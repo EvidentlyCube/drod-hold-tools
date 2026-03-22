@@ -2,9 +2,9 @@ import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } fro
 import { Hold } from "./datatypes/Hold";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { CUSTOM_CHARACTER_FIRST, UINT_MINUS_1 } from "./DrodCommonTypes";
-import { Mood, ScriptCommandType, Speaker } from "./DrodEnums";
+import { Mood, Speaker } from "./DrodEnums";
 import { HoldRef, HoldRefModel } from "./references/HoldReference";
-import { stringToWCharBase64 } from "./Utils";
+import { isAudioFormat, stringToWCharBase64 } from "./Utils";
 
 export function getLevelRoomIds(hold: Hold, levelId: number): number[] {
 	return hold.rooms.filterToArray(room => room.levelId === levelId).map(room => room.id);
@@ -150,6 +150,10 @@ export function regenerateHoldDataUses(hold: Hold, filteredByDataId?: number) {
 			hold.datas.getOrError(entrance.dataId.newValue).$uses.push(ref);
 		}
 	}
+
+	for (const savedGame of hold.savedGames.values()) {
+		// @fixme - Add reference to world map icons
+	}
 }
 
 export function regenerateHoldCharacterUses(hold: Hold, characterId: number) {
@@ -212,6 +216,8 @@ export function regenerateHoldCharacterUses(hold: Hold, characterId: number) {
 			}
 		}
 	}
+
+	// @Fixme add usage in saved games
 }
 
 export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
@@ -414,4 +420,94 @@ export function removeOtherHoldsFromHoldXML(xml: XMLDocument) {
 
 		hold.remove();
 	}
+}
+
+/**
+ * Some known uploaded holds are valid but have seemingly random, non-deterministic
+ * positioning of certain nodes. This function moves them to the place where they
+ * should be according to any known rules.
+ */
+export function fixKnownIssuesInKnownHolds(xml: XMLDocument) {
+	const version = xml.querySelector('drod')?.getAttribute('Version') ?? '100';
+	const created = xml.querySelector('Holds')?.getAttribute('GID_Created') ?? '0';
+	const playerId = xml.querySelector('Holds')?.getAttribute('GID_PlayerID') ?? '0';
+
+	function moveBefore(selectorSource: string, selectorTarget: string) {
+		const source = xml.querySelector(selectorSource);
+		const target = xml.querySelector(selectorTarget);
+
+		if (source && target) {
+			target.parentElement?.insertBefore(source, target);
+		}
+	}
+
+	function moveAllDataBeforeSpeech() {
+		const sources = xml.querySelectorAll('Data');
+
+		for (const data of sources) {
+			const format = parseInt(data.getAttribute('DataFormat') ?? '0');
+			if (!isAudioFormat(format)) {
+				continue;
+			}
+
+			const dataId = data.getAttribute('DataID') ?? '';
+			moveBefore(`Data[DataID="${dataId}"]`, `Speech[DataID="${dataId}"]`);
+		}
+	}
+
+	function moveToEnd(selector: string) {
+		const element = xml.querySelector(selector);
+
+		if (element && element.parentElement) {
+			element.parentElement.appendChild(element);
+		}
+	}
+
+	const key = `${version}.${created}.${playerId}`;
+	switch (key) {
+		case '303.1132279351.10135': // The Wrong Way flipped fix.hold
+			// Some datas are inexplicably front loaded while the rest is not
+			moveBefore('Data[DataID="15870"]', 'Data[DataID="15871"]');
+			moveBefore('Data[DataID="15872"]', 'Speech[SpeechID="44429"]');
+			moveBefore('Data[DataID="15874"]', 'Speech[SpeechID="44431"]');
+			break;
+
+		case '303.1290237613.10001': // war_the_truth_within.hold
+			// Some datas are front loaded but not all
+			moveAllDataBeforeSpeech();
+			// And one data is unused so let's move it to the end to be compatible
+			// with output
+			moveToEnd('Data[DataID="10024"]')
+			break;
+
+		default:
+			console.log("Hold Key = " + key);
+	}
+}
+
+export function isDataFrontLoaded(xml: XMLDocument) {
+	const drodNode = xml.querySelector('drod');
+	const holdNode = xml.querySelector('Holds');
+	if (!drodNode || !holdNode) {
+		return false;
+	}
+
+	// If data is inside Level then we know for sure it is NOT front loaded
+	if (xml.querySelector('Levels > Data')) {
+		return false;
+	}
+
+	const drodChildren = Array.from(drodNode.children);
+	const lastDataIndexDrod = drodChildren.findLastIndex(el => el.tagName === 'Data');
+	const firstLevelsIndexDrod = drodChildren.findIndex(el => el.tagName === 'Levels');
+
+	if (firstLevelsIndexDrod !== -1) {
+		return firstLevelsIndexDrod > lastDataIndexDrod;
+	}
+
+	const holdChildren = Array.from(holdNode.children);
+	const lastDataIndexHold = holdChildren.findLastIndex(el => el.tagName === 'Data');
+	const firstLevelsIndexHold = holdChildren.findIndex(el => el.tagName === 'Levels');
+
+	return firstLevelsIndexHold > lastDataIndexHold;
 }

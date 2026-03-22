@@ -1,4 +1,4 @@
-import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TCB_302, VERSION_TSS_507 } from "../Constants";
+import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507 } from "../Constants";
 
 export class HoldVersion {
 	public readonly version: number;
@@ -57,7 +57,7 @@ export class HoldVersion {
 	 * extra var.
 	 */
 	public get characterCommandsStoredInCommands() {
-		return this.version >= VERSION_TCB_302;
+		return this.version >= VERSION_TCB_301;
 	}
 
 	/**
