@@ -1,8 +1,6 @@
 import { UINT } from "../utils/NumberUtils";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
 
-type EnumToNameMap = ReadonlyMap<number, string>;
-
 export enum EntranceShowDescription {
 	No = 0,
 	Always = 1,

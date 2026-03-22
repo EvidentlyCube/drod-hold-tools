@@ -172,6 +172,10 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 
 	refs.entranceIds.add(entrance.id);
 
+	if (holdVersion.isEntranceInLevelAttributes) {
+		return;
+	}
+
 	if (entrance.dataId.newValue) {
 		await writeData(writer, refs, entrance.$hold.datas.get(entrance.dataId.newValue), holdVersion);
 	}
@@ -313,12 +317,19 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel,
 		.attr('GID_LevelIndex', level.gidLevelIndex)
 		.attrIf('OrderIndex', level.orderIndex, holdVersion.levelsHaveOrderIndex)
 		.attr('PlayerID', level.playerId.newValue)
-		.attr('NameMessage', level.name)
-		.attrIf('DescriptionMessage', level.description, holdVersion.entranceInLevelAttributes)
-		.attrIf('RoomID', level.entranceDetails.roomId, holdVersion.entranceInLevelAttributes)
-		.attrIf('X', level.entranceDetails.x, holdVersion.entranceInLevelAttributes)
-		.attrIf('Y', level.entranceDetails.y, holdVersion.entranceInLevelAttributes)
-		.attrIf('O', level.entranceDetails.o, holdVersion.entranceInLevelAttributes)
+		.attr('NameMessage', level.name);
+
+	if (holdVersion.isEntranceInLevelAttributes) {
+		const entrance = level.$hold.entrances.getOrError(level.id);
+		writer
+			.attr('DescriptionMessage', entrance.description)
+			.attr('RoomID', entrance.roomId)
+			.attr('X', entrance.x)
+			.attr('Y', entrance.y)
+			.attr('O', entrance.o);
+	}
+
+	writer
 		.attr('Created', (level.createdTimestamp.newValue / 1000) | 0)
 		.attr('LastUpdated', level.lastUpdated)
 		.attrU('IsRequired', level.isRequired)
@@ -476,8 +487,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 
 	for (const exit of room.exits) {
 		writer.tag('Exits')
-			.attrIf('EntranceID', exit.entranceId, !holdVersion.entranceInLevelAttributes)
-			.attrIf('LevelID', exit.levelId, holdVersion.entranceInLevelAttributes)
+			.attrIf('EntranceID', exit.entranceId, !holdVersion.isEntranceInLevelAttributes)
+			.attrIf('LevelID', exit.levelId, holdVersion.isEntranceInLevelAttributes)
 			.attr('Left', exit.left)
 			.attr('Right', exit.right)
 			.attr('Top', exit.top)

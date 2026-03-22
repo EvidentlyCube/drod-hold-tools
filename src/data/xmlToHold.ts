@@ -1,3 +1,4 @@
+import { version } from "os";
 import { Constants } from "../Constants";
 import { assertNotNull } from "../utils/Asserts";
 import { diffXml, DiffXmlError } from "../utils/DiffXml";
@@ -196,19 +197,30 @@ export async function xmlToHold(
 				holdId: int(levelXml, 'HoldID'),
 				created: int(levelXml, 'Created'),
 				encName: str(levelXml, 'NameMessage'),
-				encDescription: strU(levelXml, 'DescriptionMessage') ?? "",
 				gidLevelIndex: int(levelXml, 'GID_LevelIndex'),
 				isRequired: boolU(levelXml, 'IsRequired'),
 				lastUpdated: int(levelXml, 'LastUpdated'),
 				orderIndex: intU(levelXml, 'OrderIndex') ?? -1,
 				playerId: int(levelXml, 'PlayerID'),
-				entranceDetails: {
+			});
+
+			// AE had entrance as part of level attributes so we create a fake one
+			// to not create separate AE interface
+			if (holdVersion.isEntranceInLevelAttributes) {
+				const entrance = new HoldEntrance(hold, {
+					id: holdLevel.id,
 					roomId: intU(levelXml, 'RoomID') ?? 0,
+					encDescription: strU(levelXml, 'DescriptionMessage') ?? "",
 					x: intU(levelXml, 'X') ?? 0,
 					y: intU(levelXml, 'Y') ?? 0,
 					o: intU(levelXml, 'O') ?? 0,
-				}
-			});
+					isMainEntrance: true,
+					showDescription: -1,
+					dataId: undefined
+				})
+
+				hold.entrances.set(id, entrance);
+			}
 
 			hold.levels.set(holdLevel.id, holdLevel);
 			await sleep();

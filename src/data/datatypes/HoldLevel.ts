@@ -4,12 +4,6 @@ import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldRoom } from "./HoldRoom";
 
-interface LevelAE_EntranceDetails {
-	roomId: number;
-	x: number;
-	y: number;
-	o: number;
-}
 interface LevelConstructor {
 	id: number;
 	holdId: number;
@@ -20,9 +14,6 @@ interface LevelConstructor {
 	created: number;
 	lastUpdated: number;
 	isRequired: boolean | undefined;
-
-	encDescription: string;
-	entranceDetails: LevelAE_EntranceDetails;
 }
 export class HoldLevel {
 	public readonly $hold: Hold;
@@ -40,13 +31,6 @@ export class HoldLevel {
 	public readonly createdTimestamp: SignalUpdatableValue<number>;
 	public readonly lastUpdated: number;
 	public readonly isRequired: boolean | undefined;
-
-	// Outdated properties
-	/** @version 100 - Replaced by Entrances in JtRH */
-	public readonly description: SignalUpdatableValue<string>;
-
-	/** @version 100 - Replaced by Entrances in JtRH*/
-	public readonly entranceDetails: LevelAE_EntranceDetails;
 
 	private $_primaryEntranceIdCache?: number;
 	private $_roomsCache?: readonly HoldRoom[];
@@ -86,8 +70,6 @@ export class HoldLevel {
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
-		this.description = new SignalUpdatableValue(wcharBase64ToString(opts.encDescription));
-		this.entranceDetails = opts.entranceDetails;
 		this.createdTimestamp = new SignalUpdatableValue(opts.created * 1000);
 		this.lastUpdated = opts.lastUpdated;
 		this.isRequired = opts.isRequired;
