@@ -12,6 +12,7 @@ import HoldProblems from "../../components/viewHold/summary/HoldProblems";
 type GetData = (hold: Hold) => ReactElement[] | ReactElement | string | number;
 
 const DataPoints: Record<string, GetData> = {
+	"Version": hold => hold.version.toString(),
 	"Name": hold => hold.name.oldValue,
 	"Author": hold => <div className="is-flex is-gap-1 is-align-items-center">
 		<SwapPlayerButton hold={hold} playerSource={hold.playerId} />
