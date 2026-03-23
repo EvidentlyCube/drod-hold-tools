@@ -1,3 +1,4 @@
+import { wrap } from "module";
 import { bytesArrToBase64 } from "../utils/StringUtils";
 import { PackedVars, PackedVarType } from "./PackedVars";
 
@@ -14,80 +15,129 @@ class WrappedArray {
 		this._pos = 0;
 	}
 
-	public readBool(): boolean {
-		return this._array[this._pos++] > 0;
-	}
-
-	public writeBool(bool: boolean) {
-		this._array[this._pos++] = bool ? 1 : 0;
-	}
-
-	public readUint(): number {
-		const pos0 = this._array[this._pos++];
-		const pos1 = this._array[this._pos++];
-		const pos2 = this._array[this._pos++];
-		const pos3 = this._array[this._pos++];
-
-		return pos0
-			+ (pos1 * 256)
-			+ (pos2 * 256 * 256)
-			+ (pos3 * 256 * 256 * 256);
-	}
-
-	public writeUint(val: number) {
-		this._array[this._pos++] = val & 0xFF;
-		this._array[this._pos++] = (val / 256) & 0xFF;
-		this._array[this._pos++] = (val / (256 * 256)) & 0xFF;
-		this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xFF;
-	}
-
-	public readInt(): number {
-		const pos0 = this._array[this._pos++];
-		const pos1 = this._array[this._pos++];
-		const pos2 = this._array[this._pos++];
-		const pos3 = this._array[this._pos++];
-
-		return pos0
-			+ (pos1 * 256)
-			+ (pos2 * 256 * 256)
-			+ (pos3 * 256 * 256 * 256);
-	}
-
-	public writeInt(val: number) {
-		this._array[this._pos++] = val & 0xFF;
-		this._array[this._pos++] = (val / 255) & 0xFF;
-		this._array[this._pos++] = (val / (255 * 255)) & 0xFF;
-		this._array[this._pos++] = (val / (255 * 255 * 255)) & 0xFF;
-	}
-
-	public readWcharString(characters: number): string {
-		const chars = [];
-		while (characters-- > 0 && this._pos < this._array.length) {
-			chars.push(String.fromCharCode(this._array[this._pos++]));
+	public readBool(varSize: number): boolean {
+		let isTrue = false;
+		for (var i = 0; i < varSize; i++) {
+			if (this._array[this._pos + i]) {
+				isTrue = true;
+			}
 		}
 
-		return chars.filter(x => x !== '\u0000').join('');
+		this._pos += varSize;
+
+		return isTrue;
 	}
 
-	public writeString(str: string) {
-		for (let i = 0; i < str.length; i++) {
+	public writeBool(bool: boolean, varSize: number) {
+		this.writeUint(bool ? 1 : 0, varSize);
+	}
+
+	public readUint(varSize: number): number {
+		const pos0 = varSize >= 1 ? this._array[this._pos + 0] : 0;
+		const pos1 = varSize >= 2 ? this._array[this._pos + 1] : 0;
+		const pos2 = varSize >= 3 ? this._array[this._pos + 2] : 0;
+		const pos3 = varSize >= 4 ? this._array[this._pos + 3] : 0;
+
+		this._pos += varSize;
+
+		return pos0
+			+ (pos1 * 256)
+			+ (pos2 * 256 * 256)
+			+ (pos3 * 256 * 256 * 256);
+	}
+
+	public writeUint(val: number, varSize: number) {
+		if (varSize >= 1) {
+			this._array[this._pos++] = val & 0xFF;
+		}
+		if (varSize >= 2) {
+			this._array[this._pos++] = (val / 256) & 0xFF;
+		}
+		if (varSize >= 3) {
+			this._array[this._pos++] = (val / (256 * 256)) & 0xFF;
+		}
+		if (varSize >= 4) {
+			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xFF;
+		}
+
+		this.padZeroBytes(varSize - 4);
+	}
+
+	public readInt(varSize: number): number {
+		const pos0 = varSize >= 1 ? this._array[this._pos + 0] : 0;
+		const pos1 = varSize >= 2 ? this._array[this._pos + 1] : 0;
+		const pos2 = varSize >= 3 ? this._array[this._pos + 2] : 0;
+		const pos3 = varSize >= 4 ? this._array[this._pos + 3] : 0;
+
+		this._pos += varSize;
+
+		return pos0
+			+ (pos1 * 256)
+			+ (pos2 * 256 * 256)
+			+ (pos3 * 256 * 256 * 256);
+	}
+
+	public writeInt(val: number, varSize: number) {
+		if (varSize >= 1) {
+			this._array[this._pos++] = val & 0xFF;
+		}
+		if (varSize >= 2) {
+			this._array[this._pos++] = (val / 256) & 0xFF;
+		}
+		if (varSize >= 3) {
+			this._array[this._pos++] = (val / (256 * 256)) & 0xFF;
+		}
+		if (varSize >= 4) {
+			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xFF;
+		}
+		this.padZeroBytes(varSize - 4);
+	}
+
+	public readCharString(varSize: number): string {
+		const chars = [];
+		// -1 to skip null byte at the end
+		for (let i = 0; i < varSize - 1; i++) {
+			chars.push(String.fromCharCode(this._array[this._pos + i]));
+		}
+
+		this._pos += varSize;
+
+		return chars.join('');
+	}
+
+	public readWcharString(varSize: number): string {
+		const chars = [];
+		// -2 because it's null terminated and we skip the last WCHAR
+		for (let i = 0; i < varSize - 2; i += 2) {
+			const codeUnit = this._array[this._pos + i] | (this._array[this._pos + i + 1] << 8);
+			chars.push(String.fromCharCode(codeUnit));
+		}
+
+		this._pos += varSize;
+
+		return chars.join('');
+	}
+
+	public writeString(str: string, varSize: number) {
+		// -1 to leave space for null byte
+		for (let i = 0; i < varSize - 1; i++) {
 			const charCode = str.charCodeAt(i);
 			if (charCode > 128) {
 				throw new Error(`Trying to write char code ${charCode}`);
 			}
 			this._array[this._pos++] = charCode;
 		}
+
 		this._array[this._pos++] = 0;
 	}
 
-	public writeWCharString(str: string) {
-		for (let i = 0; i < str.length; i++) {
-			const charCode = str.charCodeAt(i);
-			if (charCode > 128) {
-				throw new Error(`Trying to write char code ${charCode}`);
-			}
-			this._array[this._pos++] = charCode;
-			this._array[this._pos++] = 0;
+	public writeWCharString(str: string, varSize: number) {
+		// -2 because null bytes at the end are not part of the string
+		for (let i = 0; i < varSize - 2; i += 2) {
+			// Division because we want to go character by character
+			const charCode = str.charCodeAt(i / 2);
+			this._array[this._pos++] = charCode & 0xFF;
+			this._array[this._pos++] = (charCode >> 8) & 0xFF;
 		}
 
 		this._array[this._pos++] = 0;
@@ -104,9 +154,15 @@ class WrappedArray {
 		return readBytes;
 	}
 
-	public writeRaw(buffer: number[]) {
-		for (let i = 0; i < buffer.length; i++) {
+	public writeRaw(buffer: number[], bytesToWrite: number) {
+		for (let i = 0; i < bytesToWrite; i++) {
 			this._array[this._pos++] = buffer[i];
+		}
+	}
+
+	private padZeroBytes(count: number) {
+		for (let i = 0; i < count; i++) {
+			this._array[this._pos++] = 0;
 		}
 	}
 }
@@ -145,46 +201,47 @@ const PackedVarsUtils = {
 		}
 
 		const arr = new WrappedArray(array);
-		let varNameLength = arr.readUint();
+		let varNameLength = arr.readUint(4);
 
 		while (varNameLength !== 0 && !Number.isNaN(varNameLength)) {
 			if (varNameLength >= 256) {
 				throw new Error(`Variable name cannot be more than 255 characters, but got ${varNameLength} instead`);
 			}
 
-			const varName = arr.readWcharString(varNameLength);
+			const varName = arr.readCharString(varNameLength);
 			if (!varName) {
 				throw new Error(`Failed to read variable name`);
 			}
 
-			const varType = arr.readInt() as PackedVarType;
-			const varSize = arr.readUint();
+			const varType = arr.readInt(4) as PackedVarType;
+			const varSize = arr.readUint(4);
 
 			switch (varType) {
 				case PackedVarType.ByteBuffer:
-					vars.writeByteBuffer(varName, arr.readRaw(varSize));
+					vars.writeByteBuffer(varName, arr.readRaw(varSize), varSize);
 					break;
 				case PackedVarType.Uint:
-					vars.writeUint(varName, arr.readUint());
+					vars.writeUint(varName, arr.readUint(varSize), varSize);
 					break;
 				case PackedVarType.deprecated_DWord:
-					vars.writeDWord_deprecated(varName, arr.readUint());
+					vars.writeDWord_deprecated(varName, arr.readUint(varSize), varSize);
 					break;
 				case PackedVarType.Int:
-					vars.writeInt(varName, arr.readInt());
+					vars.writeInt(varName, arr.readInt(varSize), varSize);
 					break;
 				case PackedVarType.Bool:
-					vars.writeBool(varName, arr.readBool());
+					vars.writeBool(varName, arr.readBool(varSize), varSize);
 					break;
 				case PackedVarType.WcharString:
-					vars.writeWcharString(varName, arr.readWcharString(varSize));
+					vars.writeWcharString(varName, arr.readWcharString(varSize), varSize);
 					break;
 				default:
 					console.error(varName, varType, varSize, arr.readRaw(varSize));
 					throw new Error(`Unknown packed var type ${varType}`);
 			}
 
-			varNameLength = arr.readUint();
+			varNameLength = arr.readUint(4);
+
 		}
 
 		return vars;
@@ -194,59 +251,54 @@ const PackedVarsUtils = {
 		const buf = new WrappedArray(new Uint8Array());
 
 		for (const packedVar of packedVars.vars) {
-			const { name, type, value } = packedVar;
+			const { name, type, value, size } = packedVar;
 
-			buf.writeUint(name.length + 1);
-			buf.writeString(name);
-			buf.writeInt(type);
+			buf.writeUint(name.length + 1, 4);
+			buf.writeString(name, name.length + 1);
+			buf.writeInt(type, 4);
+			buf.writeUint(size, 4);
 
 			switch (type) {
 				case PackedVarType.ByteBuffer: {
 					if (!Array.isArray(value)) {
 						throw new Error(`Expected ByteBuffer value to be number[] or Uint8Array for variable "${name}"`);
 					}
-					buf.writeUint(value.length);
-					buf.writeRaw(value);
+					buf.writeRaw(value, size);
 					break;
 				}
 				case PackedVarType.Uint: {
 					if (typeof value !== 'number' || !Number.isFinite(value)) {
 						throw new Error(`Expected Uint value to be a number for variable "${name}"`);
 					}
-					buf.writeUint(4);
-					buf.writeUint(value >>> 0);
+					buf.writeUint(value >>> 0, size);
 					break;
 				}
 				case PackedVarType.deprecated_DWord: {
 					if (typeof value !== 'number' || !Number.isFinite(value)) {
 						throw new Error(`Expected deprecated_DWord value to be a number for variable "${name}"`);
 					}
-					buf.writeUint(4);
-					buf.writeUint(value >>> 0);
+					buf.writeUint(value >>> 0, size);
 					break;
 				}
 				case PackedVarType.Int: {
 					if (typeof value !== 'number' || !Number.isFinite(value)) {
 						throw new Error(`Expected Int value to be a finite number for variable "${name}"`);
 					}
-					buf.writeUint(4);
-					buf.writeInt(value | 0);
+					buf.writeInt(value | 0, size);
 					break;
 				}
 				case PackedVarType.Bool: {
 					if (typeof value !== 'boolean') {
 						throw new Error(`Expected Bool value to be boolean for variable "${name}"`);
 					}
-					buf.writeUint(1);
-					buf.writeBool(value);
+					buf.writeBool(value, size);
 					break;
 				}
 				case PackedVarType.WcharString: {
 					if (typeof value !== 'string') {
 						throw new Error(`Expected WcharString value to be string for variable "${name}"`);
 					}
-					buf.writeUint(value.length * 2 + 2);
-					buf.writeWCharString(value);
+					buf.writeWCharString(value, size);
 					break;
 				}
 				default:

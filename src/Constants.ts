@@ -13,6 +13,14 @@ export const Constants = {
 	isDev: process.env.NODE_ENV === 'development',
 	diffXmlSleep: 100,
 	xmlReaderFrameDuration: 100,
+	xmlReaderSleep: 16,
 	xmlToHoldSleep: 100,
-	xmlToHoldFrameDuration: 16
+	xmlToHoldFrameDuration: 16,
+
+	xmlReader: {
+		// 8 Megabytes per chunk
+		xorDecodeChunk: 1024 * 1024 * 8,
+		// 4 Megabytes per chunk
+		textDecodeChunk: 1024 * 1024 * 4,
+	}
 };

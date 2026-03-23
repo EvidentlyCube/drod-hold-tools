@@ -11,6 +11,7 @@ interface PlayerConstructor {
 	encOriginalName: string;
 	gidCreated: number;
 	encName: string;
+	encEmailMessage: string | undefined;
 	$isNewlyAdded: boolean;
 }
 export class HoldPlayer {
@@ -20,6 +21,9 @@ export class HoldPlayer {
 	public readonly gidOriginalName: string;
 	public readonly gidCreated: number;
 	public readonly name: SignalUpdatableValue<string>;
+
+	/** @version 100 Only spotted in some AE holds */
+	public readonly encEmailMessage: string | undefined;
 
 	public readonly $isDeleted: SignalUpdatableValue<boolean>;
 	public readonly $isNewlyAdded: boolean;
@@ -60,6 +64,7 @@ export class HoldPlayer {
 		this.gidOriginalName = wcharBase64ToString(opts.encOriginalName);
 		this.gidCreated = opts.gidCreated;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.encEmailMessage = opts.encEmailMessage;
 
 		this.$isNewlyAdded = opts.$isNewlyAdded;
 		this.$isDeleted = new SignalUpdatableValue(false);

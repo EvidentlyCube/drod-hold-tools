@@ -1,7 +1,9 @@
 import { Constants } from "../Constants";
 
-export async function parseXml(xmlString: string, updateCallback?: (log: string) => void): Promise<XMLDocument> {
-	const reader = new XmlBufferReader(xmlString, updateCallback);
+type ProgressCallback = (log: string, progressFactor: number) => void;
+
+export async function parseXml(xmlString: string, progressCallback?: ProgressCallback): Promise<XMLDocument> {
+	const reader = new XmlBufferReader(xmlString, progressCallback);
 	const xmlDoc = document.implementation.createDocument(null, null, null);
 
 	const [headerType, headerData] = reader.consumeHeader();
@@ -80,7 +82,7 @@ class XmlBufferReader {
 	private _xml: string;
 	private _length: number;
 	private _pos: number;
-	private _updateCallback?: (log: string) => void;
+	private _progressCallback?: ProgressCallback;
 	private _lastSleep: number = Date.now();
 
 	public get isSleepTime() {
@@ -106,11 +108,11 @@ class XmlBufferReader {
 		return this._pos >= this._xml.length;
 	}
 
-	public constructor(xml: string, updateCallback?: (log: string) => void) {
+	public constructor(xml: string, progressCallback?: ProgressCallback) {
 		this._xml = xml.replace(/\r|\n/g, '');
 		this._length = xml.length;
 		this._pos = 0;
-		this._updateCallback = updateCallback;
+		this._progressCallback = progressCallback;
 	}
 
 	public consumeHeader() {
@@ -281,19 +283,9 @@ class XmlBufferReader {
 	}
 
 	private _log() {
-		if (!this._updateCallback) {
-			return;
-		}
-
-		const lines = [
-			this._xml.substring(
-				this._pos - 20,
-				this._pos + 20,
-			),
-			"^",
-			`${(this._pos * 100 / this._xml.length).toFixed(2)}% (${this._pos}/${this._xml.length})`
-		].join("\n");
-
-		this._updateCallback(lines);
+		this._progressCallback?.(
+			`Processing: ${this._xml.substring(this._pos - 20, this._pos + 20)}`,
+			this._pos / this._xml.length
+		);
 	}
 }

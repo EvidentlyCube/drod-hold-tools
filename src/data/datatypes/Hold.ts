@@ -24,6 +24,7 @@ interface HoldProblem {
 interface HoldConstructor {
 	$holdReaderId: number;
 	$isDataFrontLoaded: boolean;
+	$hasEndHoldMessage: boolean;
 
 	id: number;
 	version: HoldVersion;
@@ -82,12 +83,18 @@ export class Hold {
 	public readonly savedGames = new OrderedMap<number, HoldSavedGame>();
 
 	public readonly $holdReaderId: number;
+
 	/**
 	 * There is no consistency in whether all data is front loaded at the start
 	 * of the hold file or listed right before being used so we detect that on
 	 * import and follow the detected convention.
 	 */
 	public readonly $isDataFrontLoaded: boolean;
+	/**
+	 * Back in AE it was possible for EndHoldMessage attribute to not be
+	 * present
+	 */
+	public readonly $hasEndHoldMessage: boolean;
 	public readonly $changes = new HoldChangeList();
 
 	public readonly $problems: HoldProblem[] = [];
@@ -109,6 +116,7 @@ export class Hold {
 	public constructor(options: HoldConstructor) {
 		this.$holdReaderId = options.$holdReaderId;
 		this.$isDataFrontLoaded = options.$isDataFrontLoaded;
+		this.$hasEndHoldMessage = options.$hasEndHoldMessage;
 
 		this.id = options.id;
 		this.version = options.version;

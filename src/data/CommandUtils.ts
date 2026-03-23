@@ -104,7 +104,7 @@ export function unpackCommands(hold: Hold, vars: PackedVars): CommandsList | und
 		return new CommandsList(
 			hold,
 			readCommandsBuffer(vars.readByteBuffer('SerializedCommands', [])),
-			CommandListPackingType.SerializedIntoCommands
+			CommandListPackingType.SerializedIntoSerializedCommands
 		);
 	} else {
 		const commands = unpackCommands_spreadInExtraVars(vars);

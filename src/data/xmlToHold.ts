@@ -24,12 +24,13 @@ import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 import { HoldRefModel } from "./references/HoldReference";
+import { OnProgressCallback } from "../processor/HoldReader3";
 
 export async function xmlToHold(
 	holdReaderId: number,
 	originalXml: Document,
 	storedChanges: HoldChange[],
-	log: (log: string) => void
+	log: OnProgressCallback
 ): Promise<Hold> {
 	removeOtherHoldsFromHoldXML(originalXml);
 	fixKnownIssuesInKnownHolds(originalXml);
@@ -40,9 +41,10 @@ export async function xmlToHold(
 	assertNotNull(drodXml, "Missing 'drod' node in the hold XML");
 	assertNotNull(holdXml, "Missing 'Holds' node in the hold XML");
 
-	log("Parsing Hold");
+	log("Parsing Hold", 0, "Start");
 
 	const holdVersion = new HoldVersion(intU(drodXml, 'Version'));
+	log("Parsing Hold", 0, "Got version");
 
 	const holdConstructor: ConstructorParameters<typeof Hold>[0] = {
 		$holdReaderId: holdReaderId,
@@ -53,7 +55,7 @@ export async function xmlToHold(
 		playerId: int(holdXml, 'GID_PlayerID'),
 		editingPrivileges: int(holdXml, 'EditingPrivileges'),
 		encDescriptionMessage: str(holdXml, 'DescriptionMessage'),
-		encEndHoldMessage: str(holdXml, 'EndHoldMessage'),
+		encEndHoldMessage: strU(holdXml, 'EndHoldMessage') ?? "",
 		encName: str(holdXml, 'NameMessage'),
 		lastUpdated: int(holdXml, 'LastUpdated'),
 		lastCharId: intU(holdXml, 'CharID') ?? 0,
@@ -63,22 +65,26 @@ export async function xmlToHold(
 		status: intU(holdXml, 'Status'),
 		lastWorldMapId: intU(holdXml, 'WorldMap') ?? 0,
 		encDrodInfo: strU(drodXml, 'Info') ?? "",
-		$isDataFrontLoaded: isDataFrontLoaded(originalXml)
+		$isDataFrontLoaded: isDataFrontLoaded(originalXml),
+		$hasEndHoldMessage: holdXml.hasAttribute('EndHoldMessage')
 	};
+	log("Parsing Hold", 0, "Got constructor");
 
 	const hold = new Hold(holdConstructor);
 
 	try {
 		await sleep();
 
-		for (const playerXml of originalXml.querySelectorAll('Players')) {
+
+		for (const [playerXml, i, total] of querySelectorAll(originalXml, 'Players')) {
 			const id = int(playerXml, 'PlayerID');
-			log(`Parsing Players ${id}`);
+			log(`Players`, i / total, `${id}`);
 
 			const playerData = new HoldPlayer(hold, {
 				id,
 				encName: str(playerXml, 'NameMessage'),
 				encOriginalName: str(playerXml, 'GID_OriginalNameMessage'),
+				encEmailMessage: strU(playerXml, 'EMailMessage'),
 				gidCreated: int(playerXml, 'GID_Created'),
 				$isNewlyAdded: false
 			});
@@ -87,9 +93,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const dataXml of originalXml.querySelectorAll('Data')) {
+		for (const [dataXml, i, total] of querySelectorAll(originalXml, 'Data')) {
 			const id = int(dataXml, 'DataID');
-			log(`Parsing Data ${id}`);
+			log(`Data`, i / total, `${id}`);
 
 			const holdData = new HoldData(hold, {
 				id,
@@ -103,10 +109,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const entranceXml of originalXml.querySelectorAll('Entrances')) {
+		for (const [entranceXml, i, total] of querySelectorAll(originalXml, 'Entrances')) {
 			const id = int(entranceXml, 'EntranceID');
-
-			log(`Parsing Entrance ${id}`);
+			log(`Entrance`, i / total, `${id}`);
 
 			const entranceData = new HoldEntrance(hold, {
 				id,
@@ -124,9 +129,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const varXml of originalXml.querySelectorAll('Vars')) {
+		for (const [varXml, i, total] of querySelectorAll(originalXml, 'Vars')) {
 			const id = int(varXml, 'VarID');
-			log(`Parsing Variable ${id}`);
+			log(`Variable`, i / total, `${id}`);
 
 			const holdVar = new HoldVariable(hold, {
 				id,
@@ -137,9 +142,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const speechXml of originalXml.querySelectorAll('Speech')) {
+		for (const [speechXml, i, total] of querySelectorAll(originalXml, 'Speech')) {
 			const id = int(speechXml, 'SpeechID');
-			log(`Parsing Speech ${id}`);
+			log(`Speech`, i / total, `${id}`);
 
 			const holdSpeech = new HoldSpeech(hold, {
 				id,
@@ -154,9 +159,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const characterXml of originalXml.querySelectorAll('Characters')) {
+		for (const [characterXml, i, total] of querySelectorAll(originalXml, 'Characters')) {
 			const id = int(characterXml, 'CharID');
-			log(`Parsing Character ${id}`);
+			log(`Characters`, i / total, `${id}`);
 
 			const holdCharacter = new HoldCharacter(hold, {
 				id,
@@ -172,9 +177,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const worldMapXml of originalXml.querySelectorAll('WorldMaps')) {
+		for (const [worldMapXml, i, total] of querySelectorAll(originalXml, 'WorldMaps')) {
 			const id = int(worldMapXml, 'WorldMap');
-			log(`Parsing World Map ${id}`);
+			log(`WorldMaps`, i / total, `${id}`);
 
 			const holdWorldMap = new HoldWorldMap(hold, {
 				id,
@@ -188,9 +193,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const levelXml of originalXml.querySelectorAll('Levels')) {
+		for (const [levelXml, i, total] of querySelectorAll(originalXml, 'Levels')) {
 			const id = int(levelXml, 'LevelID');
-			log(`Parsing Level ${id}`);
+			log(`Levels`, i / total, `${id}`);
 
 			const holdLevel = new HoldLevel(hold, {
 				id,
@@ -226,9 +231,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const roomXml of originalXml.querySelectorAll('Rooms')) {
+		for (const [roomXml, i, total] of querySelectorAll(originalXml, 'Rooms')) {
 			const roomId = int(roomXml, 'RoomID');
-			log(`Parsing Room ${roomId}`);
+			log(`Rooms`, i / total, `${roomId}`);
 
 			const holdRoom = new HoldRoom(hold, {
 				id: roomId,
@@ -253,8 +258,9 @@ export async function xmlToHold(
 				isNestedInLevel: roomXml.parentElement?.tagName === 'Levels',
 			});
 
-			log(`Parsing Room ${roomId} -> Orbs`);
-			for (const orbXml of roomXml.querySelectorAll('Orbs')) {
+			for (const [orbXml, orbI, orbTotal] of querySelectorAll(roomXml, 'Orbs')) {
+				log(`Rooms`, i / total, `${roomId} -> Orb ${orbI}/${orbTotal}`);
+
 				const orb: HoldOrb = {
 					type: intU(orbXml, 'Type'),
 					x: int(orbXml, 'X'),
@@ -275,10 +281,9 @@ export async function xmlToHold(
 				await sleep();
 			}
 
-			log(`Parsing Room ${roomId} -> Monsters`);
-			let monsterIndex = 0;
-			for (const monsterXml of roomXml.querySelectorAll('Monsters')) {
-				const holdMonster = new HoldMonster(holdRoom, monsterIndex++, {
+			for (const [monsterXml, monsterI, monsterTotal] of querySelectorAll(roomXml, 'Monsters')) {
+				log(`Rooms`, i / total, `${roomId} -> Monster ${monsterI}/${monsterTotal}`);
+				const holdMonster = new HoldMonster(holdRoom, monsterI, {
 					x: int(monsterXml, 'X'),
 					y: int(monsterXml, 'Y'),
 					o: int(monsterXml, 'O'),
@@ -300,8 +305,8 @@ export async function xmlToHold(
 				await sleep();
 			}
 
-			log(`Parsing Room ${roomId} -> Scrolls`);
-			for (const scrollXml of roomXml.querySelectorAll('Scrolls')) {
+			for (const [scrollXml, scrollI, scrollTotal] of querySelectorAll(roomXml, 'Scrolls')) {
+
 				const x = int(scrollXml, 'X');
 				const y = int(scrollXml, 'Y');
 				holdRoom.scrolls.push({
@@ -316,8 +321,8 @@ export async function xmlToHold(
 				await sleep();
 			}
 
-			log(`Parsing Room ${roomId} -> Exits`);
-			for (const exitXml of roomXml.querySelectorAll('Exits')) {
+			for (const [exitXml, exitI, exitTotal] of querySelectorAll(roomXml, 'Exits')) {
+				log(`Rooms`, i / total, `${roomId} -> Exit ${exitI}/${exitTotal}`);
 				holdRoom.exits.push({
 					entranceId: intU(exitXml, 'EntranceID') ?? 0,
 					levelId: intU(exitXml, 'LevelID') ?? 0,
@@ -330,8 +335,8 @@ export async function xmlToHold(
 				await sleep();
 			}
 
-			log(`Parsing Room ${roomId} -> Checkpoints`);
-			for (const checkpointXml of roomXml.querySelectorAll('Checkpoints')) {
+			for (const [checkpointXml, checkpointI, checkpointTotal] of querySelectorAll(roomXml, 'Checkpoints')) {
+				log(`Rooms`, i / total, `${roomId} -> Checkpoint ${checkpointI}/${checkpointTotal}`);
 				holdRoom.checkpoints.push({
 					x: int(checkpointXml, 'X'),
 					y: int(checkpointXml, 'Y'),
@@ -343,9 +348,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const savedGameXml of originalXml.querySelectorAll('SavedGames')) {
+		for (const [savedGameXml, i, total] of querySelectorAll(originalXml, 'SavedGames')) {
 			const id = int(savedGameXml, 'SavedGameID');
-			log(`Parsing Saved Game ${id}`);
+			log(`SavedGames`, i / total, `${id}`);
 
 			const holdSavedGame = new HoldSavedGame(hold, {
 				id,
@@ -367,6 +372,7 @@ export async function xmlToHold(
 				exploredRooms: intArrayU(savedGameXml, 'ExploredRooms') ?? [],
 				conqueredRooms: intArrayU(savedGameXml, 'ConqueredRooms') ?? [],
 				completedScripts: intArrayU(savedGameXml, 'CompletedScripts') ?? [],
+				globalScripts: intArrayU(savedGameXml, 'GlobalScripts') ?? [],
 				entrancesExplored: intArrayU(savedGameXml, 'EntrancesExplored') ?? [],
 				created: int(savedGameXml, 'Created'),
 				encCommands: str(savedGameXml, 'Commands'),
@@ -396,9 +402,9 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		for (const demoXml of originalXml.querySelectorAll('Demos')) {
+		for (const [demoXml, i, total] of querySelectorAll(originalXml, 'Demos')) {
 			const id = int(demoXml, 'DemoID');
-			log(`Parsing Demo ${id}`);
+			log(`Demos`, i / total, `${id}`);
 
 			const holdDemo = new HoldDemo(hold, {
 				id,
@@ -417,24 +423,21 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		log("Initializing dynamic data");
-
 		/** Init dynamic data */
 		loadDynamicData(hold, log);
 
-		log("Stability check: Exporting XML")
+		log("Stability check", 0, 'Exporting XML');
 		const exportedXml = await holdToXml(hold);
-		log("Stability check: Comparing XMLs")
+
 		try {
 			await diffXml(originalXml, exportedXml, (index, total) => {
 				const percent = (index / total) * 100;
-				log(`Stability check: ${percent.toFixed(2)}% (${index} / ${total})`);
+				log("Stability check", index / total, 'Comparing XMLs');
 			});
 
 		} catch (e) {
 			if (Constants.isDev) {
 				(window as any).lastDiffXmlError = e;
-				console.error("Diff error details stored in `lastDiffXmlError`")
 			}
 			throw new Error(
 				"Stability check failed. When attempting to export\n"
@@ -462,22 +465,22 @@ export async function xmlToHold(
 	return hold;
 }
 
-async function loadDynamicData(hold: Hold, log: (log: string) => void) {
-	log("Regenerating speech locations");
+async function loadDynamicData(hold: Hold, log: OnProgressCallback) {
+	log("Generating dynamic info", -1, "Speech locations");
 	regenerateHoldSpeechLocations(hold);
 	await sleep();
 
-	log("Regenerating Data usage");
+	log("Generating dynamic info", -1, "Data uses");
 	regenerateHoldDataUses(hold);
 	await sleep();
 
 	for (const [variableId, variable, index] of hold.variables) {
-		log(`Regenerating hold variable usage ${variable.name.newValue} (${index + 1} / ${hold.variables.size})`);
+		log("Generating dynamic info", index / hold.variables.size, `Hold variable ${variable.name.newValue}`);
 		regenerateHoldVariableUses(hold, variableId);
 		await sleep();
 	}
 	for (const [characterId, character, index] of hold.characters) {
-		log(`Regenerating hold character usage ${character.name.newValue} (${index + 1} / ${hold.characters.size})`);
+		log("Generating dynamic info", index / hold.characters.size, `Hold character ${character.name.newValue}`);
 		regenerateHoldCharacterUses(hold, characterId);
 		await sleep();
 	}
@@ -543,6 +546,18 @@ async function sleep(forced = false) {
 			resolve();
 		}
 	})
+}
+
+function* querySelectorAll<T extends Element>(
+	document: Document | Element,
+	query: string
+): Generator<[ T, number, number ]> {
+	const elements = document.querySelectorAll<T>(query);
+	const total = elements.length;
+
+	for (let index = 0; index < total; index++) {
+		yield [elements[index], index, total];
+	}
 }
 
 export class XmlToHoldError extends Error {

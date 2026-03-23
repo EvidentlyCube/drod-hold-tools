@@ -236,7 +236,6 @@ function getUnpackHoldStep(reader: HoldReader) {
 	let compressedSize = 0;
 	let error: Error | undefined;
 
-
 	let inflator: AsyncGunzip | AsyncUnzlib;
 
 	const onData = (flateError: FlateError | null, data: Uint8Array, final: boolean) => {

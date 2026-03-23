@@ -504,9 +504,6 @@ export function fixKnownIssuesInKnownHolds(xml: XMLDocument) {
 			// with output
 			moveToEnd('Data[DataID="10024"]')
 			break;
-
-		default:
-			console.log("Hold Key = " + key);
 	}
 }
 

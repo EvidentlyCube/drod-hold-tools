@@ -77,7 +77,7 @@ export async function holdToXml(hold: Hold, options: Partial<HoldToXmlOptions> =
 		.attr('LevelID', hold.startingLevelId)
 		.attr('GID_NewLevelIndex', hold.gidNewLevelIndex)
 		.attr('EditingPrivileges', hold.editingPrivileges)
-		.attr('EndHoldMessage', hold.endHoldMessage)
+		.attrIf('EndHoldMessage', hold.endHoldMessage, hold.$hasEndHoldMessage)
 		.attrIf('ScriptID', hold.lastScriptId, version.hasScripting)
 		.attrIf('VarID', hold.lastVarId, version.holdAttr_varId)
 		.attrIf('CharID', hold.lastCharId, version.holdAttr_charId)
@@ -155,7 +155,7 @@ async function writePlayer(writer: XMLWriter, refs: OutputRefs, player: HoldPlay
 		.attr('GID_Created', gidCreated)
 		.attr('LastUpdated', 0)
 		.attr('NameMessage', player.name)
-		.attrIf('EMailMessage', { _safeString: '' }, holdVersion.playerAttr_emailMessage)
+		.attrIf('EMailMessage', { _safeString: player.encEmailMessage ?? "" }, player.encEmailMessage !== undefined)
 		.attrIf('ForumName', 0, holdVersion.playerAttr_forumName)
 		.attrIf('ForumPassword', 0, holdVersion.playerAttr_forumPassword)
 		.attr('IsLocal', 0)
@@ -626,6 +626,9 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		.attrIf('CompletedScripts',
 			{ _safeString: savedGame.completedScripts.join(" ") + " " },
 			savedGame.completedScripts.length > 0)
+		.attrIf('GlobalScripts',
+			{ _safeString: savedGame.globalScripts.join(" ") + " " },
+			savedGame.globalScripts.length > 0)
 		.attr('Created', savedGame.created)
 		.attr('Commands', { _safeString: savedGame.encCommands })
 		.attrIf('EntrancesExplored',

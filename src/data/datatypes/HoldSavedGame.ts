@@ -31,6 +31,7 @@ interface HoldSavedGameConstructor {
 	exploredRooms: number[];
 	conqueredRooms: number[];
 	completedScripts: number[];
+	globalScripts: number[];
 	entrancesExplored: number[];
 	created: number;
 	encCommands: string;
@@ -66,6 +67,7 @@ export class HoldSavedGame {
 	public readonly exploredRooms: number[];
 	public readonly conqueredRooms: number[];
 	public readonly completedScripts: number[];
+	public readonly globalScripts: number[];
 	/** @version 508+ */
 	public readonly entrancesExplored: number[];
 	public readonly created: number;
@@ -101,6 +103,7 @@ export class HoldSavedGame {
 		this.exploredRooms = opts.exploredRooms;
 		this.conqueredRooms = opts.conqueredRooms;
 		this.completedScripts = opts.completedScripts;
+		this.globalScripts = opts.globalScripts;
 		this.entrancesExplored = opts.entrancesExplored;
 		this.created = opts.created;
 		this.encCommands = opts.encCommands;

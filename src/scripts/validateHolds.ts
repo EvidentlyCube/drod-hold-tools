@@ -8,10 +8,18 @@ import { holdToXml } from "../data/HoldToXml";
 import { getHoldCommandsExport } from "../data/Utils";
 import { XmlToHoldError } from "../data/xmlToHold";
 import { HoldReader } from "../processor/HoldReader";
+import { readHold } from '../processor/HoldReader3';
+import { DiffXmlError } from '../utils/DiffXml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const dom = new JSDOM();
+
+const ANSI_BOLD = (text: string) => `\x1b[1m${text}\x1b[0m`;
+const ANSI_UNDERLINE = (text: string) => `\x1b[4m${text}\x1b[0m`;
+const ANSI_GRAY = (text: string) => `\x1b[90m${text}\x1b[0m`;
+const ANSI_RED = (text: string) => `\x1b[31m${text}\x1b[0m`;
+const LOG_FIELD = (name: string, value: string) => console.log(ANSI_BOLD(` - ${name}: `) + ANSI_GRAY(value));
 
 global.window = (dom.window as any);
 global.document = dom.window.document;
@@ -29,6 +37,8 @@ if (!givenPath) {
 (async () => {
 	const holds = await getHolds(givenPath);
 
+	holds.sort((l, r) => l.toLocaleLowerCase().localeCompare(r.toLocaleLowerCase()));
+
 	Constants.isDev = true;
 	Constants.diffXmlSleep = 1;
 	Constants.xmlReaderFrameDuration = 1000;
@@ -42,57 +52,81 @@ if (!givenPath) {
 			continue;
 		}
 
-		console.log(`## Parsing ${hold}`)
-		console.log(` - PATH = ${holdFullPath}`);
+		console.log("");
+		console.log(ANSI_UNDERLINE(ANSI_BOLD(`## ${hold} ##`)));
+		LOG_FIELD("PATH", holdFullPath);
 
 		const holdBuffer = await readFile(holdFullPath);
 
-		const reader = new HoldReader(1, { fileBinary: new Uint8Array(holdBuffer) }, []);
-		let lastLogs = 0;
+		let lastLogTime = 0;
+		let lastLog = '';
+		const result = await readHold(1, { data: new Uint8Array(holdBuffer) }, [], (s, l, t) => {
+			lastLog = `${s} (${(l * 100).toFixed(2)}%): ${t}`;
 
-		while (!reader.isFinished) {
-			reader.update();
-			await nextFrame();
-
-			if (reader.logs.length > lastLogs) {
-				// Uncomment to view logs
-				// console.log(reader.logs.array.slice())
-				lastLogs = reader.logs.length;
+			if (lastLogTime + 100 < Date.now()) {
+				process.stdout.write(" ".repeat(process.stdout.columns) + "\r");
+				process.stdout.write(` :: ${lastLog}\r`);
+				lastLogTime = Date.now();
 			}
-		}
+		});
+		process.stdout.write(" ".repeat(process.stdout.columns) + "\r");
 
-		if (!reader.error.value) {
+		if (result.isSuccess) {
 			continue;
 		}
 
-		console.log('## Error found: ##')
-		console.log(` - Decoded imported hold in: ${__dirname}/validateHolds.log.imported`)
-		const originalHoldXml = new XMLSerializer().serializeToString(reader.sharedState.holdXml!);
-		writeFileSync(`${__dirname}/validateHolds.log.imported`, truncateHold(originalHoldXml), 'utf-8');
+		const { holdXml, holdString, causedBy } = result;
 
-		if (reader.errorInstance.value instanceof XmlToHoldError) {
-			console.log(` - Decoded exported hold in: ${__dirname}/validateHolds.log.exported`)
-			writeFileSync(`${__dirname}/validateHolds.log.exported`, truncateHold(await holdToXml(reader.errorInstance.value.hold)), 'utf-8');
-			console.log(` - Hold scripts exported to: ${__dirname}/validateHolds.log.scripts`)
-			writeFileSync(`${__dirname}/validateHolds.log.scripts`, getHoldCommandsExport(reader.errorInstance.value.hold));
+		console.log("");
+		console.log(ANSI_UNDERLINE(ANSI_BOLD(ANSI_RED(`## ERROR ##`))));
 
-			const rootError = reader.errorInstance.value.rootError;
-			if (rootError) {
-				console.log(` - Root error: ${rootError.message}`);
-			}
+		console.log("");
+		console.log(ANSI_BOLD("LAST LOG:"))
+		console.log(ANSI_GRAY(lastLog));
+
+		console.log("");
+		console.log(ANSI_BOLD("MESSAGE:"))
+		console.log(ANSI_GRAY(causedBy.message));
+
+		console.log("");
+		console.log(ANSI_BOLD("STACK TRACE:"))
+		console.log(ANSI_GRAY(causedBy.stack ?? "<no stack trace>"));
+
+		if (!holdXml) {
+			console.log(ANSI_RED(`No hold XML retrieved`));
+			break;
 		}
 
+		console.log("");
+		console.log(ANSI_UNDERLINE(ANSI_BOLD(ANSI_RED(`## DETAILS: ##`))));
 
-		console.log(` - Error message: ${reader.error.value}`);
-		console.log(` - Error stack trace: ${reader.errorStackTrace.value}`);
+		LOG_FIELD("Imported hold in:", `${__dirname}/validateHolds.log.imported`);
+		const originalHoldXml = new XMLSerializer().serializeToString(holdXml);
+		writeFileSync(`${__dirname}/validateHolds.log.imported`, truncateHold(originalHoldXml), 'utf-8');
 
-		let instance: any = reader.errorInstance.value;
-		while (instance) {
-			console.log(' - Caused by:');
-			console.log(`   - ${instance.constructor.name}`)
-			console.log(`   - Message: ${instance.message}`)
-			console.log(`   - Stack: ${instance.stack}`)
-			instance = instance.cause;
+		if (causedBy instanceof XmlToHoldError) {
+			LOG_FIELD("Exported hold in:", `${__dirname}/validateHolds.log.exported`);
+			writeFileSync(`${__dirname}/validateHolds.log.exported`, truncateHold(await holdToXml(causedBy.hold)), 'utf-8');
+
+			LOG_FIELD("Hold scripts in:", `${__dirname}/validateHolds.log.exported`);
+			writeFileSync(`${__dirname}/validateHolds.log.scripts`, getHoldCommandsExport(causedBy.hold));
+
+			const rootError = causedBy.rootError;
+			if (rootError && rootError instanceof DiffXmlError) {
+				for (const detail of rootError.details) {
+					if (detail.type === 'to-store') {
+						LOG_FIELD(`${detail.name} in:`, `${__dirname}/validateHolds.log.${detail.fileSuffix}`);
+						writeFileSync(`${__dirname}/validateHolds.log.${detail.fileSuffix}`, detail.value);
+					} else {
+						LOG_FIELD(detail.name, detail.value);
+					}
+				}
+			}
+
+			if (rootError) {
+				LOG_FIELD("Root cause", rootError.message);
+				LOG_FIELD("Root trace", rootError.stack ?? "<no stack trace>");
+			}
 		}
 
 		break;

@@ -16,6 +16,7 @@ export interface PackedVar {
 	name: string;
 	type: PackedVarType;
 	value: PackedVarValue;
+	size: number;
 }
 
 export class PackedVars {
@@ -39,65 +40,73 @@ export class PackedVars {
 		return newVars;
 	}
 
-	writeInt(name: string, value: number) {
+	writeInt(name: string, value: number, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Int;
 		packedVar.value = value;
+		packedVar.size = size ?? (packedVar.size || 4);
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeUint(name: string, value: number) {
+	writeUint(name: string, value: number, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Uint;
 		packedVar.value = value;
+		packedVar.size = size ?? (packedVar.size || 4);
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeDWord_deprecated(name: string, value: number) {
+	writeDWord_deprecated(name: string, value: number, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.deprecated_DWord;
 		packedVar.value = value;
+		packedVar.size = size ?? (packedVar.size || 4);
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeBool(name: string, value: boolean) {
+	writeBool(name: string, value: boolean, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.Bool;
 		packedVar.value = value;
+		packedVar.size = size ?? (packedVar.size || 4);
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeByteBuffer(name: string, value: number[]) {
+	writeByteBuffer(name: string, value: number[], size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.ByteBuffer;
 		packedVar.value = value;
+		packedVar.size = size ?? value.length;
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeString(name: string, value: string) {
+	writeString(name: string, value: string, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.CharString;
 		packedVar.value = value;
+		packedVar.size = size ?? value.length + 1;
 
 		!isFound && this._vars.push(packedVar);
 	}
 
-	writeWcharString(name: string, value: string) {
+	writeWcharString(name: string, value: string, size?: number) {
 		const [isFound, packedVar] = this.getVar(name);
 
 		packedVar.type = PackedVarType.WcharString;
 		packedVar.value = value;
+		// WChars take two bytes & we need null double-byte at the end
+		packedVar.size = size ?? value.length * 2 + 2;
 
 		!isFound && this._vars.push(packedVar);
 	}
@@ -150,6 +159,19 @@ export class PackedVars {
 		return this._vars.findIndex(v => v.name === name);
 	}
 
+	public toDebugString() {
+		const rows = [];
+		for (const packedVar of this._vars) {
+			if (Array.isArray(packedVar.value)) {
+				rows.push(`${packedVar.name} [TYPE=${packedVar.type}]: ${packedVar.value.map(i => i.toString(16).padStart(2, '0')).join(' ')}`);
+			} else {
+				rows.push(`${packedVar.name} [TYPE=${packedVar.type}]: ${JSON.stringify(packedVar.value)}`);
+			}
+		}
+
+		return rows.join("\n");
+	}
+
 	private readVar(name: string, expectedType: PackedVarType, def: PackedVarValue): PackedVarValue {
 		const [isFound, packedVar] = this.getVar(name);
 
@@ -171,6 +193,6 @@ export class PackedVars {
 			}
 		}
 
-		return [false, {name, value: 0, type: PackedVarType.Unknown}];
+		return [false, {name, value: 0, type: PackedVarType.Unknown, size: 0}];
 	}
 }

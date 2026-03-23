@@ -17,10 +17,6 @@ export class HoldVersion {
 		return this.version > VERSION_AE;
 	}
 
-	public get playerAttr_emailMessage() {
-		return this.version <= VERSION_JTRH;
-	}
-
 	public get playerAttr_forumName() {
 		return this.version >= VERSION_JTRH;
 	}

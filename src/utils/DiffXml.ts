@@ -1,8 +1,9 @@
 import { Constants } from "../Constants";
 import { areCommandsSame, readCommandsBuffer } from "../data/CommandUtils";
 import { PackedVar, PackedVarType } from "../data/PackedVars";
-import { readPackedVars } from "../data/PackedVarsUtils";
+import { readPackedVars, readPackedVars2 } from "../data/PackedVarsUtils";
 import { diffArraysOneWay } from "./ArrayUtils";
+import { base64ToUint8 } from "./StringUtils";
 import { parseXml } from "./XmlParser";
 
 type ProgressCallback = (index: number, total: number) => void;
@@ -21,15 +22,34 @@ interface DiffState {
 	skips: Skip[];
 }
 
+interface DiffXmlErrorDetailToPrint {
+	type: 'to-print';
+	name: string;
+	value: string;
+}
+
+interface DiffXmlErrorDetailToStore {
+	type: 'to-store';
+	name: string;
+	value: string;
+	fileSuffix: string;
+}
+
+type DiffXmlErrorDetail = DiffXmlErrorDetailToPrint | DiffXmlErrorDetailToStore;
+
 export class DiffXmlError extends Error {
 	public readonly contextOriginal: Node;
 	public readonly contextGenerated: Node;
 
-	public constructor(original: Node, generated: Node, message: string) {
+	public readonly details: DiffXmlErrorDetail[];
+
+	public constructor(original: Node, generated: Node, details: DiffXmlErrorDetail[], message: string) {
 		super(message);
 
 		this.contextOriginal = original;
 		this.contextGenerated = generated;
+		this.details = details;
+
 		this.message = message;
 	}
 }
@@ -76,7 +96,7 @@ async function compareNode(original: Node, generated: Node, context: string, sta
 
 	if (original.nodeType !== generated.nodeType) {
 		throw new DiffXmlError(
-			original, generated,
+			original, generated, [],
 			`${context}: Node type in original is '${original.nodeType}' but generated has '${generated.nodeType}'.`
 		);
 	}
@@ -92,7 +112,7 @@ async function compareNode(original: Node, generated: Node, context: string, sta
 
 		default:
 			throw new DiffXmlError(
-				original, generated,
+				original, generated, [],
 				`Unknown node type '${original.nodeType}' in original`
 			);
 	}
@@ -105,7 +125,7 @@ async function compareElement(original: Element, generated: Element, context: st
 	}
 	if (original.tagName !== generated.tagName) {
 		throw new DiffXmlError(
-			original, generated,
+			original, generated, [],
 			`${context}: Tag Name mismatch, original is '${original.tagName}' but generated is '${generated.tagName}'`
 		)
 	}
@@ -125,7 +145,7 @@ async function compareElement(original: Element, generated: Element, context: st
 	const originalUniqueAttributes = diffArraysOneWay(originalAttributeNames, generatedAttributeNames);
 	if (originalUniqueAttributes.length > 0) {
 		throw new DiffXmlError(
-			original, generated,
+			original, generated, [],
 			`${context}: Original contains attributes '${originalUniqueAttributes.join("','")}' that are not present in the generated.`
 		);
 	}
@@ -133,7 +153,7 @@ async function compareElement(original: Element, generated: Element, context: st
 	const generatedUniqueAttributes = diffArraysOneWay(generatedAttributeNames, originalAttributeNames);
 	if (generatedUniqueAttributes.length > 0) {
 		throw new DiffXmlError(
-			generated, generated,
+			generated, generated, [],
 			`${context}: Generated contains attributes '${generatedUniqueAttributes.join("','")}' that are not present in the original.`
 		);
 	}
@@ -144,7 +164,7 @@ async function compareElement(original: Element, generated: Element, context: st
 
 		if (originalAttr.name !== generatedAttr.name) {
 			throw new DiffXmlError(
-				original, generated,
+				original, generated, [],
 				`${context}.@${i}: Attribute name mismatch, in original is '${originalAttr.name}'  but in generated is '${generatedAttr.name}'`
 			);
 
@@ -152,20 +172,55 @@ async function compareElement(original: Element, generated: Element, context: st
 			continue;
 
 		} else if (originalAttr.value !== generatedAttr.value) {
-			let extraContexts: string[] = [];
+			const extraDetails: DiffXmlErrorDetail[] = [];
+
 			if (originalAttr.name === 'ExtraVars') {
-				const originalExtraVars = readPackedVars(originalAttr.value).vars;
-				const generatedExtraVars = readPackedVars(generatedAttr.value).vars;
+				const originalPackedVars = readPackedVars(originalAttr.value);
+				const originalExtraVars = originalPackedVars.vars;
+				const generatedPackedVars = readPackedVars(generatedAttr.value);
+				const generatedExtraVars = generatedPackedVars.vars;
+
+				readPackedVars2(originalAttr.value, generatedAttr.value);
 
 				if (originalExtraVars.length < generatedExtraVars.length) {
-					extraContexts.push(`\n - More generated extra vars by ${generatedExtraVars.length - originalExtraVars.length}`);
+					extraDetails.push({
+						type: 'to-print',
+						name: 'Different field counts',
+						value: `Generated XML has more extra vars by ${generatedExtraVars.length - originalExtraVars.length}`
+					});
 
 				} else if (originalExtraVars.length > generatedExtraVars.length) {
-					extraContexts.push(`\n - Fewer generated extra vars by ${originalExtraVars.length - generatedExtraVars.length}`);
+					extraDetails.push({
+						type: 'to-print',
+						name: 'Different field counts',
+						value: `Generated XML has fewer extra vars by ${generatedExtraVars.length - originalExtraVars.length}`
+					})
 				}
 
-				extraContexts.push(`\n - Original value:  ${originalAttr.value}`);
-				extraContexts.push(`\n - Generated value: ${generatedAttr.value}`);
+				extraDetails.push({
+					type: 'to-store',
+					name: 'Generated packed vars',
+					value: Array.from(base64ToUint8(generatedAttr.value)).map(x => x.toString(16).padStart(2, '0')).join(' '),
+					fileSuffix: 'packed-vars-raw.generated'
+				})
+				extraDetails.push({
+					type: 'to-store',
+					name: 'Generated packed vars',
+					value: generatedPackedVars.toDebugString(),
+					fileSuffix: 'packed-vars.generated'
+				})
+				extraDetails.push({
+					type: 'to-store',
+					name: 'Original packed vars',
+					value: Array.from(base64ToUint8(originalAttr.value)).map(x => x.toString(16).padStart(2, '0')).join(' '),
+					fileSuffix: 'packed-vars-raw.original'
+				})
+				extraDetails.push({
+					type: 'to-store',
+					name: 'Original packed vars',
+					value: originalPackedVars.toDebugString(),
+					fileSuffix: 'packed-vars.original'
+				})
 
 				const length = Math.max(originalExtraVars.length, generatedExtraVars.length);
 
@@ -178,56 +233,56 @@ async function compareElement(original: Element, generated: Element, context: st
 					const hasWrongType = original?.type !== generated?.type;
 
 					if (hasWrongName || hasWrongValue || hasWrongType) {
-						extraContexts.push(`\n - Difference between variables at ${ii}:`);
 						if (original) {
-							extraContexts.push(`\n   - Original:  [type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${previewPackedVar(original)}`);
+							extraDetails.push({
+								type: 'to-print',
+								name: 'Original',
+								value: `[type=${original.type}/${PackedVarType[original.type]}] ${original.name}=${previewPackedVar(original)}`
+							});
 						} else {
-							extraContexts.push(`\n   - Original has no field`);
+							extraDetails.push({
+								type: 'to-print',
+								name: 'Original',
+								value: `Is missing a field`
+							});
 						}
 						if (generated) {
-							extraContexts.push(`\n   - Generated: [type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${previewPackedVar(generated)}`);
+							extraDetails.push({
+								type: 'to-print',
+								name: 'Generated',
+								value: `[type=${generated.type}/${PackedVarType[generated.type]}] ${generated.name}=${previewPackedVar(generated)}`
+							});
 						} else {
-							extraContexts.push(`\n   - Generated has no field`);
+							extraDetails.push({
+								type: 'to-print',
+								name: 'Generated',
+								value: `Is missing a field`
+							});
 						}
-
-						const sliceStart = Math.max(0, ii - 5);
-						const originalSliceEnd = Math.min(originalExtraVars.length, ii + 5);
-						const generatedSliceEnd = Math.min(generatedExtraVars.length, ii + 5);
-
-						const originalNames =
-							(sliceStart > 0 ? '..., ' : '')
-							+ originalExtraVars.slice(sliceStart, originalSliceEnd).map(v => v.name).join(', ')
-							+ (originalSliceEnd < originalExtraVars.length ? ', ...' : '');
-						const generatedNames =
-							(sliceStart > 0 ? '..., ' : '')
-							+ generatedExtraVars.slice(sliceStart, generatedSliceEnd).map(v => v.name).join(', ')
-							+ (generatedSliceEnd < generatedExtraVars.length ? ', ...' : '');
-
-						extraContexts.push(`\n   - Original variables: ${originalNames}`);
-						extraContexts.push(`\n   - Generated variables: ${generatedNames}`);
-						break;
 					}
 				}
 
 				if (ii === length) {
-					extraContexts.push(`\n - Extra vars encode to different strings for no discernable reason.`);
-					extraContexts.push(`\n - Original = ${base64ToHex(originalAttr.value)}`);
-					extraContexts.push(`\n - Generated = ${base64ToHex(generatedAttr.value)}`);
+					extraDetails.push({
+						type: 'to-print',
+						name: 'Caused by',
+						value: `Extra vars encode to different strings for no discernable reason`
+					});
 				}
 			}
 
 			throw new DiffXmlError(
 				original, generated,
+				extraDetails,
 				`${context}.@${i}#${originalAttr.name}: Attribute value mismatch:`
 				+ getStringDiff(originalAttr.value, generatedAttr.value, 32)
-				+ extraContexts.join('')
 			);
 		}
 	}
 
 	if (original.children.length !== generated.children.length) {
 		throw new DiffXmlError(
-			original, generated,
+			original, generated, [],
 			`${context}: Different children number original=${original.children.length}, generated=${generated.children.length}`
 		)
 	}
@@ -242,7 +297,7 @@ async function compareDocuments(original: Document, generated: Document, context
 
 	if (original.children.length !== generated.children.length) {
 		throw new DiffXmlError(
-			original, generated,
+			original, generated, [],
 			`${context}: Different children number, original has ${original.children.length} but generated has ${generated.children.length}`
 		);
 	}
@@ -312,9 +367,16 @@ function base64ToHex(base64string: string): string {
 }
 
 function previewPackedVar(val: PackedVar) {
+	let result;
 	if (Array.isArray(val.value) && val.type === PackedVarType.ByteBuffer) {
-		return val.value.map(x => x.toString(16).padStart(2, '0')).join(' ');
+		result = val.value.map(x => x.toString(16).padStart(2, '0')).join(' ');
 	}
 
-	return JSON.stringify(val.value.toString());
+	result = JSON.stringify(val.value.toString());
+
+	if (result.length > 40) {
+		return `${result.substring(0, 32)}... (Total Length=${result.length})`;
+	} else {
+		return result;
+	}
 }
