@@ -206,7 +206,7 @@ export async function xmlToHold(
 
 			// AE had entrance as part of level attributes so we create a fake one
 			// to not create separate AE interface
-			if (holdVersion.isEntranceInLevelAttributes) {
+			if (holdVersion.entrance.isStoredInLevelAttributes) {
 				const entrance = new HoldEntrance(hold, {
 					id: holdLevel.id,
 					roomId: intU(levelXml, 'RoomID') ?? 0,

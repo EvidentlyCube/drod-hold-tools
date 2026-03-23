@@ -35,7 +35,7 @@ export class HoldReader {
 
 	public logs = new SignalArray<string>();
 	public name = new SignalValue<string>("");
-	// @FIXME Combine the two
+	// @FIXME Combine the trio
 	public error = new SignalValue<string>("");
 	public errorStackTrace = new SignalValue<string>("");
 	public errorInstance = new SignalValue<Error | undefined>(undefined);

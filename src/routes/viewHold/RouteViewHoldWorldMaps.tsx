@@ -9,6 +9,7 @@ import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
 import { DataFormat } from "../../data/DrodEnums";
 import { filterDataFormat } from "../../data/Utils";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 const Columns: SortableTableColumn<HoldWorldMap>[] = [
 
@@ -61,6 +62,12 @@ const Columns: SortableTableColumn<HoldWorldMap>[] = [
 export default function RouteViewHoldWorldMaps() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+
+
+	if (!hold.version.worldMaps.isSupported) {
+		return <HoldVersionLimitationWarning warnings={["World Maps were implemented in The Second Sky"]} />
+	}
+
 
 	return <>
 		<SortableTable

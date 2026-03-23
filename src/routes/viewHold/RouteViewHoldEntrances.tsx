@@ -12,12 +12,9 @@ import { filterDataFormat, getDataFormatFilterOptions, getShowDescriptionName } 
 import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
 import { DataFormat } from "../../data/DrodEnums";
+import { filterInline } from "../../utils/ArrayUtils";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
-const ShowDescriptionOptions: Option[] = [
-	{id: '0', value: '0', label: getShowDescriptionName(0) },
-	{id: '1', value: '1', label: getShowDescriptionName(1) },
-	{id: '2', value: '2', label: getShowDescriptionName(2) },
-];
 const ShowDescriptionTransformer = (value: string) => parseInt(value);
 
 const Columns: SortableTableColumn<HoldEntrance>[] = [
@@ -51,7 +48,7 @@ const Columns: SortableTableColumn<HoldEntrance>[] = [
 
 		render: (entrance) => <SelectEditor
 			value={entrance.showDescription}
-			options={ShowDescriptionOptions}
+			options={entrance.$hold.version.entrance.showDescriptionOptions}
 			transformer={ShowDescriptionTransformer}
 		/>
 	},
@@ -85,11 +82,33 @@ export default function RouteViewHoldEntrances() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 
+	const columns = Columns.concat();
+	const warnings: string[] = [];
+
+	if (hold.version.entrance.isStoredInLevelAttributes) {
+		warnings.push("Architect's Edition only supported one entrance per level.")
+	}
+
+	if (!hold.version.entrance.canAddSound) {
+		filterInline(columns, c => c.id === 'data');
+		warnings.push('Entrance sound not supported; Data column removed.')
+	}
+
+	if (!hold.version.entrance.canHideDescription) {
+		filterInline(columns, c => c.id === 'show-description');
+		warnings.push('Controlling whether to show description not supported; Show Description column removed.')
+
+	} else if (!hold.version.entrance.canShowDescriptionOnce) {
+		warnings.push('Cannot display entrance description once; option removed.')
+	}
+
+
 	return <>
+		<HoldVersionLimitationWarning warnings={warnings} />
 		<SortableTable
 			tableId={`entrances::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
-			columns={Columns}
+			columns={columns}
 			rows={hold.entrances.values()}
 			pageSize={25} />
 	</>

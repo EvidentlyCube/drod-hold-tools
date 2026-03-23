@@ -14,6 +14,7 @@ import ReplaceButton from "../../components/viewHold/preview/ReplaceButton";
 import DataUsesPreviewButton from "../../components/viewHold/preview/DataUsesPreviewButton";
 import { useCallback } from "react";
 import BulkReplaceButton from "../../components/viewHold/actions/BulkDataReplaceButton";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 function HoldDataSize({ data }: { data: HoldData }) {
 	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
@@ -23,7 +24,7 @@ function HoldDataSize({ data }: { data: HoldData }) {
 	</span>;
 }
 
-function DeleteCell({data}: {data: HoldData}) {
+function DeleteCell({ data }: { data: HoldData }) {
 	const isDeleted = useSignalUpdatableValue(data.$isDeleted, true);
 
 	const onClick = () => {
@@ -46,7 +47,7 @@ function DeleteCell({data}: {data: HoldData}) {
 	}
 }
 
-function PreviewCell({ data }: { data: HoldData}) {
+function PreviewCell({ data }: { data: HoldData }) {
 	const [oldDetails, isChanged, newDetails] = useSignalUpdatableValue(data.details);
 
 	const onUndoChanges = useCallback(() => {
@@ -102,7 +103,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		canHide: true,
 		className: 'has-text-right is-family-monospace',
 
-		render: data => <HoldDataSize data={ data } />,
+		render: data => <HoldDataSize data={data} />,
 		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.$size, r.$size)
 	},
 	{
@@ -120,7 +121,7 @@ const Columns: SortableTableColumn<HoldData>[] = [
 		displayName: 'Preview',
 		widthPercent: 10,
 
-		render: data => <PreviewCell data={ data } />,
+		render: data => <PreviewCell data={data} />,
 		sort: (isAsc, l, r) => sortCompareWithUndefined(isAsc, l.details.newValue, r.details.newValue),
 	},
 	{
@@ -149,6 +150,10 @@ const Columns: SortableTableColumn<HoldData>[] = [
 export default function RouteViewHoldDatas() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+
+	if (!hold.version.data.isSupported) {
+		return <HoldVersionLimitationWarning warnings={["Custom data was implemented in Journey to Rooted Hold."]} />
+	}
 
 	const datas = hold.datas.values();
 

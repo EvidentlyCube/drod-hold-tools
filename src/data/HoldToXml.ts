@@ -172,7 +172,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 
 	refs.entranceIds.add(entrance.id);
 
-	if (holdVersion.isEntranceInLevelAttributes) {
+	if (holdVersion.entrance.isStoredInLevelAttributes) {
 		return;
 	}
 
@@ -319,7 +319,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel,
 		.attr('PlayerID', level.playerId.newValue)
 		.attr('NameMessage', level.name);
 
-	if (holdVersion.isEntranceInLevelAttributes) {
+	if (holdVersion.entrance.isStoredInLevelAttributes) {
 		const entrance = level.$hold.entrances.getOrError(level.id);
 		writer
 			.attr('DescriptionMessage', entrance.description)
@@ -487,8 +487,8 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 
 	for (const exit of room.exits) {
 		writer.tag('Exits')
-			.attrIf('EntranceID', exit.entranceId, !holdVersion.isEntranceInLevelAttributes)
-			.attrIf('LevelID', exit.levelId, holdVersion.isEntranceInLevelAttributes)
+			.attrIf('EntranceID', exit.entranceId, !holdVersion.entrance.isStoredInLevelAttributes)
+			.attrIf('LevelID', exit.levelId, holdVersion.entrance.isStoredInLevelAttributes)
 			.attr('Left', exit.left)
 			.attr('Right', exit.right)
 			.attr('Top', exit.top)

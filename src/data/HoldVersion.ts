@@ -1,4 +1,6 @@
-import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507 } from "../Constants";
+import { Option } from "../components/common/Select";
+import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507, VERSION_TSS_508 } from "../Constants";
+import { getShowDescriptionName } from "./Utils";
 
 export class HoldVersion {
 	public readonly version: number;
@@ -24,6 +26,14 @@ export class HoldVersion {
 	}
 
 	public get playerAttr_forumPassword() {
+		return this.version >= VERSION_JTRH;
+	}
+
+	public get hasTabCharacters() {
+		return this.version >= VERSION_TCB_301;
+	}
+
+	public get hasTabData() {
 		return this.version >= VERSION_JTRH;
 	}
 
@@ -61,11 +71,84 @@ export class HoldVersion {
 	}
 
 	/**
-	 * In AE there was only one room entrance per level and it was stored in
-	 * Level attributes.
+	 * Audio on entrance screen was only added in TSS
 	 */
-	public get entranceInLevelAttributes() {
-		return this.version === VERSION_AE;
+	public get entrancesSupportData() {
+		return this.version >= VERSION_TSS_507;
+	}
+
+	/**
+	 * Audio on entrance screen was only added in TSS
+	 */
+	public get entrancesSupportControlOnDescriptionShowing() {
+		return this.version >= VERSION_TSS_507;
+	}
+
+	public get entrance(): HoldVersionEntrance {
+		// In AE there was only one room entrance per level and it was stored
+		// in Level attributes.
+		const isStoredInLevelAttributes = this.version === VERSION_AE;
+		const canShowDescriptionOnce = this.version >= VERSION_TSS_507;
+		const canHideDescription = this.version >= VERSION_TCB_301;
+		const canAddSound = this.version >= VERSION_TSS_507;
+		const showDescriptionOptions: Option[] = [];
+
+		if (canHideDescription) {
+			showDescriptionOptions.push({ id: '0', value: '0', label: getShowDescriptionName(0) });
+			showDescriptionOptions.push({ id: '1', value: '1', label: getShowDescriptionName(1) });
+		}
+
+		if (canShowDescriptionOnce) {
+			showDescriptionOptions.push({ id: '2', value: '2', label: getShowDescriptionName(2) });
+
+		}
+
+		return {
+			isStoredInLevelAttributes,
+			canShowDescriptionOnce,
+			canHideDescription,
+			canAddSound,
+			showDescriptionOptions,
+		}
+	}
+
+	public get data(): HoldVersionData {
+		// JtRH added scripting, speech and ability to play custom voices
+		const isSupported = this.version >= VERSION_JTRH;
+
+		return {
+			isSupported
+		};
+	}
+
+	public get characters(): HoldVersionCharacter {
+		// JtRH had scripting but predefined custom characters were first
+		// added in TCB
+		const isSupported = this.version >= VERSION_TCB_301;
+
+		return {
+			isSupported
+		};
+	}
+
+	public get scripting(): HoldVersionScripting {
+		// JtRH added scripting
+		const isSupported = this.version >= VERSION_JTRH;
+		const hasVariables = this.version >= VERSION_TCB_301;
+
+		return {
+			isSupported,
+			hasVariables,
+		};
+	}
+
+	public get worldMaps(): HoldVersionWorldMaps {
+		// TSS added world maps
+		const isSupported = this.version >= VERSION_TSS_507;
+
+		return {
+			isSupported,
+		};
 	}
 
 	/**
@@ -99,14 +182,6 @@ export class HoldVersion {
 	}
 
 	/**
-	 * In JtRH Datas were included before use, afterwards all <Data> tags
-	 * are front loaded
-	 */
-	public get frontLoadedData() {
-		return this.version >= VERSION_TCB_301;
-	}
-
-	/**
 	 * JtRH has introduced scripting
 	 */
 	public get hasScripting() {
@@ -134,4 +209,47 @@ export class HoldVersion {
 	public get saveAttr_idEarly() {
 		return this.version === VERSION_AE;
 	}
+
+	public toString() {
+		return `${this.gameName} (${this.version})`;
+	}
+
+	public get gameName() {
+		if (this.version >= 500) {
+			return "The Second Sky";
+		} else if (this.version >= 400) {
+			return "Gunthro and the Epic Blunder";
+		} else if (this.version >= 300) {
+			return "The City Beneath";
+		} else if (this.version > 200) {
+			return "Journey to Rooted Hold"
+		} else {
+			return "Architect's Edition";
+		}
+	}
+}
+
+interface HoldVersionEntrance {
+	isStoredInLevelAttributes: boolean;
+	canShowDescriptionOnce: boolean;
+	canHideDescription: boolean;
+	canAddSound: boolean;
+	showDescriptionOptions: Option[];
+}
+
+interface HoldVersionData {
+	isSupported: boolean;
+}
+
+interface HoldVersionCharacter {
+	isSupported: boolean;
+}
+
+interface HoldVersionWorldMaps {
+	isSupported: boolean;
+}
+
+interface HoldVersionScripting {
+	isSupported: boolean;
+	hasVariables: boolean;
 }

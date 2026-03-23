@@ -10,6 +10,7 @@ import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
 import { DataFormat } from "../../data/DrodEnums";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
 import CharacterUsesPreviewButton from "../../components/viewHold/preview/CharacterUsesPreviewButton";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 const Columns: SortableTableColumn<HoldCharacter>[] = [
 	{
@@ -84,6 +85,10 @@ const Columns: SortableTableColumn<HoldCharacter>[] = [
 export default function RouteViewHoldCharacters() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+
+	if (!hold.version.data.isSupported) {
+		return <HoldVersionLimitationWarning warnings={["Custom characters were implemented in The City Beneath."]} />
+	}
 
 	return <>
 		<SortableTable

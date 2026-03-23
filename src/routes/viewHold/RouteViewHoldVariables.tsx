@@ -7,6 +7,7 @@ import { filterString, sortCompareNumber, sortCompareString } from "../../utils/
 import VariableUsesPreviewButton from "../../components/viewHold/preview/VariableUsesPreviewButton";
 import VariableRenameButton from "../../components/viewHold/editables/VariableRenameButton";
 import DrodTextView from "../../components/viewHold/DrodTextView";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 const Columns: SortableTableColumn<HoldVariable>[] = [
 	{
@@ -49,6 +50,10 @@ const Columns: SortableTableColumn<HoldVariable>[] = [
 export default function RouteViewHoldVariables() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+
+	if (!hold.version.scripting.hasVariables) {
+		return <HoldVersionLimitationWarning warnings={["Variables were implemented in The City Beneath."]} />
+	}
 
 	return <>
 		<SortableTable

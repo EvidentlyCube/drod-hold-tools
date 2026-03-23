@@ -15,6 +15,7 @@ import { filterString, sortCompareBool, sortCompareRefs, sortCompareString, sort
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 import { DataFormat, Mood } from "../../data/DrodEnums";
 import { MoodToName } from "../../data/DrodEnumToName";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 const MoodOptions: Option[] = [
 	{ id: 0, value: Mood.Normal, label: MoodToName.get(Mood.Normal)! },
@@ -132,6 +133,10 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 export default function RouteViewHoldSpeeches() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
+
+	if (!hold.version.scripting.isSupported) {
+		return <HoldVersionLimitationWarning warnings={["Speech command was implemented in Journey to Rooted Hold"]} />
+	}
 
 	const speeches = hold.speeches.values();
 
