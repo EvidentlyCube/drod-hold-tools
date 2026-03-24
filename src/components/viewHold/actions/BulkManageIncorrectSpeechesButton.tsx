@@ -1,15 +1,14 @@
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
 import { Hold } from "../../../data/datatypes/Hold";
-import { HoldData } from "../../../data/datatypes/HoldData";
-import { DataFormat } from "../../../data/DrodEnums";
+import { HoldSpeech } from "../../../data/datatypes/HoldSpeech";
 import { pluralize } from "../../../utils/StringUtils";
 
 interface Props {
 	hold: Hold;
 }
 
-export default function BulkManageUnusedDataButton({ hold }: Props) {
+export default function BulkManageIncorrectSpeechesButton({ hold }: Props) {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const onClick = useCallback(() => setIsOpen(true), []);
@@ -19,13 +18,13 @@ export default function BulkManageUnusedDataButton({ hold }: Props) {
 		? <InfoModal hold={hold} onClose={onClose} />
 		: null;
 
-	return <div className="control" title="Bulk delete or restore unused data">
+	return <div className="control" title="Bulk delete or restore unused speeches">
 		<div className="button is-primary" onClick={onClick}>
 			<span className="file-icon">
 				<i className="fas fa-broom"></i>
 			</span>
 			<span className="file-label">
-				Manage unused data
+				Manage unused speeches
 			</span>
 		</div>
 		{isOpen && createPortal(modal, document.body)}
@@ -37,14 +36,14 @@ interface ResultsModalProps {
 }
 
 function InfoModal({ hold, onClose }: ResultsModalProps) {
-	const unusedData = hold.datas.filterToArray(data => data.$uses.length === 0);
+	const unusedSpeeches = hold.speeches.filterToArray(speech => speech.$canDelete);
 
 	const onDeleteAll = useCallback(() => {
-		hold.datas.forEach(data => data.$isDeleted.newValue = data.$uses.length === 0);
+		hold.speeches.forEach(speech => speech.$isDeleted.newValue = speech.$canDelete);
 		onClose();
 	}, [hold, onClose])
 	const onRestoreAll = useCallback(() => {
-		hold.datas.forEach(data => data.$isDeleted.newValue = false);
+		hold.speeches.forEach(speech => speech.$isDeleted.newValue = false);
 		onClose();
 	}, [hold, onClose])
 
@@ -53,14 +52,20 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 			<div className="modal-background" onClick={onClose}></div>
 			<div className="modal-card">
 				<header className="modal-card-head">
-					<p className="modal-card-title">Manage unused data</p>
+					<p className="modal-card-title">Manage unused speeches</p>
 					<button className="delete" onClick={onClose}></button>
 				</header>
 				<section className="modal-card-body">
 					<div className="content">
-						<h3 className="is-size-2">{unusedData.length} unused {pluralize(unusedData.length, 'data')} found</h3>
+						<h3 className="is-size-2">{unusedSpeeches.length} unused {pluralize(unusedSpeeches.length, 'speech', 'speeches')} found</h3>
+						<p>
+							Below is a list of speeches records that were found in the hold that were either
+							not used at all or linked to a command which does not use speech records. In the
+							past this happened when taking a speech command and editing it to be a different
+							command - command's type was changed but speech remained linked.
+						</p>
 						<ul className="content">
-							{unusedData.map(data => <DataRow key={data.id} data={data} />)}
+							{unusedSpeeches.map(speech => <SpeechRow key={speech.id} speech={speech} />)}
 						</ul>
 					</div>
 				</section>
@@ -77,41 +82,12 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 	);
 }
 
-function DataRow({ data }: { data: HoldData }) {
-	let icon;
+function SpeechRow({ speech }: { speech: HoldSpeech }) {
+	let message = speech.message.newValue;
 
-	switch (data.details.newValue.format) {
-		case DataFormat.Unknown:
-			icon = <Icon name="fa-circle-question" />;
-			break;
-
-		case DataFormat.BMP:
-		case DataFormat.JPG:
-		case DataFormat.PNG:
-			icon = <Icon name="fa-image" />;
-			break;
-
-		case DataFormat.S3M:
-		case DataFormat.WAV:
-		case DataFormat.OGG:
-			icon = <Icon name="fa-music" />;
-			break;
-		case DataFormat.TTF:
-			icon = <Icon name="fa-font" />;
-			break;
-
-		case DataFormat.THEORA:
-			icon = <Icon name="fa-video" />;
-			break;
+	if (message.length > 40) {
+		message = message.substring(0, 32) + "...";
 	}
-	return <li key={data.id}>
-		{icon}
-		{data.name.newValue}
-	</li>;
-}
 
-function Icon({ name }: { name: string }) {
-	return <span className="icon">
-		<i className={`fas ${name}`}></i>
-	</span>;
+	return <li key={speech.id}>{message}</li>;
 }

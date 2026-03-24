@@ -51,7 +51,7 @@ export default function DataDownloadButton({ hold }: Props) {
 		? <DownloadModal archiveName={archiveName} progress={progress} objectUrl={objectUrl} canClose={!isProcessing} onClose={onClose} />
 		: null;
 
-	return <div className="control" title="Upload a zip file with identically named files to replace them.">
+	return <div className="control" title="Download a zip archive with all data files in the hold">
 		<div className="button is-primary" onClick={processArchive}>
 			<span className="file-icon">
 				<i className="fas fa-download"></i>

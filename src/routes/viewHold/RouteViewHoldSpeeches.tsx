@@ -1,21 +1,22 @@
 import { useParams } from "react-router-dom";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 import { Option } from "../../components/common/Select";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
 import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
 import HoldRefView from "../../components/viewHold/HoldRefView";
+import BulkManageIncorrectSpeechesButton from "../../components/viewHold/actions/BulkManageIncorrectSpeechesButton";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import SelectEditor from "../../components/viewHold/editables/SelectEditor";
 import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
+import { MoodToName } from "../../data/DrodEnumToName";
+import { DataFormat, Mood } from "../../data/DrodEnums";
 import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldSpeech } from "../../data/datatypes/HoldSpeech";
 import { holdRefToSortableString } from "../../data/references/holdRefToSortableString";
+import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 import { HoldReaders } from "../../processor/HoldReaders";
 import { filterString, sortCompareBool, sortCompareRefs, sortCompareString, sortData } from "../../utils/SortUtils";
-import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
-import { DataFormat, Mood } from "../../data/DrodEnums";
-import { MoodToName } from "../../data/DrodEnumToName";
-import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 
 const MoodOptions: Option[] = [
 	{ id: 0, value: Mood.Normal, label: MoodToName.get(Mood.Normal)! },
@@ -141,6 +142,10 @@ export default function RouteViewHoldSpeeches() {
 	const speeches = hold.speeches.values();
 
 	return <>
+		<div className="buttons section p-4 mb-0">
+			<strong>Actions:</strong>
+			<BulkManageIncorrectSpeechesButton hold={hold} />
+		</div>
 		<SortableTable
 			tableId={`speeches::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
