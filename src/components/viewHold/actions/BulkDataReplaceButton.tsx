@@ -61,22 +61,18 @@ export default function BulkDataReplaceButton({ hold }: Props) {
 		? <ResultsModal files={files} canClose={!isProcessing} onClose={onClose} />
 		: null;
 
-	return <div className="field">
-		<div className="control" title="Upload a zip file with identically named files to replace them.">
-			<div className="file has-name is-primary">
-				<label className="file-label">
-					<input className="file-input" type="file" accept=".zip" onChange={onFileSelected} disabled={isProcessing} />
-					<span className="button is-primary">
-						<span className="file-icon">
-							<i className="fas fa-upload"></i>
-						</span>
-						<span className="file-label">
-							Replace all data
-						</span>
-					</span>
-				</label>
-			</div>
-		</div>
+	return <div className="control" title="Upload a zip file with identically named files to replace them.">
+		<label className="file-label">
+			<input className="file-input" type="file" accept=".zip" onChange={onFileSelected} disabled={isProcessing} />
+			<span className="button is-primary">
+				<span className="file-icon">
+					<i className="fas fa-upload"></i>
+				</span>
+				<span className="file-label">
+					Replace all data
+				</span>
+			</span>
+		</label>
 		{isOpen && createPortal(modal, document.body)}
 	</div>
 }

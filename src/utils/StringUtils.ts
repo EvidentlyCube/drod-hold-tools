@@ -64,3 +64,13 @@ export function fixCarriageReturnForDisplay(s: string): string {
 export function fixCarriageReturnForStorage(s: string): string {
 	return s.replace(/\n/g, '\r');
 }
+
+export function pluralize(countOrArray: number | unknown[], word: string, pluralWord?: string) {
+	const count = Array.isArray(countOrArray) ? countOrArray.length : countOrArray;
+
+	if (count === 1) {
+		return word;
+	} else {
+		return pluralWord ?? `${word}s`;
+	}
+}
