@@ -50,7 +50,7 @@ export class SignalArray<TElement> {
 
 		if (index !== -1) {
 			this._array.splice(index, 1);
-		this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Remove, elements: [element] });
+			this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Remove, elements: [element] });
 		}
 	}
 

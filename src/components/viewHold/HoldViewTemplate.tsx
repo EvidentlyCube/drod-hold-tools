@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { HoldReader } from "../../processor/HoldReader";
 import { Hold } from "../../data/datatypes/Hold";
+import { HoldReader } from "../../processor/HoldReaders";
 
 interface Props {
 	hold: Hold;

@@ -67,3 +67,16 @@ export function filterInline<T>(arr: T[], predicate: (item: T) => boolean) {
 		index = arr.findIndex(predicate);
 	}
 }
+
+export function concatenateUint8Arrays(arrays: Uint8Array[]): Uint8Array {
+	const totalLength = arrays.reduce((sum, c) => sum + c.length, 0);
+	const concatenated = new Uint8Array(totalLength);
+
+	let offset = 0;
+	for (const array of arrays) {
+		concatenated.set(array, offset);
+		offset += array.length;
+	}
+
+	return concatenated;
+}

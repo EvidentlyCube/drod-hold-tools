@@ -5,21 +5,21 @@ import { HoldChange } from "../data/datatypes/HoldChange";
 import { xmlToHold } from "../data/xmlToHold";
 import { shouldBeUnreachable } from "../utils/Interfaces";
 import { parseXml } from "../utils/XmlParser";
+import { concatenateUint8Arrays } from "../utils/ArrayUtils";
+import { OnProgressCallback } from "../data/DrodCommonTypes";
 
 export enum HoldEncodingType {
 	DeflateXor,
 	// From TSS 5.2 (TSS_509)
 	Gzip,
 	// When hold is provided as a string we can't know the method so guess from version if necessary
-	None,
+	Unknown,
 }
 
-type HoldSource =
+export type ReadHoldSource =
 	| { file: File }
 	| { data: Uint8Array }
 	| { xmlString: string };
-
-export type OnProgressCallback = (step: string, progressFactor: number, context: string) => void;
 
 interface ReadHoldResultSuccess {
 	isSuccess: true;
@@ -37,55 +37,47 @@ interface ReadHoldResultFailure {
 	causedBy: Error;
 }
 
-type ReadHoldResult = ReadHoldResultSuccess | ReadHoldResultFailure;
+export type ReadHoldResult = ReadHoldResultSuccess | ReadHoldResultFailure;
 
+/**
+ * Take a hold source and get a fully structured Hold object from it.
+ *
+ * @param holdReaderId Necessary to match the hold with indexed storage
+ * @param source Source of the hold
+ * @param holdChanges Array of user made changes
+ * @param onProgress Callback to log progress
+ * @returns Results of the operation
+ */
 export async function readHold(
-	id: number,
-	source: HoldSource,
+	holdReaderId: number,
+	source: ReadHoldSource,
 	holdChanges: HoldChange[] = [],
 	onProgress?: OnProgressCallback
 ): Promise<ReadHoldResult> {
-	let encodingType = HoldEncodingType.None;
-	let holdBytes: Uint8Array | undefined;
-	let holdString: string | undefined;
+	let encodingType = HoldEncodingType.Unknown;
+	let holdString: string | undefined
 	let holdXml: XMLDocument | undefined;
 	let hold: Hold | undefined;
 
 	try {
-		if ('xmlString' in source) {
-			holdString = source.xmlString;
+		const result = await readHoldXmlString(source, onProgress);
 
-		} else {
-			if ('file' in source) {
-				holdBytes = await stepReadFile(source.file, onProgress);
-
-			} else {
-				holdBytes = new Uint8Array(source.data);
+		if (!result.isSuccess) {
+			return {
+				isSuccess: false,
+				encodingType: result.encodingType,
+				holdString: undefined,
+				holdXml: undefined,
+				causedBy: result.causedBy,
 			}
-
-			encodingType = guessEncodingType(holdBytes);
-
-			switch (encodingType) {
-				case HoldEncodingType.DeflateXor:
-					holdBytes = await stepXorDecode(holdBytes, onProgress);
-					holdBytes = await stepInflate(holdBytes, new AsyncUnzlib(), onProgress);
-					break;
-
-				case HoldEncodingType.Gzip:
-					holdBytes = await stepInflate(holdBytes, new AsyncGunzip(), onProgress);
-					break;
-
-				case HoldEncodingType.None:
-				default:
-					throw new Error(`Unsupported encoding type ${encodingType}`);
-			}
-
-			holdString = await stepBytesToText(holdBytes, onProgress);
 		}
+
+		holdString = result.holdString;
+		encodingType = result.encodingType;
 
 		holdXml = await stepParseXml(holdString, onProgress);
 		hold = await xmlToHold(
-			id,
+			holdReaderId,
 			holdXml,
 			holdChanges,
 			(step, progressFactor, context) => onProgress?.(`Reading hold -> ${step}`, progressFactor, context)
@@ -109,8 +101,77 @@ export async function readHold(
 			causedBy: error,
 		}
 	}
-
 }
+
+interface ReadHoldXmlStringResultSuccess {
+	isSuccess: true;
+	encodingType: HoldEncodingType;
+	holdString: string;
+}
+
+interface ReadHoldXmlStringResultFailure {
+	isSuccess: false;
+	encodingType: HoldEncodingType;
+	causedBy: Error;
+}
+
+type ReadHoldXmlStringResult = ReadHoldXmlStringResultSuccess | ReadHoldXmlStringResultFailure;
+
+export async function readHoldXmlString(
+	source: ReadHoldSource,
+	onProgress?: OnProgressCallback
+): Promise<ReadHoldXmlStringResult> {
+	let encodingType = HoldEncodingType.Unknown;
+	let holdString: string | undefined;
+
+	try {
+		if ('xmlString' in source) {
+			holdString = source.xmlString;
+
+		} else {
+			let holdBytes = 'file' in source
+				? await stepReadFile(source.file, onProgress)
+				: new Uint8Array(source.data);
+
+			encodingType = guessEncodingType(holdBytes);
+
+			switch (encodingType) {
+				case HoldEncodingType.DeflateXor:
+					holdBytes = await stepXorDecode(holdBytes, onProgress);
+					holdBytes = await stepInflate(holdBytes, new AsyncUnzlib(), onProgress);
+					break;
+
+				case HoldEncodingType.Gzip:
+					holdBytes = await stepInflate(holdBytes, new AsyncGunzip(), onProgress);
+					break;
+
+				case HoldEncodingType.Unknown:
+					throw new Error(`Unsupported encoding type ${encodingType}`);
+
+				default:
+					shouldBeUnreachable(encodingType);
+			}
+
+			holdString = await stepBytesToText(holdBytes, onProgress);
+		}
+
+		return {
+			isSuccess: true,
+			encodingType,
+			holdString
+		};
+
+	} catch (e) {
+		const causedBy = e instanceof Error ? e : new Error(String(e));
+
+		return {
+			isSuccess: false,
+			encodingType,
+			causedBy
+		}
+	}
+}
+
 
 // Steps
 
@@ -135,9 +196,9 @@ async function stepReadFile(file: File, onProgress?: OnProgressCallback): Promis
 				resolve(new Uint8Array(result));
 
 			} else if (typeof result === 'string') {
-				reject('Fatal internal error - file was read into string and not array buffer.');
+				reject(new Error('Fatal internal error - file was read into string and not array buffer.'));
 			} else {
-				reject('Fatal error - file was read but no data is available.');
+				reject(new Error('Fatal error - file was read but no data is available.'));
 			}
 		});
 
@@ -178,6 +239,7 @@ async function stepInflate(bytes: Uint8Array, inflator: AsyncGunzip | AsyncUnzli
 		onProgress?.(STEP_NAME, 0, "Start");
 
 		const compressedSize = bytes.length;
+		const chunks: Uint8Array[] = [];
 
 		inflator.ondata = (flateError: FlateError | null, data: Uint8Array, final: boolean) => {
 			if (flateError) {
@@ -186,12 +248,14 @@ async function stepInflate(bytes: Uint8Array, inflator: AsyncGunzip | AsyncUnzli
 				return;
 			}
 
+			chunks.push(data);
+
 			if (!final) {
 				return;
 			}
 
 			onProgress?.(STEP_NAME, 1, "Finished");
-			resolve(data);
+			resolve(concatenateUint8Arrays(chunks));
 		};
 
 		inflator.ondrain = size => onProgress?.(STEP_NAME, size / compressedSize, "Inflating");
@@ -210,7 +274,10 @@ async function stepBytesToText(bytes: Uint8Array, onProgress?: OnProgressCallbac
 	while (index < length) {
 		const to = Math.min(length, index + Constants.xmlReader.textDecodeChunk);
 
-		textPieces.push(textDecoder.decode(bytes.subarray(index, to)));
+		textPieces.push(textDecoder.decode(
+			bytes.subarray(index, to),
+			{ stream: to < length }
+		));
 		index = to;
 
 		if (shouldYieldToUi()) {
@@ -236,7 +303,7 @@ async function stepParseXml(xmlString: string, onProgress?: OnProgressCallback):
 }
 
 function guessEncodingType(bytes: Uint8Array): HoldEncodingType {
-	if (bytes[0] === 0x1F && bytes[1] == 0x8B) {
+	if (bytes[0] === 0x1F && bytes[1] === 0x8B) {
 		return HoldEncodingType.Gzip;
 	} else {
 		return HoldEncodingType.DeflateXor;
@@ -245,12 +312,14 @@ function guessEncodingType(bytes: Uint8Array): HoldEncodingType {
 
 let lastSleep = 0;
 function shouldYieldToUi() {
-	if (lastSleep === 0) {
-		lastSleep = Date.now();
-	}
+	// Guard to avoid immediately yielding on the first check
+	lastSleep = lastSleep || Date.now();
 
 	return lastSleep + Constants.xmlReaderFrameDuration < Date.now();
 }
 async function yieldToUi() {
-	await new Promise(resolve => setTimeout(resolve, Constants.xmlReaderSleep));
+	await new Promise<void>(resolve => setTimeout(() => {
+		lastSleep = Date.now();
+		resolve();
+	}, Constants.xmlReaderSleep));
 }

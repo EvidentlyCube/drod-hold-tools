@@ -7,8 +7,7 @@ import { Constants } from "../Constants";
 import { holdToXml } from "../data/HoldToXml";
 import { getHoldCommandsExport } from "../data/Utils";
 import { XmlToHoldError } from "../data/xmlToHold";
-import { HoldReader } from "../processor/HoldReader";
-import { readHold } from '../processor/HoldReader3';
+import { readHold } from '../processor/readHold';
 import { DiffXmlError } from '../utils/DiffXml';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

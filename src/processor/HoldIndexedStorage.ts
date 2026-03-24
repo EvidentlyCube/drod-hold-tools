@@ -3,8 +3,7 @@ import { HoldChange } from "../data/datatypes/HoldChange";
 import { assertNotNull } from "../utils/Asserts";
 import { SignalArrayOperation, SignalArrayOperator } from "../utils/SignalArray";
 import { SignalValue } from "../utils/SignalValue";
-import { HoldReader } from "./HoldReader";
-import { HoldReaders } from "./HoldReaders";
+import { HoldReader, HoldReaders } from "./HoldReaders";
 
 const DEBOUNCE_DURATION = 2000;
 
@@ -74,13 +73,13 @@ class HoldIndexedStorageClass {
 	private onHoldListChange(op: SignalArrayOperation<HoldReader>) {
 		if (op.operator === SignalArrayOperator.Add) {
 			for (const holdReader of op.elements) {
-				holdReader.onParsed.add(this.registerHoldForChanges.bind(this));
+				holdReader.onParsed.add(reader => this.registerHoldForChanges(reader));
 
 				if (this._storedHoldReaderIds.has(holdReader.id)) {
 					continue;
 				}
 
-				holdReader.onParsed.add(this.storeHoldXml.bind(this));
+				holdReader.onParsed.add(reader => this.storeHoldXml(reader));
 			}
 		} else if (op.operator === SignalArrayOperator.Remove) {
 			for (const holdReader of op.elements) {
@@ -112,21 +111,21 @@ class HoldIndexedStorageClass {
 
 				this._storedHoldReaderIds.delete(holdReader.id);
 				this._loadedHoldToChanges.delete(holdReader.id);
-				if (holdReader.sharedState.hold) {
-					this._holdChangesSaveQueue.delete(holdReader.sharedState.hold);
+				if (holdReader.holdSafe) {
+					this._holdChangesSaveQueue.delete(holdReader.hold);
 				}
 			}
 		}
 	}
 
 	private registerHoldForChanges(holdReader: HoldReader) {
-		const { hold } = holdReader.sharedState;
+		const { holdSafe } = holdReader;
 
-		if (!hold) {
+		if (!holdSafe) {
 			return;
 		}
 
-		hold.$changes.onChange.add(this.onHoldChange.bind(this, hold));
+		holdSafe.$changes.onChange.add(this.onHoldChange.bind(this, holdSafe));
 	}
 
 	private onHoldChange(hold: Hold) {
@@ -135,13 +134,13 @@ class HoldIndexedStorageClass {
 	}
 
 	private storeHoldXml(holdReader: HoldReader) {
-		const xmlText = holdReader.sharedState.holdXmlText;
+		const { holdXmlString } = holdReader;
 
-		if (!xmlText) {
+		if (!holdXmlString) {
 			return;
 		}
 
-		const xmlBlob = new Blob([xmlText], { type: 'text/xml' });
+		const xmlBlob = new Blob([holdXmlString], { type: 'text/xml' });
 
 		this._saveHoldCounter += 2;
 
@@ -158,7 +157,7 @@ class HoldIndexedStorageClass {
 		}
 
 		const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
-		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changesBlob: new Blob(['[]'], { type: 'text/plain'}) });
+		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changesBlob: new Blob(['[]'], { type: 'text/plain' }) });
 
 		changesStoreRequest.onsuccess = e => {
 			this._saveHoldCounter--;

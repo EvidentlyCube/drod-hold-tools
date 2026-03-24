@@ -1,7 +1,6 @@
 import { Constants } from "../Constants";
-import { areCommandsSame, readCommandsBuffer } from "../data/CommandUtils";
 import { PackedVar, PackedVarType } from "../data/PackedVars";
-import { readPackedVars, readPackedVars2 } from "../data/PackedVarsUtils";
+import { readPackedVars } from "../data/PackedVarsUtils";
 import { diffArraysOneWay } from "./ArrayUtils";
 import { base64ToUint8 } from "./StringUtils";
 import { parseXml } from "./XmlParser";
@@ -179,8 +178,6 @@ async function compareElement(original: Element, generated: Element, context: st
 				const originalExtraVars = originalPackedVars.vars;
 				const generatedPackedVars = readPackedVars(generatedAttr.value);
 				const generatedExtraVars = generatedPackedVars.vars;
-
-				readPackedVars2(originalAttr.value, generatedAttr.value);
 
 				if (originalExtraVars.length < generatedExtraVars.length) {
 					extraDetails.push({

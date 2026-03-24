@@ -1,35 +1,116 @@
 import { HoldChange } from "../data/datatypes/HoldChange";
+import { OnProgressCallback } from "../data/DrodCommonTypes";
 import { assertNotNull } from "../utils/Asserts";
 import { SignalArray } from "../utils/SignalArray";
-import { HoldReader } from "./HoldReader";
+import { Signal } from "../utils/Signals";
+import { SignalValue } from "../utils/SignalValue";
+import { readHold, ReadHoldResult, ReadHoldSource } from "./readHold";
 
+export class HoldReader {
+	public readonly id: number;
+	/** Starts true to indicate it's not yet ready */
+	public readonly isBusy = new SignalValue<boolean>(true);
+	public readonly name = new SignalValue<string>("");
+	public readonly lastLog = new SignalValue<string>("Not started yet");
+	public readonly error = new SignalValue<string>("");
+	public readonly onParsed = new Signal<HoldReader>();
+
+	public get isFinished() {
+		return this._isFinished;
+	}
+
+	public get isStarted() {
+		return this._isStarted;
+	}
+
+	public get hold() {
+		if (this._result && this._result.isSuccess) {
+			return this._result.hold;
+		} else {
+			throw new Error("Accessing hold before it's ready");
+		}
+	}
+
+	public get holdSafe() {
+		if (this._result && this._result.isSuccess) {
+			return this._result.hold;
+		} else {
+			return undefined;
+		}
+	}
+
+	public get holdXmlString() {
+		return this._result?.holdString;
+	}
+
+	private readonly _source: ReadHoldSource;
+	private _isStarted = false;
+	private _isFinished = false;
+	private _result: ReadHoldResult | undefined;
+	private _changes: HoldChange[];
+
+	constructor(id: number, source: ReadHoldSource, changes: HoldChange[]) {
+		this.id = id;
+		this._source = source;
+		this._changes = changes;
+		this.name.value = id.toString();
+	}
+
+	public async start() {
+		if (this._isStarted) {
+			return;
+		}
+
+		this._isStarted = true;
+		this.isBusy.value = true;
+
+		const handleLog: OnProgressCallback = (step, progress, context) => {
+			this.lastLog.value = `${step} (${(progress * 100).toFixed(2)}%): ${context}`;
+		};
+
+		try {
+			const result = await readHold(this.id, this._source, this._changes, handleLog);
+			this._result = result;
+
+			if (this._result.isSuccess) {
+				this.name.value = this.hold.name.newValue;
+				this.onParsed.dispatch(this);
+
+			} else {
+				this.error.value = this._result.causedBy.message;
+			}
+
+		} finally {
+			this.isBusy.value = false;
+			this._isFinished = true;
+		}
+
+	}
+}
 
 class HoldReaderManager {
-	private readonly _unfinishedReaders: HoldReader[];
-
 	public holdReaders: SignalArray<HoldReader>
 
 	public get isParsing() {
-		return this._unfinishedReaders.length > 0;
+		return !!this.holdReaders.array.find(r => !r.isFinished);
 	}
 
 	public constructor() {
 		this.holdReaders = new SignalArray();
-		this._unfinishedReaders = [];
 
-		setInterval(() => this.update(), 50);
+		setInterval(() => this.pushQueue(), 100);
 	}
 
 	public getParsed(holdReaderId?: string) {
 		const id = parseInt(holdReaderId ?? "0");
-		const holdReader = HoldReaders.getById(id);
+		const holdReader = this.getById(id);
 
 		assertNotNull(holdReader, `Fatal error: no hold reader for ID=${holdReaderId}`);
-		assertNotNull(holdReader.sharedState.hold, `Fatal error: hold reader missing Hold ID=${holdReaderId}`);
+		assertNotNull(holdReader.hold, `Fatal error: hold reader missing Hold ID=${holdReaderId}`);
 
 		return {
 			holdReader,
-			hold: holdReader.sharedState.hold
+			hold: holdReader.hold
 		};
 	}
 
@@ -43,8 +124,9 @@ class HoldReaderManager {
 
 	public readHoldXmlString(xmlString: string, id: number, changes: HoldChange[]) {
 		const holdReader = new HoldReader(id, { xmlString }, changes);
-		this._unfinishedReaders.push(holdReader);
+
 		this.holdReaders.push(holdReader);
+		this.pushQueue();
 
 		return holdReader;
 	}
@@ -53,22 +135,23 @@ class HoldReaderManager {
 		const id = Date.now();
 
 		const holdReader = new HoldReader(id, { file }, changes);
-		this._unfinishedReaders.push(holdReader);
 		this.holdReaders.push(holdReader);
+		this.pushQueue();
 
 		return holdReader;
 	}
 
-	private update() {
-		if (this._unfinishedReaders.length > 0) {
-			this._unfinishedReaders[0].update();
+	public pushQueue() {
+		for (const reader of this.holdReaders.array) {
+			if (reader.isStarted && !reader.isFinished) {
+				return;
 
-			if (this._unfinishedReaders[0].isFinished) {
-				this._unfinishedReaders.splice(0, 1);
+			} else if (!reader.isStarted) {
+				reader.start();
+				return;
 			}
 		}
 	}
-
 }
 
 export const HoldReaders = new HoldReaderManager();

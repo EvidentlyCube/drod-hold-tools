@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useSignalArray } from "../../hooks/useSignalArray";
-import { HoldReader } from "../../processor/HoldReader";
-import { HoldReaders } from "../../processor/HoldReaders";
+import { HoldReader, HoldReaders } from "../../processor/HoldReaders";
 import { useSignalValue } from "../../hooks/useSignalValue";
 import { HoldIndexedStorage } from "../../processor/HoldIndexedStorage";
 
@@ -24,10 +23,15 @@ interface NavHoldProps {
 }
 function NavHold({ holdReader }: NavHoldProps) {
 	const name = useSignalValue(holdReader.name);
+	const isBusy = useSignalValue(holdReader.isBusy);
 
 	const id = holdReader.id;
+	const className = [
+		'navbar-item',
+		isBusy ? 'shimmer-loader' : ''
+	].join(' ');
 	return (
-		<NavLink className="navbar-item" to={`/hold/${id}`}>
+		<NavLink className={className} to={`/hold/${id}`}>
 			{name}
 		</NavLink>
 	);

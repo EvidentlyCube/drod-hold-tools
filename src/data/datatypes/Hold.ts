@@ -144,7 +144,8 @@ export class Hold {
 			encOriginalName: stringToWCharBase64(source?.gidOriginalName ?? id.toString()),
 			gidCreated: source?.gidCreated ?? Date.now(),
 			encName: stringToWCharBase64(source?.name ?? `New Player ${id}`),
-			$isNewlyAdded: true
+			$isNewlyAdded: true,
+			encEmailMessage: "",
 		});
 
 		this.players.set(id, player);

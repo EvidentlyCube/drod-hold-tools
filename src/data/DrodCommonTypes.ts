@@ -8,3 +8,4 @@ export interface Point {
 	y: number;
 }
 
+export type OnProgressCallback = (step: string, progressFactor: number, context: string) => void;

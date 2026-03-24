@@ -24,7 +24,7 @@ import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 import { HoldRefModel } from "./references/HoldReference";
-import { OnProgressCallback } from "../processor/HoldReader3";
+import { OnProgressCallback } from "./DrodCommonTypes";
 
 export async function xmlToHold(
 	holdReaderId: number,
