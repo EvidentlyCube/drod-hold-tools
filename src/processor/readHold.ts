@@ -3,10 +3,9 @@ import { Constants } from "../Constants";
 import { Hold } from "../data/datatypes/Hold";
 import { HoldChange } from "../data/datatypes/HoldChange";
 import { xmlToHold } from "../data/xmlToHold";
-import { shouldBeUnreachable } from "../utils/Interfaces";
+import { HoldReadProgressLog, shouldBeUnreachable } from "../utils/Interfaces";
 import { parseXml } from "../utils/XmlParser";
 import { concatenateUint8Arrays } from "../utils/ArrayUtils";
-import { OnProgressCallback } from "../data/DrodCommonTypes";
 
 export enum HoldEncodingType {
 	DeflateXor,
@@ -52,7 +51,7 @@ export async function readHold(
 	holdReaderId: number,
 	source: ReadHoldSource,
 	holdChanges: HoldChange[] = [],
-	onProgress?: OnProgressCallback
+	onProgress?: HoldReadProgressLog
 ): Promise<ReadHoldResult> {
 	let encodingType = HoldEncodingType.Unknown;
 	let holdString: string | undefined
@@ -119,7 +118,7 @@ type ReadHoldXmlStringResult = ReadHoldXmlStringResultSuccess | ReadHoldXmlStrin
 
 export async function readHoldXmlString(
 	source: ReadHoldSource,
-	onProgress?: OnProgressCallback
+	onProgress?: HoldReadProgressLog
 ): Promise<ReadHoldXmlStringResult> {
 	let encodingType = HoldEncodingType.Unknown;
 	let holdString: string | undefined;
@@ -175,7 +174,7 @@ export async function readHoldXmlString(
 
 // Steps
 
-async function stepReadFile(file: File, onProgress?: OnProgressCallback): Promise<Uint8Array> {
+async function stepReadFile(file: File, onProgress?: HoldReadProgressLog): Promise<Uint8Array> {
 	return new Promise((resolve, reject) => {
 		const STEP_NAME = "Reading file";
 		onProgress?.(STEP_NAME, 0, "Start");
@@ -187,7 +186,7 @@ async function stepReadFile(file: File, onProgress?: OnProgressCallback): Promis
 			});
 		}
 
-		fileReader.addEventListener('error', e => reject(new Error("Error occurred while reading the file.")));
+		fileReader.addEventListener('error', () => reject(new Error("Error occurred while reading the file.")));
 		fileReader.addEventListener('load', () => {
 			const { result } = fileReader;
 
@@ -206,7 +205,7 @@ async function stepReadFile(file: File, onProgress?: OnProgressCallback): Promis
 	});
 }
 
-async function stepXorDecode(bytes: Uint8Array, onProgress?: OnProgressCallback): Promise<Uint8Array> {
+async function stepXorDecode(bytes: Uint8Array, onProgress?: HoldReadProgressLog): Promise<Uint8Array> {
 	const STEP_NAME = "Decoding file";
 	onProgress?.(STEP_NAME, 0, "Start");
 
@@ -233,7 +232,7 @@ async function stepXorDecode(bytes: Uint8Array, onProgress?: OnProgressCallback)
 	return decodedBytes;
 }
 
-async function stepInflate(bytes: Uint8Array, inflator: AsyncGunzip | AsyncUnzlib, onProgress?: OnProgressCallback): Promise<Uint8Array> {
+async function stepInflate(bytes: Uint8Array, inflator: AsyncGunzip | AsyncUnzlib, onProgress?: HoldReadProgressLog): Promise<Uint8Array> {
 	return new Promise((resolve, reject) => {
 		const STEP_NAME = "Inflating file";
 		onProgress?.(STEP_NAME, 0, "Start");
@@ -262,7 +261,7 @@ async function stepInflate(bytes: Uint8Array, inflator: AsyncGunzip | AsyncUnzli
 		inflator.push(bytes, true);
 	});
 }
-async function stepBytesToText(bytes: Uint8Array, onProgress?: OnProgressCallback): Promise<string> {
+async function stepBytesToText(bytes: Uint8Array, onProgress?: HoldReadProgressLog): Promise<string> {
 	const STEP_NAME = "Reading bytes to string";
 	onProgress?.(STEP_NAME, 0, "Start");
 
@@ -291,7 +290,7 @@ async function stepBytesToText(bytes: Uint8Array, onProgress?: OnProgressCallbac
 	return textPieces.join('');
 }
 
-async function stepParseXml(xmlString: string, onProgress?: OnProgressCallback): Promise<XMLDocument> {
+async function stepParseXml(xmlString: string, onProgress?: HoldReadProgressLog): Promise<XMLDocument> {
 	const STEP_NAME = "Parsing string to XML";
 	onProgress?.(STEP_NAME, 0, "Start");
 

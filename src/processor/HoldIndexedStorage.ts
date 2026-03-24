@@ -88,7 +88,7 @@ class HoldIndexedStorageClass {
 				const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
 				const holdsStoreRequest = holdsStore.delete(holdReader.id);
 
-				holdsStoreRequest.onsuccess = e => {
+				holdsStoreRequest.onsuccess = () => {
 					this._deleteCounter--;
 				}
 				holdsStoreRequest.onerror = e => {
@@ -100,7 +100,7 @@ class HoldIndexedStorageClass {
 				const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
 				const changesStoreRequest = changesStore.delete(holdReader.id);
 
-				changesStoreRequest.onsuccess = e => {
+				changesStoreRequest.onsuccess = () => {
 					this._deleteCounter--;
 				}
 				changesStoreRequest.onerror = e => {
@@ -147,7 +147,7 @@ class HoldIndexedStorageClass {
 		const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
 		const holdsStoreRequest = holdsStore.put({ holdId: holdReader.id, xmlBlob });
 
-		holdsStoreRequest.onsuccess = e => {
+		holdsStoreRequest.onsuccess = () => {
 			this._saveHoldCounter--;
 		}
 		holdsStoreRequest.onerror = e => {
@@ -159,7 +159,7 @@ class HoldIndexedStorageClass {
 		const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
 		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changesBlob: new Blob(['[]'], { type: 'text/plain' }) });
 
-		changesStoreRequest.onsuccess = e => {
+		changesStoreRequest.onsuccess = () => {
 			this._saveHoldCounter--;
 		}
 		changesStoreRequest.onerror = e => {
@@ -187,8 +187,7 @@ class HoldIndexedStorageClass {
 			const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
 			const changesStoreRequest = changesStore.put(row);
 
-			// eslint-disable-next-line no-loop-func
-			changesStoreRequest.onsuccess = e => {
+			changesStoreRequest.onsuccess = () => {
 				popRemaining();
 			}
 			changesStoreRequest.onerror = e => {
@@ -207,20 +206,20 @@ class HoldIndexedStorageClass {
 		};
 	}
 
-	private onDbOpenRequest_error(event: Event) {
+	private onDbOpenRequest_error() {
 		// @FIXME DB Open failed
 	}
 
-	private onDbOpenRequest_success(event: Event) {
+	private onDbOpenRequest_success() {
 		this._db = this._dbOpenRequest.result;
 
 		this.loadChanges();
 	}
 
-	private onDbOpenRequest_upgrade(e: IDBVersionChangeEvent) {
+	private onDbOpenRequest_upgrade() {
 		this._db = this._dbOpenRequest.result;
 
-		this.db.onerror = (event) => {
+		this.db.onerror = () => {
 			// @FIXME on error
 		};
 
@@ -238,7 +237,7 @@ class HoldIndexedStorageClass {
 	private loadHolds() {
 		let counter = 0;
 		let isCursorFinished = false;
-		let doFinish = () => {
+		const doFinish = () => {
 			if (counter === 0 && isCursorFinished) {
 				this.isInitializing.value = false
 			}
@@ -283,7 +282,7 @@ class HoldIndexedStorageClass {
 	private loadChanges() {
 		let counter = 0;
 		let isCursorFinished = false;
-		let doFinish = () => {
+		const doFinish = () => {
 			if (counter === 0 && isCursorFinished) {
 				this.loadHolds();
 			}

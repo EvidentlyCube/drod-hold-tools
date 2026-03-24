@@ -90,7 +90,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 
 	for (const ref of variable.$uses) {
 		switch (ref.model) {
-			case HoldRefModel.CharacterCommand:
+			case HoldRefModel.CharacterCommand: {
 				const characterCommand = resolveReference(ref);
 				if (doesCommandStoreExpandableTextInLabel(characterCommand)) {
 					characterCommand.label.newValue = replaceVariableNameInText(
@@ -107,8 +107,9 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					);
 				}
 				break;
+			}
 
-			case HoldRefModel.MonsterCommand:
+			case HoldRefModel.MonsterCommand: {
 				const monsterCommand = resolveReference(ref);
 				if (doesCommandStoreExpandableTextInLabel(monsterCommand)) {
 					monsterCommand.label.newValue = replaceVariableNameInText(
@@ -125,8 +126,9 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					);
 				}
 				break;
+			}
 
-			case HoldRefModel.Entrance:
+			case HoldRefModel.Entrance: {
 				const entrance = resolveReference(ref);
 				entrance.description.newValue = replaceVariableNameInText(
 					entrance.description.newValue,
@@ -134,8 +136,9 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					newName
 				);
 				break;
+			}
 
-			case HoldRefModel.HoldEndMessage:
+			case HoldRefModel.HoldEndMessage: {
 				const hold = resolveReference(ref);
 				hold.endHoldMessage.newValue = replaceVariableNameInText(
 					hold.endHoldMessage.newValue,
@@ -143,8 +146,9 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					newName
 				);
 				break;
+			}
 
-			case HoldRefModel.Scroll:
+			case HoldRefModel.Scroll: {
 				const scroll = resolveReference(ref);
 				scroll.message.newValue = replaceVariableNameInText(
 					scroll.message.newValue,
@@ -152,8 +156,9 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					newName
 				);
 				break;
+			}
 
-			case HoldRefModel.Speech:
+			case HoldRefModel.Speech: {
 				const speech = resolveReference(ref);
 				speech.message.newValue = replaceVariableNameInText(
 					speech.message.newValue,
@@ -161,6 +166,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					newName
 				);
 				break;
+			}
 
 			default:
 				shouldBeUnreachable(ref);
@@ -183,6 +189,6 @@ function replaceVariableNameInFormula(formula: string, oldName: string, newName:
 function replaceVariableNameInText(text: string, oldName: string, newName: string) {
 	return text.replace(
 		getVariableInTextRegexp(oldName, true),
-		`\$${newName}\$`
+		`$${newName}$`
 	);
 }

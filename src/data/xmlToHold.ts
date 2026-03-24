@@ -1,7 +1,7 @@
-import { version } from "os";
 import { Constants } from "../Constants";
 import { assertNotNull } from "../utils/Asserts";
 import { diffXml, DiffXmlError } from "../utils/DiffXml";
+import { HoldReadProgressLog } from "../utils/Interfaces";
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { EntranceShowDescription } from "./DrodEnums";
 import { holdToXml } from "./HoldToXml";
@@ -24,13 +24,12 @@ import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
 import { HoldRefModel } from "./references/HoldReference";
-import { OnProgressCallback } from "./DrodCommonTypes";
 
 export async function xmlToHold(
 	holdReaderId: number,
 	originalXml: Document,
 	storedChanges: HoldChange[],
-	log: OnProgressCallback
+	log: HoldReadProgressLog
 ): Promise<Hold> {
 	removeOtherHoldsFromHoldXML(originalXml);
 	fixKnownIssuesInKnownHolds(originalXml);
@@ -306,7 +305,7 @@ export async function xmlToHold(
 			}
 
 			for (const [scrollXml, scrollI, scrollTotal] of querySelectorAll(roomXml, 'Scrolls')) {
-
+				log(`Rooms`, i / total, `${roomId} -> Scroll ${scrollI}/${scrollTotal}`);
 				const x = int(scrollXml, 'X');
 				const y = int(scrollXml, 'Y');
 				holdRoom.scrolls.push({
@@ -431,14 +430,10 @@ export async function xmlToHold(
 
 		try {
 			await diffXml(originalXml, exportedXml, (index, total) => {
-				const percent = (index / total) * 100;
 				log("Stability check", index / total, 'Comparing XMLs');
 			});
 
 		} catch (e) {
-			if (Constants.isDev) {
-				(window as any).lastDiffXmlError = e;
-			}
 			throw new Error(
 				"Stability check failed. When attempting to export\n"
 				+ "the hold without any changes the resulting output was\n"
@@ -465,7 +460,7 @@ export async function xmlToHold(
 	return hold;
 }
 
-async function loadDynamicData(hold: Hold, log: OnProgressCallback) {
+async function loadDynamicData(hold: Hold, log: HoldReadProgressLog) {
 	log("Generating dynamic info", -1, "Speech locations");
 	regenerateHoldSpeechLocations(hold);
 	await sleep();

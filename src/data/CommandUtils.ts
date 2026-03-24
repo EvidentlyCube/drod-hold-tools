@@ -52,6 +52,7 @@ class WrappedCommandBuffer {
 
 			index++;
 
+		// eslint-disable-next-line no-constant-condition
 		} while (true);
 
 		this._index = index;
@@ -70,7 +71,7 @@ class WrappedCommandBuffer {
 
 		while (s) {
 			s -= 7;
-			let divider = Math.pow(2, s);
+			const divider = Math.pow(2, s);
 			let b = (n / divider) & 0x7f;
 			if (!s)
 				b |= 0x80;
@@ -196,8 +197,8 @@ function unpackCommands_spreadInExtraVars(packedVars: PackedVars): ScriptCommand
 	const commands: ScriptCommand[] = [];
 
 	for (let i = 0; i < numCommands; i++) {
-		let speechIdType = packedVars.getType(`${i}s`);
-		let speechId = speechIdType === PackedVarType.deprecated_DWord
+		const speechIdType = packedVars.getType(`${i}s`);
+		const speechId = speechIdType === PackedVarType.deprecated_DWord
 			? packedVars.readDWord_deprecated(`${i}s`, 0)
 			: packedVars.readUint(`${i}s`, 0)
 
@@ -350,7 +351,6 @@ export function doesCommandUseCharacter(command: ScriptCommand, character: HoldC
 		case ScriptCommandType.CC_SetNPCAppearance:
 		case ScriptCommandType.CC_SetPlayerAppearance:
 		case ScriptCommandType.CC_StartGlobalScript:
-		case ScriptCommandType.CC_WaitForEntityType:
 			return command.x === character.id;
 
 		case ScriptCommandType.CC_WaitForEntityType:

@@ -458,6 +458,7 @@ export class HoldChangeListener {
 	}
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- It works and proper typing would be more effort than necessary
 function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {
 	updatableValue.onChange.add(props => {
 		change.hasChange = props.hasNewValue;
@@ -471,6 +472,7 @@ function registerTextChange(hold: Hold, change: HoldChange, updatableValue: Sign
 	})
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- It works and proper typing would be more effort than necessary
 function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any>) {
 	updatableValue.onChange.add(({ value, previousValue }) => {
 		if (previousValue) {

@@ -221,7 +221,8 @@ async function compareElement(original: Element, generated: Element, context: st
 
 				const length = Math.max(originalExtraVars.length, generatedExtraVars.length);
 
-				for (var ii = 0; ii < length; ii++) {
+				let ii = 0;
+				for (; ii < length; ii++) {
 					const original = originalExtraVars[ii];
 					const generated = generatedExtraVars[ii];
 
@@ -350,26 +351,10 @@ function skipAttribute(tagName: string, attributeName: string, state: DiffState)
 	return (tagName === 'Holds' && attributeName === 'LastUpdated');
 }
 
-function base64ToHex(base64string: string): string {
-	const result = [];
-	const str = window.atob(base64string);
-
-	for (let i = 0; i < str.length; i++) {
-		result.push(
-			str.charCodeAt(i).toString(16).padStart(2, '0')
-		);
-	}
-
-	return result.join(' ');
-}
-
 function previewPackedVar(val: PackedVar) {
-	let result;
-	if (Array.isArray(val.value) && val.type === PackedVarType.ByteBuffer) {
-		result = val.value.map(x => x.toString(16).padStart(2, '0')).join(' ');
-	}
-
-	result = JSON.stringify(val.value.toString());
+	const result = Array.isArray(val.value) && val.type === PackedVarType.ByteBuffer
+		?  val.value.map(x => x.toString(16).padStart(2, '0')).join(' ')
+		: JSON.stringify(val.value.toString());
 
 	if (result.length > 40) {
 		return `${result.substring(0, 32)}... (Total Length=${result.length})`;

@@ -114,7 +114,7 @@ export type HoldChangeEntranceShowDescription = {
 
 export type HoldChangeHoldPlayer = {
 	type: HoldChangeType.HoldPlayer,
-	location: { };
+	location: { [key: string]: never };
 
 	hasChange: boolean;
 	value: number;

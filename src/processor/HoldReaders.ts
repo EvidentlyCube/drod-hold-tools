@@ -1,6 +1,6 @@
 import { HoldChange } from "../data/datatypes/HoldChange";
-import { OnProgressCallback } from "../data/DrodCommonTypes";
 import { assertNotNull } from "../utils/Asserts";
+import { HoldReadProgressLog } from "../utils/Interfaces";
 import { SignalArray } from "../utils/SignalArray";
 import { Signal } from "../utils/Signals";
 import { SignalValue } from "../utils/SignalValue";
@@ -64,7 +64,7 @@ export class HoldReader {
 		this._isStarted = true;
 		this.isBusy.value = true;
 
-		const handleLog: OnProgressCallback = (step, progress, context) => {
+		const handleLog: HoldReadProgressLog = (step, progress, context) => {
 			this.lastLog.value = `${step} (${(progress * 100).toFixed(2)}%): ${context}`;
 		};
 

@@ -16,6 +16,7 @@
 		"use-local-storage-state": "^19.3.1"
 	},
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
 		"@types/jest": "^27.5.2",
 		"@types/jsdom": "^21.1.7",
 		"@types/node": "^16.18.101",
@@ -24,12 +25,14 @@
 		"clean-webpack-plugin": "^4.0.0",
 		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.8.1",
+		"eslint": "^10.1.0",
 		"html-webpack-plugin": "^5.5.3",
 		"jsdom": "^26.1.0",
 		"mini-css-extract-plugin": "^2.7.6",
 		"ts-loader": "^9.5.1",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
+		"typescript-eslint": "^8.57.2",
 		"webpack": "^5.89.0",
 		"webpack-cli": "^5.1.4",
 		"webpack-dev-server": "^4.15.1"

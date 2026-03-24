@@ -1,8 +1,7 @@
 import { ChangeEvent, useCallback, useState } from "react";
-import { Hold } from "../../../data/datatypes/Hold";
-import Modal from "../../common/Modal";
-import { importDataArchive, ImportDataArchiveFileStatus } from "../../../processor/importDataArchive";
 import { createPortal } from "react-dom";
+import { Hold } from "../../../data/datatypes/Hold";
+import { importDataArchive, ImportDataArchiveFileStatus } from "../../../processor/importDataArchive";
 
 interface FileStatus {
 	name: string;

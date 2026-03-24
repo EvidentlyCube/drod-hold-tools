@@ -1,5 +1,5 @@
 import { Option } from "../components/common/Select";
-import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507, VERSION_TSS_508 } from "../Constants";
+import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507 } from "../Constants";
 import { getShowDescriptionName } from "./Utils";
 
 export class HoldVersion {

@@ -1,4 +1,4 @@
-import { getSpeakerMood, getSpeakerName, wcharBase64ToString } from "../Utils";
+import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
 interface DemoConstructor {

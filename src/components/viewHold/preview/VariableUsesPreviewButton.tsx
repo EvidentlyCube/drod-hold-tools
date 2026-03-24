@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { HoldData } from "../../../data/datatypes/HoldData";
-import DataUsesPreview from "./DataUsesPreview";
 import { HoldVariable } from "../../../data/datatypes/HoldVariable";
 import VariableUsesPreview from "./VariableUsesPreview";
 

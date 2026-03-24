@@ -2,7 +2,7 @@ import { CommandsList } from "../../data/CommandList";
 import { getCharacterName, getCommandName, getCommandToString } from "../../data/Utils";
 import { Hold } from "../../data/datatypes/Hold";
 import { ScriptCommand } from "../../data/datatypes/ScriptCommand";
-import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefHold, HoldRefHoldEndMessage, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefSavedGameWorldMapIcon, HoldRefScroll } from "../../data/references/HoldReference";
+import { HoldRef, HoldRefCharacterAvatar, HoldRefCharacterCommand, HoldRefCharacterTiles, HoldRefData, HoldRefEntranceVoiceOver, HoldRefModel, HoldRefMonsterCharacterType, HoldRefMonsterCommand, HoldRefPlayer, HoldRefRoomImage, HoldRefRoomOverheadImage, HoldRefSavedGameWorldMapIcon, HoldRefScroll } from "../../data/references/HoldReference";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 
 interface Props {
@@ -29,8 +29,8 @@ export default function HoldRefView({ holdRef }: Props) {
 		case HoldRefModel.Entrance: return <ViewEntrance hold={holdRef.hold} entranceId={holdRef.entranceId} />
 		case HoldRefModel.EntranceVoiceOver: return <ViewEntranceVoiceOver r={holdRef} />
 
-		case HoldRefModel.Hold: return <ViewHold r={holdRef} />;
-		case HoldRefModel.HoldEndMessage: return <ViewHoldEndMessage r={holdRef} />;
+		case HoldRefModel.Hold: return <ViewHold />;
+		case HoldRefModel.HoldEndMessage: return <ViewHoldEndMessage />;
 		case HoldRefModel.Level: return <ViewLevel hold={holdRef.hold} levelId={holdRef.levelId} />;
 
 		case HoldRefModel.MonsterCharacterType: return <ViewMonsterCharacterType r={holdRef} />;
@@ -136,7 +136,7 @@ function ViewData({ r }: { r: HoldRefData }) {
 	</>
 }
 
-function ViewHold({ r }: { r: HoldRefHold }) {
+function ViewHold() {
 	return <>
 		<span className="icon" title="Hold">
 			<i className="fas fa-house-chimney"></i>
@@ -145,7 +145,7 @@ function ViewHold({ r }: { r: HoldRefHold }) {
 	</>
 }
 
-function ViewHoldEndMessage({ r }: { r: HoldRefHoldEndMessage }) {
+function ViewHoldEndMessage() {
 	return <>
 		<span className="icon" title="Hold">
 			<i className="fas fa-house-chimney"></i>
@@ -261,7 +261,7 @@ function ViewRoomOverheadImage({ r }: { r: HoldRefRoomOverheadImage }) {
 }
 
 function ViewSavedGameWorldMapIcon({ r }: { r: HoldRefSavedGameWorldMapIcon }) {
-	const { hold, savedGameId, worldMapIconIndex } = r;
+	const { savedGameId, worldMapIconIndex } = r;
 
 	return <>
 		<RefIcon icon="floppy-disk" title="Saved Game"/>

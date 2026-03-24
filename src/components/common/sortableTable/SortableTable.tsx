@@ -81,7 +81,7 @@ export default function SortableTable<TData extends SortableTableDataWithId>(pro
 			/>
 		</thead>
 		<tbody>
-			{paginatedRows.map((row, index) => <Row key={row.id} columns={visibleColumns} data={row} />)}
+			{paginatedRows.map(row => <Row key={row.id} columns={visibleColumns} data={row} />)}
 			{paginatedRows.length === 0 && <tr>
 				<td colSpan={visibleColumns.length}>
 					<div className="container has-text-centered">

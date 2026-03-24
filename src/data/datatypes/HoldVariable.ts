@@ -1,5 +1,4 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { escapeRegex } from "../../utils/StringUtils";
 import { HoldRefCharacterCommand, HoldRefEntrance, HoldRefHoldEndMessage, HoldRefMonsterCommand, HoldRefScroll, HoldRefSpeech } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import { getVariableInFormulaRegexp, getVariableInTextRegexp } from "../VariableUtils";

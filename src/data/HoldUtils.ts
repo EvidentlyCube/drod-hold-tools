@@ -56,7 +56,7 @@ export function regenerateHoldDataUses(hold: Hold, filteredByDataId?: number) {
 	}
 
 	for (const character of hold.characters.values()) {
-		let avatarRef: HoldRef = {
+		const avatarRef: HoldRef = {
 			hold,
 			model: HoldRefModel.CharacterAvatar,
 			characterId: character.id
@@ -375,7 +375,7 @@ export function regenerateHoldSpeechLocations(hold: Hold, speechIdToRegenerate?:
 				if (speechId.newValue && isMatch(speechId.newValue)) {
 					try {
 						hold.speeches.getOrError(speechId.newValue).$location = ref;
-					} catch (e: unknown) {
+					} catch {
 						hold.registerProblem({
 							problem: "Speech referenced by the command did not exist. A new, empty one was created",
 							ref,

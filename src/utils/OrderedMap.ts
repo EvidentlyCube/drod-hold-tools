@@ -135,7 +135,7 @@ export class OrderedMap<TKey, TValue> {
 						done: false,
 					};
 				}
-				return { value: undefined as any, done: true };
+				return { value: undefined, done: true };
 			},
 		};
 	}

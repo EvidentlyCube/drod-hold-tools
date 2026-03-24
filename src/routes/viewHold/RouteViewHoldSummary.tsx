@@ -1,13 +1,13 @@
-import { useParams } from "react-router-dom";
-import { HoldReaders } from "../../processor/HoldReaders";
-import { Hold } from "../../data/datatypes/Hold";
-import { ReactElement, useCallback, useMemo } from "react";
-import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
-import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
-import { getHoldCommandsExport } from "../../data/Utils";
 import { Zippable, zipSync } from 'fflate';
-import { base64ToUint8 } from "../../utils/StringUtils";
+import { ReactElement, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
+import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import HoldProblems from "../../components/viewHold/summary/HoldProblems";
+import { Hold } from "../../data/datatypes/Hold";
+import { getHoldCommandsExport } from "../../data/Utils";
+import { HoldReaders } from "../../processor/HoldReaders";
+import { base64ToUint8 } from "../../utils/StringUtils";
 
 type GetData = (hold: Hold) => ReactElement[] | ReactElement | string | number;
 

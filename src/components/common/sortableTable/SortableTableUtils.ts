@@ -10,9 +10,9 @@ export function getPaginationPageNumbers(page: number, total: number) {
 		items.push('ellipsis-1');
 	}
 
-	let lookahead = 2;
-	let pagesFrom = Math.max(1, page - lookahead);
-	let pagesTo = Math.min(lastPage - 1, page + lookahead);
+	const lookahead = 2;
+	const pagesFrom = Math.max(1, page - lookahead);
+	const pagesTo = Math.min(lastPage - 1, page + lookahead);
 
 	for (let i = pagesFrom; i <= pagesTo; i++) {
 		items.push(i);

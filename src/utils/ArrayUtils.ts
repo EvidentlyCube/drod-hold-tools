@@ -32,7 +32,6 @@ export function diffArrays<T extends (string | number)>(left: T[], right: T[]): 
  * but NOT the other way around.
  */
 export function diffArraysOneWay<T extends (string | number)>(left: T[], right: T[]): T[] {
-	const leftSet = new Set(left);
 	const rightSet = new Set(right);
 	const diff = new Set<T>();
 

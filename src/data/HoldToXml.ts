@@ -1,4 +1,3 @@
-import { VERSION_JTRH } from "../Constants";
 import { CommandsList } from "./CommandList";
 import { getCommandDataId } from "./CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE } from "./DrodCommonTypes";
@@ -202,6 +201,7 @@ async function writeData(
 	writer: XMLWriter,
 	refs: OutputRefs,
 	data: HoldData | undefined,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Keep it for consistency
 	holdVersion: HoldVersion
 ) {
 	if (

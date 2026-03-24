@@ -1,14 +1,13 @@
-import { dir } from "console";
 import type { OptGroup } from "../components/common/Select";
+import { shouldBeUnreachable } from "../utils/Interfaces";
 import { base64ToUint8, bytesArrToBase64 as bytesToBase64 } from "../utils/StringUtils";
 import { CommandsList } from "./CommandList";
+import { DataFormatToName, MonsterIdToName, MoodToName, ScriptCommandTypeToName, SpeakerToName } from "./DrodEnumToName";
+import { DataFormat, ScriptCommandType, Speaker } from "./DrodEnums";
 import { TextUtils } from "./TextUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldDataDetails } from "./datatypes/HoldData";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
-import { DataFormatToName, MonsterIdToName, MoodToName, ScriptCommandTypeToName, SpeakerToName } from "./DrodEnumToName";
-import { DataFormat, ScriptCommandType, Speaker } from "./DrodEnums";
-import { shouldBeUnreachable } from "../utils/Interfaces";
 
 export function isGzippedNonDecodedHold(holdBinaryData: Uint8Array) {
 	return holdBinaryData[0] === 0x1F && holdBinaryData[1] == 0x8B;
@@ -22,7 +21,7 @@ export function wcharBase64ToString(encodedText: string) {
 		codePoints.push(decodedData[i] | (decodedData[i + 1] << 8));
 	}
 
-	return String.fromCharCode.apply(String, codePoints);
+	return String.fromCharCode(...codePoints);
 }
 
 export function stringToWCharBase64(s: string) {
@@ -52,8 +51,8 @@ export function stringToUint8(str: string) {
 	return bytes;
 }
 
-export function downloadBlob(data: Uint8Array, fileName: string, mimeType: string) {
-	const blob = new Blob([data as any], {
+export function downloadBlob(data: Uint8Array<ArrayBuffer>, fileName: string, mimeType: string) {
+	const blob = new Blob([data], {
 		type: mimeType
 	});
 
@@ -420,7 +419,7 @@ export function getBase64DecodedLength(data: string) {
 		return 0;
 	}
 
-	let padding = data.endsWith('==') ? 2
+	const padding = data.endsWith('==') ? 2
 		: data.endsWith('=') ? 1
 			: 0;
 

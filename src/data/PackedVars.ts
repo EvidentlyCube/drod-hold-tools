@@ -47,7 +47,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? (packedVar.size || 4);
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeUint(name: string, value: number, size?: number) {
@@ -57,7 +59,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? (packedVar.size || 4);
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeDWord_deprecated(name: string, value: number, size?: number) {
@@ -67,7 +71,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? (packedVar.size || 4);
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeBool(name: string, value: boolean, size?: number) {
@@ -77,7 +83,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? (packedVar.size || 4);
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeByteBuffer(name: string, value: number[], size?: number) {
@@ -87,7 +95,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? value.length;
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeString(name: string, value: string, size?: number) {
@@ -97,7 +107,9 @@ export class PackedVars {
 		packedVar.value = value;
 		packedVar.size = size ?? value.length + 1;
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	writeWcharString(name: string, value: string, size?: number) {
@@ -108,7 +120,9 @@ export class PackedVars {
 		// WChars take two bytes & we need null double-byte at the end
 		packedVar.size = size ?? value.length * 2 + 2;
 
-		!isFound && this._vars.push(packedVar);
+		if (!isFound) {
+			this._vars.push(packedVar);
+		}
 	}
 
 	readByteBuffer(name: string, def: number[]) {

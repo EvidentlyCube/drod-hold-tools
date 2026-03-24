@@ -1,17 +1,9 @@
-import { ChangeEvent, useCallback, useState } from "react";
-import { Hold } from "../../../data/datatypes/Hold";
-import Modal from "../../common/Modal";
-import { importDataArchive, ImportDataArchiveFileStatus } from "../../../processor/importDataArchive";
+import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { pluralize } from "../../../utils/StringUtils";
+import { Hold } from "../../../data/datatypes/Hold";
 import { HoldData } from "../../../data/datatypes/HoldData";
 import { DataFormat } from "../../../data/DrodEnums";
-
-interface FileStatus {
-	name: string;
-	context: string;
-	status: ImportDataArchiveFileStatus;
-}
+import { pluralize } from "../../../utils/StringUtils";
 
 interface Props {
 	hold: Hold;

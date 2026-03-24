@@ -2,7 +2,7 @@ import { CommandsList } from "./CommandList";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 import { AttackTileType, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, NaturalTargetTypeToName, OrbAgentTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
+import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, NaturalTargetTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];

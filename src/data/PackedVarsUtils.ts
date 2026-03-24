@@ -1,4 +1,3 @@
-import { wrap } from "module";
 import { bytesArrToBase64 } from "../utils/StringUtils";
 import { PackedVars, PackedVarType } from "./PackedVars";
 
@@ -17,7 +16,7 @@ class WrappedArray {
 
 	public readBool(varSize: number): boolean {
 		let isTrue = false;
-		for (var i = 0; i < varSize; i++) {
+		for (let i = 0; i < varSize; i++) {
 			if (this._array[this._pos + i]) {
 				isTrue = true;
 			}

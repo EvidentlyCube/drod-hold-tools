@@ -60,5 +60,5 @@ async function extractArchive(archiveBytes: Uint8Array): Promise<ArchiveContents
 }
 
 function extractFilename(path: string): string {
-	return path.match(/[^\/\\]*$/)![0];
+	return path.match(/[^/\\]*$/)![0];
 }

@@ -1,19 +1,18 @@
 import { useParams } from "react-router-dom";
+import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
+import HoldRefView from "../../components/viewHold/HoldRefView";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
+import SelectEditor from "../../components/viewHold/editables/SelectEditor";
+import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
+import { DataFormat } from "../../data/DrodEnums";
+import { filterDataFormat, getDataFormatFilterOptions } from "../../data/Utils";
 import { HoldEntrance } from "../../data/datatypes/HoldEntrance";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
-import HoldRefView from "../../components/viewHold/HoldRefView";
-import SelectEditor from "../../components/viewHold/editables/SelectEditor";
-import { Option } from "../../components/common/Select";
-import { filterDataFormat, getDataFormatFilterOptions, getShowDescriptionName } from "../../data/Utils";
-import SwapDataButton from "../../components/viewHold/preview/SwapDataButton";
-import { DataRefViewByIdDynamic } from "../../components/viewHold/DataRefView";
-import { DataFormat } from "../../data/DrodEnums";
 import { filterInline } from "../../utils/ArrayUtils";
-import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
+import { filterString, sortCompareNumber, sortCompareString, sortData } from "../../utils/SortUtils";
 
 const ShowDescriptionTransformer = (value: string) => parseInt(value);
 

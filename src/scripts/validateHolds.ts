@@ -20,6 +20,7 @@ const ANSI_GRAY = (text: string) => `\x1b[90m${text}\x1b[0m`;
 const ANSI_RED = (text: string) => `\x1b[31m${text}\x1b[0m`;
 const LOG_FIELD = (name: string, value: string) => console.log(ANSI_BOLD(` - ${name}: `) + ANSI_GRAY(value));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- It works
 global.window = (dom.window as any);
 global.document = dom.window.document;
 global.Document = dom.window.Document;
@@ -74,7 +75,7 @@ if (!givenPath) {
 			continue;
 		}
 
-		const { holdXml, holdString, causedBy } = result;
+		const { holdXml, causedBy } = result;
 
 		console.log("");
 		console.log(ANSI_UNDERLINE(ANSI_BOLD(ANSI_RED(`## ERROR ##`))));
@@ -131,12 +132,6 @@ if (!givenPath) {
 		break;
 	}
 })()
-
-async function nextFrame() {
-	return new Promise(resolve => {
-		setImmediate(resolve);
-	})
-}
 
 async function getHolds(path: string): Promise<string[]> {
 	path = path.replace(/\/$|\\$/, '');
