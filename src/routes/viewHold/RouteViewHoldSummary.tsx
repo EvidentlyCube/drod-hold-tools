@@ -29,7 +29,7 @@ export default function RouteViewHoldSummary() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 	const handleDownloadScripts = useCallback(() => {
-		navigator.clipboard.writeText(getHoldCommandsExport(hold));
+		void navigator.clipboard.writeText(getHoldCommandsExport(hold));
 		alert("Copied!");
 
 	}, [hold]);

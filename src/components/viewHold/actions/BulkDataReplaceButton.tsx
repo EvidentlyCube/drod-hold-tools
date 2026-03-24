@@ -47,7 +47,7 @@ export default function BulkDataReplaceButton({ hold }: Props) {
 
 		e.target.value = "";
 
-		processArchive(file);
+		void processArchive(file);
 	}, [processArchive]);
 
 	const onClose = useCallback(() => {

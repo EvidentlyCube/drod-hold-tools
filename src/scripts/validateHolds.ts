@@ -34,7 +34,7 @@ if (!givenPath) {
 	process.exit(1);
 }
 
-(async () => {
+void (async () => {
 	const holds = await getHolds(givenPath);
 
 	holds.sort((l, r) => l.toLocaleLowerCase().localeCompare(r.toLocaleLowerCase()));

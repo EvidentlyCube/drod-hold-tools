@@ -147,7 +147,7 @@ class HoldReaderManager {
 				return;
 
 			} else if (!reader.isStarted) {
-				reader.start();
+				void reader.start();
 				return;
 			}
 		}

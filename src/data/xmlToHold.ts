@@ -422,9 +422,6 @@ export async function xmlToHold(
 			await sleep();
 		}
 
-		/** Init dynamic data */
-		loadDynamicData(hold, log);
-
 		log("Stability check", 0, 'Exporting XML');
 		const exportedXml = await holdToXml(hold);
 
@@ -448,7 +445,7 @@ export async function xmlToHold(
 		hold.$changes.loadStored(storedChanges);
 		applyHoldChanges(hold);
 
-		loadDynamicData(hold, log);
+		await loadDynamicData(hold, log);
 
 		hold.$changeListener.register(hold);
 
