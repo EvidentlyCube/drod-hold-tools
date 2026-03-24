@@ -4,7 +4,7 @@ interface HoldVersionLimitationWarningProps {
 }
 
 export function HoldVersionLimitationWarning({ warnings }: HoldVersionLimitationWarningProps) {
-	if (!warnings) {
+	if (warnings.length === 0) {
 		return null;
 	}
 

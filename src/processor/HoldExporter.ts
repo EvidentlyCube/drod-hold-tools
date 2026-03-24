@@ -32,7 +32,7 @@ class HoldExporterImpl {
 		const xmlBytes = stringToUint8(xmlString);
 		const asyncZlib = new AsyncZlib();
 
-		const packedBytes = await new Promise<Uint8Array>(resolve => {
+		const packedBytes = await new Promise<Uint8Array<ArrayBuffer>>(resolve => {
 			let bytes = new Uint8Array();
 			asyncZlib.ondata = (flateError: FlateError | null, data: Uint8Array, final: boolean) => {
 				if (flateError) {

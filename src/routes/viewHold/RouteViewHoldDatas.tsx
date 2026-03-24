@@ -16,6 +16,7 @@ import { useCallback } from "react";
 import BulkReplaceButton from "../../components/viewHold/actions/BulkDataReplaceButton";
 import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 import BulkManageUnusedDataButton from "../../components/viewHold/actions/BulkManageUnusedDataButton";
+import DataDownloadButton from "../../components/viewHold/actions/DataDownloadButton";
 
 function HoldDataSize({ data }: { data: HoldData }) {
 	const { rawEncodedData } = useSignalUpdatableValue(data.details, true);
@@ -163,6 +164,7 @@ export default function RouteViewHoldDatas() {
 			<strong>Actions:</strong>
 			<BulkReplaceButton hold={hold} />
 			<BulkManageUnusedDataButton hold={hold} />
+			<DataDownloadButton hold={hold} />
 		</div>
 		<SortableTable
 			tableId={`data::${hold.$holdReaderId}`}
