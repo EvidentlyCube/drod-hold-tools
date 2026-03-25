@@ -1,5 +1,7 @@
 import { ReactElement, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import TextImportButton from "../../components/viewHold/actions/TextsImportButton";
+import TextsExportButton from "../../components/viewHold/actions/TextsExportButton";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import HoldProblems from "../../components/viewHold/summary/HoldProblems";
@@ -29,7 +31,6 @@ export default function RouteViewHoldSummary() {
 	const handleDownloadScripts = useCallback(() => {
 		void navigator.clipboard.writeText(getHoldCommandsExport(hold));
 		alert("Copied!");
-
 	}, [hold]);
 
 	return (
@@ -39,9 +40,13 @@ export default function RouteViewHoldSummary() {
 				<tr>
 					<th>Actions</th>
 					<td>
-						<button className="button ml-3 is-primary" title="Download scripts" onClick={handleDownloadScripts}>
-							Download all Scripts
-						</button>
+						<div className="buttons section p-4 mb-0">
+							<button className="button ml-3 is-primary" title="Download scripts" onClick={handleDownloadScripts}>
+								Download all Scripts
+							</button>
+							<TextsExportButton hold={hold} />
+							<TextImportButton hold={hold} />
+						</div>
 					</td>
 				</tr>
 				<tr>

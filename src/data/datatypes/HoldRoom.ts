@@ -3,7 +3,7 @@ import { Point } from "../DrodCommonTypes";
 import { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
 import { getCoordinateName, wcharBase64ToString } from "../Utils";
-import { HoldRefScroll } from "../references/HoldReference";
+import { HoldRefModel, HoldRefScroll } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
 import { HoldSpeech } from "./HoldSpeech";
@@ -34,14 +34,46 @@ interface Checkpoint {
 	x: number;
 	y: number;
 }
-export interface HoldScroll {
-	id: string;
-	$room: HoldRoom;
-	$scrollRef: HoldRefScroll;
+
+interface ScrollConstructor {
 	x: number;
 	y: number;
-	message: SignalUpdatableValue<string>;
+	encMessage: string;
+	roomId: number;
 }
+export class HoldScroll {
+	public readonly id: string;
+	public readonly x: number;
+	public readonly y: number;
+	public readonly message: SignalUpdatableValue<string>;
+
+	public readonly $hold: Hold;
+	public readonly $roomId: number;
+	public readonly $scrollRef: HoldRefScroll;
+
+	public get $room(): HoldRoom {
+		return this.$hold.rooms.getOrError(this.$roomId);
+	}
+
+	constructor(hold: Hold, opts: ScrollConstructor) {
+		this.$hold = hold;
+		this.id = `${opts.roomId}:scroll:${opts.x}:${opts.y}`;
+
+		this.x = opts.x;
+		this.y = opts.y;
+		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
+
+		this.$roomId = opts.roomId;
+		this.$scrollRef = {
+			hold,
+			model: HoldRefModel.Scroll,
+			roomId: opts.roomId,
+			x: opts.x,
+			y: opts.y
+		};
+	}
+}
+
 export interface HoldOrbAgent {
 	type: number;
 	x: number;

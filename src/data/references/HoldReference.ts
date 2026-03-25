@@ -301,3 +301,29 @@ export function resolveReference(
 	}
 }
 
+export function serializeRef(ref: HoldRef): string {
+	const copy: Record<string, unknown> = {...ref};
+	delete copy['hold'];
+
+	return JSON.stringify(copy);
+}
+
+export function deserializeRef(refString: string, hold: Hold): HoldRef {
+	const ref = JSON.parse(refString);
+	ref.hold = hold;
+
+	// This guarantees it's a valid ref
+	if (!resolveReference(ref)) {
+		throw new Error("Invalid reference");
+	}
+
+	return ref as HoldRef;
+}
+
+export function deserializeRefSafe(refString: string, hold: Hold): HoldRef | undefined {
+	try {
+		return deserializeRef(refString, hold);
+	} catch {
+		return undefined;
+	}
+}

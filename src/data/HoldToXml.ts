@@ -1,3 +1,4 @@
+import { tryToYieldToUi } from "../utils/AsyncUtils";
 import { CommandsList } from "./CommandList";
 import { getCommandDataId } from "./CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE } from "./DrodCommonTypes";
@@ -161,7 +162,7 @@ async function writePlayer(writer: XMLWriter, refs: OutputRefs, player: HoldPlay
 		.attr('PlayerID', player.id)
 		.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: HoldEntrance, holdVersion: HoldVersion) {
@@ -194,7 +195,7 @@ async function writeEntrance(writer: XMLWriter, refs: OutputRefs, entrance: Hold
 	}
 	writer.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeData(
@@ -225,7 +226,7 @@ async function writeData(
 		.attr('DataID', data.id)
 		.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeSpeech(
@@ -257,7 +258,7 @@ async function writeSpeech(
 		.attr('SpeechID', speech.id)
 		.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeVariable(writer: XMLWriter, refs: OutputRefs, variable: HoldVariable) {
@@ -272,7 +273,7 @@ async function writeVariable(writer: XMLWriter, refs: OutputRefs, variable: Hold
 		.attr('VarNameText', variable.name)
 		.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeWorldMap(
@@ -299,7 +300,7 @@ async function writeWorldMap(
 		.attr('WorldMapNameText', worldMap.name)
 		.end();
 
-	await sleep();
+	await tryToYieldToUi();
 
 }
 
@@ -355,7 +356,7 @@ async function writeLevel(writer: XMLWriter, refs: OutputRefs, level: HoldLevel,
 		await writeRoom(writer, refs, room, holdVersion);
 	}
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, holdVersion: HoldVersion) {
@@ -435,7 +436,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 		writer.end('Orbs');
 	}
 
-	await sleep();
+	await tryToYieldToUi();
 
 	for (const monster of room.monsters) {
 		writer.tag('Monsters')
@@ -471,7 +472,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 			writer.end();
 
 
-			await sleep();
+			await tryToYieldToUi();
 		}
 	}
 
@@ -483,7 +484,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 			.end();
 	}
 
-	await sleep();
+	await tryToYieldToUi();
 
 	for (const exit of room.exits) {
 		writer.tag('Exits')
@@ -496,7 +497,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 			.end();
 	}
 
-	await sleep();
+	await tryToYieldToUi();
 
 	for (const checkpoint of room.checkpoints) {
 		writer.tag('Checkpoints')
@@ -507,7 +508,7 @@ async function writeRoom(writer: XMLWriter, refs: OutputRefs, room: HoldRoom, ho
 
 	writer.end('Rooms')
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeCharacter(
@@ -557,7 +558,7 @@ async function writeCharacter(
 
 	writer.end();
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeCommandDataAndSpeech(
@@ -662,7 +663,7 @@ async function writeSavedGame(writer: XMLWriter, refs: OutputRefs, savedGame: Ho
 		writer.end();
 	}
 
-	await sleep();
+	await tryToYieldToUi();
 }
 
 async function writeDemo(
@@ -701,19 +702,5 @@ async function writeDemo(
 
 	writer.end();
 
-	await sleep();
-}
-
-let lastSleep = 0;
-async function sleep(forced = false) {
-	return new Promise<void>(resolve => {
-		if (Date.now() > lastSleep + 16 || forced) {
-			setTimeout(() => {
-				lastSleep = Date.now();
-				resolve();
-			}, 100)
-		} else {
-			resolve();
-		}
-	})
+	await tryToYieldToUi();
 }

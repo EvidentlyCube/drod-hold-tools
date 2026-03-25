@@ -1,6 +1,7 @@
 import { zip, Zippable } from "fflate";
 import { Hold } from "../data/datatypes/Hold";
 import { base64ToUint8 } from "../utils/StringUtils";
+import { shouldYieldToUi, yieldToUi } from "../utils/AsyncUtils";
 
 export async function createDataArchive(
 	hold: Hold,
@@ -10,10 +11,12 @@ export async function createDataArchive(
 	const files = {} as Zippable;
 
 	for (const [, data, index] of hold.datas) {
-		onProgress?.(index / hold.datas.size);
-
 		files[data.name.newValue] = base64ToUint8(data.details.newValue.rawEncodedData);
-		await yieldToUi();
+
+		if (shouldYieldToUi()) {
+			await yieldToUi();
+			onProgress?.(index / hold.datas.size);
+		}
 	}
 
 	return new Promise((resolve, reject) => {
@@ -25,8 +28,4 @@ export async function createDataArchive(
 			resolve(new Uint8Array(data));
 		});
 	});
-}
-
-async function yieldToUi() {
-	await new Promise<void>(resolve => setTimeout(resolve, 0));
 }

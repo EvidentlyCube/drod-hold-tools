@@ -7,3 +7,13 @@ export interface Point {
 	x: number;
 	y: number;
 }
+
+export enum ImportExportTextRowType {
+	Speech = "Speech",
+	CharacterName = "Character Name",
+	DataName = "Data Name",
+	LevelName = "Level Name",
+	PlayerName = "Player Name",
+	ScrollText = "Scroll Text",
+	EntranceText = "Entrance Text",
+}

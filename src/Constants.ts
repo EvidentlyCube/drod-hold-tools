@@ -11,11 +11,9 @@ export const VERSION_TSS_508 = 508;
 
 export const Constants = {
 	isDev: process.env.NODE_ENV === 'development',
-	diffXmlSleep: 100,
-	xmlReaderFrameDuration: 100,
-	xmlReaderSleep: 16,
-	xmlToHoldSleep: 100,
-	xmlToHoldFrameDuration: 16,
+
+	yieldFrameDuration: 100,
+	yieldSleepDuration: 16,
 
 	xmlReader: {
 		// 8 Megabytes per chunk

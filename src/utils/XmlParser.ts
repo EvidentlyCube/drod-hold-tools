@@ -1,4 +1,4 @@
-import { Constants } from "../Constants";
+import { tryToYieldToUi } from "./AsyncUtils";
 
 type ProgressCallback = (log: string, progressFactor: number) => void;
 
@@ -20,9 +20,7 @@ export async function parseXml(xmlString: string, progressCallback?: ProgressCal
 }
 
 async function readElement(parent: Element | XMLDocument, reader: XmlBufferReader) {
-	if (reader.isSleepTime) {
-		await reader.sleep();
-	}
+	await tryToYieldToUi();
 
 	const document = 'createElement' in parent ? parent : parent.ownerDocument;
 
@@ -83,26 +81,6 @@ class XmlBufferReader {
 	private _length: number;
 	private _pos: number;
 	private _progressCallback?: ProgressCallback;
-	private _lastSleep: number = Date.now();
-
-	public get isSleepTime() {
-		return Date.now() > this._lastSleep + Constants.xmlReaderFrameDuration;
-	}
-
-	public async sleep() {
-		return new Promise<void>(resolve => {
-			if (this.isSleepTime) {
-				this._log();
-
-				setTimeout(() => {
-					this._lastSleep = Date.now();
-					resolve();
-				}, 1)
-			} else {
-				resolve();
-			}
-		})
-	}
 
 	public get isFinished() {
 		return this._pos >= this._xml.length;

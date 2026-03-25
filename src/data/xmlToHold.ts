@@ -1,13 +1,11 @@
-import { Constants } from "../Constants";
 import { assertNotNull } from "../utils/Asserts";
+import { tryToYieldToUi } from "../utils/AsyncUtils";
 import { diffXml, DiffXmlError } from "../utils/DiffXml";
 import { HoldReadProgressLog } from "../utils/Interfaces";
-import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { EntranceShowDescription } from "./DrodEnums";
 import { holdToXml } from "./HoldToXml";
 import { fixKnownIssuesInKnownHolds, isDataFrontLoaded, regenerateHoldCharacterUses, regenerateHoldDataUses, regenerateHoldSpeechLocations, regenerateHoldVariableUses, removeOtherHoldsFromHoldXML, scanHoldForIssues } from "./HoldUtils";
 import { HoldVersion } from "./HoldVersion";
-import { wcharBase64ToString } from "./Utils";
 import { applyHoldChanges } from "./applyHoldChanges";
 import { Hold } from "./datatypes/Hold";
 import { HoldChange } from "./datatypes/HoldChange";
@@ -18,12 +16,11 @@ import { HoldEntrance } from "./datatypes/HoldEntrance";
 import { HoldLevel } from "./datatypes/HoldLevel";
 import { HoldMonster } from "./datatypes/HoldMonster";
 import { HoldPlayer } from "./datatypes/HoldPlayer";
-import { HoldOrb, HoldRoom } from "./datatypes/HoldRoom";
+import { HoldOrb, HoldRoom, HoldScroll } from "./datatypes/HoldRoom";
 import { HoldSavedGame } from "./datatypes/HoldSavedGame";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldWorldMap } from "./datatypes/HoldWorldMap";
-import { HoldRefModel } from "./references/HoldReference";
 
 export async function xmlToHold(
 	holdReaderId: number,
@@ -72,8 +69,7 @@ export async function xmlToHold(
 	const hold = new Hold(holdConstructor);
 
 	try {
-		await sleep();
-
+		await tryToYieldToUi();
 
 		for (const [playerXml, i, total] of querySelectorAll(originalXml, 'Players')) {
 			const id = int(playerXml, 'PlayerID');
@@ -89,7 +85,7 @@ export async function xmlToHold(
 			});
 
 			hold.players.set(playerData.id, playerData);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [dataXml, i, total] of querySelectorAll(originalXml, 'Data')) {
@@ -105,7 +101,7 @@ export async function xmlToHold(
 			});
 
 			hold.datas.set(holdData.id, holdData);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [entranceXml, i, total] of querySelectorAll(originalXml, 'Entrances')) {
@@ -125,7 +121,7 @@ export async function xmlToHold(
 			});
 
 			hold.entrances.set(entranceData.id, entranceData);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [varXml, i, total] of querySelectorAll(originalXml, 'Vars')) {
@@ -138,7 +134,7 @@ export async function xmlToHold(
 			});
 
 			hold.variables.set(holdVar.id, holdVar);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [speechXml, i, total] of querySelectorAll(originalXml, 'Speech')) {
@@ -155,7 +151,7 @@ export async function xmlToHold(
 			});
 
 			hold.speeches.set(holdSpeech.id, holdSpeech);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [characterXml, i, total] of querySelectorAll(originalXml, 'Characters')) {
@@ -173,7 +169,7 @@ export async function xmlToHold(
 			});
 
 			hold.characters.set(holdCharacter.id, holdCharacter);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [worldMapXml, i, total] of querySelectorAll(originalXml, 'WorldMaps')) {
@@ -189,7 +185,7 @@ export async function xmlToHold(
 			});
 
 			hold.worldMaps.set(holdWorldMap.id, holdWorldMap);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [levelXml, i, total] of querySelectorAll(originalXml, 'Levels')) {
@@ -227,7 +223,7 @@ export async function xmlToHold(
 			}
 
 			hold.levels.set(holdLevel.id, holdLevel);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [roomXml, i, total] of querySelectorAll(originalXml, 'Rooms')) {
@@ -277,7 +273,7 @@ export async function xmlToHold(
 
 				holdRoom.orbs.push(orb);
 
-				await sleep();
+				await tryToYieldToUi();
 			}
 
 			for (const [monsterXml, monsterI, monsterTotal] of querySelectorAll(roomXml, 'Monsters')) {
@@ -301,23 +297,19 @@ export async function xmlToHold(
 				}
 
 				holdRoom.monsters.push(holdMonster);
-				await sleep();
+				await tryToYieldToUi();
 			}
 
 			for (const [scrollXml, scrollI, scrollTotal] of querySelectorAll(roomXml, 'Scrolls')) {
 				log(`Rooms`, i / total, `${roomId} -> Scroll ${scrollI}/${scrollTotal}`);
 				const x = int(scrollXml, 'X');
 				const y = int(scrollXml, 'Y');
-				holdRoom.scrolls.push({
-					id: `${roomId}:scroll:${x}:${y}`,
-					$room: holdRoom,
-					$scrollRef: { hold, model: HoldRefModel.Scroll, roomId, x, y },
-					x,
-					y,
-					message: new SignalUpdatableValue(wcharBase64ToString(str(scrollXml, 'Message')))
-				});
+				holdRoom.scrolls.push(new HoldScroll(hold, {
+					roomId, x, y,
+					encMessage: str(scrollXml, 'Message')
+				}));
 
-				await sleep();
+				await tryToYieldToUi();
 			}
 
 			for (const [exitXml, exitI, exitTotal] of querySelectorAll(roomXml, 'Exits')) {
@@ -331,7 +323,7 @@ export async function xmlToHold(
 					bottom: int(exitXml, 'Bottom'),
 				});
 
-				await sleep();
+				await tryToYieldToUi();
 			}
 
 			for (const [checkpointXml, checkpointI, checkpointTotal] of querySelectorAll(roomXml, 'Checkpoints')) {
@@ -344,7 +336,7 @@ export async function xmlToHold(
 
 
 			hold.rooms.set(holdRoom.id, holdRoom);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [savedGameXml, i, total] of querySelectorAll(originalXml, 'SavedGames')) {
@@ -384,7 +376,7 @@ export async function xmlToHold(
 			});
 
 			hold.savedGames.set(holdSavedGame.id, holdSavedGame);
-			await sleep();
+			await tryToYieldToUi();
 
 			for (const worldMapIconXml of savedGameXml.querySelectorAll('WorldMapIcons')) {
 				holdSavedGame.worldMapIcons.push({
@@ -398,7 +390,7 @@ export async function xmlToHold(
 				});
 			}
 
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		for (const [demoXml, i, total] of querySelectorAll(originalXml, 'Demos')) {
@@ -419,7 +411,7 @@ export async function xmlToHold(
 			});
 
 			hold.demos.set(holdDemo.id, holdDemo);
-			await sleep();
+			await tryToYieldToUi();
 		}
 
 		log("Stability check", 0, 'Exporting XML');
@@ -460,21 +452,21 @@ export async function xmlToHold(
 async function loadDynamicData(hold: Hold, log: HoldReadProgressLog) {
 	log("Generating dynamic info", -1, "Speech locations");
 	regenerateHoldSpeechLocations(hold);
-	await sleep();
+	await tryToYieldToUi();
 
 	log("Generating dynamic info", -1, "Data uses");
 	regenerateHoldDataUses(hold);
-	await sleep();
+	await tryToYieldToUi();
 
 	for (const [variableId, variable, index] of hold.variables) {
 		log("Generating dynamic info", index / hold.variables.size, `Hold variable ${variable.name.newValue}`);
 		regenerateHoldVariableUses(hold, variableId);
-		await sleep();
+		await tryToYieldToUi();
 	}
 	for (const [characterId, character, index] of hold.characters) {
 		log("Generating dynamic info", index / hold.characters.size, `Hold character ${character.name.newValue}`);
 		regenerateHoldCharacterUses(hold, characterId);
-		await sleep();
+		await tryToYieldToUi();
 	}
 }
 
@@ -524,20 +516,6 @@ function intArray(node: Element, attribute: string) {
 
 function intArrayU(node: Element, attribute: string) {
 	return node.hasAttribute(attribute) ? intArray(node, attribute) : undefined;
-}
-
-let lastSleep = 0;
-async function sleep(forced = false) {
-	return new Promise<void>(resolve => {
-		if (Date.now() > lastSleep + Constants.xmlToHoldFrameDuration || forced) {
-			setTimeout(() => {
-				lastSleep = Date.now();
-				resolve();
-			}, Constants.xmlToHoldSleep)
-		} else {
-			resolve();
-		}
-	})
 }
 
 function* querySelectorAll<T extends Element>(

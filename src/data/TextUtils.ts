@@ -1,8 +1,8 @@
 import { CommandsList } from "./CommandList";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
-import { AttackTileType, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, NaturalTargetTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
+import { AttackTileType, Mood, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
+import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, MoodToName, NaturalTargetTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];
@@ -34,6 +34,22 @@ export class TextUtils {
 		return MonsterIdToName.get(id)
 			?? hold.characters.get(id)?.name.newValue
 			?? `UnknownEntity_${id}`;
+	}
+
+	public static entityIdFromName(name: string, hold: Hold): number | undefined {
+		for (const character of hold.characters.values()) {
+			if (character.name.newValue === name) {
+				return character.id;
+			}
+		}
+
+		for (const [id, monsterName] of MonsterIdToName.entries()) {
+			if (monsterName === name) {
+				return id;
+			}
+		}
+
+		return undefined;
 	}
 
 	public static displayFilter(id: number): string {
@@ -99,6 +115,21 @@ export class TextUtils {
 	public static worldMapIcon(id: number): string {
 		return WorldMapIconToName.get(id)
 			?? `UnknownWorldMapIcon_${id}`;
+	}
+
+	public static moodName(mood: number): string {
+		return MoodToName.get(mood) ?? 'Normal';
+	}
+
+	public static moodFromName(moodName: string): number {
+		moodName = moodName.toLowerCase().trim();
+		for (const [mood, name] of MoodToName.entries()) {
+			if (name.toLowerCase().trim() === moodName) {
+				return mood;
+			}
+		}
+
+		return Mood.Normal;
 	}
 
 

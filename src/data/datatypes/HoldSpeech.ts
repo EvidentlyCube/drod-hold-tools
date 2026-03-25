@@ -1,7 +1,8 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { doesCommandUseSpeech } from "../CommandUtils";
-import { HoldRefCharacterCommand, HoldRefMonsterCommand, resolveReference } from "../references/HoldReference";
-import { getSpeakerMood, getSpeakerName, wcharBase64ToString } from "../Utils";
+import { HoldRefCharacterCommand, HoldRefModel, HoldRefMonsterCommand, HoldRefSpeech, resolveReference } from "../references/HoldReference";
+import { TextUtils } from "../TextUtils";
+import { getSpeakerName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 import { HoldData } from "./HoldData";
 
@@ -32,11 +33,19 @@ export class HoldSpeech {
 	}
 
 	public get $mood() :string {
-		return getSpeakerMood(this.mood.newValue);
+		return TextUtils.moodName(this.mood.newValue);
 	}
 
 	public get $data(): HoldData | undefined {
 		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
+	}
+
+	public get $ref(): HoldRefSpeech {
+		return {
+			model: HoldRefModel.Speech,
+			hold: this.$hold,
+			speechId: this.id
+		};
 	}
 
 	/**

@@ -6,6 +6,7 @@ import { xmlToHold } from "../data/xmlToHold";
 import { HoldReadProgressLog, shouldBeUnreachable } from "../utils/Interfaces";
 import { parseXml } from "../utils/XmlParser";
 import { concatenateUint8Arrays } from "../utils/ArrayUtils";
+import { shouldYieldToUi, yieldToUi } from "../utils/AsyncUtils";
 
 export enum HoldEncodingType {
 	DeflateXor,
@@ -307,18 +308,4 @@ function guessEncodingType(bytes: Uint8Array): HoldEncodingType {
 	} else {
 		return HoldEncodingType.DeflateXor;
 	}
-}
-
-let lastSleep = 0;
-function shouldYieldToUi() {
-	// Guard to avoid immediately yielding on the first check
-	lastSleep = lastSleep || Date.now();
-
-	return lastSleep + Constants.xmlReaderFrameDuration < Date.now();
-}
-async function yieldToUi() {
-	await new Promise<void>(resolve => setTimeout(() => {
-		lastSleep = Date.now();
-		resolve();
-	}, Constants.xmlReaderSleep));
 }

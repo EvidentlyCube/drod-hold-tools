@@ -1,7 +1,7 @@
-import { Constants } from "../Constants";
 import { PackedVar, PackedVarType } from "../data/PackedVars";
 import { readPackedVars } from "../data/PackedVarsUtils";
 import { diffArraysOneWay } from "./ArrayUtils";
+import { tryToYieldToUi } from "./AsyncUtils";
 import { base64ToUint8 } from "./StringUtils";
 import { parseXml } from "./XmlParser";
 
@@ -91,7 +91,7 @@ function flattenDom(document: XMLDocument): Element[] {
 }
 
 async function compareNode(original: Node, generated: Node, context: string, state: DiffState) {
-	await sleep();
+	await tryToYieldToUi();
 
 	if (original.nodeType !== generated.nodeType) {
 		throw new DiffXmlError(
@@ -326,20 +326,6 @@ function getStringDiff(original: string, generated: string, context: number) {
 	}
 
 	return "Strings are the same";
-}
-
-let lastSleep = 0;
-async function sleep(forced = false) {
-	return new Promise<void>(resolve => {
-		if (Date.now() > lastSleep + 16 || forced) {
-			setTimeout(() => {
-				lastSleep = Date.now();
-				resolve();
-			}, Constants.diffXmlSleep)
-		} else {
-			resolve();
-		}
-	})
 }
 
 function skipAttribute(tagName: string, attributeName: string, state: DiffState) {

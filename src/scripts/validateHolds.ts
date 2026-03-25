@@ -40,10 +40,6 @@ void (async () => {
 	holds.sort((l, r) => l.toLocaleLowerCase().localeCompare(r.toLocaleLowerCase()));
 
 	Constants.isDev = true;
-	Constants.diffXmlSleep = 1;
-	Constants.xmlReaderFrameDuration = 1000;
-	Constants.xmlToHoldSleep = 1;
-	Constants.xmlToHoldFrameDuration = 1000;
 
 	for (const holdFullPath of holds) {
 		const hold = basename(holdFullPath);
