@@ -10,6 +10,7 @@ import type { HoldData } from "./HoldData";
 import { HoldDemo } from "./HoldDemo";
 import type { HoldEntrance } from "./HoldEntrance";
 import type { HoldLevel } from "./HoldLevel";
+import { HoldMonster } from "./HoldMonster";
 import { HoldPlayer } from "./HoldPlayer";
 import type { HoldRoom, HoldScroll } from "./HoldRoom";
 import { HoldSavedGame } from "./HoldSavedGame";
@@ -111,6 +112,19 @@ export class Hold {
 		}
 
 		return this.$_scrollsCache;
+	}
+
+	private $_monstersCache?: HoldMonster[];
+	public get $monsters(): readonly HoldMonster[] {
+		if (!this.$_monstersCache) {
+			this.$_monstersCache = [];
+
+			for (const room of this.rooms.values()) {
+				this.$_monstersCache.push(...room.monsters);
+			}
+		}
+
+		return this.$_monstersCache;
 	}
 
 	public constructor(options: HoldConstructor) {

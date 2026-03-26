@@ -1,6 +1,6 @@
 import { shouldBeUnreachable } from "../utils/Interfaces";
 import { escapeRegex } from "../utils/StringUtils";
-import { doesCommandStoreExpandableTextInLabel, doesCommandStoreFormulaInLabel } from "./CommandUtils";
+import { canCommandTypeStoreExpandableTextInLabel, canCommandTypeStoreFormulaInLabel } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
 import { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldRefModel, resolveReference } from "./references/HoldReference";
@@ -30,12 +30,16 @@ export function isValidVariableSubsequentCharacter(char: string): boolean {
 	return isDigit(char) || isAlphaCharacter(char) || char === "_" || char === " ";
 }
 
+export function isArrayVariableFirstCharacter(char: string): boolean {
+	return char === '@' || char === '#';
+}
+
 /**
  * Generate a regular expression that matches a given variable name within
  * command formulas.
  */
 export function getVariableInFormulaRegexp(variableName: string, globalFlag: boolean = false) {
-	return new RegExp(`(?<![a-z0-9\\._])${escapeRegex(variableName)}(?![a-z0-9_])`, `i${globalFlag ? 'g' : ''}`);
+	return new RegExp(`(?<![a-z0-9\\.#@_])${escapeRegex(variableName)}(?![a-z0-9_])`, `i${globalFlag ? 'g' : ''}`);
 }
 
 /**
@@ -43,6 +47,11 @@ export function getVariableInFormulaRegexp(variableName: string, globalFlag: boo
  * texts (ie. surrounded by dollar signs).
  */
 export function getVariableInTextRegexp(variableName: string, globalFlag: boolean = false) {
+	// Arrays can end with
+	if (variableName[0] === '@' || variableName[0] === '#') {
+
+	}
+
 	return new RegExp(`${escapeRegex('$' + variableName + '$')}`, `i${globalFlag ? 'g' : ''}`);
 }
 
@@ -92,14 +101,14 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 		switch (ref.model) {
 			case HoldRefModel.CharacterCommand: {
 				const characterCommand = resolveReference(ref);
-				if (doesCommandStoreExpandableTextInLabel(characterCommand)) {
+				if (canCommandTypeStoreExpandableTextInLabel(characterCommand)) {
 					characterCommand.label.newValue = replaceVariableNameInText(
 						characterCommand.label.newValue,
 						oldName,
 						newName
 					);
 
-				} else if (doesCommandStoreFormulaInLabel(characterCommand)) {
+				} else if (canCommandTypeStoreFormulaInLabel(characterCommand)) {
 					characterCommand.label.newValue = replaceVariableNameInFormula(
 						characterCommand.label.newValue,
 						oldName,
@@ -111,14 +120,14 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 
 			case HoldRefModel.MonsterCommand: {
 				const monsterCommand = resolveReference(ref);
-				if (doesCommandStoreExpandableTextInLabel(monsterCommand)) {
+				if (canCommandTypeStoreExpandableTextInLabel(monsterCommand)) {
 					monsterCommand.label.newValue = replaceVariableNameInText(
 						monsterCommand.label.newValue,
 						oldName,
 						newName
 					);
 
-				} else if (doesCommandStoreFormulaInLabel(monsterCommand)) {
+				} else if (canCommandTypeStoreFormulaInLabel(monsterCommand)) {
 					monsterCommand.label.newValue = replaceVariableNameInFormula(
 						monsterCommand.label.newValue,
 						oldName,
@@ -179,16 +188,29 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 	return true;
 }
 
-function replaceVariableNameInFormula(formula: string, oldName: string, newName: string) {
+export function isVariableUsedInText(text: string, variableFormulaRegexp: RegExp): boolean {
+	const matches = text.matchAll(/\$(.*)\$/g);
+
+	for (const [, match] of matches) {
+		if (variableFormulaRegexp.test(match)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+export function replaceVariableNameInFormula(formula: string, oldName: string, newName: string, ) {
 	return formula.replace(
 		getVariableInFormulaRegexp(oldName, true),
 		newName
 	);
 }
 
-function replaceVariableNameInText(text: string, oldName: string, newName: string) {
-	return text.replace(
-		getVariableInTextRegexp(oldName, true),
-		`$${newName}$`
-	);
+export function replaceVariableNameInText(text: string, oldName: string, newName: string) {
+	return text.replace(/\$(.*?)\$/g, (_, match) => {
+		return '$'
+			+ replaceVariableNameInFormula(match, oldName, newName)
+			+ '$';
+	});
 }

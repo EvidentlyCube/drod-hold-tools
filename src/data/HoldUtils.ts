@@ -1,6 +1,11 @@
-import { doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
+import { canCommandTypeStoreExpandableTextInLabel, canCommandTypeStoreExpandableTextInSpeech, canCommandTypeStoreFormulaInLabel, canCommandUseVariableInField, doesCommandUseCharacter, doesCommandUseVariable, getCommandDataId } from "./CommandUtils";
 import { Hold } from "./datatypes/Hold";
+import { HoldCharacter } from "./datatypes/HoldCharacter";
+import { HoldEntrance } from "./datatypes/HoldEntrance";
+import { HoldMonster } from "./datatypes/HoldMonster";
+import { HoldScroll } from "./datatypes/HoldRoom";
 import { HoldSpeech } from "./datatypes/HoldSpeech";
+import { ScriptCommand } from "./datatypes/ScriptCommand";
 import { CUSTOM_CHARACTER_FIRST, UINT_MINUS_1 } from "./DrodCommonTypes";
 import { Mood, Speaker } from "./DrodEnums";
 import { HoldRef, HoldRefModel } from "./references/HoldReference";
@@ -245,41 +250,127 @@ export function regenerateHoldCharacterUses(hold: Hold, characterId: number) {
 	}
 }
 
-export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
-	const variable = hold.variables.getOrError(variableId);
+interface RegenerateHoldVariablesCache {
+	hold: Hold;
+	speechesWithVariables: HoldSpeech[];
+	entrances: HoldEntrance[],
+	scrolls: HoldScroll[],
+	characterCommands: [HoldCharacter, ScriptCommand][];
+	monsterCommands: [HoldMonster, ScriptCommand][];
+}
+let lastCache: RegenerateHoldVariablesCache | undefined;
 
-	variable.$uses.length = 0;
+function buildHoldVariableUsesCache(hold: Hold) {
+	if (lastCache && lastCache.hold === hold) {
+		return lastCache;
+	}
 
-	// CHECK ALL CUSTOM CHARACTERS
+	lastCache = {
+		hold,
+		speechesWithVariables: [],
+		entrances: [],
+		scrolls: [],
+		characterCommands: [],
+		monsterCommands: [],
+	};
+
+	for (const speech of hold.speeches.values()) {
+		if (speech.$containsVariableReference) {
+			lastCache.speechesWithVariables.push(speech);
+		}
+	}
+
+	for (const entrance of hold.entrances.values()) {
+		if (entrance.description.newValue.includes('$')) {
+			lastCache.entrances.push(entrance);
+		}
+	}
+
+	for (const scroll of hold.$scrolls.values()) {
+		if (scroll.message.newValue.includes('$')) {
+			lastCache.scrolls.push(scroll);
+		}
+	}
+
 	for (const character of hold.characters.values()) {
 		if (!character.$commandList) {
 			continue;
 		}
 
 		for (const command of character.$commandList.commands) {
-			const { speechId, index } = command;
-
-			if (variable.isUsedInText(hold.speeches.get(speechId.newValue)?.message.newValue ?? "")) {
-				variable.$uses.push({
-					model: HoldRefModel.Speech,
-					speechId: speechId.newValue,
-					hold
-				});
-			}
-
-			if (doesCommandUseVariable(command, variable)) {
-				variable.$uses.push({
-					model: HoldRefModel.CharacterCommand,
-					characterId: character.id,
-					commandIndex: index,
-					hold,
-				});
+			if (
+				canCommandUseVariableInField(command)
+				|| (canCommandTypeStoreExpandableTextInLabel(command) && command.label.newValue.includes('$'))
+				|| (canCommandTypeStoreFormulaInLabel(command) && command.label.newValue.match(/[a-zA-Z]/))
+				|| (canCommandTypeStoreExpandableTextInSpeech(command) && hold.speeches.get(command.speechId.newValue)?.message.newValue.includes('$'))
+			) {
+				lastCache.characterCommands.push([character, command]);
 			}
 		}
 	}
 
+	for (const room of hold.rooms.values()) {
+		for (const monster of room.$monstersWithCommands) {
+			if (!monster.$commandList) {
+				continue;
+			}
+
+			for (const command of monster.$commandList.commands) {
+				if (
+					canCommandUseVariableInField(command)
+					|| (canCommandTypeStoreExpandableTextInLabel(command) && command.label.newValue.includes('$'))
+					|| (canCommandTypeStoreFormulaInLabel(command) && command.label.newValue.match(/[a-zA-Z]/))
+					|| (canCommandTypeStoreExpandableTextInSpeech(command) && hold.speeches.get(command.speechId.newValue)?.message.newValue.includes('$'))
+				) {
+					lastCache.monsterCommands.push([monster, command]);
+				}
+			}
+		}
+	}
+
+	return lastCache;
+}
+export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
+	const cache = buildHoldVariableUsesCache(hold);
+	const variable = hold.variables.getOrError(variableId);
+
+	variable.$uses.length = 0;
+
+	for (const speech of cache.speechesWithVariables) {
+		if (variable.isUsedInText(speech.message.newValue)) {
+			variable.$uses.push({
+				model: HoldRefModel.Speech,
+				speechId: speech.id,
+				hold
+			});
+		}
+	}
+
+	for (const [character, command] of cache.characterCommands) {
+		if (doesCommandUseVariable(command, variable)) {
+			variable.$uses.push({
+				model: HoldRefModel.CharacterCommand,
+				characterId: character.id,
+				commandIndex: command.index,
+				hold,
+			});
+		}
+	}
+
+	for (const [monster, command] of cache.monsterCommands) {
+		if (doesCommandUseVariable(command, variable)) {
+			variable.$uses.push({
+				model: HoldRefModel.MonsterCommand,
+				roomId: monster.$room.id,
+				monsterIndex: monster.$index,
+				commandIndex: command.index,
+				hold,
+			});
+		}
+	}
+
 	// ENTRANCES
-	for (const entrance of hold.entrances.values()) {
+	for (const entrance of cache.entrances) {
 		if (variable.isUsedInText(entrance.description.newValue)) {
 			variable.$uses.push({
 				model: HoldRefModel.Entrance,
@@ -289,40 +380,10 @@ export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
 		}
 	}
 
-	// CHECK ROOMS - CHARACTERS & SCROLLS
-	for (const room of hold.rooms.values()) {
-		for (const scroll of hold.$scrolls) {
-			if (variable.isUsedInText(scroll.message.newValue)) {
-				variable.$uses.push(scroll.$scrollRef)
-			}
-		}
-
-		for (const monster of room.$monstersWithCommands) {
-			if (!monster.$commandList) {
-				continue;
-			}
-
-			for (const command of monster.$commandList.commands) {
-				const { speechId, index } = command;
-
-				if (variable.isUsedInText(hold.speeches.get(speechId.newValue)?.message.newValue ?? "")) {
-					variable.$uses.push({
-						model: HoldRefModel.Speech,
-						speechId: speechId.newValue,
-						hold
-					});
-				}
-
-				if (doesCommandUseVariable(command, variable)) {
-					variable.$uses.push({
-						model: HoldRefModel.MonsterCommand,
-						roomId: room.id,
-						monsterIndex: monster.$index,
-						commandIndex: index,
-						hold,
-					});
-				}
-			}
+	// ENTRANCES
+	for (const scroll of cache.scrolls) {
+		if (variable.isUsedInText(scroll.message.newValue)) {
+			variable.$uses.push(scroll.$scrollRef)
 		}
 	}
 

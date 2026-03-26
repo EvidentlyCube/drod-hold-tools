@@ -27,6 +27,8 @@ export class HoldSpeech {
 	public readonly $isDeleted: SignalUpdatableValue<boolean>;
 	public $location?: HoldRefCharacterCommand | HoldRefMonsterCommand;
 
+	private _containsVariableReferenceCache?: boolean;
+
 	public get $speaker(): string {
 		const command = resolveReference(this.$location);
 		return getSpeakerName(this.$hold, this.character, command?.x ?? 0, command?.y ?? 0);
@@ -38,6 +40,14 @@ export class HoldSpeech {
 
 	public get $data(): HoldData | undefined {
 		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
+	}
+
+	public get $containsVariableReference() {
+		if (this._containsVariableReferenceCache === undefined) {
+			this._containsVariableReferenceCache = this.message.newValue.includes('$');
+		}
+
+		return this._containsVariableReferenceCache;
 	}
 
 	public get $ref(): HoldRefSpeech {
@@ -71,5 +81,7 @@ export class HoldSpeech {
 		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
 
 		this.$isDeleted = new SignalUpdatableValue(false);
+
+		this.message.onChange.add(() => this._containsVariableReferenceCache = undefined);
 	}
 }

@@ -40,7 +40,8 @@
 	"scripts": {
 		"start": "webpack serve",
 		"build": "NODE_ENV=production webpack",
-		"test": "jest"
+		"test": "npx tsx --test --test-reporter dot --import ./test/bootstrap.ts test/**/*.test.ts",
+		"test-watch": "npx tsx --test --watch --import ./test/bootstrap.ts test/**/*.test.ts"
 	},
 	"browserslist": {
 		"production": [

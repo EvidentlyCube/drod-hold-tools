@@ -28,7 +28,7 @@ class WrappedCommandBuffer {
 	public readWChar(characters: number): string {
 		const chars = [];
 		while (characters > 0 && this._index < this._buffer.length) {
-        	const codeUnit = this._buffer[this._index] | (this._buffer[this._index + 1] << 8);
+			const codeUnit = this._buffer[this._index] | (this._buffer[this._index + 1] << 8);
 			chars.push(String.fromCharCode(codeUnit));
 
 			this._index += 2;
@@ -52,7 +52,7 @@ class WrappedCommandBuffer {
 
 			index++;
 
-		// eslint-disable-next-line no-constant-condition
+			// eslint-disable-next-line no-constant-condition
 		} while (true);
 
 		this._index = index;
@@ -117,8 +117,8 @@ export function unpackCommands(hold: Hold, vars: PackedVars): CommandsList | und
 				hold,
 				commands,
 				isSortedAlphabetically
-					 ? CommandListPackingType.SeparateVarsAlphabeticallySorted
-					 : CommandListPackingType.SeparateVarsIndexSorted
+					? CommandListPackingType.SeparateVarsAlphabeticallySorted
+					: CommandListPackingType.SeparateVarsIndexSorted
 			);
 		}
 	}
@@ -284,10 +284,13 @@ export function getCommandDataId(command: ScriptCommand): number {
  * @returns True if the command stores text in `label` that can be expanded
  * by variables.
  */
-export function doesCommandStoreExpandableTextInLabel(command: ScriptCommand): boolean {
+export function canCommandTypeStoreExpandableTextInLabel(command: ScriptCommand): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_VarSet:
 			return command.y === ScriptVarOperators.AppendText || command.y === ScriptVarOperators.AssignText;
+
+		case ScriptCommandType.CC_VarSetAt:
+			return command.h === ScriptVarOperators.AppendText || command.h === ScriptVarOperators.AssignText;
 
 		case ScriptCommandType.CC_WaitForVar:
 			return command.y === ScriptVarComparators.EqualsText;
@@ -301,16 +304,65 @@ export function doesCommandStoreExpandableTextInLabel(command: ScriptCommand): b
 }
 
 /**
- * @returns True if the command stores a mathematical formula in `label` that
- * can be use variables.
+ * @returns True if the command stores text in speech's message that can be
+ * expanded by variables.
  */
-export function doesCommandStoreFormulaInLabel(command: ScriptCommand): boolean {
+export function canCommandTypeStoreExpandableTextInSpeech(command: ScriptCommand): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_AnswerOption:
+		case ScriptCommandType.CC_FlashingText:
+		case ScriptCommandType.CC_Question:
+		case ScriptCommandType.CC_RoomLocationText:
+		case ScriptCommandType.CC_Speech:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * @returns True if the command stores a mathematical formula in `label` that
+ * can use variables.
+ */
+export function canCommandTypeStoreFormulaInLabel(command: ScriptCommand): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_VarSet:
 			return command.y !== ScriptVarOperators.AppendText && command.y !== ScriptVarOperators.AssignText;
 
+		case ScriptCommandType.CC_VarSetAt:
+			return command.h !== ScriptVarOperators.AppendText && command.h !== ScriptVarOperators.AssignText;
+
 		case ScriptCommandType.CC_WaitForVar:
 			return command.y !== ScriptVarComparators.EqualsText;
+
+		case ScriptCommandType.CC_ArrayVarSet:
+		case ScriptCommandType.CC_ArrayVarSetAt:
+		case ScriptCommandType.CC_CountArrayEntries:
+		case ScriptCommandType.CC_WaitForArrayEntry:
+		case ScriptCommandType.CC_WaitForExpression:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+export function canCommandUseVariableInField(command: ScriptCommand): boolean {
+	switch (command.type) {
+		case ScriptCommandType.CC_ArrayVarSet:
+		case ScriptCommandType.CC_ArrayVarSetAt:
+		case ScriptCommandType.CC_ClearArrayVar:
+		case ScriptCommandType.CC_CountArrayEntries:
+		case ScriptCommandType.CC_FlashingText:
+		case ScriptCommandType.CC_Question:
+		case ScriptCommandType.CC_RoomLocationText:
+		case ScriptCommandType.CC_Speech:
+		case ScriptCommandType.CC_VarSet:
+		case ScriptCommandType.CC_VarSetAt:
+		case ScriptCommandType.CC_WaitForArrayEntry:
+		case ScriptCommandType.CC_WaitForVar:
+			return true;
 
 		default:
 			return false;
@@ -319,6 +371,19 @@ export function doesCommandStoreFormulaInLabel(command: ScriptCommand): boolean 
 
 export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVariable): boolean {
 	switch (command.type) {
+		case ScriptCommandType.CC_ClearArrayVar:
+			return command.x === variable.id;
+
+		case ScriptCommandType.CC_CountArrayEntries:
+		case ScriptCommandType.CC_WaitForArrayEntry:
+			return command.x === variable.id
+				|| variable.isUsedInFormula(command.label.newValue);
+
+		case ScriptCommandType.CC_ArrayVarSet:
+		case ScriptCommandType.CC_ArrayVarSetAt:
+			return command.w === variable.id
+				|| variable.isUsedInFormula(command.label.newValue);
+
 		case ScriptCommandType.CC_VarSet:
 			return command.x === variable.id
 				|| (command.y === ScriptVarOperators.AppendText && variable.isUsedInText(command.label.newValue))
@@ -329,6 +394,16 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 					&& variable.isUsedInFormula(command.label.newValue)
 				);
 
+		case ScriptCommandType.CC_VarSetAt:
+			return command.w === variable.id
+				|| (command.h === ScriptVarOperators.AppendText && variable.isUsedInText(command.label.newValue))
+				|| (command.h === ScriptVarOperators.AssignText && variable.isUsedInText(command.label.newValue))
+				|| (
+					command.h !== ScriptVarOperators.AssignText
+					&& command.h !== ScriptVarOperators.AppendText
+					&& variable.isUsedInFormula(command.label.newValue)
+				);
+
 		case ScriptCommandType.CC_WaitForVar:
 			return command.x === variable.id
 				|| (command.y === ScriptVarComparators.EqualsText && variable.isUsedInText(command.label.newValue))
@@ -336,6 +411,16 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 
 		case ScriptCommandType.CC_ImageOverlay:
 			return variable.isUsedInText(command.label.newValue);
+
+		case ScriptCommandType.CC_WaitForExpression:
+			return variable.isUsedInFormula(command.label.newValue);
+
+		case ScriptCommandType.CC_AnswerOption:
+		case ScriptCommandType.CC_FlashingText:
+		case ScriptCommandType.CC_RoomLocationText:
+		case ScriptCommandType.CC_Speech:
+		case ScriptCommandType.CC_Question:
+			return variable.isUsedInText(variable.hold.speeches.get(command.speechId.newValue)?.message.newValue ?? "");
 
 		default:
 			return false;
@@ -449,11 +534,11 @@ export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
 			return false;
 
 
-		// ScriptCommandType.CC_Speech
-		// ScriptCommandType.CC_FlashingText
 		// ScriptCommandType.CC_AnswerOption
+		// ScriptCommandType.CC_FlashingText
 		// ScriptCommandType.CC_Question
 		// ScriptCommandType.CC_RoomLocationText;
+		// ScriptCommandType.CC_Speech
 		// And any new command that gets added
 		default:
 			return true

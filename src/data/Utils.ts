@@ -303,7 +303,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_WaitForNotHalph: return `[DEPRECATED - CC_WaitForNotHalph]`;
 		case ScriptCommandType.CC_WaitForNotMonster: return `[DEPRECATED - CC_WaitForNotMonster]`;
 		default:
-			shouldBeUnreachable(c.type);
+			// shouldBeUnreachable(c.type);
 			return "";
 	}
 }

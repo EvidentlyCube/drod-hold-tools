@@ -8,6 +8,7 @@ export const VERSION_TCB_304 = 304;
 export const VERSION_GATEB = 400;
 export const VERSION_TSS_507 = 507;
 export const VERSION_TSS_508 = 508;
+export const VERSION_TSS_509 = 509;
 
 export const Constants = {
 	isDev: process.env.NODE_ENV === 'development',
