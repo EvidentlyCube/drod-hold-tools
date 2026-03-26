@@ -23,7 +23,7 @@ export function isAlphaCharacter(char: string): boolean {
 }
 
 export function isValidVariableFirstCharacter(char: string): boolean {
-	return isDigit(char) || isAlphaCharacter(char) || char === ".";
+	return isDigit(char) || isAlphaCharacter(char) || char === "." || char === '@' || char === '#';
 }
 
 export function isValidVariableSubsequentCharacter(char: string): boolean {
@@ -34,6 +34,10 @@ export function isArrayVariableFirstCharacter(char: string): boolean {
 	return char === '@' || char === '#';
 }
 
+export function isTypedVariableFirstCharacter(char: string) {
+	return char === '@' || char === '#' || char === '.';
+}
+
 /**
  * Generate a regular expression that matches a given variable name within
  * command formulas.
@@ -42,29 +46,13 @@ export function getVariableInFormulaRegexp(variableName: string, globalFlag: boo
 	return new RegExp(`(?<![a-z0-9\\.#@_])${escapeRegex(variableName)}(?![a-z0-9_])`, `i${globalFlag ? 'g' : ''}`);
 }
 
-/**
- * Generate a regular expression that matches a given variable name within
- * texts (ie. surrounded by dollar signs).
- */
-export function getVariableInTextRegexp(variableName: string, globalFlag: boolean = false) {
-	// Arrays can end with
-	if (variableName[0] === '@' || variableName[0] === '#') {
-
-	}
-
-	return new RegExp(`${escapeRegex('$' + variableName + '$')}`, `i${globalFlag ? 'g' : ''}`);
-}
-
 export function validateVariableRenaming(hold: Hold, oldName: string, newName: string): string | false {
 	if (newName.length === 0) {
 		return "Variable name must be longer than 0 characters.";
 	}
 
-	if (oldName[0] === "." && newName[0] !== ".") {
-		return "A local variable cannot be changed to a global variable.";
-
-	} else if (oldName[0] !== "." && newName[0] === ".") {
-		return "A global variable cannot be changed to a local variable.";
+	if (isTypedVariableFirstCharacter(oldName[0]) && oldName[0] !== newName[0]) {
+		return "Variable type cannot be changed.";
 
 	} else if (!isValidVariableFirstCharacter(newName[0])) {
 		return "A variable name must start with a digit or a letter (uppercase or lowercase) or a period.";
