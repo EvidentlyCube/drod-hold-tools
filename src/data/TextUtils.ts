@@ -2,7 +2,7 @@ import { CommandsList } from "./CommandList";
 import { Hold } from "./datatypes/Hold";
 import { ScriptCommand } from "./datatypes/ScriptCommand";
 import { AttackTileType, Mood, OrbAgentType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { AttackTileTypeToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, MonsterIdToName, MoodToName, NaturalTargetTypeToName, OrientationToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
+import { AttackTileTypeToName, BehaviorToName, CommandInputToName, CueEventTypeToName, GameEffectTypeToName, ImperativeToName, LightColorToName, MonsterIdToName, MoodToName, MovementTypeToName, NaturalTargetTypeToName, OrientationToName, PlayerBehaviorStateToName, PlayerBehaviorToName, PlayerStateToName, PredefinedVariableToName, ScreenFilterToName, StealthTypeToName, TileGroupToName, TileTypeToName, WaitForFlagToName, WaterTraversalToName, WeaponTypeFlagToName, WeaponTypeToName, WorldMapIconToName } from "./DrodEnumToName";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];
@@ -25,9 +25,34 @@ export class TextUtils {
 		return TextUtils.entity(id, hold);
 	}
 
+	public static behavior(id: number): string {
+		return BehaviorToName.get(id)
+			?? `UnknownBehavior_${id}`;
+	}
+
+	public static playerBehavior(id: number): string {
+		return PlayerBehaviorToName.get(id)
+			?? `UnknownPlayerBehavior_${id}`;
+	}
+
+	public static playerBehaviorState(id: number): string {
+		return PlayerBehaviorStateToName.get(id)
+			?? `UnknownPlayerBehaviorState_${id}`;
+	}
+
+	public static playerState(id: number): string {
+		return PlayerStateToName.get(id)
+			?? `UnknownPlayerState_${id}`;
+	}
+
 	public static tile(id: number): string {
 		return TileTypeToName.get(id)
 			?? `UnknownTileType_${id}`;
+	}
+
+	public static tileGroup(id: number): string {
+		return TileGroupToName.get(id)
+			?? `UnknownTileGroup_${id}`;
 	}
 
 	public static entity(id: number, hold: Hold): string {
@@ -50,6 +75,16 @@ export class TextUtils {
 		}
 
 		return undefined;
+	}
+
+	public static monster(id: number): string {
+		return MonsterIdToName.get(id)
+			?? `UnknownMonster_${id};`
+	}
+
+	public static movementType(id: number): string {
+		return MovementTypeToName.get(id)
+			?? `UnknownMovementType_${id}`;
 	}
 
 	public static displayFilter(id: number): string {
@@ -82,6 +117,8 @@ export class TextUtils {
 			return "Open";
 		} else if (id === OrbAgentType.Close) {
 			return "Close";
+		} else if (id === OrbAgentType.Toggle) {
+			return "toggle";
 		} else {
 			return `UnknownOpenCloseFlag_${id}`;
 		}
@@ -100,6 +137,15 @@ export class TextUtils {
 	public static weapon(id: number): string {
 		return WeaponTypeToName.get(id)
 			?? `UnknownWeaponType_${id}`;
+	}
+
+	public static weaponFlag(id: number): string {
+		return WeaponTypeFlagToName.get(id)
+			?? `UnknownWeaponTypeFlag_${id}`
+	}
+
+	public static weaponFlags(bitField: number): string {
+		return bitMask(bitField, TextUtils.weaponFlag).join(' ');
 	}
 
 	public static event(id: number): string {
@@ -142,6 +188,11 @@ export class TextUtils {
 		return text.replace(/\n|\r/g, ' ');
 	}
 
+	public static lightColor(id: number): string {
+		return LightColorToName.get(id)
+			?? `UnknownLightColor_${id}`;
+	}
+
 	public static join(items: string[]): string {
 		return items.filter(x => x !== null && x !== undefined && x !== '').join("");
 	}
@@ -164,7 +215,7 @@ export class TextUtils {
 	}
 
 	public static xywh(command: ScriptCommand): string {
-		return `${command.x},${command.y},${command.x + command.w},${command.y + command.h}`;
+		return `(${command.x},${command.y}),(${command.x + command.w},${command.y + command.h})`;
 	}
 
 	public static onOff(value: number): string {
@@ -209,6 +260,27 @@ export class TextUtils {
 		}
 	}
 
+	public static arrayVarSet(c: ScriptCommand, context: CommandsList) {
+		return TextUtils.join([
+			'Set array var ',
+			TextUtils.variable(c.w, context.hold),
+			`[${c.flags}] `,
+			`${TextUtils.scriptVarOp(c.h)} `,
+			c.label.newValue,
+		])
+	}
+
+	public static arrayVarSetAt(c: ScriptCommand, context: CommandsList) {
+		return TextUtils.join([
+			'Set array var ',
+			TextUtils.variable(c.w, context.hold),
+			`[${c.flags}] `,
+			`at ${TextUtils.xy(c)}`,
+			`${TextUtils.scriptVarOp(c.h)} `,
+			c.label.newValue,
+		])
+	}
+
 	public static varSet(c: ScriptCommand, context: CommandsList) {
 		return TextUtils.join([
 			'Set var ',
@@ -218,6 +290,51 @@ export class TextUtils {
 			c.label.newValue ? '' : c.w.toString()
 		])
 	}
+
+	public static varSetAt(c: ScriptCommand, context: CommandsList) {
+		return TextUtils.join([
+			'Set var ',
+			TextUtils.xy(c),
+			` "${TextUtils.variable(c.w, context.hold)}" `,
+			`${TextUtils.scriptVarOp(c.h)} `,
+			c.label.newValue,
+			c.label.newValue ? '' : c.flags.toString()
+		])
+	}
+
+	public static waitForOpenTile(c: ScriptCommand) {
+		return TextUtils.join([
+			'Wait for open tile ',
+			TextUtils.movementType(c.w),
+			' ',
+			TextUtils.xy(c),
+			c.h || c.flags ? ', Ignore ' : '',
+			c.h ? 'Weapons' : '',
+			c.h || c.flags ? ' ' : '',
+			c.flags ? TextUtils.waitFlags(c.flags) : ''
+		])
+	}
+
+	public static countArrayEntries(c: ScriptCommand, context: CommandsList) {
+		return TextUtils.join([
+			'Count array entries ',
+			`${TextUtils.variable(c.x, context.hold)}[] `,
+			`${TextUtils.scriptVarOp(c.y)} `,
+			c.label.newValue,
+			c.label.newValue ? '' : c.w.toString()
+		])
+	}
+
+	public static waitForArrayEntry(c: ScriptCommand, context: CommandsList) {
+		return TextUtils.join([
+			'Wait for array entry ',
+			`${TextUtils.variable(c.x, context.hold)}[] `,
+			`${TextUtils.scriptVarOp(c.y)} `,
+			c.label.newValue,
+			c.label.newValue ? '' : c.w.toString()
+		])
+	}
+
 
 	public static waitForVar(c: ScriptCommand, context: CommandsList) {
 		return TextUtils.join([

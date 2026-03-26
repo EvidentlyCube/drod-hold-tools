@@ -176,6 +176,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		appearanceMonster,
 		appearancePlayer,
 		attack,
+		behavior,
 		dir,
 		displayFilter,
 		effect,
@@ -185,16 +186,26 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		imperative,
 		input,
 		join,
+		lightColor,
+		monster,
+		movementType,
 		music,
 		natTarget,
 		onOff,
 		openClose,
+		playerBehavior,
+		playerBehaviorState,
+		playerState,
+		scriptVarComp,
 		stealth,
 		stripNewline,
 		tile,
+		tileGroup,
+		variable,
 		waitFlags,
 		waterTraversal,
 		weapon,
+		weaponFlags,
 		wh,
 		worldMapIcon,
 		xy,
@@ -203,15 +214,23 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 
 	switch (c.type) {
 		case ScriptCommandType.CC_ActivateItemAt: return `Active item at ${xy(c)}`;
+		case ScriptCommandType.CC_AddRoomToMap: return `Add room to map ${xy(c)}`;
 		case ScriptCommandType.CC_AmbientSound: return `Ambient sound ${wh(c)}`;
 		case ScriptCommandType.CC_AmbientSoundAt: return `Ambient sound at ${xy(c)},${wh(c)}`;
 		case ScriptCommandType.CC_AnswerOption: return `Answer option "${speech?.message.newValue ?? '?'}",${labelCommand?.label.newValue ?? '?'}`;
 		case ScriptCommandType.CC_Appear: return "Appear";
 		case ScriptCommandType.CC_AppearAt: return `Appear at ${xy(c)}`;
+		case ScriptCommandType.CC_ArrayVarSet: return TextUtils.arrayVarSet(c, context);
+		case ScriptCommandType.CC_ArrayVarSetAt: return TextUtils.arrayVarSetAt(c, context);
 		case ScriptCommandType.CC_AttackTile: return `Attack tile ${xy(c)},${attack(c.flags)}`;
+		case ScriptCommandType.CC_Behavior: return `Behavior ${behavior(c.x)},${onOff(c.y)}`;
 		case ScriptCommandType.CC_Build: return `Build ${tile(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_BuildMarker: return `Build Marker ${tile(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_ChallengeCompleted: return `Challenge completed ${c.label.newValue}`;
+		case ScriptCommandType.CC_ClearArrayVar: return `Clear array var ${variable(c.x, hold)}`;
+		case ScriptCommandType.CC_CountArrayEntries: return TextUtils.countArrayEntries(c, context);
+		case ScriptCommandType.CC_CountEntityType: return `Count entity type ${entity(c.flags, hold)} at ${xywh(c)}`;
+		case ScriptCommandType.CC_CountItem: return `Count item ${tile(c.flags)} at ${xywh(c)}`;
 		case ScriptCommandType.CC_CutScene: return `Cut scene ${c.x}`;
 		case ScriptCommandType.CC_DestroyTrapdoor: return `Destroy Trapdoor ${xywh(c)}`;
 		case ScriptCommandType.CC_Disappear: return `Disappear`;
@@ -236,26 +255,45 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_GoSub: return `GoSub ${labelCommand?.label.newValue ?? '?'}`;
 		case ScriptCommandType.CC_GoTo: return `Go to ${labelCommand?.label.newValue ?? '?'}`;
 		case ScriptCommandType.CC_If: return `If ...`;
+		case ScriptCommandType.CC_IfNot: return `If Not ...`;
 		case ScriptCommandType.CC_IfElse: return `Else`;
 		case ScriptCommandType.CC_IfElseIf: return `Else If`;
+		case ScriptCommandType.CC_IfElseIfNot: return `Else If Not`;
 		case ScriptCommandType.CC_IfEnd: return `If End`;
 		case ScriptCommandType.CC_ImageOverlay: return `Image overlay ${c.w},${stripNewline(c.label.newValue)}`;
 		case ScriptCommandType.CC_Imperative: return `Imperative ${imperative(c.x)}`;
 		case ScriptCommandType.CC_Label: return `${c.label.newValue}`;
 		case ScriptCommandType.CC_LevelEntrance: return `Level entrance ${xy(c)}`;
+		case ScriptCommandType.CC_LinkOrb: return `Link Orb ${xy(c)} to ${wh(c)} ${openClose(c.flags)}`;
+		case ScriptCommandType.CC_LogicalWaitAnd: return `Wait for All:`;
+		case ScriptCommandType.CC_LogicalWaitEnd: return `Wait for Conditions End`;
+		case ScriptCommandType.CC_LogicalWaitNOR: return `Wait for None:`;
+		case ScriptCommandType.CC_LogicalWaitOr: return `Wait for Any:`;
+		case ScriptCommandType.CC_LogicalWaitXOR: return `Wait for Exactly One:`;
 		case ScriptCommandType.CC_MoveRel: return join(['Move ', !c.flags ? `${xy(c)},` : '', wh(c)]);
 		case ScriptCommandType.CC_MoveTo: return join(['Move to', waitFlags(c.flags), !c.flags ? `${xy(c)},` : '', wh(c)]);
 		case ScriptCommandType.CC_PlayerEquipsWeapon: return `Set player sword ${onOff(c.x)}`;
 		case ScriptCommandType.CC_PlayVideo: return `Play video ${xy(c)},${c.w}`;
+		case ScriptCommandType.CC_PushTile: return `Push tile ${xy(c)} ${dir(c.w)}`;
 		case ScriptCommandType.CC_Question: return `Question "${speech?.message.newValue ?? '?'}"`;
+		case ScriptCommandType.CC_ReplaceWithDefault: return `Replace with Default Script`;
+		case ScriptCommandType.CC_ResetOverrides: return `Reset _MyScript variables`;
 		case ScriptCommandType.CC_Return: return `Return`;
 		case ScriptCommandType.CC_RoomLocationText: return `Room location text "${speech?.message.newValue ?? '?'}"`;
+		case ScriptCommandType.CC_SelectSquare: return `Select square ${c.x ? '(Restricted)' : ''}`;
+		case ScriptCommandType.CC_SetCeilingLight: return `Set ceiling light ${lightColor(c.flags)} at ${xywh(c)}`;
+		case ScriptCommandType.CC_SetDarkness: return `Set ceiling darkness ${c.flags} at ${xywh(c)}`;
+		case ScriptCommandType.CC_SetEntityWeapon: return `Set entity weapon ${weapon(c.w)} at ${xy(c)}`;
+		case ScriptCommandType.CC_SetMovementType: return `Set movement type ${movementType(c.x)}`;
 		case ScriptCommandType.CC_SetMusic: return `Set music ${music(c)}`;
 		case ScriptCommandType.CC_SetNPCAppearance: return `Set appearance ${appearanceMonster(c.x, hold)}`;
 		case ScriptCommandType.CC_SetPlayerAppearance: return `Set player appearance ${appearancePlayer(c.x, hold)}`;
+		case ScriptCommandType.CC_SetPlayerBehavior: return `Set player behavior ${playerBehavior(c.x)} ${playerBehaviorState(c.y)}`;
+		case ScriptCommandType.CC_SetPlayerState: return `Set player state ${playerState(c.y)} ${onOff(c.x)}`;
 		case ScriptCommandType.CC_SetPlayerStealth: return `Set player stealth ${stealth(c.x)}`;
 		case ScriptCommandType.CC_SetPlayerWeapon: return `Set player weapon ${weapon(c.x)}`;
 		case ScriptCommandType.CC_SetWaterTraversal: return `Set water traversal ${waterTraversal(c.x)}`;
+		case ScriptCommandType.CC_SetWallLight: return `Set wall light ${lightColor(c.flags)}, ${c.w} ${xy(c)}`;
 		case ScriptCommandType.CC_Speech: return !speech
 			? 'Speech ?'
 			: join([
@@ -271,25 +309,38 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_TeleportTo: return `Teleport to ${xy(c)}`;
 		case ScriptCommandType.CC_TurnIntoMonster: return `Turn into monster`;
 		case ScriptCommandType.CC_VarSet: return TextUtils.varSet(c, context);
+		case ScriptCommandType.CC_VarSetAt: return TextUtils.varSetAt(c, context);
 		case ScriptCommandType.CC_Wait: return `Wait ${c.x}`;
+		case ScriptCommandType.CC_WaitForArrayEntry: return TextUtils.waitForArrayEntry(c, context);
+		case ScriptCommandType.CC_WaitForBrainSense: return `Wait for brain sensing player`;
+		case ScriptCommandType.CC_WaitForBuilding: return `Wait for building marker at ${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForBuildType: return `Wait for building marker type ${tile(c.flags)} at ${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForCleanLevel: return `Wait for clean level`;
 		case ScriptCommandType.CC_WaitForCleanRoom: return `Wait for clean room`;
 		case ScriptCommandType.CC_WaitForCueEvent: return `Wait for event ${event(c.x)}`;
 		case ScriptCommandType.CC_WaitForDoorTo: return `Wait for door to ${openClose(c.w)},${xy(c)}`;
 		case ScriptCommandType.CC_WaitForEntityType: return `Wait for entity type ${appearanceMonster(c.flags, hold)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForExpression: return `Wait until expression ${c.label} ${scriptVarComp(c.y)} ${c.x}`;
 		case ScriptCommandType.CC_WaitForItem: return `Wait for item ${tile(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForItemGroup: return `Wait for item group ${tileGroup(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForNoBuilding: return `Wait for no building marker ${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNotItemGroup: return `Wait while item group ${tileGroup(c.flags)},${xywh(c)}`;
+		case ScriptCommandType.CC_WaitForNotBuildType: return `Wait until building marker type ${tile(c.flags)} at ${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForNotEntityType: return `Wait while entity type ${appearanceMonster(c.flags, hold)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForNotRect: return `Wait while entity ${waitFlags(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForOpenMove: return `Wait for open move ${dir(c.x)}`;
+		case ScriptCommandType.CC_WaitForOpenTile: return TextUtils.waitForOpenTile(c);
 		case ScriptCommandType.CC_WaitForPlayerInput: return `Wait for player input ${input(c.x)}`;
+		case ScriptCommandType.CC_WaitForPlayerState: return `Wait for player state ${playerState(c.y)} ${onOff(c.x)}`;
 		case ScriptCommandType.CC_WaitForPlayerToFace: return `Wait for player to face ${dir(c.x)}`;
 		case ScriptCommandType.CC_WaitForPlayerToMove: return `Wait for player to move ${dir(c.x)}`;
 		case ScriptCommandType.CC_WaitForPlayerToTouchMe: return `Wait for player to touch me`;
+		case ScriptCommandType.CC_WaitForRemains: return `Wait for remains ${monster(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForRect: return `Wait for entity ${waitFlags(c.flags)},${xywh(c)}`;
 		case ScriptCommandType.CC_WaitForSomeoneToPushMe: return `Wait for someone to push me`;
 		case ScriptCommandType.CC_WaitForTurn: return `Wait for turn ${c.x}`;
 		case ScriptCommandType.CC_WaitForVar: return TextUtils.waitForVar(c, context);
+		case ScriptCommandType.CC_WaitForWeapon: return `Wait for weapon ${weaponFlags(c.flags)} ${xywh(c)}`;
 		case ScriptCommandType.CC_WorldMapIcon: return `World map icon ${appearanceMonster(c.h, hold)},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
 		case ScriptCommandType.CC_WorldMapImage: return `World map image ${c.h},${worldMapIcon(c.flags)},${xy(c)},${c.w}`;
 		case ScriptCommandType.CC_WorldMapMusic: return `World map music ${music(c)}`;
@@ -303,7 +354,7 @@ export function getCommandToString(c: ScriptCommand, context: CommandsList): str
 		case ScriptCommandType.CC_WaitForNotHalph: return `[DEPRECATED - CC_WaitForNotHalph]`;
 		case ScriptCommandType.CC_WaitForNotMonster: return `[DEPRECATED - CC_WaitForNotMonster]`;
 		default:
-			// shouldBeUnreachable(c.type);
+			shouldBeUnreachable(c.type);
 			return "";
 	}
 }
