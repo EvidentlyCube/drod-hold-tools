@@ -330,7 +330,12 @@ function buildHoldVariableUsesCache(hold: Hold) {
 
 	return lastCache;
 }
-export function regenerateHoldVariableUses(hold: Hold, variableId: number) {
+
+export function regenerateHoldVariableUses(hold: Hold, variableId: number, forceCacheFlush = false) {
+	if (forceCacheFlush) {
+		lastCache = undefined;
+	}
+
 	const cache = buildHoldVariableUsesCache(hold);
 	const variable = hold.variables.getOrError(variableId);
 

@@ -1,22 +1,12 @@
 import assert from 'node:assert';
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { test } from 'node:test';
-import { fileURLToPath } from 'node:url';
 import { HoldMonster } from '../src/data/datatypes/HoldMonster';
-import { HoldRefModel, serializeRef } from '../src/data/references/HoldReference';
-import { readHold } from '../src/processor/readHold';
 import { ScriptCommandType } from '../src/data/DrodEnums';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { HoldRefModel, serializeRef } from '../src/data/references/HoldReference';
+import { TestDataFactory } from './helpers/TestDataFactory';
 
 await test('Validate all uses of the variable were found', async () => {
-	const holdBuffer = await readFile(`${__dirname}/holds/VariableTester.hold`);
-	const holdBytes = new Uint8Array(holdBuffer);
-	const result = await readHold(0, { data: holdBytes });
-	assert.ok(result.isSuccess);
-
-	const { hold } = result;
+	const hold = await TestDataFactory.loadHold('VariableTester.hold');
 	const monster = hold.$monsters.find(monster => monster.x === 1 && monster.y === 1);
 	assert.ok(monster);
 
