@@ -5,7 +5,7 @@ import type { Hold } from "../../../data/datatypes/Hold";
 import type { HoldData } from "../../../data/datatypes/HoldData";
 import { shouldBeUnreachable } from "../../../utils/Interfaces";
 import { pluralize } from "../../../utils/StringUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -53,7 +53,7 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 	}, [hold, onClose]);
 
 	return (
-		<FullModal
+		<Modal
 			title="Manage unused data"
 			onClose={onClose}
 			buttons={[
@@ -83,7 +83,7 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 					<DataRow key={data.id} data={data} />
 				))}
 			</ul>
-		</FullModal>
+		</Modal>
 	);
 }
 

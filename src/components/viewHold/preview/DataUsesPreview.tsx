@@ -1,5 +1,5 @@
 import type { HoldData } from "../../../data/datatypes/HoldData";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 import { HoldRefsTableList } from "../HoldRefView";
 
 interface Props {
@@ -10,8 +10,8 @@ export default function DataUsesPreview(props: Props) {
 	const { data, onClose } = props;
 
 	return (
-		<FullModal title={`Uses of data "${data.name.newValue}"`} onClose={onClose}>
+		<Modal title={`Uses of data "${data.name.newValue}"`} onClose={onClose}>
 			<HoldRefsTableList holdRefs={data.$uses} />
-		</FullModal>
+		</Modal>
 	);
 }

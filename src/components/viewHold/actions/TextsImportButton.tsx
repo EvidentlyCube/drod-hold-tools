@@ -5,7 +5,7 @@ import {
 	type ImportAllTextsResult,
 	importAllTexts,
 } from "../../../processor/importAllTexts";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -102,7 +102,7 @@ function ResultsModal({
 	onClose,
 }: ResultsModalProps) {
 	return (
-		<FullModal title="Import Texts" onClose={onClose} canClose={canClose}>
+		<Modal title="Import Texts" onClose={onClose} canClose={canClose}>
 			{!result && (
 				<>
 					<h3 className="is-size-3">Importing</h3>
@@ -135,6 +135,6 @@ function ResultsModal({
 					<p>{result.causedBy.message}</p>
 				</>
 			)}
-		</FullModal>
+		</Modal>
 	);
 }

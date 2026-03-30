@@ -88,7 +88,6 @@ function toSortableString(ref?: HoldRef): string {
 			return `Variable: ${ref.hold.variables.get(ref.variableId)?.name.newValue ?? "<INVALID VARIABLE ID>"}`;
 		case HoldRefModel.WorldMap:
 			return `World Map: ${ref.hold.worldMaps.get(ref.worldMapId)?.name.newValue ?? "<INVALID WORLD MAP ID>"}`;
-
 		default:
 			shouldBeUnreachable(model);
 			return "Unknown model";
@@ -102,7 +101,7 @@ function toSortableCharCommand(ref: HoldRefCharacterCommand) {
 			commandIndex
 		];
 
-	return `${getCharacterName(hold, characterId)} #${commandIndex}::${getCommandName(command.type)}`;
+	return `${getCharacterName(hold, characterId)} #${commandIndex}::${command ? getCommandName(command.type) : "Unable to retrieve command"}`;
 }
 
 function toSortableLevelName(hold: Hold, levelId: number) {

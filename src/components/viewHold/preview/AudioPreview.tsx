@@ -1,5 +1,5 @@
 import AudioPlayer from "react-h5-audio-player";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	name: string;
@@ -10,10 +10,10 @@ export default function AudioPreview(props: Props) {
 	const { name, dataUri, onClose } = props;
 
 	return (
-		<FullModal
+		<Modal
 			title={`Preview of ${name}`}
 			onClose={onClose}
-			bodyClassName="is-flex is-justify-content-center is-align-items-center"
+			contentClassName="is-flex is-justify-content-center is-align-items-center"
 		>
 			<AudioPlayer
 				style={{ width: "400px" }}
@@ -21,6 +21,6 @@ export default function AudioPreview(props: Props) {
 				showSkipControls={false}
 				customAdditionalControls={[]}
 			/>
-		</FullModal>
+		</Modal>
 	);
 }

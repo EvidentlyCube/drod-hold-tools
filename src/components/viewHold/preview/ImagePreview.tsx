@@ -2,6 +2,7 @@ import { type CSSProperties, useCallback } from "react";
 import { useImageSize } from "react-image-size";
 import useLocalStorageState from "use-local-storage-state";
 import { useKeyDownCallback } from "../../../hooks/useKeyboardCallback";
+import Modal from "../../common/Modal";
 
 const Backgrounds = [
 	"has-background-white",
@@ -60,50 +61,47 @@ export default function ImagePreview(props: Props) {
 	}
 
 	return (
-		<div className="modal is-active">
-			<button
-				type="button"
-				className="modal-background"
-				onClick={onClose}
-			></button>
-			<div className="modal-card image-preview">
-				<header className="modal-card-head">
-					<p className="modal-card-title">{name}</p>
-					<button type="button" className="delete" onClick={onClose}></button>
-				</header>
-				<section
-					className={`modal-card-body is-flex is-justify-content-center is-align-items-center ${backgroundClass}`}
+		<Modal
+			onClose={onClose}
+			title={`Preview ${name}`}
+			modalBodyClassName="p-0"
+			contentClassName={`is-flex is-justify-content-center is-align-items-center p-3 ${backgroundClass}`}
+			buttons={[
+				<button
+					key="zoom-in"
+					type="button"
+					className="button"
+					onClick={decreaseZoomLevel}
+					disabled={zoomLevel === 0}
 				>
-					{!loading && <img src={dataUri} alt={name} style={style} />}
-				</section>
-				<footer className="modal-card-foot is-justify-content-center">
-					<div className="buttons">
-						<button
-							type="button"
-							className="icon is-large"
-							onClick={decreaseZoomLevel}
-							disabled={zoomLevel === 0}
-						>
-							<i className="fas fa-magnifying-glass-minus" />
-						</button>
-						<button
-							type="button"
-							className="icon is-large"
-							onClick={increaseZoomLevel}
-							disabled={zoomLevel === ZoomLevels.length - 1}
-						>
-							<i className="fas fa-magnifying-glass-plus" />
-						</button>
-						<button
-							type="button"
-							className="icon is-large"
-							onClick={toggleBackground}
-						>
-							<i className="fas fa-palette" />
-						</button>
-					</div>
-				</footer>
-			</div>
-		</div>
+					<span className="icon is-large">
+						<i className="fas fa-magnifying-glass-minus" />
+					</span>
+				</button>,
+				<button
+					key="zoom-out"
+					type="button"
+					className="button"
+					onClick={increaseZoomLevel}
+					disabled={zoomLevel === ZoomLevels.length - 1}
+				>
+					<span className="icon is-large">
+						<i className="fas fa-magnifying-glass-plus" />
+					</span>
+				</button>,
+				<button
+					key="palette"
+					type="button"
+					className="button"
+					onClick={toggleBackground}
+				>
+					<span className="icon is-large">
+						<i className="fas fa-palette" />
+					</span>
+				</button>,
+			]}
+		>
+			{!loading && <img src={dataUri} alt={name} style={style} />}
+		</Modal>
 	);
 }

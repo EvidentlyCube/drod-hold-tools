@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import type { Hold } from "../../../data/datatypes/Hold";
 import { exportAllTexts } from "../../../processor/exportAllTexts";
 import { sanitizeFileName } from "../../../utils/FileUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -88,7 +88,7 @@ function DownloadModal({
 }: DownloadModalProps) {
 	const percent = (progress * 100) | 0;
 	return (
-		<FullModal
+		<Modal
 			title="Export all texts"
 			onClose={onClose}
 			canClose={canClose}
@@ -116,6 +116,6 @@ function DownloadModal({
 				</>
 			)}
 			{objectUrl && <h3 className="is-size-3">Ready to download</h3>}
-		</FullModal>
+		</Modal>
 	);
 }

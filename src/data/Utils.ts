@@ -501,6 +501,8 @@ export function getCommandToString(
 			return `[DEPRECATED - CC_WaitForNotHalph]`;
 		case ScriptCommandType.CC_WaitForNotMonster:
 			return `[DEPRECATED - CC_WaitForNotMonster]`;
+		case ScriptCommandType.CC_Invalid:
+			return `[Invalid Command]`;
 		default:
 			shouldBeUnreachable(c.type);
 			return "";

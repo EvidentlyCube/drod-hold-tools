@@ -54,7 +54,7 @@ export default function DataPreview({ data, details, onClose }: Props) {
 
 		default:
 			return (
-				<Modal onClose={onClose}>
+				<Modal title={`Preview of ${data.name.newValue}`} onClose={onClose}>
 					<div className="container has-text-centered has-background-white p-4">
 						<h2 className="is-size-2">{data.name.newValue}</h2>
 						<p>No preview for format {details.format}</p>

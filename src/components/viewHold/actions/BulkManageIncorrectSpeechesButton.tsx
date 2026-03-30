@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import type { Hold } from "../../../data/datatypes/Hold";
 import type { HoldSpeech } from "../../../data/datatypes/HoldSpeech";
 import { pluralize } from "../../../utils/StringUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -53,7 +53,7 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 	}, [hold, onClose]);
 
 	return (
-		<FullModal
+		<Modal
 			title="Manage unused speeches"
 			onClose={onClose}
 			buttons={[
@@ -93,7 +93,7 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 					))}
 				</ul>
 			</div>
-		</FullModal>
+		</Modal>
 	);
 }
 

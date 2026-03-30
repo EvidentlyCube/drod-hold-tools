@@ -7,7 +7,7 @@ import {
 } from "react";
 import type { HoldVariable } from "../../../data/datatypes/HoldVariable";
 import { validateVariableRenaming } from "../../../data/VariableUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	variable: HoldVariable;
@@ -46,7 +46,7 @@ export default function VariableRenameModal(props: Props) {
 	);
 
 	return (
-		<FullModal
+		<Modal
 			title={`Rename variable "${variable.name.newValue}"`}
 			onClose={onClose}
 			buttons={
@@ -89,6 +89,6 @@ export default function VariableRenameModal(props: Props) {
 			) : (
 				<p className="help is-success has-text-centered mt-3">Looking good!</p>
 			)}
-		</FullModal>
+		</Modal>
 	);
 }

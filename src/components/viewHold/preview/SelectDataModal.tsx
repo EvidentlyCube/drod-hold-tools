@@ -2,7 +2,7 @@ import { type ChangeEvent, useCallback, useMemo, useState } from "react";
 import type { DataFormat } from "../../../data/DrodEnums";
 import type { Hold } from "../../../data/datatypes/Hold";
 import { filterString, sortCompareString } from "../../../utils/SortUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 import DataRefView from "../DataRefView";
 
 interface Props {
@@ -37,7 +37,7 @@ export default function SelectDataModal(props: Props) {
 	}, []);
 
 	return (
-		<FullModal title="Replace data" onClose={onClose}>
+		<Modal title="Replace data" onClose={onClose}>
 			<table className="table is-fullwidth is-hoverable is-striped is-middle">
 				<thead>
 					<tr>
@@ -95,6 +95,6 @@ export default function SelectDataModal(props: Props) {
 					))}
 				</tbody>
 			</table>
-		</FullModal>
+		</Modal>
 	);
 }

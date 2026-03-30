@@ -48,13 +48,10 @@ export class HoldData {
 		this.$isDeleted = new SignalUpdatableValue(false);
 
 		if (!this.details.oldValue.rawEncodedData) {
-			hold.$problems.push({
-				ref: {
-					hold,
-					model: HoldRefModel.Data,
-					dataId: this.id,
-				},
-				problem: "No file data was given.",
+			hold.registerProblem("No file data was given.", {
+				hold,
+				model: HoldRefModel.Data,
+				dataId: this.id,
 			});
 		}
 	}

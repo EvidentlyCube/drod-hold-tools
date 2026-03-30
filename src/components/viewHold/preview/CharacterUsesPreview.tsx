@@ -1,5 +1,5 @@
 import type { HoldCharacter } from "../../../data/datatypes/HoldCharacter";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 import HoldRefView from "../HoldRefView";
 
 interface Props {
@@ -10,7 +10,7 @@ export default function CharacterUsesPreview(props: Props) {
 	const { character, onClose } = props;
 
 	return (
-		<FullModal title={`Uses of ${character.name.newValue}`} onClose={onClose}>
+		<Modal title={`Uses of ${character.name.newValue}`} onClose={onClose}>
 			<table>
 				<tbody>
 					{character.$uses.map((ref, index) => (
@@ -23,6 +23,6 @@ export default function CharacterUsesPreview(props: Props) {
 					))}
 				</tbody>
 			</table>
-		</FullModal>
+		</Modal>
 	);
 }

@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import type { Hold } from "../../../data/datatypes/Hold";
 import { createDataArchive } from "../../../processor/createDataArchive";
 import { sanitizeFileName } from "../../../utils/FileUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -92,7 +92,7 @@ function DownloadModal({
 }: DownloadModalProps) {
 	const percent = (progress * 100) | 0;
 	return (
-		<FullModal
+		<Modal
 			title="Bulk data replace"
 			canClose={canClose}
 			onClose={onClose}
@@ -120,6 +120,6 @@ function DownloadModal({
 				</>
 			)}
 			{objectUrl && <h3 className="is-size-3">Ready to download</h3>}
-		</FullModal>
+		</Modal>
 	);
 }

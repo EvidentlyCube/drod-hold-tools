@@ -5,6 +5,7 @@ import {
 	type ImportDataArchiveFileStatus,
 	importDataArchive,
 } from "../../../processor/importDataArchive";
+import Modal from "../../common/Modal";
 
 interface FileStatus {
 	name: string;
@@ -97,47 +98,32 @@ interface ResultsModalProps {
 
 function ResultsModal({ files, canClose, onClose }: ResultsModalProps) {
 	return (
-		<div className="modal is-active">
-			<button
-				type="button"
-				className="modal-background"
-				onClick={onClose}
-			></button>
-			<div className="modal-card">
-				<header className="modal-card-head">
-					<p className="modal-card-title">Bulk data replace</p>
-					{canClose && (
-						<button type="button" className="delete" onClick={onClose}></button>
-					)}
-				</header>
-				<section className="modal-card-body">
-					<FileList
-						files={files}
-						filterByStatus="replaced"
-						header="Updated Files"
-						className="has-text-success"
-					/>
-					<FileList
-						files={files}
-						filterByStatus="identical"
-						header="Identical Files"
-						className="has-text-info"
-					/>
-					<FileList
-						files={files}
-						filterByStatus="no-match"
-						header="Unmatched Files"
-						className="has-text-warning"
-					/>
-					<FileList
-						files={files}
-						filterByStatus="error"
-						header="Errors"
-						className="has-text-error"
-					/>
-				</section>
-			</div>
-		</div>
+		<Modal title="Bulk data replace" canClose={canClose} onClose={onClose}>
+			<FileList
+				files={files}
+				filterByStatus="replaced"
+				header="Updated Files"
+				className="has-text-success"
+			/>
+			<FileList
+				files={files}
+				filterByStatus="identical"
+				header="Identical Files"
+				className="has-text-info"
+			/>
+			<FileList
+				files={files}
+				filterByStatus="no-match"
+				header="Unmatched Files"
+				className="has-text-warning"
+			/>
+			<FileList
+				files={files}
+				filterByStatus="error"
+				header="Errors"
+				className="has-text-error"
+			/>
+		</Modal>
 	);
 }
 

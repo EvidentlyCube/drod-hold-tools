@@ -1,7 +1,7 @@
 import { type ChangeEvent, useCallback, useMemo, useState } from "react";
 import type { Hold } from "../../../data/datatypes/Hold";
 import { filterString, sortCompareString } from "../../../utils/SortUtils";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 
 interface Props {
 	hold: Hold;
@@ -32,7 +32,7 @@ export default function SelectPlayerModal(props: Props) {
 	}, []);
 
 	return (
-		<FullModal title="Replace player" onClose={onClose}>
+		<Modal title="Replace player" onClose={onClose}>
 			<table className="table is-fullwidth is-hoverable is-striped is-middle">
 				<thead>
 					<tr>
@@ -68,6 +68,6 @@ export default function SelectPlayerModal(props: Props) {
 					))}
 				</tbody>
 			</table>
-		</FullModal>
+		</Modal>
 	);
 }

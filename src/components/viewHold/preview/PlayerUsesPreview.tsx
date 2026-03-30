@@ -1,5 +1,5 @@
 import type { HoldPlayer } from "../../../data/datatypes/HoldPlayer";
-import FullModal from "../../common/FullModal";
+import Modal from "../../common/Modal";
 import { HoldRefsTableList } from "../HoldRefView";
 
 interface Props {
@@ -10,11 +10,8 @@ export default function PlayerUsesPreview(props: Props) {
 	const { player, onClose } = props;
 
 	return (
-		<FullModal
-			title={`Uses of Player "${player.name.newValue}"`}
-			onClose={onClose}
-		>
+		<Modal title={`Uses of Player "${player.name.newValue}"`} onClose={onClose}>
 			<HoldRefsTableList holdRefs={player.$uses} />
-		</FullModal>
+		</Modal>
 	);
 }
