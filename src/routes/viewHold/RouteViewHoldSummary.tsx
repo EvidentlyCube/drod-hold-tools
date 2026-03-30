@@ -42,7 +42,7 @@ export default function RouteViewHoldSummary() {
 					<td>
 						<div className="buttons section p-4 mb-0">
 							<button className="button ml-3 is-primary" title="Download scripts" onClick={handleDownloadScripts}>
-								Download all Scripts
+								Copy all scripts to clipboard
 							</button>
 							<TextsExportButton hold={hold} />
 							<TextImportButton hold={hold} />

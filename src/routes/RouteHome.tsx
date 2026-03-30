@@ -83,12 +83,15 @@ export default function RouteHome() {
 					<div className="card-content">
 						<div className="content">
 							<h3>Changelog</h3>
-							<h5 className="subtitle is-6">v0.1.9{" "}<span className="is-muted">(Unreleased)</span></h5>
+							<h5 className="subtitle is-6">v0.1.10{" "}<span className="is-muted">(Unreleased)</span></h5>
 							<ul>
 								<li><Feat />Script export displays imperatives by name</li>
 								<li><Feat />Mechanism to replace data files in bulk.</li>
+								<li><Feat />Updated everything to work with 5.2.</li>
+								<li><Feat />Optimized variable usage calculating.</li>
+								<li><Feat />Fixed a bunch of subtle bugs with variable renaming.</li>
 							</ul>
-							<h5 className="subtitle is-6">v0.1.8{" "}<span className="is-muted">(2026-02-20)</span></h5>
+							<h5 className="subtitle is-6">v0.1.9{" "}<span className="is-muted">(2026-02-20)</span></h5>
 							<ul>
 								<li>
 									<Feat />Added indents for script export to improve readability, especially
