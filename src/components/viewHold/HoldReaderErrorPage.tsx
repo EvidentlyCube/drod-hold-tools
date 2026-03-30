@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
-import FullPageMessage from "../common/FullPageMessage";
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { HoldReaders } from "../../processor/HoldReaders";
+import FullPageMessage from "../common/FullPageMessage";
 
 interface Props {
 	id: number;
@@ -18,7 +18,7 @@ export default function HoldReaderErrorPage({ id, error }: Props) {
 	return (
 		<FullPageMessage header="Error!">
 			<p>{error}</p>
-			<button className="button is-danger" onClick={onDelete}>
+			<button type="button" className="button is-danger" onClick={onDelete}>
 				Delete
 			</button>
 		</FullPageMessage>

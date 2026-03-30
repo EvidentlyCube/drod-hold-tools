@@ -4,11 +4,21 @@
 
 	transition-duration: var(--bulma-duration);
 	transition-property: background-color, border-color, color;
-	background-color: hsla(var(--bulma-navbar-h), var(--bulma-navbar-s), calc(var(--bulma-navbar-item-background-l) + var(--bulma-navbar-item-background-l-delta)), var(--bulma-navbar-item-background-a));
+	background-color: hsla(
+		var(--bulma-navbar-h),
+		var(--bulma-navbar-s),
+		calc(
+			var(--bulma-navbar-item-background-l) +
+			var(--bulma-navbar-item-background-l-delta)
+		),
+		var(--bulma-navbar-item-background-a)
+	);
 }
 
 .navbar .add-item:hover {
-	--bulma-navbar-item-background-l-delta: var(--bulma-navbar-item-hover-background-l-delta);
+	--bulma-navbar-item-background-l-delta: var(
+		--bulma-navbar-item-hover-background-l-delta
+	);
 	--bulma-navbar-item-background-a: 1;
 }
 
@@ -28,7 +38,7 @@
 }
 
 .navbar.is-success .navbar-item.active {
-	background: hsl(153, 53%, 43%)
+	background: hsl(153, 53%, 43%);
 }
 
 @keyframes save-swing {
@@ -63,25 +73,29 @@
 }
 
 .shimmer-loader:not(.active) {
-  color: #444;
-  background: linear-gradient(
-    90deg,
-    #000  0%,
-    #888  10%,
-    #000  20%,
-    #000  50%,  /* second band starts here, 50% offset */
-    #888  60%,
-    #000  70%,
-    #000  100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 0.5s linear infinite;
+	color: #444;
+	background: linear-gradient(
+		90deg,
+		#000 0%,
+		#888 10%,
+		#000 20%,
+		#000 50% /* second band starts here, 50% offset */,
+		#888 60%,
+		#000 70%,
+		#000 100%
+	);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: shimmer 0.5s linear infinite;
 }
 
 @keyframes shimmer {
-  0%   { background-position: 100% center; }
-  100% { background-position: 0% center; }
+	0% {
+		background-position: 100% center;
+	}
+	100% {
+		background-position: 0% center;
+	}
 }

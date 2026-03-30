@@ -1,13 +1,18 @@
 export function range(from: number, to: number, step: number = 1) {
-	const len = Math.floor((to - from) / step) + 1
-	return Array(len).fill(0).map((_, idx) => from + (idx * step))
+	const len = Math.floor((to - from) / step) + 1;
+	return Array(len)
+		.fill(0)
+		.map((_, idx) => from + idx * step);
 }
 
 /**
  * Return elements from left array that are not present in the right array
  * AND elements from the right array not present in the left array.
  */
-export function diffArrays<T extends (string | number)>(left: T[], right: T[]): T[] {
+export function diffArrays<T extends string | number>(
+	left: T[],
+	right: T[],
+): T[] {
 	const leftSet = new Set(left);
 	const rightSet = new Set(right);
 	const diff = new Set<T>();
@@ -31,7 +36,10 @@ export function diffArrays<T extends (string | number)>(left: T[], right: T[]): 
  * Return elements from left array that are not present in the right array
  * but NOT the other way around.
  */
-export function diffArraysOneWay<T extends (string | number)>(left: T[], right: T[]): T[] {
+export function diffArraysOneWay<T extends string | number>(
+	left: T[],
+	right: T[],
+): T[] {
 	const rightSet = new Set(right);
 	const diff = new Set<T>();
 

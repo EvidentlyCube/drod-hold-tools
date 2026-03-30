@@ -7,7 +7,7 @@ export enum PackedVarType {
 	WcharString = 6,
 	ByteBuffer = 7,
 	Bool = 8,
-	Unknown = 9
+	Unknown = 9,
 }
 
 type PackedVarValue = boolean | number | string | number[];
@@ -177,23 +177,32 @@ export class PackedVars {
 		const rows = [];
 		for (const packedVar of this._vars) {
 			if (Array.isArray(packedVar.value)) {
-				rows.push(`${packedVar.name} [TYPE=${packedVar.type}]: ${packedVar.value.map(i => i.toString(16).padStart(2, '0')).join(' ')}`);
+				rows.push(
+					`${packedVar.name} [TYPE=${packedVar.type}]: ${packedVar.value.map(i => i.toString(16).padStart(2, "0")).join(" ")}`,
+				);
 			} else {
-				rows.push(`${packedVar.name} [TYPE=${packedVar.type}]: ${JSON.stringify(packedVar.value)}`);
+				rows.push(
+					`${packedVar.name} [TYPE=${packedVar.type}]: ${JSON.stringify(packedVar.value)}`,
+				);
 			}
 		}
 
 		return rows.join("\n");
 	}
 
-	private readVar(name: string, expectedType: PackedVarType, def: PackedVarValue): PackedVarValue {
+	private readVar(
+		name: string,
+		expectedType: PackedVarType,
+		def: PackedVarValue,
+	): PackedVarValue {
 		const [isFound, packedVar] = this.getVar(name);
 
 		if (!isFound) {
 			return def;
-
 		} else if (packedVar.type !== expectedType) {
-			console.warn(`Attempted to read packed var '${name}' with type ${expectedType} but its stored type was ${packedVar.type}`)
+			console.warn(
+				`Attempted to read packed var '${name}' with type ${expectedType} but its stored type was ${packedVar.type}`,
+			);
 			return def;
 		}
 
@@ -207,6 +216,6 @@ export class PackedVars {
 			}
 		}
 
-		return [false, {name, value: 0, type: PackedVarType.Unknown, size: 0}];
+		return [false, { name, value: 0, type: PackedVarType.Unknown, size: 0 }];
 	}
 }

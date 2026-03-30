@@ -1,7 +1,7 @@
 import { areObjectsSame } from "../../utils/ObjectUtils";
 import { SignalSet } from "../../utils/SignalSet";
 import { Signal } from "../../utils/Signals";
-import { HoldDataDetails } from "./HoldData";
+import type { HoldDataDetails } from "./HoldData";
 
 export enum HoldChangeType {
 	SpeechMessage = 0,
@@ -33,127 +33,127 @@ export enum HoldChangeType {
 }
 
 export type HoldChangeCharacterAvatarDataId = {
-	type: HoldChangeType.CharacterAvatarDataId,
+	type: HoldChangeType.CharacterAvatarDataId;
 	location: { characterId: number };
 
 	hasChange: boolean;
 	value?: number;
-}
+};
 
 export type HoldChangeCharacterName = {
-	type: HoldChangeType.CharacterName,
+	type: HoldChangeType.CharacterName;
 	location: { characterId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeCharacterTilesDataId = {
-	type: HoldChangeType.CharacterTilesDataId,
+	type: HoldChangeType.CharacterTilesDataId;
 	location: { characterId: number };
 
 	hasChange: boolean;
 	value?: number;
-}
+};
 
 export type HoldChangeCharacterCommandLabel = {
-	type: HoldChangeType.CharacterCommandLabel,
-	location: { characterId: number, commandIndex: number };
+	type: HoldChangeType.CharacterCommandLabel;
+	location: { characterId: number; commandIndex: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeMonsterCommandLabel = {
-	type: HoldChangeType.MonsterCommandLabel,
-	location: { roomId: number, monsterIndex: number, commandIndex: number };
+	type: HoldChangeType.MonsterCommandLabel;
+	location: { roomId: number; monsterIndex: number; commandIndex: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeDataName = {
-	type: HoldChangeType.DataName,
+	type: HoldChangeType.DataName;
 	location: { dataId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeDataFile = {
-	type: HoldChangeType.DataFile,
+	type: HoldChangeType.DataFile;
 	location: { dataId: number };
 
 	hasChange: boolean;
 	value: HoldDataDetails;
-}
+};
 
 export type HoldChangeEntranceDataId = {
-	type: HoldChangeType.EntranceDataId,
+	type: HoldChangeType.EntranceDataId;
 	location: { entranceId: number };
 
 	hasChange: boolean;
 	value?: number;
-}
+};
 
 export type HoldChangeEntranceDescription = {
-	type: HoldChangeType.EntranceDescription,
+	type: HoldChangeType.EntranceDescription;
 	location: { entranceId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeEntranceShowDescription = {
-	type: HoldChangeType.EntranceShowDescription,
+	type: HoldChangeType.EntranceShowDescription;
 	location: { entranceId: number };
 
 	hasChange: boolean;
 	value: number;
-}
+};
 
 export type HoldChangeHoldPlayer = {
-	type: HoldChangeType.HoldPlayer,
+	type: HoldChangeType.HoldPlayer;
 	location: { [key: string]: never };
 
 	hasChange: boolean;
 	value: number;
-}
+};
 
 export type HoldChangeLevelCreated = {
-	type: HoldChangeType.LevelCreated,
+	type: HoldChangeType.LevelCreated;
 	location: { levelId: number };
 
 	hasChange: boolean;
 	value: number;
-}
+};
 
 export type HoldChangeLevelName = {
-	type: HoldChangeType.LevelName,
+	type: HoldChangeType.LevelName;
 	location: { levelId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export type HoldChangeLevelPlayerId = {
-	type: HoldChangeType.LevelPlayerId,
+	type: HoldChangeType.LevelPlayerId;
 	location: { levelId: number };
 
 	hasChange: boolean;
 	value: number;
-}
+};
 
 export type HoldChangePlayerDeletion = {
-	type: HoldChangeType.PlayerDeletion,
+	type: HoldChangeType.PlayerDeletion;
 	location: { playerId: number };
 
 	hasChange: boolean;
 	value: boolean;
-}
+};
 
 export type HoldChangePlayerInsertion = {
-	type: HoldChangeType.PlayerInsertion,
+	type: HoldChangeType.PlayerInsertion;
 	location: { playerId: number };
 
 	hasChange: boolean;
@@ -161,16 +161,16 @@ export type HoldChangePlayerInsertion = {
 		name: string;
 		gidOriginalName: string;
 		gidCreated: number;
-	}
-}
+	};
+};
 
 export type HoldChangePlayerName = {
-	type: HoldChangeType.PlayerName,
+	type: HoldChangeType.PlayerName;
 	location: { playerId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
 export interface HoldChangeSpeechDataId {
 	type: HoldChangeType.SpeechDataId;
@@ -198,7 +198,7 @@ export interface HoldChangeSpeechMood {
 
 export interface HoldChangeScrollMessage {
 	type: HoldChangeType.ScrollMessage;
-	location: { roomId: number, x: number, y: number };
+	location: { roomId: number; x: number; y: number };
 
 	hasChange: boolean;
 	value: string;
@@ -221,30 +221,31 @@ export interface HoldChangeWorldMapName {
 }
 
 export type HoldChangeDataDeletion = {
-	type: HoldChangeType.DataDeletion,
+	type: HoldChangeType.DataDeletion;
 	location: { dataId: number };
 
 	hasChange: boolean;
 	value: boolean;
-}
+};
 
 export type HoldChangeSpeechDeletion = {
-	type: HoldChangeType.SpeechDeletion,
+	type: HoldChangeType.SpeechDeletion;
 	location: { speechId: number };
 
 	hasChange: boolean;
 	value: boolean;
-}
+};
 
 export type HoldChangeVariableName = {
-	type: HoldChangeType.VariableName,
+	type: HoldChangeType.VariableName;
 	location: { variableId: number };
 
 	hasChange: boolean;
 	value: string;
-}
+};
 
-export type HoldChange = HoldChangeCharacterAvatarDataId
+export type HoldChange =
+	| HoldChangeCharacterAvatarDataId
 	| HoldChangeCharacterCommandLabel
 	| HoldChangeCharacterName
 	| HoldChangeCharacterTilesDataId
@@ -272,7 +273,9 @@ export type HoldChange = HoldChangeCharacterAvatarDataId
 	| HoldChangeVariableName;
 
 function match(left: HoldChange, right: HoldChange) {
-	return left.type === right.type && areObjectsSame(left.location, right.location);
+	return (
+		left.type === right.type && areObjectsSame(left.location, right.location)
+	);
 }
 
 export class HoldChangeList {
@@ -280,7 +283,7 @@ export class HoldChangeList {
 	public readonly onChange = new Signal<HoldChange>();
 
 	public loadStored(changes: HoldChange[]) {
-		changes.forEach(change => this.list.add(change));
+		changes.forEach(change => void this.list.add(change));
 	}
 
 	public add(change: HoldChange) {
@@ -300,5 +303,4 @@ export class HoldChangeList {
 	public toJson() {
 		return JSON.stringify(this.list.values());
 	}
-
 }

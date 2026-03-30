@@ -1,12 +1,10 @@
 import { DataFormat } from "../../data/DrodEnums";
-import {
-	getFormatName
-} from "../../data/Utils";
-import { Hold } from "../../data/datatypes/Hold";
-import { HoldData } from "../../data/datatypes/HoldData";
+import type { Hold } from "../../data/datatypes/Hold";
+import type { HoldData } from "../../data/datatypes/HoldData";
+import { getFormatName } from "../../data/Utils";
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
-import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 
 interface PropsById {
 	hold: Hold;
@@ -15,7 +13,7 @@ interface PropsById {
 }
 interface PropsByIdDynamic {
 	hold: Hold;
-	dataIdSource: SignalUpdatableValue<number|undefined>;
+	dataIdSource: SignalUpdatableValue<number | undefined>;
 	showName?: boolean;
 }
 
@@ -31,9 +29,13 @@ export function DataRefViewById({ hold, dataId, showName }: PropsById) {
 		return <span className="is-muted">None</span>;
 	}
 
-	return <DataRefView data={ data } showName={showName} />
+	return <DataRefView data={data} showName={showName} />;
 }
-export function DataRefViewByIdDynamic({ hold, dataIdSource, showName }: PropsByIdDynamic) {
+export function DataRefViewByIdDynamic({
+	hold,
+	dataIdSource,
+	showName,
+}: PropsByIdDynamic) {
 	const dataId = useSignalUpdatableValue(dataIdSource, true);
 	const data = hold.datas.get(dataId ?? -1);
 
@@ -41,10 +43,10 @@ export function DataRefViewByIdDynamic({ hold, dataIdSource, showName }: PropsBy
 		return <span className="is-muted">None</span>;
 	}
 
-	return <DataRefView data={ data } showName={showName} />
+	return <DataRefView data={data} showName={showName} />;
 }
 
-export default function DataRefView({data, showName}: Props) {
+export default function DataRefView({ data, showName }: Props) {
 	const name = useSignalUpdatableValue(data.name, true);
 	const { format } = useSignalUpdatableValue(data.details, true);
 

@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Hold } from "../../data/datatypes/Hold";
-import { HoldReader } from "../../processor/HoldReaders";
+import type { Hold } from "../../data/datatypes/Hold";
+import type { HoldReader } from "../../processor/HoldReaders";
 
 interface Props {
 	hold: Hold;
@@ -20,34 +20,58 @@ export default function HoldViewTemplate({ hold, holdReader }: Props) {
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}`} end>
 						Hold
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/characters`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/characters`}
+					>
 						Characters
 					</NavLink>
 					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/datas`}>
 						Datas
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/entrances`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/entrances`}
+					>
 						Entrances
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/levels`} >
+					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/levels`}>
 						Levels
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/players`} >
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/players`}
+					>
 						Players
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/scrolls`} >
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/scrolls`}
+					>
 						Scrolls
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/speeches`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/speeches`}
+					>
 						Speeches
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/variables`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/variables`}
+					>
 						Variables
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/world-maps`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/world-maps`}
+					>
 						World Maps
 					</NavLink>
-					<NavLink className="navbar-item" to={`/hold/${holdReader.id}/changes`}>
+					<NavLink
+						className="navbar-item"
+						to={`/hold/${holdReader.id}/changes`}
+					>
 						Changes
 					</NavLink>
 				</div>

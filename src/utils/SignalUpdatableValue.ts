@@ -57,7 +57,7 @@ export class SignalUpdatableValue<T> {
 		this.onChange.dispatch({
 			value: this.oldValue,
 			previousValue,
-			hasNewValue: false
+			hasNewValue: false,
 		});
 	}
 }

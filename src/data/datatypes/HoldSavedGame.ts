@@ -84,7 +84,7 @@ export class HoldSavedGame {
 	public constructor(hold: Hold, opts: HoldSavedGameConstructor) {
 		this.$hold = hold;
 
-		this.id = opts.id
+		this.id = opts.id;
 		this.playerId = opts.playerId;
 		this.roomId = opts.roomId;
 		this.worldMap = opts.worldMap;

@@ -19,7 +19,9 @@ export class HoldWorldMap {
 	public readonly name: SignalUpdatableValue<string>;
 
 	public get $data() {
-		return this.dataId.newValue ? this.$hold.datas.getOrError(this.dataId.newValue) : undefined;
+		return this.dataId.newValue
+			? this.$hold.datas.getOrError(this.dataId.newValue)
+			: undefined;
 	}
 
 	public constructor(hold: Hold, opts: Constructor) {

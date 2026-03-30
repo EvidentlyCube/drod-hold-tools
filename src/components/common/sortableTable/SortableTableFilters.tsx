@@ -1,10 +1,10 @@
+import { memo } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import Select from "../Select";
-import {
+import type {
 	SortableTableColumn,
 	SortableTableDataWithId,
 } from "./SortableTableCommons";
-import { memo } from "react";
 
 interface Props<T extends SortableTableDataWithId> {
 	columns: readonly SortableTableColumn<T>[];
@@ -12,34 +12,38 @@ interface Props<T extends SortableTableDataWithId> {
 	setColumnFilter: (column: string, filter: string) => void;
 }
 export function _SortableTableFilters<T extends SortableTableDataWithId>(
-	props: Props<T>
+	props: Props<T>,
 ) {
 	const { columns, columnFilters, setColumnFilter } = props;
 
-	if (columns.find((column) => column.filter) === undefined) {
+	if (columns.find(column => column.filter) === undefined) {
 		return null;
 	}
 
 	return (
 		<tr>
-			{columns.map((column) => {
+			{columns.map(column => {
 				const style = { width: `${column.widthPercent}%` };
 
-				return <th key={column.id} style={style}>
-					{column.filter && (
-						<FilterInput
-							column={column}
-							columnFilters={columnFilters}
-							setColumnFilter={setColumnFilter}
-						/>
-					)}
-				</th>
+				return (
+					<th key={column.id} style={style}>
+						{column.filter && (
+							<FilterInput
+								column={column}
+								columnFilters={columnFilters}
+								setColumnFilter={setColumnFilter}
+							/>
+						)}
+					</th>
+				);
 			})}
 		</tr>
 	);
 }
 
-export const SortableTableFilters = memo(_SortableTableFilters) as typeof _SortableTableFilters;
+export const SortableTableFilters = memo(
+	_SortableTableFilters,
+) as typeof _SortableTableFilters;
 
 interface FilterInputProps<T extends SortableTableDataWithId> {
 	column: SortableTableColumn<T>;
@@ -47,13 +51,13 @@ interface FilterInputProps<T extends SortableTableDataWithId> {
 	setColumnFilter: (column: string, filter: string) => void;
 }
 export function FilterInput<T extends SortableTableDataWithId>(
-	props: FilterInputProps<T>
+	props: FilterInputProps<T>,
 ) {
 	const { column, columnFilters, setColumnFilter } = props;
 
 	const setFilter = useDebouncedCallback((column: string, filter: string) => {
-		setColumnFilter(column, filter)
-	}, column.filterDebounce ?? 0)
+		setColumnFilter(column, filter);
+	}, column.filterDebounce ?? 0);
 
 	if (column.filterOptions) {
 		return (
@@ -71,7 +75,6 @@ export function FilterInput<T extends SortableTableDataWithId>(
 				</span>
 			</div>
 		);
-
 	} else {
 		return (
 			<div className="control has-icons-left">
@@ -79,9 +82,7 @@ export function FilterInput<T extends SortableTableDataWithId>(
 					className="input is-small is-rounded"
 					defaultValue={columnFilters.get(column.id) ?? ""}
 					placeholder="Filter..."
-					onInput={(e) =>
-						setFilter(column.id, e.currentTarget.value)
-					}
+					onInput={e => setFilter(column.id, e.currentTarget.value)}
 				/>
 				<span className="icon is-small is-left">
 					<i className="fas fa-magnifying-glass"></i>

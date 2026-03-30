@@ -1,13 +1,16 @@
-import { Hold } from "../../data/datatypes/Hold";
+import type { Hold } from "../../data/datatypes/Hold";
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
-import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 
 interface PropsByIdDynamic {
 	hold: Hold;
 	playerIdSource: SignalUpdatableValue<number>;
 }
 
-export function PlayerRefViewByIdDynamic({ hold, playerIdSource }: PropsByIdDynamic) {
+export function PlayerRefViewByIdDynamic({
+	hold,
+	playerIdSource,
+}: PropsByIdDynamic) {
 	const playerId = useSignalUpdatableValue(playerIdSource, true);
 	const player = hold.players.get(playerId);
 

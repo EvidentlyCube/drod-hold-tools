@@ -1,10 +1,10 @@
-import { HoldChange } from "../data/datatypes/HoldChange";
+import type { HoldChange } from "../data/datatypes/HoldChange";
 import { assertNotNull } from "../utils/Asserts";
-import { HoldReadProgressLog } from "../utils/Interfaces";
+import type { HoldReadProgressLog } from "../utils/Interfaces";
 import { SignalArray } from "../utils/SignalArray";
 import { Signal } from "../utils/Signals";
 import { SignalValue } from "../utils/SignalValue";
-import { readHold, ReadHoldResult, ReadHoldSource } from "./readHold";
+import { type ReadHoldResult, type ReadHoldSource, readHold } from "./readHold";
 
 export class HoldReader {
 	public readonly id: number;
@@ -24,7 +24,7 @@ export class HoldReader {
 	}
 
 	public get hold() {
-		if (this._result && this._result.isSuccess) {
+		if (this._result?.isSuccess) {
 			return this._result.hold;
 		} else {
 			throw new Error("Accessing hold before it's ready");
@@ -32,7 +32,7 @@ export class HoldReader {
 	}
 
 	public get holdSafe() {
-		if (this._result && this._result.isSuccess) {
+		if (this._result?.isSuccess) {
 			return this._result.hold;
 		} else {
 			return undefined;
@@ -69,27 +69,29 @@ export class HoldReader {
 		};
 
 		try {
-			const result = await readHold(this.id, this._source, this._changes, handleLog);
+			const result = await readHold(
+				this.id,
+				this._source,
+				this._changes,
+				handleLog,
+			);
 			this._result = result;
 
 			if (this._result.isSuccess) {
 				this.name.value = this.hold.name.newValue;
 				this.onParsed.dispatch(this);
-
 			} else {
 				this.error.value = this._result.causedBy.message;
 			}
-
 		} finally {
 			this.isBusy.value = false;
 			this._isFinished = true;
 		}
-
 	}
 }
 
 class HoldReaderManager {
-	public holdReaders: SignalArray<HoldReader>
+	public holdReaders: SignalArray<HoldReader>;
 
 	public get isParsing() {
 		return !!this.holdReaders.array.find(r => !r.isFinished);
@@ -102,15 +104,21 @@ class HoldReaderManager {
 	}
 
 	public getParsed(holdReaderId?: string) {
-		const id = parseInt(holdReaderId ?? "0");
+		const id = parseInt(holdReaderId ?? "0", 10);
 		const holdReader = this.getById(id);
 
-		assertNotNull(holdReader, `Fatal error: no hold reader for ID=${holdReaderId}`);
-		assertNotNull(holdReader.hold, `Fatal error: hold reader missing Hold ID=${holdReaderId}`);
+		assertNotNull(
+			holdReader,
+			`Fatal error: no hold reader for ID=${holdReaderId}`,
+		);
+		assertNotNull(
+			holdReader.hold,
+			`Fatal error: hold reader missing Hold ID=${holdReaderId}`,
+		);
 
 		return {
 			holdReader,
-			hold: holdReader.hold
+			hold: holdReader.hold,
 		};
 	}
 
@@ -122,7 +130,11 @@ class HoldReaderManager {
 		this.holdReaders.removeBy(holdReader => holdReader.id === id);
 	}
 
-	public readHoldXmlString(xmlString: string, id: number, changes: HoldChange[]) {
+	public readHoldXmlString(
+		xmlString: string,
+		id: number,
+		changes: HoldChange[],
+	) {
 		const holdReader = new HoldReader(id, { xmlString }, changes);
 
 		this.holdReaders.push(holdReader);
@@ -145,7 +157,6 @@ class HoldReaderManager {
 		for (const reader of this.holdReaders.array) {
 			if (reader.isStarted && !reader.isFinished) {
 				return;
-
 			} else if (!reader.isStarted) {
 				void reader.start();
 				return;

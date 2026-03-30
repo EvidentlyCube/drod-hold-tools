@@ -1,5 +1,5 @@
 import { useSignalUpdatableValue } from "../../hooks/useSignalUpdatableValue";
-import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 
 interface Props {
 	text: SignalUpdatableValue<string>;

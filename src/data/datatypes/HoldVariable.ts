@@ -1,10 +1,21 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { HoldRefCharacterCommand, HoldRefEntrance, HoldRefHoldEndMessage, HoldRefMonsterCommand, HoldRefScroll, HoldRefSpeech } from "../references/HoldReference";
+import type {
+	HoldRefCharacterCommand,
+	HoldRefEntrance,
+	HoldRefHoldEndMessage,
+	HoldRefMonsterCommand,
+	HoldRefScroll,
+	HoldRefSpeech,
+} from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
-import { getVariableInFormulaRegexp, isVariableUsedInText } from "../VariableUtils";
+import {
+	getVariableInFormulaRegexp,
+	isVariableUsedInText,
+} from "../VariableUtils";
 import type { Hold } from "./Hold";
 
-type HoldVariableUseRef = HoldRefCharacterCommand
+type HoldVariableUseRef =
+	| HoldRefCharacterCommand
 	| HoldRefEntrance
 	| HoldRefHoldEndMessage
 	| HoldRefMonsterCommand
@@ -28,15 +39,19 @@ export class HoldVariable {
 	public isUsedInFormula(formula: string) {
 		this._formulaRegexpCache ||= getVariableInFormulaRegexp(this.name.newValue);
 
-		return formula.toLowerCase().includes(this.name.newValue.toLowerCase())
-			&& this._formulaRegexpCache.test(formula);
+		return (
+			formula.toLowerCase().includes(this.name.newValue.toLowerCase())
+			&& this._formulaRegexpCache.test(formula)
+		);
 	}
 
 	public isUsedInText(text: string) {
 		this._formulaRegexpCache ||= getVariableInFormulaRegexp(this.name.newValue);
 
-		return text.toLowerCase().includes(this.name.newValue.toLowerCase())
-			&& isVariableUsedInText(text, this._formulaRegexpCache);
+		return (
+			text.toLowerCase().includes(this.name.newValue.toLowerCase())
+			&& isVariableUsedInText(text, this._formulaRegexpCache)
+		);
 	}
 
 	public constructor(hold: Hold, opts: VariableConstructor) {
@@ -48,6 +63,6 @@ export class HoldVariable {
 		// Clear cache when name changes
 		this.name.onChange.add(() => {
 			this._formulaRegexpCache = undefined;
-		})
+		});
 	}
 }

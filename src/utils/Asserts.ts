@@ -1,5 +1,8 @@
-
-export function assertNotNull<T>(value: T | undefined | null, message: string, ...context: unknown[]): asserts value is T {
+export function assertNotNull<T>(
+	value: T | undefined | null,
+	message: string,
+	...context: unknown[]
+): asserts value is T {
 	if (value === null) {
 		if (context.length) {
 			console.error(...context);

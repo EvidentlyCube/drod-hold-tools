@@ -1,13 +1,13 @@
-import { ChangeEvent, useCallback, useRef } from "react";
-import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
+import { type ChangeEvent, useCallback, useRef } from "react";
 import ReactTextareaAutosize from "react-textarea-autosize";
-import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
+import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 
 interface Props {
 	text: SignalUpdatableValue<string>;
-	tag?: 'input'|'textarea';
+	tag?: "input" | "textarea";
 }
-export default function DrodTextEditor({text, tag}: Props) {
+export default function DrodTextEditor({ text, tag }: Props) {
 	const [oldValue, isEdited, newValue] = useSignalUpdatableValue(text);
 	const inputRef = useRef(null);
 
@@ -15,7 +15,7 @@ export default function DrodTextEditor({text, tag}: Props) {
 		if (!isEdited) {
 			text.set(true, text.oldValue);
 			if (inputRef.current) {
-				(inputRef.current as HTMLElement).focus()
+				(inputRef.current as HTMLElement).focus();
 			}
 		} else {
 			text.unset();
@@ -26,52 +26,67 @@ export default function DrodTextEditor({text, tag}: Props) {
 		if (isEdited && text.newValue === text.oldValue) {
 			text.unset();
 		}
-	}, [text, isEdited])
+	}, [text, isEdited]);
 
 	// Using any to avoid typescript complaints about type
-	const onType = useCallback((e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLTextAreaElement>) => {
-		text.set(true, e.target.value);
-	}, [text]);
+	const onType = useCallback(
+		(e: ChangeEvent<HTMLInputElement> & ChangeEvent<HTMLTextAreaElement>) => {
+			text.set(true, e.target.value);
+		},
+		[text],
+	);
 
-	const title = isEdited
-		? "Cancel changes"
-		: "Edit text";
+	const title = isEdited ? "Cancel changes" : "Edit text";
 
-	if (tag === 'textarea') {
-		return <div className="control has-icons-left">
-			<ReactTextareaAutosize
-				className="textarea textarea-auto-size is-read-only-hidden"
-				value={newValue}
-				readOnly={!isEdited}
-				onInput={onType}
-				ref={inputRef}
-				onClick={!isEdited ? onToggle : undefined}
-				onBlur={onBlur}
-				title={oldValue}
-				minRows={1}
-				maxRows={8}
+	if (tag === "textarea") {
+		return (
+			<div className="control has-icons-left">
+				<ReactTextareaAutosize
+					className="textarea textarea-auto-size is-read-only-hidden"
+					value={newValue}
+					readOnly={!isEdited}
+					onInput={onType}
+					ref={inputRef}
+					onClick={!isEdited ? onToggle : undefined}
+					onBlur={onBlur}
+					title={oldValue}
+					minRows={1}
+					maxRows={8}
 				/>
-			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-				{!isEdited && <i className="fas fa-pen-to-square" />}
-				{isEdited && <i className="fas fa-rotate-left" />}
+				<button
+					type="button"
+					className="icon is-small is-left is-interactive"
+					onClick={onToggle}
+					title={title}
+				>
+					{!isEdited && <i className="fas fa-pen-to-square" />}
+					{isEdited && <i className="fas fa-rotate-left" />}
+				</button>
 			</div>
-		</div>
+		);
 	} else {
-		return <div className="control has-icons-left">
-			<input
-				className="input is-read-only-hidden"
-				value={newValue}
-				readOnly={!isEdited}
-				onInput={onType}
-				ref={inputRef}
-				onClick={!isEdited ? onToggle : undefined}
-				onBlur={onBlur}
-				title={oldValue}
+		return (
+			<div className="control has-icons-left">
+				<input
+					className="input is-read-only-hidden"
+					value={newValue}
+					readOnly={!isEdited}
+					onInput={onType}
+					ref={inputRef}
+					onClick={!isEdited ? onToggle : undefined}
+					onBlur={onBlur}
+					title={oldValue}
 				/>
-			<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-				{!isEdited && <i className="fas fa-pen-to-square" />}
-				{isEdited && <i className="fas fa-rotate-left" />}
+				<button
+					type="button"
+					className="icon is-small is-left is-interactive"
+					onClick={onToggle}
+					title={title}
+				>
+					{!isEdited && <i className="fas fa-pen-to-square" />}
+					{isEdited && <i className="fas fa-rotate-left" />}
+				</button>
 			</div>
-		</div>
+		);
 	}
 }

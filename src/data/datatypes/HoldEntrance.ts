@@ -1,6 +1,6 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { HoldRefModel, type HoldRefRoom } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
-import { HoldRefModel, HoldRefRoom } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 interface EntranceConstructor {
@@ -19,7 +19,7 @@ export class HoldEntrance {
 
 	public readonly id: number;
 	public readonly roomId: number;
-	public readonly dataId: SignalUpdatableValue<number|undefined>;
+	public readonly dataId: SignalUpdatableValue<number | undefined>;
 	public readonly x: number;
 	public readonly y: number;
 	public readonly o: number;
@@ -39,12 +39,14 @@ export class HoldEntrance {
 		return {
 			hold: this.$hold,
 			model: HoldRefModel.Room,
-			roomId: this.roomId
+			roomId: this.roomId,
 		};
 	}
 
 	public get $data() {
-		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
+		return this.dataId.newValue
+			? this.$hold.datas.get(this.dataId.newValue)
+			: undefined;
 	}
 
 	public constructor(hold: Hold, opts: EntranceConstructor) {
@@ -58,6 +60,8 @@ export class HoldEntrance {
 		this.o = opts.o;
 		this.isMainEntrance = opts.isMainEntrance;
 		this.showDescription = new SignalUpdatableValue(opts.showDescription);
-		this.description = new SignalUpdatableValue(wcharBase64ToString(opts.encDescription));
+		this.description = new SignalUpdatableValue(
+			wcharBase64ToString(opts.encDescription),
+		);
 	}
 }

@@ -1,58 +1,63 @@
-import { getFormatName } from "../data/Utils";
-import { HoldData } from "../data/datatypes/HoldData";
-import { HoldRef } from "../data/references/HoldReference";
+import type { HoldData } from "../data/datatypes/HoldData";
+import type { HoldRef } from "../data/references/HoldReference";
 import { holdRefToSortableString } from "../data/references/holdRefToSortableString";
+import { getFormatName } from "../data/Utils";
 import { escapeFilterToRegex } from "./StringUtils";
 
 export function sortCompareBool(isAsc: boolean, left: boolean, right: boolean) {
-	return isAsc
-		? Number(left) - Number(right)
-		: Number(right) - Number(left);
+	return isAsc ? Number(left) - Number(right) : Number(right) - Number(left);
 }
 
 export function sortCompareString(isAsc: boolean, left: string, right: string) {
-	return isAsc
-		? left.localeCompare(right)
-		: right.localeCompare(left);
+	return isAsc ? left.localeCompare(right) : right.localeCompare(left);
 }
 
-export function sortCompareStringOptional(isAsc: boolean, left: string | undefined, right: string | undefined) {
+export function sortCompareStringOptional(
+	isAsc: boolean,
+	left: string | undefined,
+	right: string | undefined,
+) {
 	if (!left || !right) {
 		return sortCompareWithUndefined(isAsc, left, right);
 	}
 
-	return isAsc
-		? left.localeCompare(right)
-		: right.localeCompare(left);
+	return isAsc ? left.localeCompare(right) : right.localeCompare(left);
 }
 
-export function sortCompareWithUndefined<T>(isAsc: boolean, left: T | undefined, right: T | undefined) {
+export function sortCompareWithUndefined<T>(
+	isAsc: boolean,
+	left: T | undefined,
+	right: T | undefined,
+) {
 	if (left && right) {
 		return 0;
-
 	} else if (!left && !right) {
 		return 0;
-
 	} else if (!left) {
 		return isAsc ? 1 : -1;
-
 	} else {
 		return isAsc ? -1 : 1;
 	}
 }
 
 export function sortCompareNumber(isAsc: boolean, left: number, right: number) {
-	return isAsc
-		? left - right
-		: right - left
+	return isAsc ? left - right : right - left;
 }
 
-export function sortCompareRefs(isAsc: boolean, left?: HoldRef, right?: HoldRef) {
+export function sortCompareRefs(
+	isAsc: boolean,
+	left?: HoldRef,
+	right?: HoldRef,
+) {
 	if (!left || !right) {
 		return sortCompareWithUndefined(isAsc, left, right);
 	}
 
-	return sortCompareString(isAsc, holdRefToSortableString(left), holdRefToSortableString(right));
+	return sortCompareString(
+		isAsc,
+		holdRefToSortableString(left),
+		holdRefToSortableString(right),
+	);
 }
 
 export function sortData(isAsc: boolean, left?: HoldData, right?: HoldData) {
@@ -60,10 +65,14 @@ export function sortData(isAsc: boolean, left?: HoldData, right?: HoldData) {
 		return sortCompareWithUndefined(isAsc, left, right);
 	}
 
-	return sortCompareString(isAsc, getFormatName(left.details.newValue.format), getFormatName(right.details.newValue.format))
-		|| sortCompareString(isAsc, left.name.newValue, right.name.newValue);
+	return (
+		sortCompareString(
+			isAsc,
+			getFormatName(left.details.newValue.format),
+			getFormatName(right.details.newValue.format),
+		) || sortCompareString(isAsc, left.name.newValue, right.name.newValue)
+	);
 }
-
 
 let cacheClearTimeout: undefined | number;
 const filterStringCache = new Map<string, RegExp>();
@@ -71,7 +80,7 @@ const filterStringCache = new Map<string, RegExp>();
 export function filterString(toFilter: string, filter: string): boolean {
 	let regex = filterStringCache.get(filter);
 	if (!regex) {
-		regex = new RegExp(escapeFilterToRegex(filter), 'i');
+		regex = new RegExp(escapeFilterToRegex(filter), "i");
 		filterStringCache.set(filter, regex);
 
 		if (!cacheClearTimeout) {

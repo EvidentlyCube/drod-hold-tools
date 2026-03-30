@@ -1,12 +1,12 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { Point } from "../DrodCommonTypes";
-import { PackedVars } from "../PackedVars";
+import type { Point } from "../DrodCommonTypes";
+import type { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
+import { HoldRefModel, type HoldRefScroll } from "../references/HoldReference";
 import { getCoordinateName, wcharBase64ToString } from "../Utils";
-import { HoldRefModel, HoldRefScroll } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 import type { HoldMonster } from "./HoldMonster";
-import { HoldSpeech } from "./HoldSpeech";
+import type { HoldSpeech } from "./HoldSpeech";
 
 interface RoomConstructor {
 	id: number;
@@ -61,7 +61,9 @@ export class HoldScroll {
 
 		this.x = opts.x;
 		this.y = opts.y;
-		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
+		this.message = new SignalUpdatableValue(
+			wcharBase64ToString(opts.encMessage),
+		);
 
 		this.$roomId = opts.roomId;
 		this.$scrollRef = {
@@ -69,7 +71,7 @@ export class HoldScroll {
 			model: HoldRefModel.Scroll,
 			roomId: opts.roomId,
 			x: opts.x,
-			y: opts.y
+			y: opts.y,
 		};
 	}
 }
@@ -140,7 +142,9 @@ export class HoldRoom {
 
 	public get $monstersWithCommands() {
 		if (!this._monstersWithCommands) {
-			this._monstersWithCommands = this.monsters.filter(monster => !!monster.$commandList);
+			this._monstersWithCommands = this.monsters.filter(
+				monster => !!monster.$commandList,
+			);
 		}
 
 		return this._monstersWithCommands;
@@ -148,7 +152,9 @@ export class HoldRoom {
 
 	public get $monstersWithSpeechCommand() {
 		if (!this._monstersWithSpeechCommand) {
-			this._monstersWithSpeechCommand = this.monsters.filter(monster => monster.$commandList?.$commandsWithSpeech?.length);
+			this._monstersWithSpeechCommand = this.monsters.filter(
+				monster => monster.$commandList?.$commandsWithSpeech?.length,
+			);
 		}
 
 		return this._monstersWithSpeechCommand;
@@ -156,7 +162,9 @@ export class HoldRoom {
 
 	public get $monstersWithDataCommand() {
 		if (!this._monstersWithDataCommand) {
-			this._monstersWithDataCommand = this.monsters.filter(monster => monster.$commandList?.$commandsWithData?.length);
+			this._monstersWithDataCommand = this.monsters.filter(
+				monster => monster.$commandList?.$commandsWithData?.length,
+			);
 		}
 
 		return this._monstersWithDataCommand;
@@ -166,7 +174,8 @@ export class HoldRoom {
 		if (!this._speeches) {
 			this._speeches = this.$monstersWithSpeechCommand.reduce(
 				(speeches, monster) => {
-					for (const command of monster.$commandList?.$commandsWithSpeech ?? []) {
+					for (const command of monster.$commandList?.$commandsWithSpeech
+						?? []) {
 						const speech = this.$hold.speeches.get(command.speechId.newValue);
 
 						if (speech) {
@@ -175,8 +184,8 @@ export class HoldRoom {
 					}
 					return speeches;
 				},
-				[] as HoldSpeech[]
-			)
+				[] as HoldSpeech[],
+			);
 		}
 
 		return this._speeches;
@@ -192,7 +201,7 @@ export class HoldRoom {
 		return {
 			x: this.roomX - x,
 			y: this.roomY - y,
-		}
+		};
 	}
 
 	public get $coordsName(): string {
@@ -201,9 +210,12 @@ export class HoldRoom {
 		return getCoordinateName(x, y);
 	}
 
-	public getScroll(ref: { x: number, y: number }): HoldScroll | undefined;
+	public getScroll(ref: { x: number; y: number }): HoldScroll | undefined;
 	public getScroll(x: number, y: number): HoldScroll | undefined;
-	public getScroll(refOrX: { x: number, y: number } | number, y?: number): HoldScroll | undefined {
+	public getScroll(
+		refOrX: { x: number; y: number } | number,
+		y?: number,
+	): HoldScroll | undefined {
 		if (typeof refOrX !== "number") {
 			return this.getScroll(refOrX.x, refOrX.y);
 		}
@@ -214,24 +226,26 @@ export class HoldRoom {
 	public constructor(hold: Hold, opts: RoomConstructor) {
 		this.$hold = hold;
 
-		this.id = opts.id
-		this.levelId = opts.levelId
-		this.dataId = opts.dataId
-		this.overheadDataId = opts.overheadDataId
+		this.id = opts.id;
+		this.levelId = opts.levelId;
+		this.dataId = opts.dataId;
+		this.overheadDataId = opts.overheadDataId;
 		this.isRequired = opts.isRequired;
 		this.isSecret = opts.isSecret;
-		this.roomX = opts.roomX
-		this.roomY = opts.roomY
-		this.roomCols = opts.roomCols
-		this.roomRows = opts.roomRows
+		this.roomX = opts.roomX;
+		this.roomY = opts.roomY;
+		this.roomCols = opts.roomCols;
+		this.roomRows = opts.roomRows;
 		this.imageStartX = opts.imageStartX;
 		this.imageStartY = opts.imageStartY;
 		this.overheadImageStartX = opts.overheadImageStartX;
 		this.overheadImageStartY = opts.overheadImageStartY;
-		this.encSquares = opts.encSquares
+		this.encSquares = opts.encSquares;
 		this.style = opts.style;
-		this.styleName = new SignalUpdatableValue(wcharBase64ToString(opts.encStyleName));
-		this.encTileLights = opts.encTileLights
+		this.styleName = new SignalUpdatableValue(
+			wcharBase64ToString(opts.encStyleName),
+		);
+		this.encTileLights = opts.encTileLights;
 		this.extraVars = readPackedVars(opts.encExtraVars);
 		this.isNestedInLevel = opts.isNestedInLevel;
 	}

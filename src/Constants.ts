@@ -1,4 +1,3 @@
-
 export const VERSION_AE = 100;
 export const VERSION_JTRH = 201;
 export const VERSION_TCB_301 = 301;
@@ -11,7 +10,7 @@ export const VERSION_TSS_508 = 508;
 export const VERSION_TSS_509 = 509;
 
 export const Constants = {
-	isDev: process.env.NODE_ENV === 'development',
+	isDev: process.env.NODE_ENV === "development",
 
 	yieldFrameDuration: 100,
 	yieldSleepDuration: 16,
@@ -21,5 +20,5 @@ export const Constants = {
 		xorDecodeChunk: 1024 * 1024 * 8,
 		// 4 Megabytes per chunk
 		textDecodeChunk: 1024 * 1024 * 4,
-	}
+	},
 };

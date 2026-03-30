@@ -1,6 +1,6 @@
-import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { ScriptCommandType } from "../DrodEnums";
-import { PackedVarType } from "../PackedVars";
+import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import type { ScriptCommandType } from "../DrodEnums";
+import type { PackedVarType } from "../PackedVars";
 
 export interface ScriptCommand {
 	type: ScriptCommandType;

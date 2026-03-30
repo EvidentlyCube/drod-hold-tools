@@ -1,7 +1,10 @@
-import { ChangeEvent, useCallback, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { Hold } from "../../../data/datatypes/Hold";
-import { importDataArchive, ImportDataArchiveFileStatus } from "../../../processor/importDataArchive";
+import type { Hold } from "../../../data/datatypes/Hold";
+import {
+	type ImportDataArchiveFileStatus,
+	importDataArchive,
+} from "../../../processor/importDataArchive";
 
 interface FileStatus {
 	name: string;
@@ -15,40 +18,42 @@ interface Props {
 
 export default function BulkDataReplaceButton({ hold }: Props) {
 	const [isProcessing, setIsProcessing] = useState(false);
-	const [files, setFiles] = useState<FileStatus[]>([])
+	const [files, setFiles] = useState<FileStatus[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
 
-	const processArchive = useCallback(async (file: File) => {
-		setFiles([]);
-		setIsOpen(true);
-		setIsProcessing(true);
+	const processArchive = useCallback(
+		async (file: File) => {
+			setFiles([]);
+			setIsOpen(true);
+			setIsProcessing(true);
 
-		try {
-			const data = await file.bytes();
+			try {
+				const data = await file.bytes();
 
-			await importDataArchive(
-				hold,
-				data,
-				{
-					onLog: (name, status, context) => setFiles(prev => [...prev, { name, context, status }])
-				}
-			);
-		} finally {
-			setIsProcessing(false);
-		}
+				await importDataArchive(hold, data, {
+					onLog: (name, status, context) =>
+						setFiles(prev => [...prev, { name, context, status }]),
+				});
+			} finally {
+				setIsProcessing(false);
+			}
+		},
+		[hold],
+	);
 
-	}, [hold]);
+	const onFileSelected = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const file = e.target.files?.[0];
+			if (!file) {
+				return;
+			}
 
-	const onFileSelected = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (!file) {
-			return;
-		}
+			e.target.value = "";
 
-		e.target.value = "";
-
-		void processArchive(file);
-	}, [processArchive]);
+			void processArchive(file);
+		},
+		[processArchive],
+	);
 
 	const onClose = useCallback(() => {
 		if (!isProcessing) {
@@ -56,24 +61,33 @@ export default function BulkDataReplaceButton({ hold }: Props) {
 		}
 	}, [isProcessing]);
 
-	const modal = isOpen
-		? <ResultsModal files={files} canClose={!isProcessing} onClose={onClose} />
-		: null;
+	const modal = isOpen ? (
+		<ResultsModal files={files} canClose={!isProcessing} onClose={onClose} />
+	) : null;
 
-	return <div className="control" title="Upload a zip file with identically named files to replace them.">
-		<label className="file-label">
-			<input className="file-input" type="file" accept=".zip" onChange={onFileSelected} disabled={isProcessing} />
-			<span className="button is-primary">
-				<span className="file-icon">
-					<i className="fas fa-upload"></i>
+	return (
+		<div
+			className="control"
+			title="Upload a zip file with identically named files to replace them."
+		>
+			<label className="file-label">
+				<input
+					className="file-input"
+					type="file"
+					accept=".zip"
+					onChange={onFileSelected}
+					disabled={isProcessing}
+				/>
+				<span className="button is-primary">
+					<span className="file-icon">
+						<i className="fas fa-upload"></i>
+					</span>
+					<span className="file-label">Replace all data</span>
 				</span>
-				<span className="file-label">
-					Replace all data
-				</span>
-			</span>
-		</label>
-		{isOpen && createPortal(modal, document.body)}
-	</div>
+			</label>
+			{isOpen && createPortal(modal, document.body)}
+		</div>
+	);
 }
 interface ResultsModalProps {
 	files: FileStatus[];
@@ -84,17 +98,43 @@ interface ResultsModalProps {
 function ResultsModal({ files, canClose, onClose }: ResultsModalProps) {
 	return (
 		<div className="modal is-active">
-			<div className="modal-background" onClick={onClose}></div>
+			<button
+				type="button"
+				className="modal-background"
+				onClick={onClose}
+			></button>
 			<div className="modal-card">
 				<header className="modal-card-head">
 					<p className="modal-card-title">Bulk data replace</p>
-					{canClose && <button className="delete" onClick={onClose}></button>}
+					{canClose && (
+						<button type="button" className="delete" onClick={onClose}></button>
+					)}
 				</header>
 				<section className="modal-card-body">
-					<FileList files={files} filterByStatus="replaced" header="Updated Files" className="has-text-success" />
-					<FileList files={files} filterByStatus="identical" header="Identical Files" className="has-text-info" />
-					<FileList files={files} filterByStatus="no-match" header="Unmatched Files" className="has-text-warning" />
-					<FileList files={files} filterByStatus="error" header="Errors" className="has-text-error" />
+					<FileList
+						files={files}
+						filterByStatus="replaced"
+						header="Updated Files"
+						className="has-text-success"
+					/>
+					<FileList
+						files={files}
+						filterByStatus="identical"
+						header="Identical Files"
+						className="has-text-info"
+					/>
+					<FileList
+						files={files}
+						filterByStatus="no-match"
+						header="Unmatched Files"
+						className="has-text-warning"
+					/>
+					<FileList
+						files={files}
+						filterByStatus="error"
+						header="Errors"
+						className="has-text-error"
+					/>
 				</section>
 			</div>
 		</div>
@@ -115,13 +155,17 @@ function FileList({ files, filterByStatus, header, className }: FileListProps) {
 		return null;
 	}
 
-	return <>
-		<h4 className="is-size-3">{header}</h4>
-		<ul>
-			{filteredFiles.map((f, i) => <li
-				key={i}
-				className={className}
-			>{f.name}{f.context ? ` - ${f.context}` : ''}</li>)}
-		</ul>
-	</>;
+	return (
+		<>
+			<h4 className="is-size-3">{header}</h4>
+			<ul>
+				{filteredFiles.map(f => (
+					<li key={f.name} className={className}>
+						{f.name}
+						{f.context ? ` - ${f.context}` : ""}
+					</li>
+				))}
+			</ul>
+		</>
+	);
 }

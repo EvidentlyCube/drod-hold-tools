@@ -1,9 +1,11 @@
-import { useCallback, useState } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { Hold } from "../../../data/datatypes/Hold";
-import { HoldData } from "../../../data/datatypes/HoldData";
 import { DataFormat } from "../../../data/DrodEnums";
+import type { Hold } from "../../../data/datatypes/Hold";
+import type { HoldData } from "../../../data/datatypes/HoldData";
+import { shouldBeUnreachable } from "../../../utils/Interfaces";
 import { pluralize } from "../../../utils/StringUtils";
+import FullModal from "../../common/FullModal";
 
 interface Props {
 	hold: Hold;
@@ -15,21 +17,19 @@ export default function BulkManageUnusedDataButton({ hold }: Props) {
 	const onClick = useCallback(() => setIsOpen(true), []);
 	const onClose = useCallback(() => setIsOpen(false), []);
 
-	const modal = isOpen
-		? <InfoModal hold={hold} onClose={onClose} />
-		: null;
+	const modal = isOpen ? <InfoModal hold={hold} onClose={onClose} /> : null;
 
-	return <div className="control" title="Bulk delete or restore unused data">
-		<div className="button is-primary" onClick={onClick}>
-			<span className="file-icon">
-				<i className="fas fa-broom"></i>
-			</span>
-			<span className="file-label">
-				Manage unused data
-			</span>
+	return (
+		<div className="control" title="Bulk delete or restore unused data">
+			<button type="button" className="button is-primary" onClick={onClick}>
+				<span className="file-icon">
+					<i className="fas fa-broom"></i>
+				</span>
+				<span className="file-label">Manage unused data</span>
+			</button>
+			{isOpen && createPortal(modal, document.body)}
 		</div>
-		{isOpen && createPortal(modal, document.body)}
-	</div>
+	);
 }
 interface ResultsModalProps {
 	hold: Hold;
@@ -40,45 +40,55 @@ function InfoModal({ hold, onClose }: ResultsModalProps) {
 	const unusedData = hold.datas.filterToArray(data => data.$uses.length === 0);
 
 	const onDeleteAll = useCallback(() => {
-		hold.datas.forEach(data => data.$isDeleted.newValue = data.$uses.length === 0);
+		hold.datas.forEach(data => {
+			data.$isDeleted.newValue = data.$uses.length === 0;
+		});
 		onClose();
-	}, [hold, onClose])
+	}, [hold, onClose]);
 	const onRestoreAll = useCallback(() => {
-		hold.datas.forEach(data => data.$isDeleted.newValue = false);
+		hold.datas.forEach(data => {
+			data.$isDeleted.newValue = false;
+		});
 		onClose();
-	}, [hold, onClose])
+	}, [hold, onClose]);
 
 	return (
-		<div className="modal is-active">
-			<div className="modal-background" onClick={onClose}></div>
-			<div className="modal-card">
-				<header className="modal-card-head">
-					<p className="modal-card-title">Manage unused data</p>
-					<button className="delete" onClick={onClose}></button>
-				</header>
-				<section className="modal-card-body">
-					<div className="content">
-						<h3 className="is-size-2">{unusedData.length} unused {pluralize(unusedData.length, 'data')} found</h3>
-						<ul className="content">
-							{unusedData.map(data => <DataRow key={data.id} data={data} />)}
-						</ul>
-					</div>
-				</section>
-				<footer className="modal-card-foot">
-					<div className="buttons is-flex-grow-1">
-						<button onClick={onDeleteAll} className="button is-danger">Delete All</button>
-						<button onClick={onRestoreAll} className="button is-warning">Restore All</button>
-						<span className="is-flex-grow-1"></span>
-						<button onClick={onClose} className="button">Cancel</button>
-					</div>
-				</footer>
-			</div>
-		</div>
+		<FullModal
+			title="Manage unused data"
+			onClose={onClose}
+			buttons={[
+				<button
+					key="delete"
+					type="button"
+					onClick={onDeleteAll}
+					className="button is-danger"
+				>
+					Delete All
+				</button>,
+				<button
+					key="restore"
+					type="button"
+					onClick={onRestoreAll}
+					className="button is-warning"
+				>
+					Restore All
+				</button>,
+			]}
+		>
+			<h3 className="is-size-2">
+				{unusedData.length} unused {pluralize(unusedData.length, "data")} found
+			</h3>
+			<ul className="content">
+				{unusedData.map(data => (
+					<DataRow key={data.id} data={data} />
+				))}
+			</ul>
+		</FullModal>
 	);
 }
 
 function DataRow({ data }: { data: HoldData }) {
-	let icon;
+	let icon: ReactNode = null;
 
 	switch (data.details.newValue.format) {
 		case DataFormat.Unknown:
@@ -103,15 +113,23 @@ function DataRow({ data }: { data: HoldData }) {
 		case DataFormat.THEORA:
 			icon = <Icon name="fa-video" />;
 			break;
+
+		default:
+			shouldBeUnreachable(data.details.newValue.format);
+			break;
 	}
-	return <li key={data.id}>
-		{icon}
-		{data.name.newValue}
-	</li>;
+	return (
+		<li key={data.id}>
+			{icon}
+			{data.name.newValue}
+		</li>
+	);
 }
 
 function Icon({ name }: { name: string }) {
-	return <span className="icon">
-		<i className={`fas ${name}`}></i>
-	</span>;
+	return (
+		<span className="icon">
+			<i className={`fas ${name}`}></i>
+		</span>
+	);
 }

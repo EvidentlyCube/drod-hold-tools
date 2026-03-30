@@ -1,6 +1,6 @@
 import { useSignalValue } from "../../hooks/useSignalValue";
 import { useSignalValueThrottled } from "../../hooks/useSignalValueThrottled";
-import { HoldReader } from "../../processor/HoldReaders";
+import type { HoldReader } from "../../processor/HoldReaders";
 import FullPageMessage from "../common/FullPageMessage";
 import HoldReaderErrorPage from "./HoldReaderErrorPage";
 import HoldViewTemplate from "./HoldViewTemplate";
@@ -14,10 +14,7 @@ export default function HoldReaderView({ holdReader }: Props) {
 	const error = useSignalValue(holdReader.error);
 
 	if (error) {
-		return (
-			<HoldReaderErrorPage id={holdReader.id} error={error} />
-		);
-
+		return <HoldReaderErrorPage id={holdReader.id} error={error} />;
 	} else if (holdReader.isBusy.value) {
 		return (
 			<FullPageMessage header="Status">
@@ -25,11 +22,6 @@ export default function HoldReaderView({ holdReader }: Props) {
 			</FullPageMessage>
 		);
 	} else {
-		return (
-			<HoldViewTemplate
-				hold={holdReader.hold}
-				holdReader={holdReader}
-			/>
-		);
+		return <HoldViewTemplate hold={holdReader.hold} holdReader={holdReader} />;
 	}
 }

@@ -1,8 +1,10 @@
-import { unzip } from 'fflate';
+import { unzip } from "fflate";
 
 export type ArchiveContents = Map<string, Uint8Array<ArrayBuffer>>;
 
-export function unzipPromise(data: Uint8Array<ArrayBuffer>): Promise<ArchiveContents> {
+export function unzipPromise(
+	data: Uint8Array<ArrayBuffer>,
+): Promise<ArchiveContents> {
 	return new Promise((resolve, reject) => {
 		unzip(data, (err, unzipped) => {
 			if (err) {

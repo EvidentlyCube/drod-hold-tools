@@ -19,8 +19,10 @@ export async function tryToYieldToUi() {
 }
 
 export async function yieldToUi() {
-	await new Promise<void>(resolve => setTimeout(() => {
-		lastSleep = Date.now();
-		resolve();
-	}, Constants.yieldSleepDuration));
+	await new Promise<void>(resolve =>
+		setTimeout(() => {
+			lastSleep = Date.now();
+			void resolve();
+		}, Constants.yieldSleepDuration),
+	);
 }

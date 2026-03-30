@@ -1,12 +1,12 @@
-import { ChangeEvent, useCallback, useRef } from "react";
+import { type ChangeEvent, useCallback, useRef } from "react";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
-import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 import { formatDateTimeForInput } from "../../../utils/DateUtils";
+import type { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 
 interface Props {
 	datetime: SignalUpdatableValue<number>;
 }
-export default function DateTimeEditor({datetime}: Props) {
+export default function DateTimeEditor({ datetime }: Props) {
 	const [oldValue, isEdited, newValue] = useSignalUpdatableValue(datetime);
 	const inputRef = useRef(null);
 
@@ -14,7 +14,7 @@ export default function DateTimeEditor({datetime}: Props) {
 		if (!isEdited) {
 			datetime.set(true, datetime.oldValue);
 			if (inputRef.current) {
-				(inputRef.current as HTMLElement).focus()
+				(inputRef.current as HTMLElement).focus();
 			}
 		} else {
 			datetime.unset();
@@ -25,31 +25,39 @@ export default function DateTimeEditor({datetime}: Props) {
 		if (isEdited && datetime.newValue === datetime.oldValue) {
 			datetime.unset();
 		}
-	}, [datetime, isEdited])
+	}, [datetime, isEdited]);
 
-	const onType = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		datetime.set(true, new Date(e.target.value).getTime());
-	}, [datetime]);
+	const onType = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			datetime.set(true, new Date(e.target.value).getTime());
+		},
+		[datetime],
+	);
 
-	const title = isEdited
-		? "Cancel changes"
-		: "Edit text";
+	const title = isEdited ? "Cancel changes" : "Edit text";
 
-	return <div className="control has-icons-left">
-		<input
-			type="datetime-local"
-			className="input is-read-only-hidden"
-			value={formatDateTimeForInput(newValue)}
-			readOnly={!isEdited}
-			onInput={onType}
-			ref={inputRef}
-			onClick={!isEdited ? onToggle : undefined}
-			onBlur={onBlur}
-			title={(new Date(oldValue)).toLocaleString()}
+	return (
+		<div className="control has-icons-left">
+			<input
+				type="datetime-local"
+				className="input is-read-only-hidden"
+				value={formatDateTimeForInput(newValue)}
+				readOnly={!isEdited}
+				onInput={onType}
+				ref={inputRef}
+				onClick={!isEdited ? onToggle : undefined}
+				onBlur={onBlur}
+				title={new Date(oldValue).toLocaleString()}
 			/>
-		<div className="icon is-small is-left is-interactive" onClick={onToggle} title={title}>
-			{!isEdited && <i className="fas fa-pen-to-square" />}
-			{isEdited && <i className="fas fa-rotate-left" />}
+			<button
+				type="button"
+				className="icon is-small is-left is-interactive"
+				onClick={onToggle}
+				title={title}
+			>
+				{!isEdited && <i className="fas fa-pen-to-square" />}
+				{isEdited && <i className="fas fa-rotate-left" />}
+			</button>
 		</div>
-	</div>
+	);
 }

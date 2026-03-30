@@ -1,5 +1,5 @@
-import { ReactElement } from "react";
-import { OptGroup, Option } from "../Select";
+import type { ReactElement } from "react";
+import type { OptGroup, Option } from "../Select";
 
 export interface SortableTableDataWithId {
 	id: string | number;
@@ -12,7 +12,7 @@ export interface SortableTableColumnSansData {
 	widthPercent: number;
 	canHide?: boolean;
 	className?: string;
-	filterOptions?: { options?: Option[], optgroups?: OptGroup[] };
+	filterOptions?: { options?: Option[]; optgroups?: OptGroup[] };
 	filterDebounce?: number;
 }
 

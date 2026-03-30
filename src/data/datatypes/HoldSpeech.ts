@@ -1,10 +1,16 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { doesCommandUseSpeech } from "../CommandUtils";
-import { HoldRefCharacterCommand, HoldRefModel, HoldRefMonsterCommand, HoldRefSpeech, resolveReference } from "../references/HoldReference";
+import {
+	type HoldRefCharacterCommand,
+	HoldRefModel,
+	type HoldRefMonsterCommand,
+	type HoldRefSpeech,
+	resolveReference,
+} from "../references/HoldReference";
 import { TextUtils } from "../TextUtils";
 import { getSpeakerName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
-import { HoldData } from "./HoldData";
+import type { HoldData } from "./HoldData";
 
 interface SpeechConstructor {
 	id: number;
@@ -18,7 +24,7 @@ export class HoldSpeech {
 	public readonly $hold: Hold;
 
 	public readonly id: number;
-	public readonly dataId: SignalUpdatableValue<number|undefined>;
+	public readonly dataId: SignalUpdatableValue<number | undefined>;
 	public readonly character: number;
 	public readonly mood: SignalUpdatableValue<number>;
 	public readonly delay: number;
@@ -31,20 +37,28 @@ export class HoldSpeech {
 
 	public get $speaker(): string {
 		const command = resolveReference(this.$location);
-		return getSpeakerName(this.$hold, this.character, command?.x ?? 0, command?.y ?? 0);
+		return getSpeakerName(
+			this.$hold,
+			this.character,
+			command?.x ?? 0,
+			command?.y ?? 0,
+		);
 	}
 
-	public get $mood() :string {
+	public get $mood(): string {
 		return TextUtils.moodName(this.mood.newValue);
 	}
 
 	public get $data(): HoldData | undefined {
-		return this.dataId.newValue ? this.$hold.datas.get(this.dataId.newValue) : undefined;
+		return this.dataId.newValue
+			? this.$hold.datas.get(this.dataId.newValue)
+			: undefined;
 	}
 
 	public get $containsVariableReference() {
 		if (this._containsVariableReferenceCache === undefined) {
-			this._containsVariableReferenceCache = this.message.newValue.includes('$');
+			this._containsVariableReferenceCache =
+				this.message.newValue.includes("$");
 		}
 
 		return this._containsVariableReferenceCache;
@@ -54,7 +68,7 @@ export class HoldSpeech {
 		return {
 			model: HoldRefModel.Speech,
 			hold: this.$hold,
-			speechId: this.id
+			speechId: this.id,
 		};
 	}
 
@@ -73,15 +87,19 @@ export class HoldSpeech {
 	public constructor(hold: Hold, opts: SpeechConstructor) {
 		this.$hold = hold;
 
-		this.id = opts.id
-		this.dataId = new SignalUpdatableValue(opts.dataId)
-		this.character = opts.character
+		this.id = opts.id;
+		this.dataId = new SignalUpdatableValue(opts.dataId);
+		this.character = opts.character;
 		this.mood = new SignalUpdatableValue(opts.mood);
-		this.delay = opts.delay
-		this.message = new SignalUpdatableValue(wcharBase64ToString(opts.encMessage));
+		this.delay = opts.delay;
+		this.message = new SignalUpdatableValue(
+			wcharBase64ToString(opts.encMessage),
+		);
 
 		this.$isDeleted = new SignalUpdatableValue(false);
 
-		this.message.onChange.add(() => this._containsVariableReferenceCache = undefined);
+		this.message.onChange.add(
+			() => (this._containsVariableReferenceCache = undefined),
+		);
 	}
 }

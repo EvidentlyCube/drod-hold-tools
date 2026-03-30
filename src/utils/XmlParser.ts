@@ -2,16 +2,22 @@ import { tryToYieldToUi } from "./AsyncUtils";
 
 type ProgressCallback = (log: string, progressFactor: number) => void;
 
-export async function parseXml(xmlString: string, progressCallback?: ProgressCallback): Promise<XMLDocument> {
+export async function parseXml(
+	xmlString: string,
+	progressCallback?: ProgressCallback,
+): Promise<XMLDocument> {
 	const reader = new XmlBufferReader(xmlString, progressCallback);
 	const xmlDoc = document.implementation.createDocument(null, null, null);
 
 	const [headerType, headerData] = reader.consumeHeader();
-	const processingInstruction = xmlDoc.createProcessingInstruction(headerType, headerData);
+	const processingInstruction = xmlDoc.createProcessingInstruction(
+		headerType,
+		headerData,
+	);
 	xmlDoc.insertBefore(processingInstruction, null);
 
 	while (!reader.isFinished) {
-		if (!await readElement(xmlDoc, reader)) {
+		if (!(await readElement(xmlDoc, reader))) {
 			break;
 		}
 	}
@@ -19,10 +25,13 @@ export async function parseXml(xmlString: string, progressCallback?: ProgressCal
 	return xmlDoc;
 }
 
-async function readElement(parent: Element | XMLDocument, reader: XmlBufferReader) {
+async function readElement(
+	parent: Element | XMLDocument,
+	reader: XmlBufferReader,
+) {
 	await tryToYieldToUi();
 
-	const document = 'createElement' in parent ? parent : parent.ownerDocument;
+	const document = "createElement" in parent ? parent : parent.ownerDocument;
 
 	if (!reader.consumeTagOpen()) {
 		return false;
@@ -42,7 +51,9 @@ async function readElement(parent: Element | XMLDocument, reader: XmlBufferReade
 	}
 
 	if (!reader.consumeTagClose()) {
-		reader.throwError("Parse failure - expected tag close because not self-closing but it wasn't found");
+		reader.throwError(
+			"Parse failure - expected tag close because not self-closing but it wasn't found",
+		);
 	}
 
 	element.appendChild(document.createTextNode("\n"));
@@ -56,7 +67,7 @@ async function readElement(parent: Element | XMLDocument, reader: XmlBufferReade
 			break;
 		}
 
-		if (!await readElement(element, reader)) {
+		if (!(await readElement(element, reader))) {
 			break;
 		}
 	}
@@ -65,16 +76,16 @@ async function readElement(parent: Element | XMLDocument, reader: XmlBufferReade
 }
 
 type Attr = [string, string];
-const Whitespace = new Set([' ', "\n", "\r", "\t"]);
-const CharCode_a = 'a'.charCodeAt(0);
-const CharCode_z = 'z'.charCodeAt(0);
-const CharCode_A = 'A'.charCodeAt(0);
-const CharCode_Z = 'Z'.charCodeAt(0);
-const CharCode_0 = '0'.charCodeAt(0);
-const CharCode_9 = '9'.charCodeAt(0);
-const CharCode_Dash = '-'.charCodeAt(0);
-const CharCode_Underscore = '_'.charCodeAt(0);
-const CharCode_Colon = ':'.charCodeAt(0);
+const Whitespace = new Set([" ", "\n", "\r", "\t"]);
+const CharCode_a = "a".charCodeAt(0);
+const CharCode_z = "z".charCodeAt(0);
+const CharCode_A = "A".charCodeAt(0);
+const CharCode_Z = "Z".charCodeAt(0);
+const CharCode_0 = "0".charCodeAt(0);
+const CharCode_9 = "9".charCodeAt(0);
+const CharCode_Dash = "-".charCodeAt(0);
+const CharCode_Underscore = "_".charCodeAt(0);
+const CharCode_Colon = ":".charCodeAt(0);
 
 class XmlBufferReader {
 	private _xml: string;
@@ -87,14 +98,16 @@ class XmlBufferReader {
 	}
 
 	public constructor(xml: string, progressCallback?: ProgressCallback) {
-		this._xml = xml.replace(/\r|\n/g, '');
+		this._xml = xml.replace(/\r|\n/g, "");
 		this._length = xml.length;
 		this._pos = 0;
 		this._progressCallback = progressCallback;
 	}
 
 	public consumeHeader() {
-		const match = this._xml.substring(this._pos).match(/^<\?(.+?)\s+(.+?)\s*\?>/);
+		const match = this._xml
+			.substring(this._pos)
+			.match(/^<\?(.+?)\s+(.+?)\s*\?>/);
 
 		if (match) {
 			this._pos += match[0].length;
@@ -106,7 +119,7 @@ class XmlBufferReader {
 	}
 
 	public consumeTagOpen() {
-		if (this._xml.charAt(this._pos) === '<') {
+		if (this._xml.charAt(this._pos) === "<") {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
@@ -116,7 +129,7 @@ class XmlBufferReader {
 	}
 
 	public consumeTagClose() {
-		if (this._xml[this._pos] === '>') {
+		if (this._xml[this._pos] === ">") {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
@@ -126,7 +139,7 @@ class XmlBufferReader {
 	}
 
 	public consumeSlash() {
-		if (this._xml[this._pos] === '/') {
+		if (this._xml[this._pos] === "/") {
 			this._pos++;
 			this._pos = this.getWhitespaceEnd(this._pos);
 			return true;
@@ -136,6 +149,7 @@ class XmlBufferReader {
 	}
 
 	public consumeTagName() {
+		this._log();
 		let i = this._pos;
 		for (; i < this._length; i++) {
 			const code = this._xml.charCodeAt(i);
@@ -203,15 +217,17 @@ class XmlBufferReader {
 		const attributeName = this._xml.substring(this._pos, i);
 		this._pos = this.getWhitespaceEnd(i);
 
-		if (this._xml[this._pos++] !== '=') {
-			this.throwError("Invalid XML - Expected an equality sign after attribute name");
+		if (this._xml[this._pos++] !== "=") {
+			this.throwError(
+				"Invalid XML - Expected an equality sign after attribute name",
+			);
 		}
 
 		this._pos = this.getWhitespaceEnd(this._pos);
 
 		const quoteChar = this._xml[this._pos++];
 
-		i = this._pos
+		i = this._pos;
 		while (i < this._length && this._xml[i] !== quoteChar) {
 			i++;
 		}
@@ -235,12 +251,12 @@ class XmlBufferReader {
 
 	public lookaheadTagClose() {
 		let i = this._pos;
-		if (this._xml[i++] !== '<') {
+		if (this._xml[i++] !== "<") {
 			return false;
 		}
 
 		i = this.getWhitespaceEnd(i);
-		if (this._xml[i] !== '/') {
+		if (this._xml[i] !== "/") {
 			return false;
 		}
 
@@ -248,22 +264,24 @@ class XmlBufferReader {
 	}
 
 	public throwError(message: string) {
-		throw new Error(message + ":" + this.context());
+		throw new Error(`${message}:${this.context()}`);
 	}
 
 	public context(pos?: number) {
 		pos = pos ?? this._pos;
-		return this._xml.substring(pos - 20, pos)
+		return (
+			this._xml.substring(pos - 20, pos)
 			+ " -->"
 			+ this._xml[pos]
 			+ "<-- "
-			+ this._xml.substring(pos + 1, pos + 20);
+			+ this._xml.substring(pos + 1, pos + 20)
+		);
 	}
 
 	private _log() {
 		this._progressCallback?.(
 			`Processing: ${this._xml.substring(this._pos - 20, this._pos + 20)}`,
-			this._pos / this._xml.length
+			this._pos / this._xml.length,
 		);
 	}
 }

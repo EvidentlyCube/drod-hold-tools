@@ -12,7 +12,7 @@ export interface SignalSetOperation<T> {
 }
 
 export class SignalSet<TElement> {
-	private _set = new Set<TElement>()
+	private _set = new Set<TElement>();
 	public onChange = new Signal<SignalSetOperation<TElement>>();
 
 	public get set(): ReadonlySet<TElement> {
@@ -25,7 +25,7 @@ export class SignalSet<TElement> {
 			this.onChange.dispatch({
 				operand: element,
 				operator: SignalSetOperator.Add,
-				set: this
+				set: this,
 			});
 		}
 	}
@@ -36,7 +36,7 @@ export class SignalSet<TElement> {
 			this.onChange.dispatch({
 				operand: element,
 				operator: SignalSetOperator.Remove,
-				set: this
+				set: this,
 			});
 		}
 	}

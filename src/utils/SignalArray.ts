@@ -32,7 +32,11 @@ export class SignalArray<TElement> {
 
 		if (index === -1) {
 			this._array.push(element);
-			this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Add, elements: [element] });
+			this.onChange.dispatch({
+				array: this,
+				operator: SignalArrayOperator.Add,
+				elements: [element],
+			});
 		}
 	}
 
@@ -42,7 +46,11 @@ export class SignalArray<TElement> {
 
 	public push(element: TElement) {
 		this._array.push(element);
-		this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Add, elements: [element] });
+		this.onChange.dispatch({
+			array: this,
+			operator: SignalArrayOperator.Add,
+			elements: [element],
+		});
 	}
 
 	public remove(element: TElement) {
@@ -50,7 +58,11 @@ export class SignalArray<TElement> {
 
 		if (index !== -1) {
 			this._array.splice(index, 1);
-			this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Remove, elements: [element] });
+			this.onChange.dispatch({
+				array: this,
+				operator: SignalArrayOperator.Remove,
+				elements: [element],
+			});
 		}
 	}
 
@@ -66,6 +78,10 @@ export class SignalArray<TElement> {
 			}
 		}
 
-		this.onChange.dispatch({ array: this, operator: SignalArrayOperator.Remove, elements: filteredOut });
+		this.onChange.dispatch({
+			array: this,
+			operator: SignalArrayOperator.Remove,
+			elements: filteredOut,
+		});
 	}
 }

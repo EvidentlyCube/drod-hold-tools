@@ -1,21 +1,26 @@
 import { parseFileToDataDetail } from "../data/actions/parseFileToDataDetail";
-import { Hold } from "../data/datatypes/Hold";
-import { ArchiveContents, unzipPromise } from "../utils/FflateUtils";
+import type { Hold } from "../data/datatypes/Hold";
+import { type ArchiveContents, unzipPromise } from "../utils/FflateUtils";
 import { guessMimeType } from "../utils/FileUtils";
 
-export type ImportDataArchiveFileStatus = 'replaced'
-	| 'identical'
-	| 'no-match'
-	| 'error'
+export type ImportDataArchiveFileStatus =
+	| "replaced"
+	| "identical"
+	| "no-match"
+	| "error";
 
 interface ImportDataArchiveOptions {
-	onLog: (path: string, status: ImportDataArchiveFileStatus, context: string) => void;
+	onLog: (
+		path: string,
+		status: ImportDataArchiveFileStatus,
+		context: string,
+	) => void;
 }
 
 export async function importDataArchive(
 	hold: Hold,
 	archiveBytes: Uint8Array<ArrayBuffer>,
-	options?: Partial<ImportDataArchiveOptions>
+	options?: Partial<ImportDataArchiveOptions>,
 ): Promise<void> {
 	const files = await extractArchive(archiveBytes);
 
@@ -26,10 +31,12 @@ export async function importDataArchive(
 			continue;
 		}
 
-		const matchedData = hold.datas.find(data => data.name.newValue === fileName);
+		const matchedData = hold.datas.find(
+			data => data.name.newValue === fileName,
+		);
 
 		if (!matchedData) {
-			options?.onLog?.(path, 'no-match', '');
+			options?.onLog?.(path, "no-match", "");
 			continue;
 		}
 
@@ -37,28 +44,32 @@ export async function importDataArchive(
 		try {
 			const newDetail = await parseFileToDataDetail(matchedData, file);
 
-			if (newDetail.rawEncodedData === matchedData.details.newValue.rawEncodedData) {
-				options?.onLog?.(path, 'identical', '');
+			if (
+				newDetail.rawEncodedData === matchedData.details.newValue.rawEncodedData
+			) {
+				options?.onLog?.(path, "identical", "");
 				continue;
 			}
 
 			matchedData.$lastReplaceError.unset();
 			matchedData.details.newValue = newDetail;
 
-			options?.onLog?.(path, 'replaced', '');
+			options?.onLog?.(path, "replaced", "");
 		} catch (e) {
-			options?.onLog?.(path, 'error', String(e));
+			options?.onLog?.(path, "error", String(e));
 		}
 	}
 }
 
-async function extractArchive(archiveBytes: Uint8Array): Promise<ArchiveContents> {
+function extractArchive(archiveBytes: Uint8Array): Promise<ArchiveContents> {
 	switch (guessMimeType(archiveBytes)) {
-		case 'application/zip': return unzipPromise(archiveBytes.slice());
-		default: throw new Error("Unsupported file format");
+		case "application/zip":
+			return unzipPromise(archiveBytes.slice());
+		default:
+			throw new Error("Unsupported file format");
 	}
 }
 
 function extractFilename(path: string): string {
-	return path.match(/[^/\\]*$/)![0];
+	return path.match(/[^/\\]*$/)?.[0] ?? path;
 }

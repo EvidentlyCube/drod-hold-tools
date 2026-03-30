@@ -1,6 +1,5 @@
 import { Signal } from "./Signals";
 
-
 export class SignalNullable<T> {
 	private _value?: T;
 	public onChange = new Signal<T | undefined>();

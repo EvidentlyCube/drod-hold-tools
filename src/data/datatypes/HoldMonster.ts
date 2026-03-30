@@ -1,7 +1,7 @@
-import { CommandsList } from "../CommandList";
+import type { CommandsList } from "../CommandList";
 import { packCommands, unpackCommands } from "../CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE, UINT_MINUS_1 } from "../DrodCommonTypes";
-import { PackedVars } from "../PackedVars";
+import type { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
 import type { HoldRoom } from "./HoldRoom";
 
@@ -43,7 +43,7 @@ export class HoldMonster {
 	 * ID of the selected character typ if this is a character, (UINT)-1 otherwise
 	 */
 	public get $characterTypeId(): number {
-		return this.extraVars?.readUint('id', UINT_MINUS_1) ?? UINT_MINUS_1;
+		return this.extraVars?.readUint("id", UINT_MINUS_1) ?? UINT_MINUS_1;
 	}
 
 	public constructor(room: HoldRoom, index: number, opts: MonsterConstructor) {

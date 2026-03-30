@@ -1,28 +1,46 @@
-import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
-import { Hold } from "./Hold";
+import type { Hold } from "./Hold";
 import {
-	HoldChange, HoldChangeCharacterAvatarDataId, HoldChangeCharacterCommandLabel, HoldChangeCharacterName,
-	HoldChangeCharacterTilesDataId, HoldChangeDataDeletion, HoldChangeDataFile, HoldChangeDataName,
-	HoldChangeEntranceDataId, HoldChangeEntranceDescription,
-	HoldChangeEntranceShowDescription, HoldChangeHoldPlayer,
-	HoldChangeLevelCreated, HoldChangeLevelName, HoldChangeLevelPlayerId,
-	HoldChangeMonsterCommandLabel,
-	HoldChangePlayerDeletion, HoldChangePlayerInsertion, HoldChangePlayerName,
-	HoldChangeScrollMessage, HoldChangeSpeechDataId, HoldChangeSpeechDeletion, HoldChangeSpeechMessage,
-	HoldChangeSpeechMood, HoldChangeType, HoldChangeVariableName, HoldChangeWorldMapDataId,
-	HoldChangeWorldMapName
+	type HoldChange,
+	type HoldChangeCharacterAvatarDataId,
+	type HoldChangeCharacterCommandLabel,
+	type HoldChangeCharacterName,
+	type HoldChangeCharacterTilesDataId,
+	type HoldChangeDataDeletion,
+	type HoldChangeDataFile,
+	type HoldChangeDataName,
+	type HoldChangeEntranceDataId,
+	type HoldChangeEntranceDescription,
+	type HoldChangeEntranceShowDescription,
+	type HoldChangeHoldPlayer,
+	type HoldChangeLevelCreated,
+	type HoldChangeLevelName,
+	type HoldChangeLevelPlayerId,
+	type HoldChangeMonsterCommandLabel,
+	type HoldChangePlayerDeletion,
+	type HoldChangePlayerInsertion,
+	type HoldChangePlayerName,
+	type HoldChangeScrollMessage,
+	type HoldChangeSpeechDataId,
+	type HoldChangeSpeechDeletion,
+	type HoldChangeSpeechMessage,
+	type HoldChangeSpeechMood,
+	HoldChangeType,
+	type HoldChangeVariableName,
+	type HoldChangeWorldMapDataId,
+	type HoldChangeWorldMapName,
 } from "./HoldChange";
-import { HoldCharacter } from "./HoldCharacter";
-import { HoldData } from "./HoldData";
-import { HoldEntrance } from "./HoldEntrance";
-import { HoldLevel } from "./HoldLevel";
-import { HoldMonster } from "./HoldMonster";
-import { HoldPlayer } from "./HoldPlayer";
-import { HoldScroll } from "./HoldRoom";
-import { HoldSpeech } from "./HoldSpeech";
-import { HoldVariable } from "./HoldVariable";
-import { HoldWorldMap } from "./HoldWorldMap";
+import type { HoldCharacter } from "./HoldCharacter";
+import type { HoldData } from "./HoldData";
+import type { HoldEntrance } from "./HoldEntrance";
+import type { HoldLevel } from "./HoldLevel";
+import type { HoldMonster } from "./HoldMonster";
+import type { HoldPlayer } from "./HoldPlayer";
+import type { HoldScroll } from "./HoldRoom";
+import type { HoldSpeech } from "./HoldSpeech";
+import type { HoldVariable } from "./HoldVariable";
+import type { HoldWorldMap } from "./HoldWorldMap";
 
 export class HoldChangeListener {
 	public register(hold: Hold) {
@@ -30,7 +48,7 @@ export class HoldChangeListener {
 
 		hold.variables.forEach(variable => {
 			this.registerVariableNameChange(variable);
-		})
+		});
 
 		hold.characters.forEach(character => {
 			this.registerCharacterAvatarDataIdChange(character);
@@ -42,7 +60,7 @@ export class HoldChangeListener {
 			for (const monster of room.monsters) {
 				this.registerMonsterCommandLabelChange(monster);
 			}
-		})
+		});
 		hold.datas.forEach(data => {
 			this.registerDataNameChange(data);
 			this.registerDataFileChange(data);
@@ -52,16 +70,16 @@ export class HoldChangeListener {
 			this.registerEntranceDataIdChange(entrance);
 			this.registerEntranceDescriptionChange(entrance);
 			this.registerEntranceShowDescriptionChange(entrance);
-		})
+		});
 		hold.levels.forEach(level => {
 			this.registerLevelCreatedChange(level);
 			this.registerLevelNameChange(level);
 			this.registerLevelPlayerIdChange(level);
-		})
-		hold.players.forEach(player => this.registerNewPlayer(player));
+		});
+		hold.players.forEach(player => void this.registerNewPlayer(player));
 		hold.$scrolls.forEach(scroll => {
 			this.registerScrollMessageChange(scroll);
-		})
+		});
 		hold.speeches.forEach(speech => {
 			this.registerSpeechDataIdChange(speech);
 			this.registerSpeechMessageChange(speech);
@@ -88,7 +106,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.HoldPlayer,
 			location: {},
 			hasChange: false,
-			value: hold.playerId.newValue
+			value: hold.playerId.newValue,
 		});
 
 		registerTextChange(hold, change, hold.playerId);
@@ -102,7 +120,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.CharacterAvatarDataId,
 			location: { characterId: id },
 			hasChange: false,
-			value: avatarDataId.newValue
+			value: avatarDataId.newValue,
 		});
 
 		registerTextChange($hold, change, avatarDataId);
@@ -115,7 +133,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.VariableName,
 			location: { variableId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange(hold, change, name);
@@ -128,7 +146,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.CharacterName,
 			location: { characterId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange($hold, change, name);
@@ -141,7 +159,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.CharacterTilesDataId,
 			location: { characterId: id },
 			hasChange: false,
-			value: tilesDataId.newValue
+			value: tilesDataId.newValue,
 		});
 
 		registerTextChange($hold, change, tilesDataId);
@@ -161,7 +179,7 @@ export class HoldChangeListener {
 				type: HoldChangeType.CharacterCommandLabel,
 				location: { characterId: id, commandIndex: index },
 				hasChange: false,
-				value: label.newValue
+				value: label.newValue,
 			});
 
 			registerTextChange($hold, change, label);
@@ -180,9 +198,13 @@ export class HoldChangeListener {
 
 			const change = $hold.$changes.create<HoldChangeMonsterCommandLabel>({
 				type: HoldChangeType.MonsterCommandLabel,
-				location: { roomId: $room.id, monsterIndex: monster.$index, commandIndex: command.index },
+				location: {
+					roomId: $room.id,
+					monsterIndex: monster.$index,
+					commandIndex: command.index,
+				},
 				hasChange: false,
-				value: label.newValue
+				value: label.newValue,
 			});
 
 			registerTextChange($hold, change, label);
@@ -196,7 +218,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.DataName,
 			location: { dataId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange($hold, change, name);
@@ -209,7 +231,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.DataFile,
 			location: { dataId: id },
 			hasChange: false,
-			value: details.newValue
+			value: details.newValue,
 		});
 
 		registerTextChange($hold, change, details);
@@ -222,7 +244,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.DataDeletion,
 			location: { dataId: id },
 			hasChange: false,
-			value: $isDeleted.newValue
+			value: $isDeleted.newValue,
 		});
 
 		registerTextChange($hold, change, $isDeleted);
@@ -235,7 +257,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.EntranceDataId,
 			location: { entranceId: id },
 			hasChange: false,
-			value: dataId.newValue
+			value: dataId.newValue,
 		});
 
 		registerTextChange($hold, change, dataId);
@@ -249,7 +271,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.EntranceDescription,
 			location: { entranceId: id },
 			hasChange: false,
-			value: description.newValue
+			value: description.newValue,
 		});
 
 		registerTextChange($hold, change, description);
@@ -262,7 +284,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.EntranceShowDescription,
 			location: { entranceId: id },
 			hasChange: false,
-			value: showDescription.newValue
+			value: showDescription.newValue,
 		});
 
 		registerTextChange($hold, change, showDescription);
@@ -275,7 +297,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.LevelCreated,
 			location: { levelId: id },
 			hasChange: false,
-			value: createdTimestamp.newValue
+			value: createdTimestamp.newValue,
 		});
 
 		registerTextChange($hold, change, createdTimestamp);
@@ -288,7 +310,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.LevelName,
 			location: { levelId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange($hold, change, name);
@@ -301,7 +323,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.LevelPlayerId,
 			location: { levelId: id },
 			hasChange: false,
-			value: playerId.newValue
+			value: playerId.newValue,
 		});
 
 		registerTextChange($hold, change, playerId);
@@ -315,7 +337,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.PlayerDeletion,
 			location: { playerId: id },
 			hasChange: false,
-			value: $isDeleted.newValue
+			value: $isDeleted.newValue,
 		});
 
 		registerTextChange($hold, change, $isDeleted);
@@ -332,8 +354,8 @@ export class HoldChangeListener {
 			value: {
 				gidCreated: player.gidCreated,
 				gidOriginalName: player.gidOriginalName,
-				name: player.name.newValue
-			}
+				name: player.name.newValue,
+			},
 		});
 
 		name.onChange.add(({ value }) => {
@@ -348,7 +370,7 @@ export class HoldChangeListener {
 				$hold.players.del(id);
 				$hold.$changes.del(change);
 			}
-		})
+		});
 	}
 
 	private registerPlayerNameChange(player: HoldPlayer) {
@@ -358,7 +380,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.PlayerName,
 			location: { playerId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange($hold, change, name);
@@ -372,7 +394,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.ScrollMessage,
 			location: { roomId: $room.id, x, y },
 			hasChange: false,
-			value: message.newValue
+			value: message.newValue,
 		});
 
 		registerTextChange($hold, change, message);
@@ -385,7 +407,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.SpeechDataId,
 			location: { speechId: id },
 			hasChange: false,
-			value: dataId.newValue
+			value: dataId.newValue,
 		});
 
 		registerTextChange($hold, change, dataId);
@@ -399,7 +421,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.SpeechMessage,
 			location: { speechId: id },
 			hasChange: false,
-			value: message.newValue
+			value: message.newValue,
 		});
 
 		registerTextChange($hold, change, message);
@@ -412,7 +434,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.SpeechMood,
 			location: { speechId: id },
 			hasChange: false,
-			value: mood.newValue
+			value: mood.newValue,
 		});
 
 		registerTextChange($hold, change, mood);
@@ -425,7 +447,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.SpeechDeletion,
 			location: { speechId: id },
 			hasChange: false,
-			value: $isDeleted.newValue
+			value: $isDeleted.newValue,
 		});
 
 		registerTextChange($hold, change, $isDeleted);
@@ -438,7 +460,7 @@ export class HoldChangeListener {
 			type: HoldChangeType.WorldMapDataId,
 			location: { worldMapId: id },
 			hasChange: false,
-			value: dataId.newValue
+			value: dataId.newValue,
 		});
 
 		registerTextChange($hold, change, dataId);
@@ -451,29 +473,36 @@ export class HoldChangeListener {
 			type: HoldChangeType.WorldMapName,
 			location: { worldMapId: id },
 			hasChange: false,
-			value: name.newValue
+			value: name.newValue,
 		});
 
 		registerTextChange($hold, change, name);
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- It works and proper typing would be more effort than necessary
-function registerTextChange(hold: Hold, change: HoldChange, updatableValue: SignalUpdatableValue<any>) {
+function registerTextChange(
+	hold: Hold,
+	change: HoldChange,
+	// biome-ignore lint: It works and proper typing would be more effort than benefit
+	updatableValue: SignalUpdatableValue<any>,
+) {
 	updatableValue.onChange.add(props => {
 		change.hasChange = props.hasNewValue;
 		change.value = props.value;
 
 		if (!props.hasNewValue || props.value === updatableValue.oldValue) {
-			hold.$changes.del(change)
+			hold.$changes.del(change);
 		} else {
-			hold.$changes.add(change)
+			hold.$changes.add(change);
 		}
-	})
+	});
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- It works and proper typing would be more effort than necessary
-function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any>) {
+function registerDataChange(
+	hold: Hold,
+	// biome-ignore lint: It works and proper typing would be more effort than benefit
+	updatableValue: SignalUpdatableValue<any>,
+) {
 	updatableValue.onChange.add(({ value, previousValue }) => {
 		if (previousValue) {
 			regenerateHoldDataUses(hold, previousValue);
@@ -481,13 +510,16 @@ function registerDataChange(hold: Hold, updatableValue: SignalUpdatableValue<any
 		if (value && value !== previousValue) {
 			regenerateHoldDataUses(hold, value);
 		}
-	})
+	});
 }
 
-function registerPlayerRestoration(hold: Hold, updatableValue: SignalUpdatableValue<number>) {
+function registerPlayerRestoration(
+	hold: Hold,
+	updatableValue: SignalUpdatableValue<number>,
+) {
 	updatableValue.onChange.add(({ value }) => {
 		const player = hold.players.get(value);
 
 		player?.$isDeleted.unset();
-	})
+	});
 }

@@ -1,6 +1,6 @@
 import { doesCommandUseSpeech } from "../data/CommandUtils";
-import { Hold } from "../data/datatypes/Hold";
 import { ImportExportTextRowType } from "../data/DrodCommonTypes";
+import type { Hold } from "../data/datatypes/Hold";
 import { HoldRefModel, serializeRef } from "../data/references/HoldReference";
 import { TextUtils } from "../data/TextUtils";
 import { getShowDescriptionName } from "../data/Utils";
@@ -9,9 +9,10 @@ import { arrayToCsvString } from "../utils/CsvUtils";
 
 export async function exportAllTexts(
 	hold: Hold,
-	onProgress: (progressFactor: number) => void
+	onProgress: (progressFactor: number) => void,
 ): Promise<string> {
-	const recordsCount = hold.speeches.size
+	const recordsCount =
+		hold.speeches.size
 		+ hold.levels.size
 		+ hold.rooms.size
 		+ hold.characters.size
@@ -23,14 +24,7 @@ export async function exportAllTexts(
 	const parsedSpeechIds = new Set<number>();
 	let index = 0;
 
-	rows.push([
-		"Hold Ref",
-		"Location",
-		"Type",
-		"Info 1",
-		"Info 2",
-		"Text"
-	]);
+	rows.push(["Hold Ref", "Location", "Type", "Info 1", "Info 2", "Text"]);
 
 	const exportSpeech = (speechId: number, location: string) => {
 		if (parsedSpeechIds.has(speechId)) {
@@ -50,72 +44,71 @@ export async function exportAllTexts(
 			ImportExportTextRowType.Speech,
 			speech.$speaker,
 			speech.$mood,
-			speech.message.newValue
+			speech.message.newValue,
 		]);
 		index++;
-	}
-
+	};
 
 	for (const player of hold.players.values()) {
 		const playerId = player.id;
 		rows.push([
 			serializeRef({ model: HoldRefModel.Player, hold, playerId }),
-			'Hold',
+			"Hold",
 			ImportExportTextRowType.PlayerName,
-			'',
-			'',
-			player.name.newValue
+			"",
+			"",
+			player.name.newValue,
 		]);
 
 		index++;
 	}
 
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
+	await tryToYieldToUi();
 
 	for (const level of hold.levels.values()) {
 		const levelId = level.id;
 		rows.push([
 			serializeRef({ model: HoldRefModel.Level, hold, levelId }),
-			'Hold',
+			"Hold",
 			ImportExportTextRowType.LevelName,
-			'',
-			'',
-			level.name.newValue
+			"",
+			"",
+			level.name.newValue,
 		]);
 
 		index++;
 	}
 
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
+	await tryToYieldToUi();
 
 	for (const entrance of hold.entrances.values()) {
 		const entranceId = entrance.id;
 		rows.push([
 			serializeRef({ model: HoldRefModel.Entrance, hold, entranceId }),
-			'Hold',
+			"Hold",
 			ImportExportTextRowType.EntranceText,
-			'',
+			"",
 			getShowDescriptionName(entrance.showDescription.newValue),
-			entrance.description.newValue
+			entrance.description.newValue,
 		]);
 
 		index++;
 	}
 
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
+	await tryToYieldToUi();
 
 	for (const character of hold.characters.values()) {
 		const characterId = character.id;
 		rows.push([
 			serializeRef({ model: HoldRefModel.Character, hold, characterId }),
-			'Hold',
+			"Hold",
 			ImportExportTextRowType.CharacterName,
-			'',
-			'',
-			character.name.newValue
+			"",
+			"",
+			character.name.newValue,
 		]);
 
 		if (character.$commandList) {
@@ -124,7 +117,10 @@ export async function exportAllTexts(
 					continue;
 				}
 
-				exportSpeech(command.speechId.newValue, `Character ${character.name.newValue}, Command #${command.index}`);
+				exportSpeech(
+					command.speechId.newValue,
+					`Character ${character.name.newValue}, Command #${command.index}`,
+				);
 			}
 		}
 
@@ -132,25 +128,30 @@ export async function exportAllTexts(
 	}
 
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
+	await tryToYieldToUi();
 
 	for (const scroll of hold.$scrolls) {
-
 		const { x, y, $room } = scroll;
 		rows.push([
-			serializeRef({ model: HoldRefModel.Scroll, hold, roomId: $room.id, x, y }),
+			serializeRef({
+				model: HoldRefModel.Scroll,
+				hold,
+				roomId: $room.id,
+				x,
+				y,
+			}),
 			`${$room.$level.name.newValue}: ${$room.$coordsName} (${x},${y})`,
 			ImportExportTextRowType.ScrollText,
-			'',
-			'',
-			scroll.message.newValue
+			"",
+			"",
+			scroll.message.newValue,
 		]);
 
 		index++;
 	}
 
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
+	await tryToYieldToUi();
 
 	for (const room of hold.rooms.values()) {
 		for (const monster of room.$monstersWithSpeechCommand) {
@@ -163,7 +164,7 @@ export async function exportAllTexts(
 
 					exportSpeech(
 						command.speechId.newValue,
-						`${room.$level.name.newValue}: ${room.$coordsName}, ${TextUtils.entity(monster.type, hold)} at (${x},${y}), Command #${command.index}`
+						`${room.$level.name.newValue}: ${room.$coordsName}, ${TextUtils.entity(monster.type, hold)} at (${x},${y}), Command #${command.index}`,
 					);
 				}
 			}
@@ -172,10 +173,8 @@ export async function exportAllTexts(
 		index++;
 	}
 
-
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
-
+	await tryToYieldToUi();
 
 	for (const speech of hold.speeches.values()) {
 		if (parsedSpeechIds.has(speech.id)) {
@@ -190,16 +189,14 @@ export async function exportAllTexts(
 			ImportExportTextRowType.Speech,
 			speech.$speaker,
 			speech.$mood,
-			speech.message.newValue
+			speech.message.newValue,
 		]);
 
 		index++;
 	}
 
-
 	onProgress(index / recordsCount);
-	await tryToYieldToUi()
-
+	await tryToYieldToUi();
 
 	return arrayToCsvString(rows);
 }

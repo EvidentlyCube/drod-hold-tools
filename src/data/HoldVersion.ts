@@ -1,5 +1,10 @@
-import { Option } from "../components/common/Select";
-import { VERSION_AE, VERSION_JTRH, VERSION_TCB_301, VERSION_TSS_507 } from "../Constants";
+import {
+	VERSION_AE,
+	VERSION_JTRH,
+	VERSION_TCB_301,
+	VERSION_TSS_507,
+} from "../Constants";
+import type { Option } from "../components/common/Select";
 import { getShowDescriptionName } from "./Utils";
 
 export class HoldVersion {
@@ -90,13 +95,24 @@ export class HoldVersion {
 		const showDescriptionOptions: Option[] = [];
 
 		if (canHideDescription) {
-			showDescriptionOptions.push({ id: '0', value: '0', label: getShowDescriptionName(0) });
-			showDescriptionOptions.push({ id: '1', value: '1', label: getShowDescriptionName(1) });
+			showDescriptionOptions.push({
+				id: "0",
+				value: "0",
+				label: getShowDescriptionName(0),
+			});
+			showDescriptionOptions.push({
+				id: "1",
+				value: "1",
+				label: getShowDescriptionName(1),
+			});
 		}
 
 		if (canShowDescriptionOnce) {
-			showDescriptionOptions.push({ id: '2', value: '2', label: getShowDescriptionName(2) });
-
+			showDescriptionOptions.push({
+				id: "2",
+				value: "2",
+				label: getShowDescriptionName(2),
+			});
 		}
 
 		return {
@@ -105,7 +121,7 @@ export class HoldVersion {
 			canHideDescription,
 			canAddSound,
 			showDescriptionOptions,
-		}
+		};
 	}
 
 	public get data(): HoldVersionData {
@@ -113,7 +129,7 @@ export class HoldVersion {
 		const isSupported = this.version >= VERSION_JTRH;
 
 		return {
-			isSupported
+			isSupported,
 		};
 	}
 
@@ -123,7 +139,7 @@ export class HoldVersion {
 		const isSupported = this.version >= VERSION_TCB_301;
 
 		return {
-			isSupported
+			isSupported,
 		};
 	}
 
@@ -218,7 +234,7 @@ export class HoldVersion {
 		} else if (this.version >= 300) {
 			return "The City Beneath";
 		} else if (this.version > 200) {
-			return "Journey to Rooted Hold"
+			return "Journey to Rooted Hold";
 		} else {
 			return "Architect's Edition";
 		}

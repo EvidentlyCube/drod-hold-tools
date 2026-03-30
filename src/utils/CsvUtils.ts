@@ -1,5 +1,7 @@
 export function arrayToCsvString(rows: string[][]): string {
-	return rows.map(row => row.map(cell => escapeCsvCell(cell)).join(',')).join("\r\n");
+	return rows
+		.map(row => row.map(cell => escapeCsvCell(cell)).join(","))
+		.join("\r\n");
 }
 
 function escapeCsvCell(cell: string): string {
@@ -12,7 +14,7 @@ function escapeCsvCell(cell: string): string {
 export function csvStringToArray(input: string): string[][] {
 	const rows: string[][] = [];
 	let row: string[] = [];
-	let field = '';
+	let field = "";
 	let inQuotes = false;
 	let i = 0;
 
@@ -33,27 +35,27 @@ export function csvStringToArray(input: string): string[][] {
 				i++;
 			}
 		} else {
-			if (char === '"' && field === '') {
+			if (char === '"' && field === "") {
 				// Start of quoted field
 				inQuotes = true;
 				i++;
-			} else if (char === ',') {
+			} else if (char === ",") {
 				row.push(field);
-				field = '';
+				field = "";
 				i++;
-			} else if (char === '\r' && next === '\n') {
+			} else if (char === "\r" && next === "\n") {
 				// Windows line ending
 				row.push(field);
 				rows.push(row);
 				row = [];
-				field = '';
+				field = "";
 				i += 2;
-			} else if (char === '\n' || char === '\r') {
+			} else if (char === "\n" || char === "\r") {
 				// Unix / old Mac line ending
 				row.push(field);
 				rows.push(row);
 				row = [];
-				field = '';
+				field = "";
 				i++;
 			} else {
 				field += char;

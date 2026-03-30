@@ -1,5 +1,6 @@
-import { HoldData } from "../../../data/datatypes/HoldData";
-import HoldRefView from "../HoldRefView";
+import type { HoldData } from "../../../data/datatypes/HoldData";
+import FullModal from "../../common/FullModal";
+import { HoldRefsTableList } from "../HoldRefView";
 
 interface Props {
 	data: HoldData;
@@ -9,27 +10,8 @@ export default function DataUsesPreview(props: Props) {
 	const { data, onClose } = props;
 
 	return (
-		<div className="modal is-active">
-			<div className="modal-background" onClick={onClose}></div>
-			<div className="modal-card">
-				<header className="modal-card-head">
-					<p className="modal-card-title">Uses of {data.name.newValue}</p>
-					<button className="delete" onClick={onClose}></button>
-				</header>
-				<section className="modal-card-body">
-					<table>
-						<tbody>
-							{data.$uses.map((ref, index) => (
-								<tr key={index}>
-									<td>
-										<HoldRefView holdRef={ref} />
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</section>
-			</div>
-		</div>
+		<FullModal title={`Uses of data "${data.name.newValue}"`} onClose={onClose}>
+			<HoldRefsTableList holdRefs={data.$uses} />
+		</FullModal>
 	);
 }

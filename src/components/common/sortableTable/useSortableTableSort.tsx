@@ -13,7 +13,7 @@ export default function useSortableTableSort(defaultSort: string) {
 				setSortAsc(true);
 			}
 		},
-		[setSortBy, setSortAsc, sortAsc, sortBy]
+		[sortAsc, sortBy],
 	);
 
 	return { sortBy, sortAsc, onSort };

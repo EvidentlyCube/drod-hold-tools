@@ -1,14 +1,17 @@
-import { Hold } from "../data/datatypes/Hold";
-import { HoldChange } from "../data/datatypes/HoldChange";
+import type { Hold } from "../data/datatypes/Hold";
+import type { HoldChange } from "../data/datatypes/HoldChange";
 import { assertNotNull } from "../utils/Asserts";
-import { SignalArrayOperation, SignalArrayOperator } from "../utils/SignalArray";
+import {
+	type SignalArrayOperation,
+	SignalArrayOperator,
+} from "../utils/SignalArray";
 import { SignalValue } from "../utils/SignalValue";
-import { HoldReader, HoldReaders } from "./HoldReaders";
+import { type HoldReader, HoldReaders } from "./HoldReaders";
 
 const DEBOUNCE_DURATION = 2000;
 
-const STORE_HOLDS = 'holds';
-const STORE_CHANGES = 'changes';
+const STORE_HOLDS = "holds";
+const STORE_CHANGES = "changes";
 
 class HoldIndexedStorageClass {
 	private _dbOpenRequest: IDBOpenDBRequest;
@@ -33,10 +36,11 @@ class HoldIndexedStorageClass {
 	private _deleteCounter = 0;
 
 	public constructor() {
-		this._dbOpenRequest = window.indexedDB.open('holds', 3);
+		this._dbOpenRequest = window.indexedDB.open("holds", 3);
 		this._dbOpenRequest.onerror = this.onDbOpenRequest_error.bind(this);
 		this._dbOpenRequest.onsuccess = this.onDbOpenRequest_success.bind(this);
-		this._dbOpenRequest.onupgradeneeded = this.onDbOpenRequest_upgrade.bind(this);
+		this._dbOpenRequest.onupgradeneeded =
+			this.onDbOpenRequest_upgrade.bind(this);
 
 		setInterval(() => this.update(), 50);
 	}
@@ -46,7 +50,7 @@ class HoldIndexedStorageClass {
 			if (this.isBusy.value) {
 				return "Changes are still saving, are you sure you want to continue?";
 			}
-		}
+		};
 		HoldReaders.holdReaders.onChange.add(this.onHoldListChange.bind(this));
 	}
 
@@ -55,7 +59,8 @@ class HoldIndexedStorageClass {
 	}
 
 	private update() {
-		this.isBusy.value = this._deleteCounter > 0
+		this.isBusy.value =
+			this._deleteCounter > 0
 			|| this._saveHoldCounter > 0
 			|| HoldReaders.isParsing
 			|| this._changesSaveLock
@@ -85,29 +90,33 @@ class HoldIndexedStorageClass {
 			for (const holdReader of op.elements) {
 				this._deleteCounter += 2;
 
-				const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
+				const holdsStore = this.db
+					.transaction([STORE_HOLDS], "readwrite")
+					.objectStore(STORE_HOLDS);
 				const holdsStoreRequest = holdsStore.delete(holdReader.id);
 
 				holdsStoreRequest.onsuccess = () => {
 					this._deleteCounter--;
-				}
+				};
 				holdsStoreRequest.onerror = e => {
 					this._deleteCounter--;
 					console.log(e);
 					console.log(holdsStoreRequest.error);
-				}
+				};
 
-				const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
+				const changesStore = this.db
+					.transaction([STORE_CHANGES], "readwrite")
+					.objectStore(STORE_CHANGES);
 				const changesStoreRequest = changesStore.delete(holdReader.id);
 
 				changesStoreRequest.onsuccess = () => {
 					this._deleteCounter--;
-				}
+				};
 				changesStoreRequest.onerror = e => {
 					this._deleteCounter--;
 					console.log(e);
 					console.log(changesStoreRequest.error);
-				}
+				};
 
 				this._storedHoldReaderIds.delete(holdReader.id);
 				this._loadedHoldToChanges.delete(holdReader.id);
@@ -140,33 +149,43 @@ class HoldIndexedStorageClass {
 			return;
 		}
 
-		const xmlBlob = new Blob([holdXmlString], { type: 'text/xml' });
+		const xmlBlob = new Blob([holdXmlString], { type: "text/xml" });
 
 		this._saveHoldCounter += 2;
 
-		const holdsStore = this.db.transaction([STORE_HOLDS], 'readwrite').objectStore(STORE_HOLDS);
-		const holdsStoreRequest = holdsStore.put({ holdId: holdReader.id, xmlBlob });
+		const holdsStore = this.db
+			.transaction([STORE_HOLDS], "readwrite")
+			.objectStore(STORE_HOLDS);
+		const holdsStoreRequest = holdsStore.put({
+			holdId: holdReader.id,
+			xmlBlob,
+		});
 
 		holdsStoreRequest.onsuccess = () => {
 			this._saveHoldCounter--;
-		}
+		};
 		holdsStoreRequest.onerror = e => {
 			this._saveHoldCounter--;
 			console.log(e);
 			console.log(holdsStoreRequest.error);
-		}
+		};
 
-		const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
-		const changesStoreRequest = changesStore.put({ holdId: holdReader.id, changesBlob: new Blob(['[]'], { type: 'text/plain' }) });
+		const changesStore = this.db
+			.transaction([STORE_CHANGES], "readwrite")
+			.objectStore(STORE_CHANGES);
+		const changesStoreRequest = changesStore.put({
+			holdId: holdReader.id,
+			changesBlob: new Blob(["[]"], { type: "text/plain" }),
+		});
 
 		changesStoreRequest.onsuccess = () => {
 			this._saveHoldCounter--;
-		}
+		};
 		changesStoreRequest.onerror = e => {
 			this._saveHoldCounter--;
 			console.log(e);
 			console.log(changesStoreRequest.error);
-		}
+		};
 	}
 
 	private storeHoldChanges(holds: Hold[]) {
@@ -182,27 +201,29 @@ class HoldIndexedStorageClass {
 			if (remaining <= 0) {
 				this._changesSaveLock = false;
 			}
-		}
+		};
 		for (const row of rows) {
-			const changesStore = this.db.transaction([STORE_CHANGES], 'readwrite').objectStore(STORE_CHANGES);
+			const changesStore = this.db
+				.transaction([STORE_CHANGES], "readwrite")
+				.objectStore(STORE_CHANGES);
 			const changesStoreRequest = changesStore.put(row);
 
 			changesStoreRequest.onsuccess = () => {
 				popRemaining();
-			}
+			};
 			changesStoreRequest.onerror = e => {
 				popRemaining();
 
 				console.log(e);
 				console.log(changesStoreRequest.error);
-			}
+			};
 		}
 	}
 
 	private mapHoldToChangesRow(hold: Hold) {
 		return {
 			holdId: hold.$holdReaderId,
-			changesBlob: new Blob([hold.$changes.toJson()], { type: 'text/plain' })
+			changesBlob: new Blob([hold.$changes.toJson()], { type: "text/plain" }),
 		};
 	}
 
@@ -224,13 +245,17 @@ class HoldIndexedStorageClass {
 		};
 
 		if (!this.db.objectStoreNames.contains(STORE_HOLDS)) {
-			const holdStore = this.db.createObjectStore(STORE_HOLDS, { keyPath: 'holdId' });
-			holdStore.createIndex('blob', 'xmlBlob', { unique: false });
+			const holdStore = this.db.createObjectStore(STORE_HOLDS, {
+				keyPath: "holdId",
+			});
+			holdStore.createIndex("blob", "xmlBlob", { unique: false });
 		}
 
 		if (!this.db.objectStoreNames.contains(STORE_CHANGES)) {
-			const changesStore = this.db.createObjectStore(STORE_CHANGES, { keyPath: 'holdId' });
-			changesStore.createIndex('changesBlob', 'changesBlob', { unique: false });
+			const changesStore = this.db.createObjectStore(STORE_CHANGES, {
+				keyPath: "holdId",
+			});
+			changesStore.createIndex("changesBlob", "changesBlob", { unique: false });
 		}
 	}
 
@@ -239,12 +264,14 @@ class HoldIndexedStorageClass {
 		let isCursorFinished = false;
 		const doFinish = () => {
 			if (counter === 0 && isCursorFinished) {
-				this.isInitializing.value = false
+				this.isInitializing.value = false;
 			}
-		}
+		};
 
-		const holdsStore = this.db.transaction(STORE_HOLDS).objectStore(STORE_HOLDS);
-		holdsStore.openCursor().onsuccess = (event) => {
+		const holdsStore = this.db
+			.transaction(STORE_HOLDS)
+			.objectStore(STORE_HOLDS);
+		holdsStore.openCursor().onsuccess = event => {
 			const request = event.target as IDBRequest;
 			const cursor = request.result as IDBCursorWithValue;
 
@@ -260,23 +287,27 @@ class HoldIndexedStorageClass {
 
 			const reader = new FileReader();
 			reader.onload = () => {
-				if (typeof reader.result === 'string') {
+				if (typeof reader.result === "string") {
 					this._storedHoldReaderIds.add(holdId);
-					HoldReaders.readHoldXmlString(reader.result, holdId, HoldIndexedStorage.getChangesForHold(holdId));
+					HoldReaders.readHoldXmlString(
+						reader.result,
+						holdId,
+						HoldIndexedStorage.getChangesForHold(holdId),
+					);
 				} else {
 					console.error("Stored hold was not loaded as string");
 				}
 
 				counter--;
 				doFinish();
-			}
+			};
 			reader.onerror = () => {
 				counter--;
 				doFinish();
-			}
+			};
 			reader.readAsText(xmlBlob);
 			cursor.continue();
-		}
+		};
 	}
 
 	private loadChanges() {
@@ -286,10 +317,12 @@ class HoldIndexedStorageClass {
 			if (counter === 0 && isCursorFinished) {
 				this.loadHolds();
 			}
-		}
+		};
 
-		const changesStore = this.db.transaction(STORE_CHANGES).objectStore(STORE_CHANGES);
-		changesStore.openCursor().onsuccess = (event) => {
+		const changesStore = this.db
+			.transaction(STORE_CHANGES)
+			.objectStore(STORE_CHANGES);
+		changesStore.openCursor().onsuccess = event => {
 			const request = event.target as IDBRequest;
 			const cursor = request.result as IDBCursorWithValue;
 
@@ -303,9 +336,12 @@ class HoldIndexedStorageClass {
 
 			const reader = new FileReader();
 			reader.onload = () => {
-				if (typeof reader.result === 'string') {
+				if (typeof reader.result === "string") {
 					try {
-						this._loadedHoldToChanges.set(holdId, JSON.parse(reader.result || "[]"));
+						this._loadedHoldToChanges.set(
+							holdId,
+							JSON.parse(reader.result || "[]"),
+						);
 					} catch (e) {
 						console.log(e);
 						// ignore
@@ -316,16 +352,16 @@ class HoldIndexedStorageClass {
 
 				counter--;
 				doFinish();
-			}
+			};
 			reader.onerror = () => {
 				counter--;
 				doFinish();
-			}
+			};
 			reader.readAsText(changesBlob);
 
 			counter++;
 			cursor.continue();
-		}
+		};
 	}
 }
 

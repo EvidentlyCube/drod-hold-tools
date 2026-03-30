@@ -1,9 +1,9 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { CommandsList } from "../CommandList";
+import type { CommandsList } from "../CommandList";
 import { packCommands, unpackCommands } from "../CommandUtils";
-import { PackedVars } from "../PackedVars";
+import type { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
-import { HoldRef } from "../references/HoldReference";
+import type { HoldRef } from "../references/HoldReference";
 import { getCharacterName, wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
@@ -13,8 +13,8 @@ interface CharacterConstructor {
 	type: number;
 	animationSpeed?: number;
 	encExtraVars?: string;
-	tilesDataId?: number
-	avatarDataId?: number
+	tilesDataId?: number;
+	avatarDataId?: number;
 }
 export class HoldCharacter {
 	public readonly $hold: Hold;
@@ -36,11 +36,15 @@ export class HoldCharacter {
 	}
 
 	public get $avatarData() {
-		return this.avatarDataId.newValue ? this.$hold.datas.getOrError(this.avatarDataId.newValue) : undefined;
+		return this.avatarDataId.newValue
+			? this.$hold.datas.getOrError(this.avatarDataId.newValue)
+			: undefined;
 	}
 
 	public get $tilesData() {
-		return this.tilesDataId.newValue ? this.$hold.datas.getOrError(this.tilesDataId.newValue) : undefined;
+		return this.tilesDataId.newValue
+			? this.$hold.datas.getOrError(this.tilesDataId.newValue)
+			: undefined;
 	}
 
 	public constructor(hold: Hold, options: CharacterConstructor) {

@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { HoldVariable } from "../../../data/datatypes/HoldVariable";
-import VariableRenameModal from "./VariableRenameModal";
+import type { HoldVariable } from "../../../data/datatypes/HoldVariable";
 import { renameVariable } from "../../../data/VariableUtils";
+import VariableRenameModal from "./VariableRenameModal";
 
 interface Props {
 	variable: HoldVariable;
@@ -10,21 +10,35 @@ interface Props {
 export default function VariableRenameButton({ variable }: Props) {
 	const [isOpen, setIsOpen] = useState(false);
 
-	const onRename = useCallback((newName: string) => {
-		if (!renameVariable(variable, newName)) {
-			alert("Variable rename failed for unknown reasons.");
-		}
+	const onRename = useCallback(
+		(newName: string) => {
+			if (!renameVariable(variable, newName)) {
+				alert("Variable rename failed for unknown reasons.");
+			}
 
-		setIsOpen(false);
+			setIsOpen(false);
+		},
+		[variable],
+	);
 
-	}, [variable, setIsOpen]);
+	const modal = isOpen ? (
+		<VariableRenameModal
+			variable={variable}
+			onClose={() => setIsOpen(false)}
+			onRename={onRename}
+		/>
+	) : null;
 
-	const modal = isOpen
-		? <VariableRenameModal variable={variable} onClose={() => setIsOpen(false)} onRename={onRename} />
-		: null;
-
-	return <>
-		<button className="button" onClick={() => setIsOpen(!isOpen)}>Rename</button>
-		{createPortal(modal, document.body)}
-	</>;
+	return (
+		<>
+			<button
+				type="button"
+				className="button"
+				onClick={() => setIsOpen(!isOpen)}
+			>
+				Rename
+			</button>
+			{createPortal(modal, document.body)}
+		</>
+	);
 }

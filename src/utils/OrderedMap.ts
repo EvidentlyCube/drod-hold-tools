@@ -2,7 +2,6 @@ import { removeArrayElementInline } from "./ArrayUtils";
 import { assertNotNull } from "./Asserts";
 import { Signal } from "./Signals";
 
-
 export enum OrderedMapOperator {
 	Add = 0,
 	BeforeUpdate = 1,
@@ -39,9 +38,10 @@ export class OrderedMap<TKey, TValue> {
 			this._map.delete(key);
 
 			this.onChange.dispatch({
-				key, value,
+				key,
+				value,
 				operator: OrderedMapOperator.Remove,
-				map: this
+				map: this,
 			});
 		}
 	}
@@ -52,24 +52,27 @@ export class OrderedMap<TKey, TValue> {
 			this._orderedKeys.push(key);
 
 			this.onChange.dispatch({
-				key, value,
+				key,
+				value,
 				operator: OrderedMapOperator.Add,
-				map: this
+				map: this,
 			});
 		} else if (this._map.get(key) !== value) {
 			this.onChange.dispatch({
-				key, value,
+				key,
+				value,
 				operator: OrderedMapOperator.BeforeUpdate,
-				map: this
+				map: this,
 			});
 
 			this._map.set(key, value);
 			this._orderedKeys.push(key);
 
 			this.onChange.dispatch({
-				key, value,
+				key,
+				value,
 				operator: OrderedMapOperator.AfterUpdate,
-				map: this
+				map: this,
 			});
 		}
 	}
@@ -81,7 +84,10 @@ export class OrderedMap<TKey, TValue> {
 	public getOrError(key: TKey): TValue {
 		const value = this.get(key);
 
-		assertNotNull(value, `Failed to retrieve not undefined result for key ${String(key)}`);
+		assertNotNull(
+			value,
+			`Failed to retrieve not undefined result for key ${String(key)}`,
+		);
 
 		return value;
 	}
@@ -91,7 +97,14 @@ export class OrderedMap<TKey, TValue> {
 	}
 
 	public values(): TValue[] {
-		return this._orderedKeys.map(key => this._map.get(key)!);
+		return this._orderedKeys.map(key => {
+			const value = this._map.get(key);
+			if (value === undefined) {
+				throw new Error("Internal error - Ordered map is unstable");
+			}
+
+			return value;
+		});
 	}
 
 	public forEach(predicate: (value: TValue) => void) {
@@ -111,7 +124,7 @@ export class OrderedMap<TKey, TValue> {
 	}
 
 	public filterToArray(predicate: (value: TValue) => boolean) {
-		const items = []
+		const items = [];
 		for (const item of this._map.values()) {
 			if (predicate(item)) {
 				items.push(item);
@@ -130,10 +143,14 @@ export class OrderedMap<TKey, TValue> {
 			next(): IteratorResult<[TKey, TValue, number]> {
 				if (index < keys.length) {
 					const key = keys[index];
-					return {
-						value: [key, map.get(key)!, index++],
-						done: false,
-					};
+					const value = map.get(key);
+
+					if (value) {
+						return {
+							value: [key, value, index++],
+							done: false,
+						};
+					}
 				}
 				return { value: undefined, done: true };
 			},

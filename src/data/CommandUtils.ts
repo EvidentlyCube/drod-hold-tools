@@ -1,12 +1,16 @@
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
 import { CommandListPackingType, CommandsList } from "./CommandList";
 import { UINT_MINUS_1 } from "./DrodCommonTypes";
-import { ScriptCommandType, ScriptVarComparators, ScriptVarOperators } from "./DrodEnums";
-import { PackedVars, PackedVarType } from "./PackedVars";
-import { Hold } from "./datatypes/Hold";
-import { HoldCharacter } from "./datatypes/HoldCharacter";
-import { HoldVariable } from "./datatypes/HoldVariable";
-import { ScriptCommand } from "./datatypes/ScriptCommand";
+import {
+	ScriptCommandType,
+	ScriptVarComparators,
+	ScriptVarOperators,
+} from "./DrodEnums";
+import type { Hold } from "./datatypes/Hold";
+import type { HoldCharacter } from "./datatypes/HoldCharacter";
+import type { HoldVariable } from "./datatypes/HoldVariable";
+import type { ScriptCommand } from "./datatypes/ScriptCommand";
+import { type PackedVars, PackedVarType } from "./PackedVars";
 
 class WrappedCommandBuffer {
 	private _buffer: number[];
@@ -28,14 +32,15 @@ class WrappedCommandBuffer {
 	public readWChar(characters: number): string {
 		const chars = [];
 		while (characters > 0 && this._index < this._buffer.length) {
-			const codeUnit = this._buffer[this._index] | (this._buffer[this._index + 1] << 8);
+			const codeUnit =
+				this._buffer[this._index] | (this._buffer[this._index + 1] << 8);
 			chars.push(String.fromCharCode(codeUnit));
 
 			this._index += 2;
 			characters -= 2;
 		}
 
-		return chars.join('');
+		return chars.join("");
 	}
 
 	public readBpUint() {
@@ -47,34 +52,29 @@ class WrappedCommandBuffer {
 		do {
 			n = (n << 7) + this._buffer[index2];
 
-			if (this._buffer[index2++] & 0x80 || index2 >= this.length)
-				break;
+			if (this._buffer[index2++] & 0x80 || index2 >= this.length) break;
 
 			index++;
 
-			// eslint-disable-next-line no-constant-condition
+			// biome-ignore lint: It works correctly, ignore
 		} while (true);
 
 		this._index = index;
 
 		const res = n - 0x80;
 
-		return res < 0
-			? res + UINT_MINUS_1 + 1
-			: res;
+		return res < 0 ? res + UINT_MINUS_1 + 1 : res;
 	}
 
 	public writeBpUint(n: number) {
 		let s = 7;
-		while ((n >> s) && s < 32)
-			s += 7;
+		while (n >> s && s < 32) s += 7;
 
-		while (s) {
+		while (s > 0) {
 			s -= 7;
-			const divider = Math.pow(2, s);
+			const divider = 2 ** s;
 			let b = (n / divider) & 0x7f;
-			if (!s)
-				b |= 0x80;
+			if (!s) b |= 0x80;
 
 			this._buffer[this._index++] = b;
 		}
@@ -83,8 +83,8 @@ class WrappedCommandBuffer {
 	public writeWChar(s: string) {
 		for (let i = 0; i < s.length; i++) {
 			const charCode = s.charCodeAt(i);
-			this._buffer[this._index++] = charCode & 0xFF;
-			this._buffer[this._index++] = (charCode >> 8) & 0xFF;
+			this._buffer[this._index++] = charCode & 0xff;
+			this._buffer[this._index++] = (charCode >> 8) & 0xff;
 		}
 	}
 
@@ -93,32 +93,35 @@ class WrappedCommandBuffer {
 	}
 }
 
-export function unpackCommands(hold: Hold, vars: PackedVars): CommandsList | undefined {
-	if (vars.hasVar('Commands')) {
+export function unpackCommands(
+	hold: Hold,
+	vars: PackedVars,
+): CommandsList | undefined {
+	if (vars.hasVar("Commands")) {
 		return new CommandsList(
 			hold,
-			readCommandsBuffer(vars.readByteBuffer('Commands', [])),
-			CommandListPackingType.SerializedIntoCommands
+			readCommandsBuffer(vars.readByteBuffer("Commands", [])),
+			CommandListPackingType.SerializedIntoCommands,
 		);
-
-	} else if (vars.hasVar('SerializedCommands')) {
+	} else if (vars.hasVar("SerializedCommands")) {
 		return new CommandsList(
 			hold,
-			readCommandsBuffer(vars.readByteBuffer('SerializedCommands', [])),
-			CommandListPackingType.SerializedIntoSerializedCommands
+			readCommandsBuffer(vars.readByteBuffer("SerializedCommands", [])),
+			CommandListPackingType.SerializedIntoSerializedCommands,
 		);
 	} else {
 		const commands = unpackCommands_spreadInExtraVars(vars);
 
 		if (commands.length) {
 			/** @see CommandListPackingType */
-			const isSortedAlphabetically = vars.getVarIndex('0x') > vars.getVarIndex('0c');
+			const isSortedAlphabetically =
+				vars.getVarIndex("0x") > vars.getVarIndex("0c");
 			return new CommandsList(
 				hold,
 				commands,
 				isSortedAlphabetically
 					? CommandListPackingType.SeparateVarsAlphabeticallySorted
-					: CommandListPackingType.SeparateVarsIndexSorted
+					: CommandListPackingType.SeparateVarsIndexSorted,
 			);
 		}
 	}
@@ -129,10 +132,10 @@ export function unpackCommands(hold: Hold, vars: PackedVars): CommandsList | und
 export function packCommands(vars: PackedVars, commandList: CommandsList) {
 	switch (commandList.packingType) {
 		case CommandListPackingType.SerializedIntoCommands:
-			vars.writeByteBuffer('Commands', commandList.toByteArray());
+			vars.writeByteBuffer("Commands", commandList.toByteArray());
 			break;
 		case CommandListPackingType.SerializedIntoSerializedCommands:
-			vars.writeByteBuffer('SerializedCommands', commandList.toByteArray());
+			vars.writeByteBuffer("SerializedCommands", commandList.toByteArray());
 			break;
 		case CommandListPackingType.SeparateVarsAlphabeticallySorted:
 		case CommandListPackingType.SeparateVarsIndexSorted:
@@ -158,13 +161,19 @@ export function readCommandsBuffer(buffer: number[]) {
 		const flags = arr.readBpUint();
 		const speechId = arr.readBpUint();
 		const labelSize = arr.readBpUint();
-		const label = labelSize > 0 ? arr.readWChar(labelSize) : '';
+		const label = labelSize > 0 ? arr.readWChar(labelSize) : "";
 
 		const index = commands.length;
 		commands.push({
-			index, type, x, y, w, h, flags,
+			index,
+			type,
+			x,
+			y,
+			w,
+			h,
+			flags,
 			speechId: new SignalUpdatableValue(speechId),
-			label: new SignalUpdatableValue(label)
+			label: new SignalUpdatableValue(label),
 		});
 	}
 
@@ -192,15 +201,18 @@ export function writeCommandsBuffer(commands: ReadonlyArray<ScriptCommand>) {
 	return buffer;
 }
 
-function unpackCommands_spreadInExtraVars(packedVars: PackedVars): ScriptCommand[] {
-	const numCommands = packedVars.readUint('NumCommands', 0);
+function unpackCommands_spreadInExtraVars(
+	packedVars: PackedVars,
+): ScriptCommand[] {
+	const numCommands = packedVars.readUint("NumCommands", 0);
 	const commands: ScriptCommand[] = [];
 
 	for (let i = 0; i < numCommands; i++) {
 		const speechIdType = packedVars.getType(`${i}s`);
-		const speechId = speechIdType === PackedVarType.deprecated_DWord
-			? packedVars.readDWord_deprecated(`${i}s`, 0)
-			: packedVars.readUint(`${i}s`, 0)
+		const speechId =
+			speechIdType === PackedVarType.deprecated_DWord
+				? packedVars.readDWord_deprecated(`${i}s`, 0)
+				: packedVars.readUint(`${i}s`, 0);
 
 		commands.push({
 			index: i,
@@ -210,21 +222,24 @@ function unpackCommands_spreadInExtraVars(packedVars: PackedVars): ScriptCommand
 			w: packedVars.readUint(`${i}w`, 0),
 			h: packedVars.readUint(`${i}h`, 0),
 			flags: packedVars.readUint(`${i}f`, 0),
-			label: new SignalUpdatableValue(packedVars.readWCharString(`${i}l`, '')),
+			label: new SignalUpdatableValue(packedVars.readWCharString(`${i}l`, "")),
 			speechId: new SignalUpdatableValue(speechId),
-			$speechIdType: speechIdType
+			$speechIdType: speechIdType,
 		});
 	}
 
 	return commands;
 }
 
-function packCommands_spreadInExtraVars(commandList: CommandsList, packedVars: PackedVars): void {
+function packCommands_spreadInExtraVars(
+	commandList: CommandsList,
+	packedVars: PackedVars,
+): void {
 	const { version } = commandList.hold;
 
 	// This assumes it's impossible to add/remove commands in the holds that use this mechanism
 
-	packedVars.writeUint('NumCommands', commandList.commands.length)
+	packedVars.writeUint("NumCommands", commandList.commands.length);
 	for (let i = 0; i < commandList.commands.length; i++) {
 		const command = commandList.commands[i];
 
@@ -262,17 +277,18 @@ function doesCommandHaveData(type: ScriptCommandType) {
 }
 
 function isMusicCommand(type: ScriptCommandType) {
-	return type === ScriptCommandType.CC_SetMusic || type === ScriptCommandType.CC_WorldMapMusic;
+	return (
+		type === ScriptCommandType.CC_SetMusic
+		|| type === ScriptCommandType.CC_WorldMapMusic
+	);
 }
 
 export function getCommandDataId(command: ScriptCommand): number {
 	const { type } = command;
 	if (!doesCommandHaveData(type)) {
 		return 0;
-
 	} else if (isMusicCommand(type)) {
 		return command.y;
-
 	} else if (type === ScriptCommandType.CC_WorldMapImage) {
 		return command.h;
 	}
@@ -284,13 +300,21 @@ export function getCommandDataId(command: ScriptCommand): number {
  * @returns True if the command stores text in `label` that can be expanded
  * by variables.
  */
-export function canCommandTypeStoreExpandableTextInLabel(command: ScriptCommand): boolean {
+export function canCommandTypeStoreExpandableTextInLabel(
+	command: ScriptCommand,
+): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_VarSet:
-			return command.y === ScriptVarOperators.AppendText || command.y === ScriptVarOperators.AssignText;
+			return (
+				command.y === ScriptVarOperators.AppendText
+				|| command.y === ScriptVarOperators.AssignText
+			);
 
 		case ScriptCommandType.CC_VarSetAt:
-			return command.h === ScriptVarOperators.AppendText || command.h === ScriptVarOperators.AssignText;
+			return (
+				command.h === ScriptVarOperators.AppendText
+				|| command.h === ScriptVarOperators.AssignText
+			);
 
 		case ScriptCommandType.CC_WaitForVar:
 			return command.y === ScriptVarComparators.EqualsText;
@@ -307,7 +331,9 @@ export function canCommandTypeStoreExpandableTextInLabel(command: ScriptCommand)
  * @returns True if the command stores text in speech's message that can be
  * expanded by variables.
  */
-export function canCommandTypeStoreExpandableTextInSpeech(command: ScriptCommand): boolean {
+export function canCommandTypeStoreExpandableTextInSpeech(
+	command: ScriptCommand,
+): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_AnswerOption:
 		case ScriptCommandType.CC_FlashingText:
@@ -325,13 +351,21 @@ export function canCommandTypeStoreExpandableTextInSpeech(command: ScriptCommand
  * @returns True if the command stores a mathematical formula in `label` that
  * can use variables.
  */
-export function canCommandTypeStoreFormulaInLabel(command: ScriptCommand): boolean {
+export function canCommandTypeStoreFormulaInLabel(
+	command: ScriptCommand,
+): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_VarSet:
-			return command.y !== ScriptVarOperators.AppendText && command.y !== ScriptVarOperators.AssignText;
+			return (
+				command.y !== ScriptVarOperators.AppendText
+				&& command.y !== ScriptVarOperators.AssignText
+			);
 
 		case ScriptCommandType.CC_VarSetAt:
-			return command.h !== ScriptVarOperators.AppendText && command.h !== ScriptVarOperators.AssignText;
+			return (
+				command.h !== ScriptVarOperators.AppendText
+				&& command.h !== ScriptVarOperators.AssignText
+			);
 
 		case ScriptCommandType.CC_WaitForVar:
 			return command.y !== ScriptVarComparators.EqualsText;
@@ -369,45 +403,60 @@ export function canCommandUseVariableInField(command: ScriptCommand): boolean {
 	}
 }
 
-export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVariable): boolean {
+export function doesCommandUseVariable(
+	command: ScriptCommand,
+	variable: HoldVariable,
+): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_ClearArrayVar:
 			return command.x === variable.id;
 
 		case ScriptCommandType.CC_CountArrayEntries:
 		case ScriptCommandType.CC_WaitForArrayEntry:
-			return command.x === variable.id
-				|| variable.isUsedInFormula(command.label.newValue);
+			return (
+				command.x === variable.id
+				|| variable.isUsedInFormula(command.label.newValue)
+			);
 
 		case ScriptCommandType.CC_ArrayVarSet:
 		case ScriptCommandType.CC_ArrayVarSetAt:
-			return command.w === variable.id
-				|| variable.isUsedInFormula(command.label.newValue);
+			return (
+				command.w === variable.id
+				|| variable.isUsedInFormula(command.label.newValue)
+			);
 
 		case ScriptCommandType.CC_VarSet:
-			return command.x === variable.id
-				|| (command.y === ScriptVarOperators.AppendText && variable.isUsedInText(command.label.newValue))
-				|| (command.y === ScriptVarOperators.AssignText && variable.isUsedInText(command.label.newValue))
-				|| (
-					command.y !== ScriptVarOperators.AssignText
+			return (
+				command.x === variable.id
+				|| (command.y === ScriptVarOperators.AppendText
+					&& variable.isUsedInText(command.label.newValue))
+				|| (command.y === ScriptVarOperators.AssignText
+					&& variable.isUsedInText(command.label.newValue))
+				|| (command.y !== ScriptVarOperators.AssignText
 					&& command.y !== ScriptVarOperators.AppendText
-					&& variable.isUsedInFormula(command.label.newValue)
-				);
+					&& variable.isUsedInFormula(command.label.newValue))
+			);
 
 		case ScriptCommandType.CC_VarSetAt:
-			return command.w === variable.id
-				|| (command.h === ScriptVarOperators.AppendText && variable.isUsedInText(command.label.newValue))
-				|| (command.h === ScriptVarOperators.AssignText && variable.isUsedInText(command.label.newValue))
-				|| (
-					command.h !== ScriptVarOperators.AssignText
+			return (
+				command.w === variable.id
+				|| (command.h === ScriptVarOperators.AppendText
+					&& variable.isUsedInText(command.label.newValue))
+				|| (command.h === ScriptVarOperators.AssignText
+					&& variable.isUsedInText(command.label.newValue))
+				|| (command.h !== ScriptVarOperators.AssignText
 					&& command.h !== ScriptVarOperators.AppendText
-					&& variable.isUsedInFormula(command.label.newValue)
-				);
+					&& variable.isUsedInFormula(command.label.newValue))
+			);
 
 		case ScriptCommandType.CC_WaitForVar:
-			return command.x === variable.id
-				|| (command.y === ScriptVarComparators.EqualsText && variable.isUsedInText(command.label.newValue))
-				|| (command.y !== ScriptVarComparators.EqualsText && variable.isUsedInFormula(command.label.newValue));
+			return (
+				command.x === variable.id
+				|| (command.y === ScriptVarComparators.EqualsText
+					&& variable.isUsedInText(command.label.newValue))
+				|| (command.y !== ScriptVarComparators.EqualsText
+					&& variable.isUsedInFormula(command.label.newValue))
+			);
 
 		case ScriptCommandType.CC_ImageOverlay:
 			return variable.isUsedInText(command.label.newValue);
@@ -420,14 +469,20 @@ export function doesCommandUseVariable(command: ScriptCommand, variable: HoldVar
 		case ScriptCommandType.CC_RoomLocationText:
 		case ScriptCommandType.CC_Speech:
 		case ScriptCommandType.CC_Question:
-			return variable.isUsedInText(variable.hold.speeches.get(command.speechId.newValue)?.message.newValue ?? "");
+			return variable.isUsedInText(
+				variable.hold.speeches.get(command.speechId.newValue)?.message.newValue
+					?? "",
+			);
 
 		default:
 			return false;
 	}
 }
 
-export function doesCommandUseCharacter(command: ScriptCommand, character: HoldCharacter): boolean {
+export function doesCommandUseCharacter(
+	command: ScriptCommand,
+	character: HoldCharacter,
+): boolean {
 	switch (command.type) {
 		case ScriptCommandType.CC_GenerateEntity:
 		case ScriptCommandType.CC_WorldMapIcon:
@@ -533,7 +588,6 @@ export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
 		case ScriptCommandType.CC_WorldMapSelect:
 			return false;
 
-
 		// ScriptCommandType.CC_AnswerOption
 		// ScriptCommandType.CC_FlashingText
 		// ScriptCommandType.CC_Question
@@ -541,18 +595,19 @@ export function doesCommandUseSpeech(commandType: ScriptCommandType): boolean {
 		// ScriptCommandType.CC_Speech
 		// And any new command that gets added
 		default:
-			return true
+			return true;
 	}
 }
 
-
 export function areCommandsSame(left: ScriptCommand, right: ScriptCommand) {
-	return left.type === right.type
+	return (
+		left.type === right.type
 		&& left.x === right.x
 		&& left.y === right.y
 		&& left.w === right.w
 		&& left.h === right.h
 		&& left.flags === right.flags
 		&& left.label.newValue === right.label.newValue
-		&& left.speechId.newValue === right.speechId.newValue;
+		&& left.speechId.newValue === right.speechId.newValue
+	);
 }

@@ -1,6 +1,6 @@
 interface Listener<T> {
-	callback: Callback<T>,
-	context: unknown
+	callback: Callback<T>;
+	context: unknown;
 }
 
 type Callback<T> = (value: T) => void;
@@ -32,7 +32,9 @@ export class Signal<T> {
 		if (context === undefined) {
 			this.listeners.length = 0;
 		} else {
-			this.listeners = this.listeners.filter(listener => listener.context !== context);
+			this.listeners = this.listeners.filter(
+				listener => listener.context !== context,
+			);
 		}
 	}
 

@@ -1,7 +1,11 @@
-import { ChangeEvent, useCallback } from "react";
+import { type ChangeEvent, useCallback } from "react";
 
 type OptionArray = [string, string];
-type OptionObject = { id?: string|number; value: string|number; label: string };
+type OptionObject = {
+	id?: string | number;
+	value: string | number;
+	label: string;
+};
 type OptionHr = ["hr"];
 type OptionString = string;
 
@@ -15,7 +19,7 @@ export interface OptGroup {
 type SelectProps = {
 	className?: string;
 	selectClassName?: string;
-	emptyOption?: boolean|string;
+	emptyOption?: boolean | string;
 	options?: Option[];
 	optgroups?: OptGroup[];
 	onChange?: (value: string) => void;
@@ -24,14 +28,28 @@ type SelectProps = {
 };
 
 export default function Select(props: SelectProps) {
-	const { className, selectClassName, options, optgroups, onChange, value, defaultValue, emptyOption } = props;
+	const {
+		className,
+		selectClassName,
+		options,
+		optgroups,
+		onChange,
+		value,
+		defaultValue,
+		emptyOption,
+	} = props;
 
-	const innerOnChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
-		onChange?.(e.currentTarget.value);
-	}, [onChange]);
+	const innerOnChange = useCallback(
+		(e: ChangeEvent<HTMLSelectElement>) => {
+			onChange?.(e.currentTarget.value);
+		},
+		[onChange],
+	);
 
 	return (
-		<div className={`select ${className ?? ""} ${!value && emptyOption ? 'is-empty' : ''}`}>
+		<div
+			className={`select ${className ?? ""} ${!value && emptyOption ? "is-empty" : ""}`}
+		>
 			<select
 				className={selectClassName}
 				onChange={innerOnChange}
@@ -40,14 +58,13 @@ export default function Select(props: SelectProps) {
 			>
 				{emptyOption && <option value="">{emptyOption}</option>}
 				{options && mapOptions(options)}
-				{optgroups &&
-					optgroups.map((optgroup, index) => (
-						<OptionGroup
-							key={getKey(optgroup, index)}
-							label={optgroup.label}
-							options={optgroup.options}
-						/>
-					))}
+				{optgroups?.map((optgroup, index) => (
+					<OptionGroup
+						key={getKey(optgroup, index)}
+						label={optgroup.label}
+						options={optgroup.options}
+					/>
+				))}
 			</select>
 		</div>
 	);
@@ -70,14 +87,11 @@ function OptionComp(props: OptionCompProps) {
 	if (Array.isArray(option)) {
 		if (option.length === 1) {
 			if (option[0] === "hr") {
-				return (
-					<option className="is-select-separator" disabled></option>
-				);
+				return <option className="is-select-separator" disabled></option>;
 			} else {
 				console.error(option);
 				throw new Error("Invalid Option");
 			}
-
 		} else if (option.length === 2) {
 			return <option value={option[0]}>{option[1]}</option>;
 		} else {
@@ -86,7 +100,6 @@ function OptionComp(props: OptionCompProps) {
 		}
 	} else if (typeof option === "string") {
 		return <option value={option}>{option}</option>;
-
 	} else if (typeof option === "object") {
 		return <option value={option.value}>{option.label}</option>;
 	} else {

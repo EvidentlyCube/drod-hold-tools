@@ -1,24 +1,28 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { HoldVersion } from "../HoldVersion";
+import type { HoldVersion } from "../HoldVersion";
+import {
+	areReferencesIdentical,
+	type HoldRef,
+} from "../references/HoldReference";
 import { stringToWCharBase64, wcharBase64ToString } from "../Utils";
-import { areReferencesIdentical, type HoldRef } from "../references/HoldReference";
 import { HoldChangeList } from "./HoldChange";
 import { HoldChangeListener } from "./HoldChangeListener";
 import type { HoldCharacter } from "./HoldCharacter";
 import type { HoldData } from "./HoldData";
-import { HoldDemo } from "./HoldDemo";
+import type { HoldDemo } from "./HoldDemo";
 import type { HoldEntrance } from "./HoldEntrance";
 import type { HoldLevel } from "./HoldLevel";
-import { HoldMonster } from "./HoldMonster";
+import type { HoldMonster } from "./HoldMonster";
 import { HoldPlayer } from "./HoldPlayer";
 import type { HoldRoom, HoldScroll } from "./HoldRoom";
-import { HoldSavedGame } from "./HoldSavedGame";
+import type { HoldSavedGame } from "./HoldSavedGame";
 import type { HoldSpeech } from "./HoldSpeech";
 import type { HoldVariable } from "./HoldVariable";
-import { HoldWorldMap } from "./HoldWorldMap";
+import type { HoldWorldMap } from "./HoldWorldMap";
 
 interface HoldProblem {
+	id: number;
 	ref: HoldRef;
 	problem: string;
 }
@@ -141,8 +145,12 @@ export class Hold {
 		this.lastUpdated = options.lastUpdated;
 		this.status = options.status;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));
-		this.descriptionMessage = new SignalUpdatableValue(wcharBase64ToString(options.encDescriptionMessage));
-		this.endHoldMessage = new SignalUpdatableValue(wcharBase64ToString(options.encEndHoldMessage));
+		this.descriptionMessage = new SignalUpdatableValue(
+			wcharBase64ToString(options.encDescriptionMessage),
+		);
+		this.endHoldMessage = new SignalUpdatableValue(
+			wcharBase64ToString(options.encEndHoldMessage),
+		);
 		this.lastScriptId = options.lastScriptId;
 		this.lastVarId = options.lastVarId;
 		this.lastCharId = options.lastCharId;
@@ -151,11 +159,18 @@ export class Hold {
 		this.encDrodInfo = options.encDrodInfo;
 	}
 
-	public addNewPlayer(source?: {id: number, name: string, gidOriginalName: string, gidCreated: number}) {
+	public addNewPlayer(source?: {
+		id: number;
+		name: string;
+		gidOriginalName: string;
+		gidCreated: number;
+	}) {
 		const id = source?.id ?? this.nextAvailablePlayerId();
 		const player = new HoldPlayer(this, {
 			id,
-			encOriginalName: stringToWCharBase64(source?.gidOriginalName ?? id.toString()),
+			encOriginalName: stringToWCharBase64(
+				source?.gidOriginalName ?? id.toString(),
+			),
 			gidCreated: source?.gidCreated ?? Date.now(),
 			encName: stringToWCharBase64(source?.name ?? `New Player ${id}`),
 			$isNewlyAdded: true,
@@ -166,22 +181,27 @@ export class Hold {
 		this.$changeListener.registerNewPlayer(player);
 	}
 
-	public registerProblem(newProblem: HoldProblem): void {
+	public registerProblem(problem: string, ref: HoldRef): void {
 		for (const existingProblem of this.$problems) {
 			// Do not allow duplicate problems to be registered
 			if (
-				areReferencesIdentical(newProblem.ref, existingProblem.ref)
-				&& newProblem.problem === existingProblem.problem
+				areReferencesIdentical(ref, existingProblem.ref)
+				&& problem === existingProblem.problem
 			) {
 				return;
 			}
 		}
 
-		this.$problems.push(newProblem);
+		this.$problems.push({
+			id: this.$problems.length + 1,
+			problem,
+			ref,
+		});
 	}
 
 	private nextAvailablePlayerId() {
-		return this.players.keys().reduce((max, next) => Math.max(max, next), 0) + 1;
+		return (
+			this.players.keys().reduce((max, next) => Math.max(max, next), 0) + 1
+		);
 	}
 }
-

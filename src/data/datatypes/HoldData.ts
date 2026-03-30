@@ -1,8 +1,8 @@
 import { SignalNullable } from "../../utils/SignalNullable";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
-import { DataFormat } from "../DrodEnums";
+import type { DataFormat } from "../DrodEnums";
+import { type HoldRef, HoldRefModel } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
-import { HoldRef, HoldRefModel } from "../references/HoldReference";
 import type { Hold } from "./Hold";
 
 export interface HoldDataDetails {
@@ -32,7 +32,7 @@ export class HoldData {
 	public readonly $uses: HoldRef[] = [];
 
 	public get $size() {
-		return this.details.newValue.rawEncodedData.length * 3 / 4;
+		return (this.details.newValue.rawEncodedData.length * 3) / 4;
 	}
 
 	public constructor(hold: Hold, opts: DataConstructor) {
@@ -43,7 +43,7 @@ export class HoldData {
 		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
 		this.details = new SignalUpdatableValue({
 			format: opts.format,
-			rawEncodedData: opts.encRawData ?? ""
+			rawEncodedData: opts.encRawData ?? "",
 		});
 		this.$isDeleted = new SignalUpdatableValue(false);
 
@@ -52,10 +52,10 @@ export class HoldData {
 				ref: {
 					hold,
 					model: HoldRefModel.Data,
-					dataId: this.id
+					dataId: this.id,
 				},
-				problem: "No file data was given."
-			})
+				problem: "No file data was given.",
+			});
 		}
 	}
 }

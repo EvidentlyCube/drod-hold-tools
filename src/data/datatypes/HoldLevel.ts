@@ -2,7 +2,7 @@ import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { getMainEntranceId } from "../HoldUtils";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
-import { HoldRoom } from "./HoldRoom";
+import type { HoldRoom } from "./HoldRoom";
 
 interface LevelConstructor {
 	id: number;
@@ -41,21 +41,26 @@ export class HoldLevel {
 
 	public get $primaryEntranceId() {
 		if (this.$_primaryEntranceIdCache === undefined) {
-			this.$_primaryEntranceIdCache = getMainEntranceId(this.$hold, this.id) ?? 0;
+			this.$_primaryEntranceIdCache =
+				getMainEntranceId(this.$hold, this.id) ?? 0;
 		}
 
 		return this.$_primaryEntranceIdCache;
 	}
 
 	public get $entranceCoords() {
-		const { roomX, roomY } = this.$hold.entrances.getOrError(this.$primaryEntranceId).$room;
+		const { roomX, roomY } = this.$hold.entrances.getOrError(
+			this.$primaryEntranceId,
+		).$room;
 
 		return { x: roomX, y: roomY };
 	}
 
 	public get $rooms() {
 		if (!this.$_roomsCache) {
-			this.$_roomsCache = this.$hold.rooms.filterToArray(room => room.levelId === this.id);
+			this.$_roomsCache = this.$hold.rooms.filterToArray(
+				room => room.levelId === this.id,
+			);
 		}
 
 		return this.$_roomsCache;

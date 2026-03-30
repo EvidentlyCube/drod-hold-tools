@@ -1,5 +1,6 @@
-import { HoldVariable } from "../../../data/datatypes/HoldVariable";
-import HoldRefView from "../HoldRefView";
+import type { HoldVariable } from "../../../data/datatypes/HoldVariable";
+import FullModal from "../../common/FullModal";
+import { HoldRefsTableList } from "../HoldRefView";
 
 interface Props {
 	variable: HoldVariable;
@@ -9,27 +10,11 @@ export default function VariableUsesPreview(props: Props) {
 	const { variable, onClose } = props;
 
 	return (
-		<div className="modal is-active">
-			<div className="modal-background" onClick={onClose}></div>
-			<div className="modal-card">
-				<header className="modal-card-head">
-					<p className="modal-card-title">Uses of variable {variable.name.newValue}</p>
-					<button className="delete" onClick={onClose}></button>
-				</header>
-				<section className="modal-card-body">
-					<table>
-						<tbody>
-							{variable.$uses.map((ref, index) => (
-								<tr key={index}>
-									<td>
-										<HoldRefView holdRef={ref} />
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</section>
-			</div>
-		</div>
+		<FullModal
+			title={`Uses of variable "${variable.name.newValue}"`}
+			onClose={onClose}
+		>
+			<HoldRefsTableList holdRefs={variable.$uses} />
+		</FullModal>
 	);
 }

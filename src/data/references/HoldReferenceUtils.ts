@@ -1,5 +1,5 @@
-import { HoldScroll } from "../datatypes/HoldRoom";
-import { HoldRefModel, HoldRefScroll } from "./HoldReference";
+import type { HoldScroll } from "../datatypes/HoldRoom";
+import { HoldRefModel, type HoldRefScroll } from "./HoldReference";
 
 export function getScrollRef(scroll: HoldScroll): HoldRefScroll {
 	return {
@@ -8,5 +8,5 @@ export function getScrollRef(scroll: HoldScroll): HoldRefScroll {
 		roomId: scroll.$room.id,
 		x: scroll.x,
 		y: scroll.y,
-	}
+	};
 }

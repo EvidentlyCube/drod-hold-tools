@@ -1,4 +1,4 @@
-import { SortableTableColumnSansData } from "./SortableTableCommons";
+import type { SortableTableColumnSansData } from "./SortableTableCommons";
 
 interface Props {
 	columns: readonly SortableTableColumnSansData[];
@@ -8,7 +8,7 @@ interface Props {
 
 export default function SortableTableColumnOptions(props: Props) {
 	const { columns, hiddenColumns, toggleHiddenColumn } = props;
-	const hidableColumns = columns.filter((column) => column.canHide);
+	const hidableColumns = columns.filter(column => column.canHide);
 
 	if (hidableColumns.length === 0) {
 		return null;
@@ -18,6 +18,7 @@ export default function SortableTableColumnOptions(props: Props) {
 		<div className="dropdown is-hoverable">
 			<div className="dropdown-trigger">
 				<button
+					type="button"
 					className="button"
 					aria-haspopup="true"
 					aria-controls="dropdown-menu4"
@@ -32,7 +33,7 @@ export default function SortableTableColumnOptions(props: Props) {
 					<div className="dropdown-item">
 						<strong>Visible columns:</strong>
 					</div>
-					{hidableColumns.map((column) => (
+					{hidableColumns.map(column => (
 						<HideColumn
 							key={column.id}
 							column={column}

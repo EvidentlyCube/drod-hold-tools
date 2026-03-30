@@ -1,8 +1,7 @@
 import { Signal } from "./Signals";
 
-
 export class SignalValue<T> {
-	private _value:T;
+	private _value: T;
 	public onChange = new Signal<T>();
 
 	public get value() {

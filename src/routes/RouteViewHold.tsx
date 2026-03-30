@@ -2,10 +2,9 @@ import { Navigate, useParams } from "react-router-dom";
 import HoldReaderView from "../components/viewHold/HoldReaderView";
 import { HoldReaders } from "../processor/HoldReaders";
 
-
 export default function RouteViewHold() {
 	const { holdReaderId } = useParams();
-	const id = parseInt(holdReaderId ?? "0");
+	const id = parseInt(holdReaderId ?? "0", 10);
 
 	if (!id) {
 		return <Navigate to="/" />;
@@ -15,7 +14,6 @@ export default function RouteViewHold() {
 
 	if (!holdReader) {
 		return <Navigate to="/" />;
-
 	} else {
 		return <HoldReaderView holdReader={holdReader} />;
 	}

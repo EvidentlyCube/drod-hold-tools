@@ -12,7 +12,6 @@ interface DemoConstructor {
 	nextDemoId: number;
 	checksum: number;
 	flags: number;
-
 }
 export class HoldDemo {
 	public readonly $hold: Hold;
@@ -31,7 +30,7 @@ export class HoldDemo {
 	public constructor(hold: Hold, opts: DemoConstructor) {
 		this.$hold = hold;
 
-		this.id = opts.id
+		this.id = opts.id;
 		this.savedGameId = opts.savedGameId;
 		this.isHidden = opts.isHidden;
 		this.description = wcharBase64ToString(opts.encDescription);

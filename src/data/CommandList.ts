@@ -1,7 +1,7 @@
 import { getCommandDataId, writeCommandsBuffer } from "./CommandUtils";
-import { Hold } from "./datatypes/Hold";
-import { ScriptCommand } from "./datatypes/ScriptCommand";
 import { ScriptCommandType } from "./DrodEnums";
+import type { Hold } from "./datatypes/Hold";
+import type { ScriptCommand } from "./datatypes/ScriptCommand";
 
 /**
  * Across the versions DROD used different mechanism to pack script commands
@@ -53,7 +53,11 @@ export class CommandsList {
 		this._commandsWithSpeech = undefined;
 	}
 
-	public constructor(hold: Hold, commandList: ScriptCommand[], packingType: CommandListPackingType) {
+	public constructor(
+		hold: Hold,
+		commandList: ScriptCommand[],
+		packingType: CommandListPackingType,
+	) {
 		this.hold = hold;
 		this.commands = commandList;
 		this.packingType = packingType;
@@ -61,7 +65,10 @@ export class CommandsList {
 
 	public getCommandWithLabel(labelId: number): ScriptCommand | undefined {
 		for (const command of this.commands) {
-			if (command.type === ScriptCommandType.CC_Label && command.x === labelId) {
+			if (
+				command.type === ScriptCommandType.CC_Label
+				&& command.x === labelId
+			) {
 				return command;
 			}
 		}
@@ -71,7 +78,9 @@ export class CommandsList {
 
 	public get $commandsWithSpeech() {
 		if (!this._commandsWithSpeech) {
-			this._commandsWithSpeech = this.commands.filter(command => command.speechId.newValue);
+			this._commandsWithSpeech = this.commands.filter(
+				command => command.speechId.newValue,
+			);
 		}
 
 		return this._commandsWithSpeech;
@@ -79,7 +88,9 @@ export class CommandsList {
 
 	public get $commandsWithData() {
 		if (!this._commandsWithData) {
-			this._commandsWithData = this.commands.filter(command => getCommandDataId(command));
+			this._commandsWithData = this.commands.filter(command =>
+				getCommandDataId(command),
+			);
 		}
 
 		return this._commandsWithData;

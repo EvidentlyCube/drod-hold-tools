@@ -1,4 +1,5 @@
-import { Hold } from "../data/datatypes/Hold";
+import { ImportExportTextRowType } from "../data/DrodCommonTypes";
+import type { Hold } from "../data/datatypes/Hold";
 import { HoldCharacter } from "../data/datatypes/HoldCharacter";
 import { HoldData } from "../data/datatypes/HoldData";
 import { HoldEntrance } from "../data/datatypes/HoldEntrance";
@@ -6,8 +7,10 @@ import { HoldLevel } from "../data/datatypes/HoldLevel";
 import { HoldPlayer } from "../data/datatypes/HoldPlayer";
 import { HoldScroll } from "../data/datatypes/HoldRoom";
 import { HoldSpeech } from "../data/datatypes/HoldSpeech";
-import { ImportExportTextRowType } from "../data/DrodCommonTypes";
-import { deserializeRef, resolveReference } from "../data/references/HoldReference";
+import {
+	deserializeRef,
+	resolveReference,
+} from "../data/references/HoldReference";
 import { TextUtils } from "../data/TextUtils";
 import { shouldYieldToUi, yieldToUi } from "../utils/AsyncUtils";
 import { csvStringToArray } from "../utils/CsvUtils";
@@ -25,14 +28,16 @@ interface ImportAllTextsResultFailure {
 	causedBy: Error;
 }
 
-export type ImportAllTextsResult = ImportAllTextsResultSuccess | ImportAllTextsResultFailure;
+export type ImportAllTextsResult =
+	| ImportAllTextsResultSuccess
+	| ImportAllTextsResultFailure;
 
 type Callback = () => void;
 
 export async function importAllTexts(
 	csvString: string,
 	hold: Hold,
-	onProgress: (progressFactor: number) => void
+	onProgress: (progressFactor: number) => void,
 ): Promise<ImportAllTextsResult> {
 	const rows = csvStringToArray(csvString);
 
@@ -257,14 +262,14 @@ export async function importAllTexts(
 
 		return {
 			isSuccess: true,
-			identicalRows, unresolvableRefs, updatedRows
+			identicalRows,
+			unresolvableRefs,
+			updatedRows,
 		};
-
 	} catch (e) {
 		return {
 			isSuccess: false,
 			causedBy: e instanceof Error ? e : new Error(String(e)),
-		}
+		};
 	}
-
 }

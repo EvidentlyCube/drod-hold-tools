@@ -1,62 +1,81 @@
 import { shouldBeUnreachable } from "../utils/Interfaces";
 import { escapeRegex } from "../utils/StringUtils";
-import { canCommandTypeStoreExpandableTextInLabel, canCommandTypeStoreFormulaInLabel } from "./CommandUtils";
-import { Hold } from "./datatypes/Hold";
-import { HoldVariable } from "./datatypes/HoldVariable";
+import {
+	canCommandTypeStoreExpandableTextInLabel,
+	canCommandTypeStoreFormulaInLabel,
+} from "./CommandUtils";
+import type { Hold } from "./datatypes/Hold";
+import type { HoldVariable } from "./datatypes/HoldVariable";
 import { HoldRefModel, resolveReference } from "./references/HoldReference";
 
 /**
  * @return Returns true if the given string is a single digit.
  */
 export function isDigit(char: string): boolean {
-	return char.length === 1 && char >= '0' && char <= '9';
+	return char.length === 1 && char >= "0" && char <= "9";
 }
 
 /**
  * @return Returns true if the given string is a single character a-z either upper or lowercase.
  */
 export function isAlphaCharacter(char: string): boolean {
-	return char.length === 1 && (
-		(char >= 'a' && char <= 'z') ||
-		(char >= 'A' && char <= 'Z')
+	return (
+		char.length === 1
+		&& ((char >= "a" && char <= "z") || (char >= "A" && char <= "Z"))
 	);
 }
 
 export function isValidVariableFirstCharacter(char: string): boolean {
-	return isDigit(char) || isAlphaCharacter(char) || char === "." || char === '@' || char === '#';
+	return (
+		isDigit(char)
+		|| isAlphaCharacter(char)
+		|| char === "."
+		|| char === "@"
+		|| char === "#"
+	);
 }
 
 export function isValidVariableSubsequentCharacter(char: string): boolean {
-	return isDigit(char) || isAlphaCharacter(char) || char === "_" || char === " ";
+	return (
+		isDigit(char) || isAlphaCharacter(char) || char === "_" || char === " "
+	);
 }
 
 export function isArrayVariableFirstCharacter(char: string): boolean {
-	return char === '@' || char === '#';
+	return char === "@" || char === "#";
 }
 
 export function isTypedVariableFirstCharacter(char: string) {
-	return char === '@' || char === '#' || char === '.';
+	return char === "@" || char === "#" || char === ".";
 }
 
 /**
  * Generate a regular expression that matches a given variable name within
  * command formulas.
  */
-export function getVariableInFormulaRegexp(variableName: string, globalFlag: boolean = false) {
-	return new RegExp(`(?<![a-z0-9\\.#@_])${escapeRegex(variableName)}(?![a-z0-9_])`, `i${globalFlag ? 'g' : ''}`);
+export function getVariableInFormulaRegexp(
+	variableName: string,
+	globalFlag: boolean = false,
+) {
+	return new RegExp(
+		`(?<![a-z0-9\\.#@_])${escapeRegex(variableName)}(?![a-z0-9_])`,
+		`i${globalFlag ? "g" : ""}`,
+	);
 }
 
-export function validateVariableRenaming(hold: Hold, oldName: string, newName: string): string | false {
+export function validateVariableRenaming(
+	hold: Hold,
+	oldName: string,
+	newName: string,
+): string | false {
 	if (newName.length === 0) {
 		return "Variable name must be longer than 0 characters.";
 	}
 
 	if (isTypedVariableFirstCharacter(oldName[0]) && oldName[0] !== newName[0]) {
 		return "Variable type cannot be changed.";
-
 	} else if (!isValidVariableFirstCharacter(newName[0])) {
 		return "A variable name must start with a digit or a letter (uppercase or lowercase) or a period.";
-
 	} else {
 		for (let i = 1; i < newName.length; i++) {
 			if (!isValidVariableSubsequentCharacter(newName[i])) {
@@ -78,7 +97,10 @@ export function validateVariableRenaming(hold: Hold, oldName: string, newName: s
 	return false;
 }
 
-export function renameVariable(variable: HoldVariable, newName: string): boolean {
+export function renameVariable(
+	variable: HoldVariable,
+	newName: string,
+): boolean {
 	const oldName = variable.name.newValue;
 
 	if (validateVariableRenaming(variable.hold, oldName, newName)) {
@@ -93,14 +115,13 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					characterCommand.label.newValue = replaceVariableNameInText(
 						characterCommand.label.newValue,
 						oldName,
-						newName
+						newName,
 					);
-
 				} else if (canCommandTypeStoreFormulaInLabel(characterCommand)) {
 					characterCommand.label.newValue = replaceVariableNameInFormula(
 						characterCommand.label.newValue,
 						oldName,
-						newName
+						newName,
 					);
 				}
 				break;
@@ -112,14 +133,13 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 					monsterCommand.label.newValue = replaceVariableNameInText(
 						monsterCommand.label.newValue,
 						oldName,
-						newName
+						newName,
 					);
-
 				} else if (canCommandTypeStoreFormulaInLabel(monsterCommand)) {
 					monsterCommand.label.newValue = replaceVariableNameInFormula(
 						monsterCommand.label.newValue,
 						oldName,
-						newName
+						newName,
 					);
 				}
 				break;
@@ -130,7 +150,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 				entrance.description.newValue = replaceVariableNameInText(
 					entrance.description.newValue,
 					oldName,
-					newName
+					newName,
 				);
 				break;
 			}
@@ -140,7 +160,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 				hold.endHoldMessage.newValue = replaceVariableNameInText(
 					hold.endHoldMessage.newValue,
 					oldName,
-					newName
+					newName,
 				);
 				break;
 			}
@@ -150,7 +170,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 				scroll.message.newValue = replaceVariableNameInText(
 					scroll.message.newValue,
 					oldName,
-					newName
+					newName,
 				);
 				break;
 			}
@@ -160,7 +180,7 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 				speech.message.newValue = replaceVariableNameInText(
 					speech.message.newValue,
 					oldName,
-					newName
+					newName,
 				);
 				break;
 			}
@@ -176,7 +196,10 @@ export function renameVariable(variable: HoldVariable, newName: string): boolean
 	return true;
 }
 
-export function isVariableUsedInText(text: string, variableFormulaRegexp: RegExp): boolean {
+export function isVariableUsedInText(
+	text: string,
+	variableFormulaRegexp: RegExp,
+): boolean {
 	const matches = text.matchAll(/\$(.*)\$/g);
 
 	for (const [, match] of matches) {
@@ -188,17 +211,20 @@ export function isVariableUsedInText(text: string, variableFormulaRegexp: RegExp
 	return false;
 }
 
-export function replaceVariableNameInFormula(formula: string, oldName: string, newName: string, ) {
-	return formula.replace(
-		getVariableInFormulaRegexp(oldName, true),
-		newName
-	);
+export function replaceVariableNameInFormula(
+	formula: string,
+	oldName: string,
+	newName: string,
+) {
+	return formula.replace(getVariableInFormulaRegexp(oldName, true), newName);
 }
 
-export function replaceVariableNameInText(text: string, oldName: string, newName: string) {
+export function replaceVariableNameInText(
+	text: string,
+	oldName: string,
+	newName: string,
+) {
 	return text.replace(/\$(.*?)\$/g, (_, match) => {
-		return '$'
-			+ replaceVariableNameInFormula(match, oldName, newName)
-			+ '$';
+		return `$${replaceVariableNameInFormula(match, oldName, newName)}$`;
 	});
 }

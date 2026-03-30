@@ -1,29 +1,35 @@
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
-import { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import type { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
+import DateTimeEditor from "../../components/viewHold/editables/DateTimeEditor";
 import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
-import { HoldLevel } from "../../data/datatypes/HoldLevel";
+import type { HoldLevel } from "../../data/datatypes/HoldLevel";
 import { HoldReaders } from "../../processor/HoldReaders";
-import { filterString, sortCompareNumber, sortCompareString } from "../../utils/SortUtils";
-import DateTimeEditor from "../../components/viewHold/editables/DateTimeEditor";
+import {
+	filterString,
+	sortCompareNumber,
+	sortCompareString,
+} from "../../utils/SortUtils";
 
 const Columns: SortableTableColumn<HoldLevel>[] = [
 	{
-		id: 'index',
-		displayName: 'Index',
+		id: "index",
+		displayName: "Index",
 		widthPercent: 5,
 		canHide: true,
 
 		render: level => level.orderIndex.toString(),
-		sort: (isAsc, left, right) => sortCompareNumber(isAsc, left.orderIndex, right.orderIndex),
-		filter: (level, filter) => filterString(level.orderIndex.toString(), filter),
+		sort: (isAsc, left, right) =>
+			sortCompareNumber(isAsc, left.orderIndex, right.orderIndex),
+		filter: (level, filter) =>
+			filterString(level.orderIndex.toString(), filter),
 		filterDebounce: 500,
 	},
 	{
-		id: 'id',
-		displayName: 'ID',
+		id: "id",
+		displayName: "ID",
 		widthPercent: 5,
 		canHide: true,
 
@@ -33,45 +39,64 @@ const Columns: SortableTableColumn<HoldLevel>[] = [
 		filterDebounce: 500,
 	},
 	{
-		id: 'rooms',
-		displayName: 'Rooms',
+		id: "rooms",
+		displayName: "Rooms",
 		widthPercent: 5,
 		canHide: true,
 
 		render: level => level.$rooms.length.toString(),
-		sort: (isAsc, left, right) => sortCompareNumber(isAsc, left.$rooms.length, right.$rooms.length),
-		filter: (level, filter) => filterString(level.$rooms.length.toString(), filter),
+		sort: (isAsc, left, right) =>
+			sortCompareNumber(isAsc, left.$rooms.length, right.$rooms.length),
+		filter: (level, filter) =>
+			filterString(level.$rooms.length.toString(), filter),
 		filterDebounce: 500,
 	},
 	{
-		id: 'player-id',
-		displayName: 'Author',
+		id: "player-id",
+		displayName: "Author",
 		widthPercent: 10,
 		canHide: true,
 
-		render: level => <div className="is-flex is-gap-1 is-align-items-center">
-			<SwapPlayerButton hold={level.$hold} playerSource={level.playerId} />
-			<PlayerRefViewByIdDynamic hold={level.$hold} playerIdSource={level.playerId} />
-		</div>,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$player.name.newValue, r.$player.name.newValue),
-		filter: (speech, filter) => filterString(speech.$player.name.newValue, filter),
+		render: level => (
+			<div className="is-flex is-gap-1 is-align-items-center">
+				<SwapPlayerButton hold={level.$hold} playerSource={level.playerId} />
+				<PlayerRefViewByIdDynamic
+					hold={level.$hold}
+					playerIdSource={level.playerId}
+				/>
+			</div>
+		),
+		sort: (isAsc, l, r) =>
+			sortCompareString(
+				isAsc,
+				l.$player.name.newValue,
+				r.$player.name.newValue,
+			),
+		filter: (speech, filter) =>
+			filterString(speech.$player.name.newValue, filter),
 		filterDebounce: 500,
 	},
 	{
-		id: 'created',
-		displayName: 'Created At',
+		id: "created",
+		displayName: "Created At",
 		widthPercent: 15,
 		render: level => <DateTimeEditor datetime={level.createdTimestamp} />,
-		sort: (isAsc, l, r) => sortCompareNumber(isAsc, l.createdTimestamp.newValue, r.createdTimestamp.newValue),
+		sort: (isAsc, l, r) =>
+			sortCompareNumber(
+				isAsc,
+				l.createdTimestamp.newValue,
+				r.createdTimestamp.newValue,
+			),
 		// filter: (level, filter) => filterString(level.name.newValue, filter),
 		filterDebounce: 500,
 	},
 	{
-		id: 'name',
-		displayName: 'Name',
+		id: "name",
+		displayName: "Name",
 		widthPercent: 30,
 		render: level => <DrodTextEditor text={level.name} />,
-		sort: (isAsc, l, r) => sortCompareString(isAsc, l.name.newValue, r.name.newValue),
+		sort: (isAsc, l, r) =>
+			sortCompareString(isAsc, l.name.newValue, r.name.newValue),
 		filter: (level, filter) => filterString(level.name.newValue, filter),
 		filterDebounce: 500,
 	},
@@ -83,12 +108,13 @@ export default function RouteViewHoldLevels() {
 
 	const levels = hold.levels.values();
 
-	return <>
+	return (
 		<SortableTable
 			tableId={`levels::${hold.$holdReaderId}`}
 			className="table is-fullwidth is-hoverable is-striped is-middle"
 			columns={Columns}
 			rows={levels}
-			pageSize={25} />
-	</>
+			pageSize={25}
+		/>
+	);
 }

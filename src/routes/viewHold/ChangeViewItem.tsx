@@ -1,12 +1,22 @@
-import { ReactElement } from "react";
-import { HoldChange, HoldChangeType } from "../../data/datatypes/HoldChange";
-import { Hold } from "../../data/datatypes/Hold";
-import { HoldRef, HoldRefModel } from "../../data/references/HoldReference";
-import { getBase64DecodedLength, getFormatName, getShowDescriptionName } from "../../data/Utils";
-import { formatBytes } from "../../utils/Language";
+import type { ReactElement } from "react";
 import { DataRefViewById } from "../../components/viewHold/DataRefView";
-import { shouldBeUnreachable } from "../../utils/Interfaces";
 import { MoodToName } from "../../data/DrodEnumToName";
+import type { Hold } from "../../data/datatypes/Hold";
+import {
+	type HoldChange,
+	HoldChangeType,
+} from "../../data/datatypes/HoldChange";
+import {
+	type HoldRef,
+	HoldRefModel,
+} from "../../data/references/HoldReference";
+import {
+	getBase64DecodedLength,
+	getFormatName,
+	getShowDescriptionName,
+} from "../../data/Utils";
+import { shouldBeUnreachable } from "../../utils/Interfaces";
+import { formatBytes } from "../../utils/Language";
 import { fixCarriageReturnForDisplay } from "../../utils/StringUtils";
 
 export interface ChangeViewItem {
@@ -17,7 +27,10 @@ export interface ChangeViewItem {
 	after: ReactElement[] | ReactElement | string | number;
 }
 
-export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem {
+export function changeToViewItem(
+	change: HoldChange,
+	hold: Hold,
+): ChangeViewItem {
 	const id = `${change.type}-${JSON.stringify(change.location)}`;
 
 	const changeType = change.type;
@@ -31,10 +44,26 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Character Avatar Data Id',
-				location: { hold, model: HoldRefModel.Character, characterId: character.id },
-				before: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.oldValue} showName={true} />,
-				after: <DataRefViewById hold={character.$hold} dataId={character.avatarDataId.newValue} showName={true} />,
+				type: "Character Avatar Data Id",
+				location: {
+					hold,
+					model: HoldRefModel.Character,
+					characterId: character.id,
+				},
+				before: (
+					<DataRefViewById
+						hold={character.$hold}
+						dataId={character.avatarDataId.oldValue}
+						showName={true}
+					/>
+				),
+				after: (
+					<DataRefViewById
+						hold={character.$hold}
+						dataId={character.avatarDataId.newValue}
+						showName={true}
+					/>
+				),
 			};
 		}
 
@@ -47,10 +76,14 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Character Name',
-				location: { hold, model: HoldRefModel.Character, characterId: character.id },
+				type: "Character Name",
+				location: {
+					hold,
+					model: HoldRefModel.Character,
+					characterId: character.id,
+				},
 				before: character.name.oldValue,
-				after: character.name.newValue
+				after: character.name.newValue,
 			};
 		}
 
@@ -63,47 +96,60 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Character Tiles Data Id',
-				location: { hold, model: HoldRefModel.Character, characterId: character.id },
-				before: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.oldValue} showName={true} />,
-				after: <DataRefViewById hold={character.$hold} dataId={character.tilesDataId.newValue} showName={true} />,
+				type: "Character Tiles Data Id",
+				location: {
+					hold,
+					model: HoldRefModel.Character,
+					characterId: character.id,
+				},
+				before: (
+					<DataRefViewById
+						hold={character.$hold}
+						dataId={character.tilesDataId.oldValue}
+						showName={true}
+					/>
+				),
+				after: (
+					<DataRefViewById
+						hold={character.$hold}
+						dataId={character.tilesDataId.newValue}
+						showName={true}
+					/>
+				),
 			};
 		}
 
-		case HoldChangeType.DataName:
-			{
-				const data = hold.datas.get(change.location.dataId);
+		case HoldChangeType.DataName: {
+			const data = hold.datas.get(change.location.dataId);
 
-				if (!data) {
-					return invalid(id, "Data Name", "Cannot find data");
-				}
-
-				return {
-					id,
-					type: 'Data Name',
-					location: { hold, model: HoldRefModel.Data, dataId: data.id },
-					before: data.name.oldValue,
-					after: data.name.newValue
-				};
+			if (!data) {
+				return invalid(id, "Data Name", "Cannot find data");
 			}
 
-		case HoldChangeType.DataFile:
-			{
-				const data = hold.datas.get(change.location.dataId);
+			return {
+				id,
+				type: "Data Name",
+				location: { hold, model: HoldRefModel.Data, dataId: data.id },
+				before: data.name.oldValue,
+				after: data.name.newValue,
+			};
+		}
 
-				if (!data) {
-					return invalid(id, "Data File", "Cannot find data");
-				}
+		case HoldChangeType.DataFile: {
+			const data = hold.datas.get(change.location.dataId);
 
-				return {
-					id,
-					type: 'Data File',
-					location: { hold, model: HoldRefModel.NotApplicable },
-					before: `${getFormatName(data.details.oldValue.format)} (${formatBytes(getBase64DecodedLength(data.details.oldValue.rawEncodedData))})`,
-					after: `${getFormatName(data.details.newValue.format)} (${formatBytes(getBase64DecodedLength(data.details.newValue.rawEncodedData))})`,
-				};
+			if (!data) {
+				return invalid(id, "Data File", "Cannot find data");
 			}
 
+			return {
+				id,
+				type: "Data File",
+				location: { hold, model: HoldRefModel.NotApplicable },
+				before: `${getFormatName(data.details.oldValue.format)} (${formatBytes(getBase64DecodedLength(data.details.oldValue.rawEncodedData))})`,
+				after: `${getFormatName(data.details.newValue.format)} (${formatBytes(getBase64DecodedLength(data.details.newValue.rawEncodedData))})`,
+			};
+		}
 
 		case HoldChangeType.EntranceDataId: {
 			const entrance = hold.entrances.get(change.location.entranceId);
@@ -114,10 +160,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Entrance DataId',
+				type: "Entrance DataId",
 				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
-				before: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.oldValue} showName={true} />,
-				after: <DataRefViewById hold={entrance.$hold} dataId={entrance.dataId.newValue} showName={true} />,
+				before: (
+					<DataRefViewById
+						hold={entrance.$hold}
+						dataId={entrance.dataId.oldValue}
+						showName={true}
+					/>
+				),
+				after: (
+					<DataRefViewById
+						hold={entrance.$hold}
+						dataId={entrance.dataId.newValue}
+						showName={true}
+					/>
+				),
 			};
 		}
 
@@ -130,10 +188,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Entrance Description',
-				location: { hold, model: HoldRefModel.Entrance, entranceId: entrance.id },
-				before: <div className="is-white-space-pre">{entrance.description.oldValue.replace(/\r/g, "\n")}</div>,
-				after: <div className="is-white-space-pre">{entrance.description.newValue}</div>,
+				type: "Entrance Description",
+				location: {
+					hold,
+					model: HoldRefModel.Entrance,
+					entranceId: entrance.id,
+				},
+				before: (
+					<div className="is-white-space-pre">
+						{entrance.description.oldValue.replace(/\r/g, "\n")}
+					</div>
+				),
+				after: (
+					<div className="is-white-space-pre">
+						{entrance.description.newValue}
+					</div>
+				),
 			};
 		}
 
@@ -146,7 +216,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Entrance Show Description',
+				type: "Entrance Show Description",
 				location: { hold, model: HoldRefModel.Room, roomId: entrance.roomId },
 				before: getShowDescriptionName(entrance.showDescription.oldValue),
 				after: getShowDescriptionName(entrance.showDescription.newValue),
@@ -159,7 +229,7 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Hold Player',
+				type: "Hold Player",
 				location: { hold, model: HoldRefModel.Hold },
 				before: oldPlayer.name.newValue,
 				after: newPlayer.name.newValue,
@@ -175,10 +245,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Level Created',
+				type: "Level Created",
 				location: { hold, model: HoldRefModel.Level, levelId: level.id },
-				before: (new Date(level.createdTimestamp.oldValue)).toLocaleString(),
-				after: (new Date(level.createdTimestamp.newValue)).toLocaleString()
+				before: new Date(level.createdTimestamp.oldValue).toLocaleString(),
+				after: new Date(level.createdTimestamp.newValue).toLocaleString(),
 			};
 		}
 
@@ -191,10 +261,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Level Name',
+				type: "Level Name",
 				location: { hold, model: HoldRefModel.Level, levelId: level.id },
 				before: level.name.oldValue,
-				after: level.name.newValue
+				after: level.name.newValue,
 			};
 		}
 
@@ -210,10 +280,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Level Player Id',
+				type: "Level Player Id",
 				location: { hold, model: HoldRefModel.Level, levelId: level.id },
 				before: oldPlayer.name.newValue,
-				after: newPlayer.name.newValue
+				after: newPlayer.name.newValue,
 			};
 		}
 
@@ -226,10 +296,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Player Deletion',
+				type: "Player Deletion",
 				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: "—",
-				after: "Deleting player!"
+				after: "Deleting player!",
 			};
 		}
 
@@ -242,10 +312,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Player Insertion',
+				type: "Player Insertion",
 				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: "n/a",
-				after: `New player #${player.id}: ${player.name.newValue}`
+				after: `New player #${player.id}: ${player.name.newValue}`,
 			};
 		}
 
@@ -258,10 +328,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Player Name',
+				type: "Player Name",
 				location: { hold, model: HoldRefModel.Player, playerId: player.id },
 				before: player.name.oldValue,
-				after: player.name.newValue
+				after: player.name.newValue,
 			};
 		}
 
@@ -272,8 +342,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 				return invalid(id, "Scroll Message", "Cannot find room");
 			}
 
-			const scroll = room.scrolls
-				.find(scroll => scroll.x === change.location.x && scroll.y === change.location.y);
+			const scroll = room.scrolls.find(
+				scroll =>
+					scroll.x === change.location.x && scroll.y === change.location.y,
+			);
 
 			if (!scroll) {
 				return invalid(id, "Scroll Message", "Cannot find scroll");
@@ -281,10 +353,16 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Scroll Message',
+				type: "Scroll Message",
 				location: scroll.$scrollRef,
-				before: <div className="is-white-space-pre">{scroll.message.oldValue.replace(/\r/g, "\n")}</div>,
-				after: <div className="is-white-space-pre">{scroll.message.newValue}</div>,
+				before: (
+					<div className="is-white-space-pre">
+						{scroll.message.oldValue.replace(/\r/g, "\n")}
+					</div>
+				),
+				after: (
+					<div className="is-white-space-pre">{scroll.message.newValue}</div>
+				),
 			};
 		}
 
@@ -297,10 +375,22 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Speech Data ID',
+				type: "Speech Data ID",
 				location: speech.$location,
-				before: <DataRefViewById hold={speech.$hold} dataId={speech.dataId.oldValue} showName={true} />,
-				after: <DataRefViewById hold={speech.$hold} dataId={speech.dataId.newValue} showName={true} />,
+				before: (
+					<DataRefViewById
+						hold={speech.$hold}
+						dataId={speech.dataId.oldValue}
+						showName={true}
+					/>
+				),
+				after: (
+					<DataRefViewById
+						hold={speech.$hold}
+						dataId={speech.dataId.newValue}
+						showName={true}
+					/>
+				),
 			};
 		}
 
@@ -313,10 +403,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Speech Message',
+				type: "Speech Message",
 				location: speech.$location,
 				before: speech.message.oldValue,
-				after: speech.message.newValue
+				after: speech.message.newValue,
 			};
 		}
 
@@ -329,10 +419,14 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Speech Mood',
+				type: "Speech Mood",
 				location: speech.$location,
-				before: MoodToName.get(speech.mood.oldValue) ?? `Invalid mood ${speech.mood.oldValue}`,
-				after: MoodToName.get(speech.mood.newValue) ?? `Invalid mood ${speech.mood.newValue}`,
+				before:
+					MoodToName.get(speech.mood.oldValue)
+					?? `Invalid mood ${speech.mood.oldValue}`,
+				after:
+					MoodToName.get(speech.mood.newValue)
+					?? `Invalid mood ${speech.mood.newValue}`,
 			};
 		}
 
@@ -345,10 +439,26 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'World Map Data',
-				location: { hold, model: HoldRefModel.WorldMap, worldMapId: worldMap.id },
-				before: <DataRefViewById hold={worldMap.$hold} dataId={worldMap.dataId.oldValue} showName={true} />,
-				after: <DataRefViewById hold={worldMap.$hold} dataId={worldMap.dataId.newValue} showName={true} />,
+				type: "World Map Data",
+				location: {
+					hold,
+					model: HoldRefModel.WorldMap,
+					worldMapId: worldMap.id,
+				},
+				before: (
+					<DataRefViewById
+						hold={worldMap.$hold}
+						dataId={worldMap.dataId.oldValue}
+						showName={true}
+					/>
+				),
+				after: (
+					<DataRefViewById
+						hold={worldMap.$hold}
+						dataId={worldMap.dataId.newValue}
+						showName={true}
+					/>
+				),
 			};
 		}
 
@@ -361,10 +471,14 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'World Map Name',
-				location: { hold, model: HoldRefModel.WorldMap, worldMapId: worldMap.id },
+				type: "World Map Name",
+				location: {
+					hold,
+					model: HoldRefModel.WorldMap,
+					worldMapId: worldMap.id,
+				},
 				before: worldMap.name.oldValue,
-				after: worldMap.name.newValue
+				after: worldMap.name.newValue,
 			};
 		}
 
@@ -377,10 +491,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Data Deletion',
+				type: "Data Deletion",
 				location: { hold, model: HoldRefModel.Data, dataId: data.id },
 				before: "-",
-				after: "Deleting data!"
+				after: "Deleting data!",
 			};
 		}
 
@@ -393,10 +507,10 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Speech Deletion',
+				type: "Speech Deletion",
 				location: { hold, model: HoldRefModel.Speech, speechId: speech.id },
 				before: "-",
-				after: "Deleting speech!"
+				after: "Deleting speech!",
 			};
 		}
 
@@ -406,22 +520,27 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			if (!character) {
 				return invalid(id, "Character Command Label", "Cannot find character");
 			} else if (!character.$commandList) {
-				return invalid(id, "Character Command Label", "Character has no commands");
+				return invalid(
+					id,
+					"Character Command Label",
+					"Character has no commands",
+				);
 			}
 
-			const command = character.$commandList.commands[change.location.commandIndex];
+			const command =
+				character.$commandList.commands[change.location.commandIndex];
 			if (!command) {
 				return invalid(id, "Character Command Label", "Command not found");
 			}
 
 			return {
 				id,
-				type: 'Character Command Label',
+				type: "Character Command Label",
 				location: {
 					hold,
 					model: HoldRefModel.CharacterCommand,
 					characterId: change.location.characterId,
-					commandIndex: change.location.commandIndex
+					commandIndex: change.location.commandIndex,
 				},
 				before: fixCarriageReturnForDisplay(command.label.oldValue),
 				after: fixCarriageReturnForDisplay(command.label.newValue),
@@ -432,30 +551,39 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 			const room = hold.rooms.get(change.location.roomId);
 
 			if (!room) {
-				return invalid(id, "Monster Command Label", "Cannot find monster's room");
+				return invalid(
+					id,
+					"Monster Command Label",
+					"Cannot find monster's room",
+				);
 			}
 
 			const monster = room.monsters[change.location.monsterIndex];
 			if (!monster) {
-				return invalid(id, "Monster Command Label", "Monster not found in the room");
+				return invalid(
+					id,
+					"Monster Command Label",
+					"Monster not found in the room",
+				);
 			} else if (!monster.$commandList) {
 				return invalid(id, "Monster Command Label", "Monster has no commands");
 			}
 
-			const command = monster.$commandList.commands[change.location.commandIndex];
+			const command =
+				monster.$commandList.commands[change.location.commandIndex];
 			if (!command) {
 				return invalid(id, "Monster Command Label", "Command not found");
 			}
 
 			return {
 				id,
-				type: 'Monster Command Label',
+				type: "Monster Command Label",
 				location: {
 					hold,
 					model: HoldRefModel.MonsterCommand,
 					roomId: change.location.roomId,
 					monsterIndex: change.location.monsterIndex,
-					commandIndex: change.location.commandIndex
+					commandIndex: change.location.commandIndex,
 				},
 				before: fixCarriageReturnForDisplay(command.label.oldValue),
 				after: fixCarriageReturnForDisplay(command.label.newValue),
@@ -472,27 +600,32 @@ export function changeToViewItem(change: HoldChange, hold: Hold): ChangeViewItem
 
 			return {
 				id,
-				type: 'Variable Name',
+				type: "Variable Name",
 				location: {
-					model: HoldRefModel.Variable, hold, variableId,
+					model: HoldRefModel.Variable,
+					hold,
+					variableId,
 				},
 				before: variable.name.oldValue,
-				after: variable.name.newValue
+				after: variable.name.newValue,
 			};
 		}
 
 		default:
 			shouldBeUnreachable(changeType);
-			return invalid(id, "UNKNOWN", "Unknown change: " + JSON.stringify(change));
+			return invalid(
+				id,
+				"UNKNOWN",
+				`Unknown change: ${JSON.stringify(change)}`,
+			);
 	}
 }
-
 
 function invalid(id: string, type: string, error: string): ChangeViewItem {
 	return {
 		id,
 		type,
 		before: "# ERROR #",
-		after: error
-	}
+		after: error,
+	};
 }

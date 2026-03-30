@@ -1,6 +1,6 @@
-import { ChangeEvent, useCallback } from "react";
+import { type ChangeEvent, useCallback } from "react";
 import { parseFileToDataDetail } from "../../../data/actions/parseFileToDataDetail";
-import { HoldData } from "../../../data/datatypes/HoldData";
+import type { HoldData } from "../../../data/datatypes/HoldData";
 import { useSignalNullable } from "../../../hooks/useSignalNullable";
 
 interface Props {
@@ -9,66 +9,86 @@ interface Props {
 export default function ReplaceButton({ data }: Props) {
 	const file = useSignalNullable(data.$replacingFile);
 
-	const onFileSelected = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files ? e.target.files[0] : null;
+	const onFileSelected = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const file = e.target.files ? e.target.files[0] : null;
 
-		if (!file) {
-			return;
-		}
+			if (!file) {
+				return;
+			}
 
-		data.$replacingFile.value = file;
+			data.$replacingFile.value = file;
 
-		parseFileToDataDetail(data, file)
-			.then(newDetail => {
-				if (!data.name.isChanged) {
-					data.name.set(true, file.name);
-				}
-				data.$replacingFile.unset();
-				data.$lastReplaceError.unset();
-				data.details.set(true, newDetail);
-			})
-			.catch(error => {
-				data.$replacingFile.unset();
-				data.$lastReplaceError.value = String(error);
-			})
-
-	}, [data]);
-
-	return <>
-		<div className={`file has-name is-warning mb-1 ${file ? 'is-disabled' : ''}`}>
-			<label className="file-label">
-				<input className="file-input" type="file" onChange={onFileSelected} disabled={!!file} />
-				<span className="file-cta">
-					{!file &&
-						<span className="file-icon">
-							<i className="fas fa-upload"></i>
-						</span>
+			parseFileToDataDetail(data, file)
+				.then(newDetail => {
+					if (!data.name.isChanged) {
+						data.name.set(true, file.name);
 					}
-					<span className="file-label is-readonly">
-						{file && <div className="loader is-spinner-black"></div>}
-						{!file && "Replace data"}
+					data.$replacingFile.unset();
+					data.$lastReplaceError.unset();
+					data.details.set(true, newDetail);
+				})
+				.catch(error => {
+					data.$replacingFile.unset();
+					data.$lastReplaceError.value = String(error);
+				});
+		},
+		[data],
+	);
+
+	return (
+		<>
+			<div
+				className={`file has-name is-warning mb-1 ${file ? "is-disabled" : ""}`}
+			>
+				<label className="file-label">
+					<input
+						className="file-input"
+						type="file"
+						onChange={onFileSelected}
+						disabled={!!file}
+					/>
+					<span className="file-cta">
+						{!file && (
+							<span className="file-icon">
+								<i className="fas fa-upload"></i>
+							</span>
+						)}
+						<span className="file-label is-readonly">
+							{file && <div className="loader is-spinner-black"></div>}
+							{!file && "Replace data"}
+						</span>
 					</span>
-				</span>
-				<span className="file-name">{file?.name ?? "No file selected"}</span>
-			</label>
-		</div>
-		<ErrorMessage data={ data } />
-	</>
+					<span className="file-name">{file?.name ?? "No file selected"}</span>
+				</label>
+			</div>
+			<ErrorMessage data={data} />
+		</>
+	);
 }
 
 function ErrorMessage({ data }: Props) {
 	const lastError = useSignalNullable(data.$lastReplaceError);
 
-	const clearMessage = useCallback(() => data.$lastReplaceError.unset(), [data]);
+	const clearMessage = useCallback(
+		() => data.$lastReplaceError.unset(),
+		[data],
+	);
 
 	if (!lastError) {
 		return null;
 	}
 
-	return <article className="message is-danger is-small">
-		<div className="message-body is-flex is-align-items-center is-gap-1 p-1 pl-2">
-			<button className="delete is-small is-float-right" onClick={clearMessage}></button>
-			<p>{lastError}</p>
-		</div>
-	</article>;
+	return (
+		<article className="message is-danger is-small">
+			<div className="message-body is-flex is-align-items-center is-gap-1 p-1 pl-2">
+				<button
+					type="button"
+					className="delete is-small is-float-right"
+					onClick={clearMessage}
+				></button>
+				<p>{lastError}</p>
+			</div>
+		</article>
+	);
 }

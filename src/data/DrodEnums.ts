@@ -4,7 +4,7 @@ import { UINT_MINUS_1 } from "./DrodCommonTypes";
 export enum EntranceShowDescription {
 	No = 0,
 	Always = 1,
-	Once = 2
+	Once = 2,
 }
 
 export enum DataFormat {
@@ -16,10 +16,12 @@ export enum DataFormat {
 	WAV = 40,
 	OGG = 41,
 	TTF = 60,
-	THEORA = 70
+	THEORA = 70,
 }
 
 export enum ScriptCommandType {
+	CC_Invalid = -1,
+
 	CC_Appear = 0,
 	CC_AppearAt = 1,
 	CC_MoveTo = 2,
@@ -349,7 +351,7 @@ export enum MonsterType {
 	BeethroInDisguise = 10011,
 	Gunthro = 10012,
 
-	_CustomCharactersStart = 20000
+	_CustomCharactersStart = 20000,
 }
 
 export enum Speaker {
@@ -413,7 +415,7 @@ export enum Speaker {
 	TemporalClone = 57,
 	FluffBaby = 58,
 
-	HoldCharacter = UINT_MINUS_1
+	HoldCharacter = UINT_MINUS_1,
 }
 
 export enum Mood {
@@ -434,7 +436,7 @@ export enum ScriptVarOperators {
 	AppendText = 4,
 	MultiplyBy = 5,
 	DivideBy = 6,
-	Mod = 7
+	Mod = 7,
 }
 
 export enum ScriptVarComparators {
@@ -444,15 +446,15 @@ export enum ScriptVarComparators {
 	EqualsText = 3,
 	LessThanOrEqual = 8, //to avoid collision with Op values
 	GreaterThanOrEqual = 9,
-	Unequal = 10
+	Unequal = 10,
 }
 
 export enum ScreenFilter {
 	Normal = 0,
 	BlackAndWhite = 1,
 	Sepia = 2,
-	Negative = 3
-};
+	Negative = 3,
+}
 
 export enum AttackTileType {
 	Stab = 0,
@@ -463,7 +465,7 @@ export enum AttackTileType {
 	OneTurnStun = 5,
 	TwoTurnStun = 6,
 	FloorSpikes = 7,
-	Firetrap = 8
+	Firetrap = 8,
 }
 
 export enum WaitForFlag {
@@ -488,7 +490,7 @@ export enum NaturalTargetType {
 	NearestOpenRoomEdge = 4,
 	NearestOpenRoomEdgePlayer = 5,
 	Puff = 6,
-	Stalwart = 7
+	Stalwart = 7,
 }
 
 export enum OrbAgentType {
@@ -743,7 +745,7 @@ export enum GameEffectType {
 	IceMelt = 19,
 	PuffSplat = 20,
 	TileSwirl = 21,
-	DottedLine = 22
+	DottedLine = 22,
 }
 
 export enum PredefinedVariable {
@@ -826,7 +828,7 @@ export enum Imperative {
 	InvisibleCountMoveOrder = 32,
 	InvisibleNotCountMoveOrder = 33,
 	Friendly = 34,
-	Unfriendly = 35
+	Unfriendly = 35,
 }
 
 export enum WeaponTypeFlag {
@@ -909,7 +911,7 @@ export enum LightColor {
 	Lime = 13,
 	Turquoise = 14,
 	Violet = 15,
-	Azure = 16
+	Azure = 16,
 }
 
 export enum PlayerBehaviorState {
@@ -917,8 +919,8 @@ export enum PlayerBehaviorState {
 	On = 1,
 	Off = 2,
 	Powered = 3,
-	Unpowered = 4
-};
+	Unpowered = 4,
+}
 
 export enum PlayerBehavior {
 	Null = 0,
@@ -954,7 +956,7 @@ export enum PlayerBehavior {
 	PushObjects = 30,
 	PushMonsters = 31,
 	MovePlatforms = 32,
-};
+}
 
 export enum TileGroup {
 	PlainFloor = 0,

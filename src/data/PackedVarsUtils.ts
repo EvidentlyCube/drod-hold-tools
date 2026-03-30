@@ -39,24 +39,21 @@ class WrappedArray {
 
 		this._pos += varSize;
 
-		return pos0
-			+ (pos1 * 256)
-			+ (pos2 * 256 * 256)
-			+ (pos3 * 256 * 256 * 256);
+		return pos0 + pos1 * 256 + pos2 * 256 * 256 + pos3 * 256 * 256 * 256;
 	}
 
 	public writeUint(val: number, varSize: number) {
 		if (varSize >= 1) {
-			this._array[this._pos++] = val & 0xFF;
+			this._array[this._pos++] = val & 0xff;
 		}
 		if (varSize >= 2) {
-			this._array[this._pos++] = (val / 256) & 0xFF;
+			this._array[this._pos++] = (val / 256) & 0xff;
 		}
 		if (varSize >= 3) {
-			this._array[this._pos++] = (val / (256 * 256)) & 0xFF;
+			this._array[this._pos++] = (val / (256 * 256)) & 0xff;
 		}
 		if (varSize >= 4) {
-			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xFF;
+			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xff;
 		}
 
 		this.padZeroBytes(varSize - 4);
@@ -70,24 +67,21 @@ class WrappedArray {
 
 		this._pos += varSize;
 
-		return pos0
-			+ (pos1 * 256)
-			+ (pos2 * 256 * 256)
-			+ (pos3 * 256 * 256 * 256);
+		return pos0 + pos1 * 256 + pos2 * 256 * 256 + pos3 * 256 * 256 * 256;
 	}
 
 	public writeInt(val: number, varSize: number) {
 		if (varSize >= 1) {
-			this._array[this._pos++] = val & 0xFF;
+			this._array[this._pos++] = val & 0xff;
 		}
 		if (varSize >= 2) {
-			this._array[this._pos++] = (val / 256) & 0xFF;
+			this._array[this._pos++] = (val / 256) & 0xff;
 		}
 		if (varSize >= 3) {
-			this._array[this._pos++] = (val / (256 * 256)) & 0xFF;
+			this._array[this._pos++] = (val / (256 * 256)) & 0xff;
 		}
 		if (varSize >= 4) {
-			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xFF;
+			this._array[this._pos++] = (val / (256 * 256 * 256)) & 0xff;
 		}
 		this.padZeroBytes(varSize - 4);
 	}
@@ -101,20 +95,21 @@ class WrappedArray {
 
 		this._pos += varSize;
 
-		return chars.join('');
+		return chars.join("");
 	}
 
 	public readWcharString(varSize: number): string {
 		const chars = [];
 		// -2 because it's null terminated and we skip the last WCHAR
 		for (let i = 0; i < varSize - 2; i += 2) {
-			const codeUnit = this._array[this._pos + i] | (this._array[this._pos + i + 1] << 8);
+			const codeUnit =
+				this._array[this._pos + i] | (this._array[this._pos + i + 1] << 8);
 			chars.push(String.fromCharCode(codeUnit));
 		}
 
 		this._pos += varSize;
 
-		return chars.join('');
+		return chars.join("");
 	}
 
 	public writeString(str: string, varSize: number) {
@@ -135,8 +130,8 @@ class WrappedArray {
 		for (let i = 0; i < varSize - 2; i += 2) {
 			// Division because we want to go character by character
 			const charCode = str.charCodeAt(i / 2);
-			this._array[this._pos++] = charCode & 0xFF;
-			this._array[this._pos++] = (charCode >> 8) & 0xFF;
+			this._array[this._pos++] = charCode & 0xff;
+			this._array[this._pos++] = (charCode >> 8) & 0xff;
 		}
 
 		this._array[this._pos++] = 0;
@@ -167,13 +162,19 @@ class WrappedArray {
 }
 
 export function readPackedVars(base64ExtraVars: string): PackedVars;
-export function readPackedVars(base64ExtraVars?: string): PackedVars | undefined;
-export function readPackedVars(base64ExtraVars?: string): PackedVars | undefined {
+export function readPackedVars(
+	base64ExtraVars?: string,
+): PackedVars | undefined;
+export function readPackedVars(
+	base64ExtraVars?: string,
+): PackedVars | undefined {
 	if (!base64ExtraVars) {
 		return undefined;
 	}
 
-	return PackedVarsUtils.readBuffer(PackedVarsUtils.base64ToArray(base64ExtraVars));
+	return PackedVarsUtils.readBuffer(
+		PackedVarsUtils.base64ToArray(base64ExtraVars),
+	);
 }
 
 export function writePackedVars(packedVars: PackedVars): string {
@@ -204,7 +205,9 @@ const PackedVarsUtils = {
 
 		while (varNameLength !== 0 && !Number.isNaN(varNameLength)) {
 			if (varNameLength >= 256) {
-				throw new Error(`Variable name cannot be more than 255 characters, but got ${varNameLength} instead`);
+				throw new Error(
+					`Variable name cannot be more than 255 characters, but got ${varNameLength} instead`,
+				);
 			}
 
 			const varName = arr.readCharString(varNameLength);
@@ -240,7 +243,6 @@ const PackedVarsUtils = {
 			}
 
 			varNameLength = arr.readUint(4);
-
 		}
 
 		return vars;
@@ -260,42 +262,54 @@ const PackedVarsUtils = {
 			switch (type) {
 				case PackedVarType.ByteBuffer: {
 					if (!Array.isArray(value)) {
-						throw new Error(`Expected ByteBuffer value to be number[] or Uint8Array for variable "${name}"`);
+						throw new Error(
+							`Expected ByteBuffer value to be number[] or Uint8Array for variable "${name}"`,
+						);
 					}
 					buf.writeRaw(value, size);
 					break;
 				}
 				case PackedVarType.Uint: {
-					if (typeof value !== 'number' || !Number.isFinite(value)) {
-						throw new Error(`Expected Uint value to be a number for variable "${name}"`);
+					if (typeof value !== "number" || !Number.isFinite(value)) {
+						throw new Error(
+							`Expected Uint value to be a number for variable "${name}"`,
+						);
 					}
 					buf.writeUint(value >>> 0, size);
 					break;
 				}
 				case PackedVarType.deprecated_DWord: {
-					if (typeof value !== 'number' || !Number.isFinite(value)) {
-						throw new Error(`Expected deprecated_DWord value to be a number for variable "${name}"`);
+					if (typeof value !== "number" || !Number.isFinite(value)) {
+						throw new Error(
+							`Expected deprecated_DWord value to be a number for variable "${name}"`,
+						);
 					}
 					buf.writeUint(value >>> 0, size);
 					break;
 				}
 				case PackedVarType.Int: {
-					if (typeof value !== 'number' || !Number.isFinite(value)) {
-						throw new Error(`Expected Int value to be a finite number for variable "${name}"`);
+					if (typeof value !== "number" || !Number.isFinite(value)) {
+						throw new Error(
+							`Expected Int value to be a finite number for variable "${name}"`,
+						);
 					}
 					buf.writeInt(value | 0, size);
 					break;
 				}
 				case PackedVarType.Bool: {
-					if (typeof value !== 'boolean') {
-						throw new Error(`Expected Bool value to be boolean for variable "${name}"`);
+					if (typeof value !== "boolean") {
+						throw new Error(
+							`Expected Bool value to be boolean for variable "${name}"`,
+						);
 					}
 					buf.writeBool(value, size);
 					break;
 				}
 				case PackedVarType.WcharString: {
-					if (typeof value !== 'string') {
-						throw new Error(`Expected WcharString value to be string for variable "${name}"`);
+					if (typeof value !== "string") {
+						throw new Error(
+							`Expected WcharString value to be string for variable "${name}"`,
+						);
 					}
 					buf.writeWCharString(value, size);
 					break;

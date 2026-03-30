@@ -1,57 +1,68 @@
 import { useCallback, useState } from "react";
 import { createPortal } from "react-dom";
-import { DataFormat } from "../../../data/DrodEnums";
-import { Hold } from "../../../data/datatypes/Hold";
+import type { DataFormat } from "../../../data/DrodEnums";
+import type { Hold } from "../../../data/datatypes/Hold";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
-import { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
+import type { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 import SelectDataModal from "./SelectDataModal";
 
 interface Props {
 	hold: Hold;
-	dataSource: SignalUpdatableValue<number|undefined>;
-	formats: DataFormat[]
+	dataSource: SignalUpdatableValue<number | undefined>;
+	formats: DataFormat[];
 }
-export default function SwapDataButton({hold, dataSource, formats}: Props) {
+export default function SwapDataButton({ hold, dataSource, formats }: Props) {
 	const isChanged = useSignalUpdatableValue(dataSource)[1];
 	const [isOpen, setIsOpen] = useState(false);
-	const onSelect = useCallback((dataId: number|undefined) => {
-		if (dataId === dataSource.oldValue) {
-			dataSource.unset();
-		} else {
-			dataSource.set(true, dataId);
-		}
-		setIsOpen(false);
-	}, [ dataSource, setIsOpen ]);
+	const onSelect = useCallback(
+		(dataId: number | undefined) => {
+			if (dataId === dataSource.oldValue) {
+				dataSource.unset();
+			} else {
+				dataSource.set(true, dataId);
+			}
+			setIsOpen(false);
+		},
+		[dataSource],
+	);
 	const onUnset = useCallback(() => {
 		dataSource.unset();
 		setIsOpen(false);
-	}, [ dataSource, setIsOpen ]);
+	}, [dataSource]);
 
-	const modal = isOpen
-		? <SelectDataModal
-				hold={hold}
-				formats={formats}
-				allowEmpty={true}
-				onClose={() => setIsOpen(false)}
-				onSelect={onSelect}
-			/>
-		: null;
+	const modal = isOpen ? (
+		<SelectDataModal
+			hold={hold}
+			formats={formats}
+			allowEmpty={true}
+			onClose={() => setIsOpen(false)}
+			onSelect={onSelect}
+		/>
+	) : null;
 
-	return <>
-		<button
-			className={`button is-small is-tooltip`}
-			onClick={() => setIsOpen(!isOpen)}
-			title="Change "
-		>
-			<div className="icon"><i className="fas fa-arrows-rotate"/></div>
-		</button>
-		<button
-			className={`button is-small is-warning ${!isChanged ? 'is-hidden' : ''}`}
-			onClick={onUnset}
-			title="Undo change"
-		>
-			<div className="icon"><i className="fas fa-rotate-left"/></div>
-		</button>
-		{createPortal(modal, document.body)}
-	</>;
+	return (
+		<>
+			<button
+				type="button"
+				className={`button is-small is-tooltip`}
+				onClick={() => setIsOpen(!isOpen)}
+				title="Change "
+			>
+				<div className="icon">
+					<i className="fas fa-arrows-rotate" />
+				</div>
+			</button>
+			<button
+				type="button"
+				className={`button is-small is-warning ${!isChanged ? "is-hidden" : ""}`}
+				onClick={onUnset}
+				title="Undo change"
+			>
+				<div className="icon">
+					<i className="fas fa-rotate-left" />
+				</div>
+			</button>
+			{createPortal(modal, document.body)}
+		</>
+	);
 }
