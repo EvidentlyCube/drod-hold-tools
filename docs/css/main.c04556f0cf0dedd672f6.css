@@ -30762,7 +30762,7 @@ readers do not read off random characters that represent icons */
 }
 
 .select.is-empty select {
-	color: #CCC;
+	color: #ccc;
 }
 
 .has-background-drod-transparent-gray {
@@ -30770,7 +30770,8 @@ readers do not read off random characters that represent icons */
 }
 
 .has-background-chessboard {
-	background: repeating-conic-gradient(#BABABA 0% 25%, white 0% 50%) 50% / 20px 20px;
+	background:
+		repeating-conic-gradient(#bababa 0% 25%, white 0% 50%) 50% / 20px 20px;
 }
 
 .control.has-icons-left .icon.is-interactive,
@@ -30806,29 +30807,28 @@ readers do not read off random characters that represent icons */
 	height: 100%;
 }
 
-
-.control.has-icons-left .textarea:hover~.icon,
-.control.has-icons-right .textarea:hover~.icon {
+.control.has-icons-left .textarea:hover ~ .icon,
+.control.has-icons-right .textarea:hover ~ .icon {
 	color: var(--bulma-input-icon-hover-color);
 }
 
-.control.has-icons-left .textarea:focus~.icon,
-.control.has-icons-right .textarea:focus~.icon {
+.control.has-icons-left .textarea:focus ~ .icon,
+.control.has-icons-right .textarea:focus ~ .icon {
 	color: var(--bulma-input-icon-focus-color);
 }
 
-.control.has-icons-left .textarea.is-small~.icon,
-.control.has-icons-right .textarea.is-small~.icon {
+.control.has-icons-left .textarea.is-small ~ .icon,
+.control.has-icons-right .textarea.is-small ~ .icon {
 	font-size: var(--bulma-size-small);
 }
 
-.control.has-icons-left .textarea.is-medium~.icon,
-.control.has-icons-right .textarea.is-medium~.icon {
+.control.has-icons-left .textarea.is-medium ~ .icon,
+.control.has-icons-right .textarea.is-medium ~ .icon {
 	font-size: var(--bulma-size-medium);
 }
 
-.control.has-icons-left .textarea.is-large~.icon,
-.control.has-icons-right .textarea.is-large~.icon {
+.control.has-icons-left .textarea.is-large ~ .icon,
+.control.has-icons-right .textarea.is-large ~ .icon {
 	font-size: var(--bulma-size-large);
 }
 
@@ -30836,7 +30836,7 @@ readers do not read off random characters that represent icons */
 	padding-left: var(--bulma-input-height);
 }
 
-.control.has-icons-left .textarea~.icon {
+.control.has-icons-left .textarea ~ .icon {
 	height: 100%;
 }
 
@@ -30857,27 +30857,37 @@ readers do not read off random characters that represent icons */
 .modal-card {
 	--bulma-modal-content-width: 60em;
 }
+
+.delete[disabled] {
+	cursor: not-allowed;
+}
+
+.delete[disabled]:after,
+.delete[disabled]:before {
+	opacity: 0.5;
+}
+
 #route-drop-hold {
-    background: #DDD;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+	background: #ddd;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
 }
 
 #route-drop-hold header {
-    font-size: 32px;
+	font-size: 32px;
 }
 
 #route-drop-hold aside {
-    font-size: 22px;
+	font-size: 22px;
 
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 #route-drop-hold .logs {
@@ -30909,17 +30919,28 @@ readers do not read off random characters that represent icons */
 	font-size: 16px;
 	opacity: 0.2;
 }
+
 .navbar .add-item {
 	position: relative;
 	cursor: pointer;
 
 	transition-duration: var(--bulma-duration);
 	transition-property: background-color, border-color, color;
-	background-color: hsla(var(--bulma-navbar-h), var(--bulma-navbar-s), calc(var(--bulma-navbar-item-background-l) + var(--bulma-navbar-item-background-l-delta)), var(--bulma-navbar-item-background-a));
+	background-color: hsla(
+		var(--bulma-navbar-h),
+		var(--bulma-navbar-s),
+		calc(
+			var(--bulma-navbar-item-background-l) +
+			var(--bulma-navbar-item-background-l-delta)
+		),
+		var(--bulma-navbar-item-background-a)
+	);
 }
 
 .navbar .add-item:hover {
-	--bulma-navbar-item-background-l-delta: var(--bulma-navbar-item-hover-background-l-delta);
+	--bulma-navbar-item-background-l-delta: var(
+		--bulma-navbar-item-hover-background-l-delta
+	);
 	--bulma-navbar-item-background-a: 1;
 }
 
@@ -30939,7 +30960,7 @@ readers do not read off random characters that represent icons */
 }
 
 .navbar.is-success .navbar-item.active {
-	background: hsl(153, 53%, 43%)
+	background: hsl(153, 53%, 43%);
 }
 
 @keyframes save-swing {
@@ -30972,6 +30993,35 @@ readers do not read off random characters that represent icons */
 	transition: opacity 1s;
 	opacity: 0;
 }
+
+.shimmer-loader:not(.active) {
+	color: #444;
+	background: linear-gradient(
+		90deg,
+		#000 0%,
+		#888 10%,
+		#000 20%,
+		#000 50% /* second band starts here, 50% offset */,
+		#888 60%,
+		#000 70%,
+		#000 100%
+	);
+	background-size: 200% auto;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	animation: shimmer 0.5s linear infinite;
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: 100% center;
+	}
+	100% {
+		background-position: 0% center;
+	}
+}
+
 i.fa-icon {
 	font-style: normal;
 }
@@ -30987,10 +31037,13 @@ i.fa-icon {
 .icon-ref {
 	color: gray;
 }
+
 .modal-card.image-preview {
 	width: auto;
 	max-width: calc(100vw - var(--bulma-modal-card-spacing));
 }
 
 
-/*# sourceMappingURL=main.9c1921d308bbfa36fe20.css.map*/
+
+
+/*# sourceMappingURL=main.c04556f0cf0dedd672f6.css.map*/

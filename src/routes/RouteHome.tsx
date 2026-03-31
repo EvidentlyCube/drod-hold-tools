@@ -110,7 +110,7 @@ export default function RouteHome() {
 							<div className="content">
 								<h3>Changelog</h3>
 								<h5 className="subtitle is-6">
-									v0.1.10 <span className="is-muted">(Unreleased)</span>
+									v1.0.0 <span className="is-muted">(Unreleased)</span>
 								</h5>
 								<ul>
 									<li>
