@@ -27,7 +27,7 @@ export default function BulkManageUnusedDataButton({ hold }: Props) {
 				</span>
 				<span className="file-label">Manage unused data</span>
 			</button>
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</div>
 	);
 }

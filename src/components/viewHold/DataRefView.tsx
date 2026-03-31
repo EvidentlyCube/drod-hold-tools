@@ -55,7 +55,7 @@ export default function DataRefView({ data, showName }: Props) {
 			<span className="icon">
 				<i className={`fas ${getDataIconClass(format)}`}></i>
 			</span>{" "}
-			{showName && data.name.newValue}
+			{!!showName && data.name.newValue}
 			{!showName && getFormatName(format)}
 		</div>
 	);

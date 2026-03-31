@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useCallback } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import Select from "../Select";
 import type {
@@ -27,7 +27,7 @@ export function _SortableTableFilters<T extends SortableTableDataWithId>(
 
 				return (
 					<th key={column.id} style={style}>
-						{column.filter && (
+						{!!column.filter && (
 							<FilterInput
 								column={column}
 								columnFilters={columnFilters}
@@ -58,6 +58,15 @@ export function FilterInput<T extends SortableTableDataWithId>(
 	const setFilter = useDebouncedCallback((column: string, filter: string) => {
 		setColumnFilter(column, filter);
 	}, column.filterDebounce ?? 0);
+	const onFilterSelect = useCallback(
+		(value: string) => setFilter(column.id, value),
+		[setFilter, column],
+	);
+	const onInput = useCallback(
+		(e: React.FormEvent<HTMLInputElement>) =>
+			setFilter(column.id, e.currentTarget.value),
+		[column, setFilter],
+	);
 
 	if (column.filterOptions) {
 		return (
@@ -67,7 +76,7 @@ export function FilterInput<T extends SortableTableDataWithId>(
 					emptyOption="Filter..."
 					options={column.filterOptions.options}
 					optgroups={column.filterOptions.optgroups}
-					onChange={value => setFilter(column.id, value)}
+					onChange={onFilterSelect}
 					value={columnFilters.get(column.id)}
 				/>
 				<span className="icon is-small is-left">
@@ -82,7 +91,7 @@ export function FilterInput<T extends SortableTableDataWithId>(
 					className="input is-small is-rounded"
 					defaultValue={columnFilters.get(column.id) ?? ""}
 					placeholder="Filter..."
-					onInput={e => setFilter(column.id, e.currentTarget.value)}
+					onInput={onInput}
 				/>
 				<span className="icon is-small is-left">
 					<i className="fas fa-magnifying-glass"></i>

@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.4.9/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
 	"files": {
 		"includes": ["src/**", "test/**", "!src/assets"]
 	},
@@ -28,7 +28,34 @@
 				"noFloatingPromises": "error",
 				"noMisusedPromises": "error",
 				"noMultiAssign": "error",
-				"noUnnecessaryConditions": "error"
+				"noUnnecessaryConditions": "error",
+				"noDuplicateEnumValues": "error",
+				"noDuplicatedSpreadProps": "error",
+				"noEqualsToNull": "error",
+				"noFloatingClasses": "error",
+				"noForIn": "error",
+				"noJsxPropsBind": "error",
+				"noLeakedRender": "error",
+				"noMultiStr": "error",
+				"noNestedPromises": "error",
+				"noParametersOnlyUsedInRecursion": "error",
+				"noProto": "error",
+				"noRedundantDefaultExport": "error",
+				"noReturnAssign": "error",
+				"noUnknownAttribute": "error",
+				"noUnsafePlusOperands": "error",
+				"noUselessReturn": "error",
+				"useArraySome": "error",
+				"useArraySortCompare": "error",
+				"useAwaitThenable": "error",
+				"useConsistentEnumValueType": "error",
+				"useConsistentMethodSignatures": "error",
+				"useExhaustiveSwitchCases": "error",
+				"useFind": "error",
+				"useImportsFirst": "error",
+				"useNullishCoalescing": "error",
+				"useRegexpExec": "error",
+				"useSpread": "error"
 			}
 		}
 	},

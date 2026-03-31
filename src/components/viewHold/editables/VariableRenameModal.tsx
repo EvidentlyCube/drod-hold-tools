@@ -44,6 +44,10 @@ export default function VariableRenameModal(props: Props) {
 		},
 		[newName, onRename, error],
 	);
+	const handleRename = useCallback(
+		() => onRename(newName),
+		[newName, onRename],
+	);
 
 	return (
 		<Modal
@@ -53,7 +57,7 @@ export default function VariableRenameModal(props: Props) {
 				<button
 					type="button"
 					className="button is-danger"
-					onClick={() => onRename(newName)}
+					onClick={handleRename}
 					disabled={error !== false}
 				>
 					Rename

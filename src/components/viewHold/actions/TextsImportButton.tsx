@@ -84,7 +84,7 @@ export default function TextImportButton({ hold }: Props) {
 					<span className="file-label">Import texts</span>
 				</span>
 			</label>
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</div>
 	);
 }

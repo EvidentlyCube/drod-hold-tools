@@ -1,6 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { createPortal } from "react-dom";
 import type { Hold } from "../../../data/datatypes/Hold";
+import { useBoolState } from "../../../hooks/useBoolState";
 import { useSignalUpdatableValue } from "../../../hooks/useSignalUpdatableValue";
 import type { SignalUpdatableValue } from "../../../utils/SignalUpdatableValue";
 import SelectPlayerModal from "./SelectPlayerModal";
@@ -11,7 +12,8 @@ interface Props {
 }
 export default function SwapPlayerButton({ hold, playerSource }: Props) {
 	const isChanged = useSignalUpdatableValue(playerSource)[1];
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setOpen, setClose] = useBoolState(false);
+
 	const onSelect = useCallback(
 		(playerId: number) => {
 			if (playerId === playerSource.oldValue) {
@@ -19,21 +21,17 @@ export default function SwapPlayerButton({ hold, playerSource }: Props) {
 			} else {
 				playerSource.set(true, playerId);
 			}
-			setIsOpen(false);
+			setClose();
 		},
-		[playerSource],
+		[playerSource, setClose],
 	);
 	const onUnset = useCallback(() => {
 		playerSource.unset();
-		setIsOpen(false);
-	}, [playerSource]);
+		setClose();
+	}, [playerSource, setClose]);
 
 	const modal = isOpen ? (
-		<SelectPlayerModal
-			hold={hold}
-			onClose={() => setIsOpen(false)}
-			onSelect={onSelect}
-		/>
+		<SelectPlayerModal hold={hold} onClose={setClose} onSelect={onSelect} />
 	) : null;
 
 	return (
@@ -41,7 +39,7 @@ export default function SwapPlayerButton({ hold, playerSource }: Props) {
 			<button
 				type="button"
 				className={`button is-small is-tooltip`}
-				onClick={() => setIsOpen(!isOpen)}
+				onClick={setOpen}
 				title="Change "
 			>
 				<div className="icon">

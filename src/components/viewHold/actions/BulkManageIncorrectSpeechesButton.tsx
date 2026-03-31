@@ -25,7 +25,7 @@ export default function BulkManageIncorrectSpeechesButton({ hold }: Props) {
 				</span>
 				<span className="file-label">Manage unused speeches</span>
 			</button>
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</div>
 	);
 }

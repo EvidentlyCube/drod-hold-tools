@@ -38,9 +38,9 @@ function HoldDataSize({ data }: { data: HoldData }) {
 function DeleteCell({ data }: { data: HoldData }) {
 	const isDeleted = useSignalUpdatableValue(data.$isDeleted, true);
 
-	const onClick = () => {
+	const onClick = useCallback(() => {
 		data.$isDeleted.newValue = !data.$isDeleted.newValue;
-	};
+	}, [data]);
 
 	if (data.$uses.length > 0) {
 		return <DataUsesPreviewButton data={data} />;

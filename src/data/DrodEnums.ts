@@ -336,8 +336,8 @@ export enum MonsterType {
 	TemporalClone = 42,
 	FluffBaby = 43,
 
-	_CharacterTypesStart = 10000,
-	Negotiator = _CharacterTypesStart,
+	_LastMonsterType = 9999,
+	Negotiator = 10000,
 	Citizen1 = 10001,
 	Citizen2 = 10002,
 	GoblinKing = 10003,

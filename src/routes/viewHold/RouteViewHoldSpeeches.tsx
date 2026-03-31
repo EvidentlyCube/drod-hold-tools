@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { HoldVersionLimitationWarning } from "../../components/common/HoldVersionLimitationWarning";
 import type { Option } from "../../components/common/Select";
@@ -49,9 +50,9 @@ const MoodOptions: Option[] = [
 function DeleteCell({ speech }: { speech: HoldSpeech }) {
 	const isDeleted = useSignalUpdatableValue(speech.$isDeleted, true);
 
-	const onClick = () => {
+	const onClick = useCallback(() => {
 		speech.$isDeleted.newValue = !speech.$isDeleted.newValue;
-	};
+	}, [speech]);
 
 	if (speech.$canDelete) {
 		if (isDeleted) {
@@ -72,6 +73,11 @@ function DeleteCell({ speech }: { speech: HoldSpeech }) {
 	}
 }
 
+const transformMood = (mood: string) => {
+	const result = parseInt(mood, 10);
+
+	return result in Mood ? result : Mood.Normal;
+};
 const Columns: SortableTableColumn<HoldSpeech>[] = [
 	{
 		id: "id",
@@ -107,7 +113,7 @@ const Columns: SortableTableColumn<HoldSpeech>[] = [
 			<SelectEditor
 				value={speech.mood}
 				options={MoodOptions}
-				transformer={mood => parseInt(mood, 10)}
+				transformer={transformMood}
 			/>
 		),
 		sort: (isAsc, l, r) => sortCompareString(isAsc, l.$mood, r.$mood),

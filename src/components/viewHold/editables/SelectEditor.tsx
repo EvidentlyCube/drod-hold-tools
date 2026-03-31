@@ -44,7 +44,7 @@ export default function SelectEditor<T extends string | number>({
 				optgroups={optGroups}
 				onChange={onChange}
 			/>
-			{isEdited && (
+			{!!isEdited && (
 				<button
 					type="button"
 					className="button ml-3 is-warning"

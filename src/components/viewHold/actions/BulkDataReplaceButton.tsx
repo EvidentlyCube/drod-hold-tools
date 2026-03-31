@@ -86,7 +86,7 @@ export default function BulkDataReplaceButton({ hold }: Props) {
 					<span className="file-label">Replace all data</span>
 				</span>
 			</label>
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</div>
 	);
 }

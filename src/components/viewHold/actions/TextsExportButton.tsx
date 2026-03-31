@@ -67,7 +67,7 @@ export default function TextsExportButton({ hold }: Props) {
 				<i className="fas fa-download"></i>
 			</span>
 			Export texts
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</button>
 	);
 }
@@ -115,7 +115,7 @@ function DownloadModal({
 					></progress>
 				</>
 			)}
-			{objectUrl && <h3 className="is-size-3">Ready to download</h3>}
+			{!!objectUrl && <h3 className="is-size-3">Ready to download</h3>}
 		</Modal>
 	);
 }

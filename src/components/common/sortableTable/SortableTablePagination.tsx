@@ -1,7 +1,10 @@
 import { memo, useCallback } from "react";
 import SortableTableColumnOptions from "./SortableTableColumnOptions";
 import type { SortableTableColumnSansData } from "./SortableTableCommons";
-import { getPaginationPageNumbers } from "./SortableTableUtils";
+import {
+	getPaginationPageNumbers,
+	PAGINATION_ELLIPSIS_BUTTON,
+} from "./SortableTableUtils";
 
 interface PaginationProps {
 	totalRecords: number;
@@ -36,6 +39,14 @@ function SortableTablePaginationRaw(props: PaginationProps) {
 		},
 		[pages, setPage],
 	);
+	const setPrevPage = useCallback(
+		() => setPageSafe(currentPage - 1),
+		[currentPage, setPageSafe],
+	);
+	const setNextPage = useCallback(
+		() => setPageSafe(currentPage + 1),
+		[currentPage, setPageSafe],
+	);
 
 	const pageNumbers = getPaginationPageNumbers(currentPage, pages);
 
@@ -52,14 +63,14 @@ function SortableTablePaginationRaw(props: PaginationProps) {
 				className={
 					isFirst ? "is-disabled pagination-previous" : "pagination-previous"
 				}
-				onClick={() => setPageSafe(currentPage - 1)}
+				onClick={setPrevPage}
 			>
 				Previous
 			</button>
 			<button
 				type="button"
 				className={isLast ? "is-disabled pagination-next" : "pagination-next"}
-				onClick={() => setPageSafe(currentPage + 1)}
+				onClick={setNextPage}
 			>
 				Next page
 			</button>
@@ -89,27 +100,32 @@ export const SortableTablePagination = memo(
 interface PaginationLinkProps {
 	selected: number;
 	setPage: (page: number) => void;
-	linkingPage: number | string;
+	linkingPage: number;
 }
 function PaginationLink({
 	selected,
-	linkingPage: current,
+	linkingPage,
 	setPage,
 }: PaginationLinkProps) {
-	if (typeof current === "string") {
+	const handleClick = useCallback(
+		() => setPage(linkingPage),
+		[setPage, linkingPage],
+	);
+
+	if (linkingPage === PAGINATION_ELLIPSIS_BUTTON) {
 		return <span className="pagination-ellipsis">&hellip;</span>;
 	} else {
 		return (
 			<button
 				type="button"
 				className={
-					selected === current
+					selected === linkingPage
 						? "is-current pagination-link"
 						: "pagination-link"
 				}
-				onClick={() => setPage(current)}
+				onClick={handleClick}
 			>
-				{current + 1}
+				{linkingPage + 1}
 			</button>
 		);
 	}

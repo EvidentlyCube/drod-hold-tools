@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { createPortal } from "react-dom";
 import type { HoldData } from "../../../data/datatypes/HoldData";
+import { useBoolState } from "../../../hooks/useBoolState";
 import DataUsesPreview from "./DataUsesPreview";
 
 interface Props {
@@ -8,10 +8,10 @@ interface Props {
 }
 export default function DataUsesPreviewButton({ data }: Props) {
 	const { $uses } = data;
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setOpen, setClose] = useBoolState(false);
 
 	const modal = isOpen ? (
-		<DataUsesPreview data={data} onClose={() => setIsOpen(false)} />
+		<DataUsesPreview data={data} onClose={setClose} />
 	) : null;
 
 	if ($uses.length === 0) {
@@ -20,11 +20,7 @@ export default function DataUsesPreviewButton({ data }: Props) {
 
 	return (
 		<>
-			<button
-				type="button"
-				className="button"
-				onClick={() => setIsOpen(!isOpen)}
-			>
+			<button type="button" className="button" onClick={setOpen}>
 				{$uses.length} use{$uses.length !== 1 ? "s" : ""}
 			</button>
 			{createPortal(modal, document.body)}

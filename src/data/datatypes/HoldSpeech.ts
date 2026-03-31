@@ -98,8 +98,8 @@ export class HoldSpeech {
 
 		this.$isDeleted = new SignalUpdatableValue(false);
 
-		this.message.onChange.add(
-			() => (this._containsVariableReferenceCache = undefined),
-		);
+		this.message.onChange.add(() => {
+			this._containsVariableReferenceCache = undefined;
+		});
 	}
 }

@@ -71,7 +71,7 @@ export default function DataDownloadButton({ hold }: Props) {
 				</span>
 				<span className="file-label">Download all data</span>
 			</button>
-			{isOpen && createPortal(modal, document.body)}
+			{!!isOpen && createPortal(modal, document.body)}
 		</div>
 	);
 }
@@ -97,7 +97,7 @@ function DownloadModal({
 			canClose={canClose}
 			onClose={onClose}
 			buttons=<>
-				{objectUrl && (
+				{!!objectUrl && (
 					<a href={objectUrl} className="button" download={archiveName}>
 						Download Archive
 					</a>
@@ -119,7 +119,7 @@ function DownloadModal({
 					></progress>
 				</>
 			)}
-			{objectUrl && <h3 className="is-size-3">Ready to download</h3>}
+			{!!objectUrl && <h3 className="is-size-3">Ready to download</h3>}
 		</Modal>
 	);
 }

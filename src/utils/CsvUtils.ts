@@ -5,7 +5,7 @@ export function arrayToCsvString(rows: string[][]): string {
 }
 
 function escapeCsvCell(cell: string): string {
-	if (cell.match(/[\n,"]/)) {
+	if (/[\n,"]/.test(cell)) {
 		return `"${cell.replace(/"/g, '""')}"`;
 	} else {
 		return cell;

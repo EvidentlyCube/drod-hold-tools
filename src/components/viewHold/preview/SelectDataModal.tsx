@@ -1,6 +1,7 @@
 import { type ChangeEvent, useCallback, useMemo, useState } from "react";
 import type { DataFormat } from "../../../data/DrodEnums";
 import type { Hold } from "../../../data/datatypes/Hold";
+import type { HoldData } from "../../../data/datatypes/HoldData";
 import { filterString, sortCompareString } from "../../../utils/SortUtils";
 import Modal from "../../common/Modal";
 import DataRefView from "../DataRefView";
@@ -16,6 +17,7 @@ export default function SelectDataModal(props: Props) {
 	const { hold, formats, onClose, onSelect, allowEmpty } = props;
 
 	const [filter, setFilter] = useState("");
+	const deselect = useCallback(() => onSelect(undefined), [onSelect]);
 	const baseDatas = useMemo(() => {
 		const datas = hold.datas
 			.filterToArray(data => formats.includes(data.details.newValue.format))
@@ -57,7 +59,7 @@ export default function SelectDataModal(props: Props) {
 					</tr>
 				</thead>
 				<tbody>
-					{allowEmpty && (
+					{!!allowEmpty && (
 						<tr>
 							<td>
 								<span className="is-muted">n/a</span>
@@ -66,35 +68,40 @@ export default function SelectDataModal(props: Props) {
 								<span className="is-muted">No Data</span>
 							</td>
 							<td>
-								<button
-									type="button"
-									className="button"
-									onClick={() => onSelect(undefined)}
-								>
+								<button type="button" className="button" onClick={deselect}>
 									Select
 								</button>
 							</td>
 						</tr>
 					)}
 					{filteredDatas.map(data => (
-						<tr key={data.id}>
-							<td>
-								<DataRefView data={data} />
-							</td>
-							<td>{data.name.newValue}</td>
-							<td>
-								<button
-									type="button"
-									className="button"
-									onClick={() => onSelect(data.id)}
-								>
-									Select
-								</button>
-							</td>
-						</tr>
+						<DataRow key={data.id} data={data} onSelect={onSelect} />
 					))}
 				</tbody>
 			</table>
 		</Modal>
+	);
+}
+
+interface DataRowProps {
+	data: HoldData;
+	onSelect: (dataId: number) => void;
+}
+
+function DataRow({ data, onSelect }: DataRowProps) {
+	const onSelectInner = useCallback(() => onSelect(data.id), [data, onSelect]);
+
+	return (
+		<tr>
+			<td>
+				<DataRefView data={data} />
+			</td>
+			<td>{data.name.newValue}</td>
+			<td>
+				<button type="button" className="button" onClick={onSelectInner}>
+					Select
+				</button>
+			</td>
+		</tr>
 	);
 }

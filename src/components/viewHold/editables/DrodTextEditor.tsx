@@ -60,7 +60,7 @@ export default function DrodTextEditor({ text, tag }: Props) {
 					title={title}
 				>
 					{!isEdited && <i className="fas fa-pen-to-square" />}
-					{isEdited && <i className="fas fa-rotate-left" />}
+					{!!isEdited && <i className="fas fa-rotate-left" />}
 				</button>
 			</div>
 		);
@@ -84,7 +84,7 @@ export default function DrodTextEditor({ text, tag }: Props) {
 					title={title}
 				>
 					{!isEdited && <i className="fas fa-pen-to-square" />}
-					{isEdited && <i className="fas fa-rotate-left" />}
+					{!!isEdited && <i className="fas fa-rotate-left" />}
 				</button>
 			</div>
 		);

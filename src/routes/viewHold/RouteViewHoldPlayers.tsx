@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SortableTable from "../../components/common/sortableTable/SortableTable";
 import type { SortableTableColumn } from "../../components/common/sortableTable/SortableTableCommons";
@@ -13,9 +14,9 @@ import {
 } from "../../utils/SortUtils";
 
 function DeleteCell({ player }: { player: HoldPlayer }) {
-	const onClick = () => {
+	const onClick = useCallback(() => {
 		player.$isDeleted.newValue = !player.$isDeleted.newValue;
-	};
+	}, [player]);
 
 	if (player.$uses.length > 0) {
 		return <PlayerUsesPreviewButton player={player} />;
@@ -75,6 +76,7 @@ export default function RouteViewHoldPlayers() {
 	const { holdReaderId } = useParams();
 	const { hold } = HoldReaders.getParsed(holdReaderId);
 	const players = useSignalOrderedMapValues(hold.players);
+	const onAddNewPlayer = useCallback(() => hold.addNewPlayer(), [hold]);
 
 	return (
 		<>
@@ -83,7 +85,7 @@ export default function RouteViewHoldPlayers() {
 				<button
 					type="button"
 					className="button is-primary"
-					onClick={() => hold.addNewPlayer()}
+					onClick={onAddNewPlayer}
 				>
 					Add New Player
 				</button>

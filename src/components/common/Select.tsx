@@ -56,8 +56,8 @@ export default function Select(props: SelectProps) {
 				value={value}
 				defaultValue={defaultValue}
 			>
-				{emptyOption && <option value="">{emptyOption}</option>}
-				{options && mapOptions(options)}
+				{!!emptyOption && <option value="">{emptyOption}</option>}
+				{!!options && options.length > 0 && mapOptions(options)}
 				{optgroups?.map((optgroup, index) => (
 					<OptionGroup
 						key={getKey(optgroup, index)}

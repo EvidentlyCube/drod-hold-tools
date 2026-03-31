@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import type {
 	SortableTableColumn,
 	SortableTableDataWithId,
@@ -28,16 +29,18 @@ export default function SortableTableHeaderCell<
 	TData extends SortableTableDataWithId,
 >({ column, onSort, sortBy, sortAsc }: HeaderProps<TData>) {
 	const style = { width: `${column.widthPercent}%` };
+	const onSortInner = useCallback(
+		(e: React.MouseEvent) => {
+			e.preventDefault();
+			onSort(column.id);
+		},
+		[column, onSort],
+	);
+
 	if (column.sort) {
 		return (
 			<th style={style}>
-				<a
-					href="/"
-					onClick={e => {
-						e.preventDefault();
-						onSort(column.id);
-					}}
-				>
+				<a href="/" onClick={onSortInner}>
 					{column.displayName}
 					<span className="icon">
 						<SortIcon

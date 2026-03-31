@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import type { SortableTableColumnSansData } from "./SortableTableCommons";
 
 interface Props {
@@ -56,14 +57,14 @@ function HideColumn(props: HideColumnProps) {
 	const { column, hiddenColumns, toggleHiddenColumn } = props;
 
 	const isHidden = hiddenColumns.has(column.id);
+	const onChange = useCallback(
+		() => toggleHiddenColumn(column.id),
+		[toggleHiddenColumn, column],
+	);
 
 	return (
 		<label className="checkbox dropdown-item">
-			<input
-				type="checkbox"
-				checked={!isHidden}
-				onChange={() => toggleHiddenColumn(column.id)}
-			/>{" "}
+			<input type="checkbox" checked={!isHidden} onChange={onChange} />{" "}
 			{column.displayName}
 		</label>
 	);

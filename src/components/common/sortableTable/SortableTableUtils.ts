@@ -1,12 +1,17 @@
-export function getPaginationPageNumbers(page: number, total: number) {
+export const PAGINATION_ELLIPSIS_BUTTON = -1;
+
+export function getPaginationPageNumbers(
+	page: number,
+	total: number,
+): number[] {
 	const lastPage = total - 1;
-	const items: (number | string)[] = [0];
+	const items: number[] = [0];
 	if (total <= 1) {
 		return items;
 	}
 
 	if (page > 3) {
-		items.push("ellipsis-1");
+		items.push(PAGINATION_ELLIPSIS_BUTTON);
 	}
 
 	const lookahead = 2;
@@ -18,7 +23,7 @@ export function getPaginationPageNumbers(page: number, total: number) {
 	}
 
 	if (pagesTo + 1 < lastPage) {
-		items.push("ellipsis-2");
+		items.push(PAGINATION_ELLIPSIS_BUTTON);
 	}
 
 	if (pagesTo < lastPage) {

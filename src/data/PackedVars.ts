@@ -166,7 +166,7 @@ export class PackedVars {
 	}
 
 	hasVar(name: string) {
-		return this._vars.find(packedVar => packedVar.name === name) !== undefined;
+		return this._vars.some(packedVar => packedVar.name === name);
 	}
 
 	getVarIndex(name: string) {

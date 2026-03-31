@@ -56,7 +56,7 @@ export default function DateTimeEditor({ datetime }: Props) {
 				title={title}
 			>
 				{!isEdited && <i className="fas fa-pen-to-square" />}
-				{isEdited && <i className="fas fa-rotate-left" />}
+				{!!isEdited && <i className="fas fa-rotate-left" />}
 			</button>
 		</div>
 	);

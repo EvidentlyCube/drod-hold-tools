@@ -1,5 +1,6 @@
 import { type ChangeEvent, useCallback, useMemo, useState } from "react";
 import type { Hold } from "../../../data/datatypes/Hold";
+import type { HoldPlayer } from "../../../data/datatypes/HoldPlayer";
 import { filterString, sortCompareString } from "../../../utils/SortUtils";
 import Modal from "../../common/Modal";
 
@@ -53,21 +54,31 @@ export default function SelectPlayerModal(props: Props) {
 				</thead>
 				<tbody>
 					{filteredPlayers.map(player => (
-						<tr key={player.id}>
-							<td>{player.name.newValue}</td>
-							<td>
-								<button
-									type="button"
-									className="button"
-									onClick={() => onSelect(player.id)}
-								>
-									Select
-								</button>
-							</td>
-						</tr>
+						<PlayerRow key={player.id} player={player} onSelect={onSelect} />
 					))}
 				</tbody>
 			</table>
 		</Modal>
+	);
+}
+
+interface PlayerRowProps {
+	player: HoldPlayer;
+	onSelect: (playerId: number) => void;
+}
+function PlayerRow({ player, onSelect }: PlayerRowProps) {
+	const innerOnSelect = useCallback(
+		() => onSelect(player.id),
+		[player, onSelect],
+	);
+	return (
+		<tr>
+			<td>{player.name.newValue}</td>
+			<td>
+				<button type="button" className="button" onClick={innerOnSelect}>
+					Select
+				</button>
+			</td>
+		</tr>
 	);
 }
