@@ -1,354 +1,1928 @@
-import assert from 'node:assert';
-import { test } from 'node:test';
-import { HoldMonster } from '../src/data/datatypes/HoldMonster';
-import { ScriptCommandType } from '../src/data/DrodEnums';
-import { HoldRefModel, serializeRef } from '../src/data/references/HoldReference';
-import { TestDataFactory } from './helpers/TestDataFactory';
+import assert from "node:assert";
+import { test } from "node:test";
+import { ScriptCommandType } from "../src/data/DrodEnums";
+import type { HoldMonster } from "../src/data/datatypes/HoldMonster";
+import {
+	HoldRefModel,
+	serializeRef,
+} from "../src/data/references/HoldReference";
+import { TestDataFactory } from "./helpers/TestDataFactory";
 
-await test('Validate all uses of the variable were found', async () => {
-	const hold = await TestDataFactory.loadHold('VariableTester.hold');
-	const monster = hold.$monsters.find(monster => monster.x === 1 && monster.y === 1);
+await test("Validate all uses of the variable were found", async () => {
+	const hold = await TestDataFactory.loadHold("VariableTester.hold");
+	const monster = hold.$monsters.find(
+		monster => monster.x === 1 && monster.y === 1,
+	);
 	assert.ok(monster);
 
-	const everywhereVar = hold.variables.find(v => v.name.newValue === 'um');
+	const everywhereVar = hold.variables.find(v => v.name.newValue === "um");
 	assert.ok(everywhereVar);
 
 	try {
-		assertMonsterCommandRefersToVars(monster, 0, ScriptCommandType.CC_AnswerOption, 'um');
-		assertMonsterCommandRefersToVars(monster, 1, ScriptCommandType.CC_AnswerOption, 'umm');
-		assertMonsterCommandRefersToVars(monster, 2, ScriptCommandType.CC_AnswerOption, 'uum');
-		assertMonsterCommandRefersToVars(monster, 3, ScriptCommandType.CC_AnswerOption, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 4, ScriptCommandType.CC_AnswerOption, '.um');
-		assertMonsterCommandRefersToVars(monster, 5, ScriptCommandType.CC_AnswerOption, '.umm');
-		assertMonsterCommandRefersToVars(monster, 6, ScriptCommandType.CC_AnswerOption, '.uum');
-		assertMonsterCommandRefersToVars(monster, 7, ScriptCommandType.CC_AnswerOption, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 8, ScriptCommandType.CC_AnswerOption, '@um');
-		assertMonsterCommandRefersToVars(monster, 9, ScriptCommandType.CC_AnswerOption, '@umm');
-		assertMonsterCommandRefersToVars(monster, 10, ScriptCommandType.CC_AnswerOption, '@uum');
-		assertMonsterCommandRefersToVars(monster, 11, ScriptCommandType.CC_AnswerOption, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 12, ScriptCommandType.CC_AnswerOption, '#um');
-		assertMonsterCommandRefersToVars(monster, 13, ScriptCommandType.CC_AnswerOption, '#umm');
-		assertMonsterCommandRefersToVars(monster, 14, ScriptCommandType.CC_AnswerOption, '#uum');
-		assertMonsterCommandRefersToVars(monster, 15, ScriptCommandType.CC_AnswerOption, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			0,
+			ScriptCommandType.CC_AnswerOption,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			1,
+			ScriptCommandType.CC_AnswerOption,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			2,
+			ScriptCommandType.CC_AnswerOption,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			3,
+			ScriptCommandType.CC_AnswerOption,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			4,
+			ScriptCommandType.CC_AnswerOption,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			5,
+			ScriptCommandType.CC_AnswerOption,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			6,
+			ScriptCommandType.CC_AnswerOption,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			7,
+			ScriptCommandType.CC_AnswerOption,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			8,
+			ScriptCommandType.CC_AnswerOption,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			9,
+			ScriptCommandType.CC_AnswerOption,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			10,
+			ScriptCommandType.CC_AnswerOption,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			11,
+			ScriptCommandType.CC_AnswerOption,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			12,
+			ScriptCommandType.CC_AnswerOption,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			13,
+			ScriptCommandType.CC_AnswerOption,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			14,
+			ScriptCommandType.CC_AnswerOption,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			15,
+			ScriptCommandType.CC_AnswerOption,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 20, ScriptCommandType.CC_ClearArrayVar, '@um');
-		assertMonsterCommandRefersToVars(monster, 21, ScriptCommandType.CC_ClearArrayVar, '@umm');
-		assertMonsterCommandRefersToVars(monster, 22, ScriptCommandType.CC_ClearArrayVar, '@uum');
-		assertMonsterCommandRefersToVars(monster, 23, ScriptCommandType.CC_ClearArrayVar, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 24, ScriptCommandType.CC_ClearArrayVar, '#um');
-		assertMonsterCommandRefersToVars(monster, 25, ScriptCommandType.CC_ClearArrayVar, '#umm');
-		assertMonsterCommandRefersToVars(monster, 26, ScriptCommandType.CC_ClearArrayVar, '#uum');
-		assertMonsterCommandRefersToVars(monster, 27, ScriptCommandType.CC_ClearArrayVar, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			20,
+			ScriptCommandType.CC_ClearArrayVar,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			21,
+			ScriptCommandType.CC_ClearArrayVar,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			22,
+			ScriptCommandType.CC_ClearArrayVar,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			23,
+			ScriptCommandType.CC_ClearArrayVar,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			24,
+			ScriptCommandType.CC_ClearArrayVar,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			25,
+			ScriptCommandType.CC_ClearArrayVar,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			26,
+			ScriptCommandType.CC_ClearArrayVar,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			27,
+			ScriptCommandType.CC_ClearArrayVar,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 30, ScriptCommandType.CC_CountArrayEntries, '@um');
-		assertMonsterCommandRefersToVars(monster, 31, ScriptCommandType.CC_CountArrayEntries, '@umm');
-		assertMonsterCommandRefersToVars(monster, 32, ScriptCommandType.CC_CountArrayEntries, '@uum');
-		assertMonsterCommandRefersToVars(monster, 33, ScriptCommandType.CC_CountArrayEntries, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 34, ScriptCommandType.CC_CountArrayEntries, '@other', '@um');
-		assertMonsterCommandRefersToVars(monster, 35, ScriptCommandType.CC_CountArrayEntries, '@other', '@umm');
-		assertMonsterCommandRefersToVars(monster, 36, ScriptCommandType.CC_CountArrayEntries, '@other', '@uum');
-		assertMonsterCommandRefersToVars(monster, 37, ScriptCommandType.CC_CountArrayEntries, '@other', '@uumm');
-		assertMonsterCommandRefersToVars(monster, 38, ScriptCommandType.CC_CountArrayEntries, '#um');
-		assertMonsterCommandRefersToVars(monster, 39, ScriptCommandType.CC_CountArrayEntries, '#umm');
-		assertMonsterCommandRefersToVars(monster, 40, ScriptCommandType.CC_CountArrayEntries, '#uum');
-		assertMonsterCommandRefersToVars(monster, 41, ScriptCommandType.CC_CountArrayEntries, '#uumm');
-		assertMonsterCommandRefersToVars(monster, 42, ScriptCommandType.CC_CountArrayEntries, '#other', '#um');
-		assertMonsterCommandRefersToVars(monster, 43, ScriptCommandType.CC_CountArrayEntries, '#other', '#umm');
-		assertMonsterCommandRefersToVars(monster, 44, ScriptCommandType.CC_CountArrayEntries, '#other', '#uum');
-		assertMonsterCommandRefersToVars(monster, 45, ScriptCommandType.CC_CountArrayEntries, '#other', '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			30,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			31,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			32,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			33,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			34,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@other",
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			35,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@other",
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			36,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@other",
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			37,
+			ScriptCommandType.CC_CountArrayEntries,
+			"@other",
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			38,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			39,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			40,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			41,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			42,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#other",
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			43,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#other",
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			44,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#other",
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			45,
+			ScriptCommandType.CC_CountArrayEntries,
+			"#other",
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 50, ScriptCommandType.CC_FlashingText, 'um');
-		assertMonsterCommandRefersToVars(monster, 51, ScriptCommandType.CC_FlashingText, 'umm');
-		assertMonsterCommandRefersToVars(monster, 52, ScriptCommandType.CC_FlashingText, 'uum');
-		assertMonsterCommandRefersToVars(monster, 53, ScriptCommandType.CC_FlashingText, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 54, ScriptCommandType.CC_FlashingText, '.um');
-		assertMonsterCommandRefersToVars(monster, 55, ScriptCommandType.CC_FlashingText, '.umm');
-		assertMonsterCommandRefersToVars(monster, 56, ScriptCommandType.CC_FlashingText, '.uum');
-		assertMonsterCommandRefersToVars(monster, 57, ScriptCommandType.CC_FlashingText, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 58, ScriptCommandType.CC_FlashingText, '@um');
-		assertMonsterCommandRefersToVars(monster, 59, ScriptCommandType.CC_FlashingText, '@umm');
-		assertMonsterCommandRefersToVars(monster, 60, ScriptCommandType.CC_FlashingText, '@uum');
-		assertMonsterCommandRefersToVars(monster, 61, ScriptCommandType.CC_FlashingText, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 62, ScriptCommandType.CC_FlashingText, '#um');
-		assertMonsterCommandRefersToVars(monster, 63, ScriptCommandType.CC_FlashingText, '#umm');
-		assertMonsterCommandRefersToVars(monster, 64, ScriptCommandType.CC_FlashingText, '#uum');
-		assertMonsterCommandRefersToVars(monster, 65, ScriptCommandType.CC_FlashingText, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			50,
+			ScriptCommandType.CC_FlashingText,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			51,
+			ScriptCommandType.CC_FlashingText,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			52,
+			ScriptCommandType.CC_FlashingText,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			53,
+			ScriptCommandType.CC_FlashingText,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			54,
+			ScriptCommandType.CC_FlashingText,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			55,
+			ScriptCommandType.CC_FlashingText,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			56,
+			ScriptCommandType.CC_FlashingText,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			57,
+			ScriptCommandType.CC_FlashingText,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			58,
+			ScriptCommandType.CC_FlashingText,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			59,
+			ScriptCommandType.CC_FlashingText,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			60,
+			ScriptCommandType.CC_FlashingText,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			61,
+			ScriptCommandType.CC_FlashingText,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			62,
+			ScriptCommandType.CC_FlashingText,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			63,
+			ScriptCommandType.CC_FlashingText,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			64,
+			ScriptCommandType.CC_FlashingText,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			65,
+			ScriptCommandType.CC_FlashingText,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 70, ScriptCommandType.CC_ImageOverlay, 'um');
-		assertMonsterCommandRefersToVars(monster, 71, ScriptCommandType.CC_ImageOverlay, 'umm');
-		assertMonsterCommandRefersToVars(monster, 72, ScriptCommandType.CC_ImageOverlay, 'uum');
-		assertMonsterCommandRefersToVars(monster, 73, ScriptCommandType.CC_ImageOverlay, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 74, ScriptCommandType.CC_ImageOverlay, '.um');
-		assertMonsterCommandRefersToVars(monster, 75, ScriptCommandType.CC_ImageOverlay, '.umm');
-		assertMonsterCommandRefersToVars(monster, 76, ScriptCommandType.CC_ImageOverlay, '.uum');
-		assertMonsterCommandRefersToVars(monster, 77, ScriptCommandType.CC_ImageOverlay, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 78, ScriptCommandType.CC_ImageOverlay, '@um');
-		assertMonsterCommandRefersToVars(monster, 79, ScriptCommandType.CC_ImageOverlay, '@umm');
-		assertMonsterCommandRefersToVars(monster, 80, ScriptCommandType.CC_ImageOverlay, '@uum');
-		assertMonsterCommandRefersToVars(monster, 81, ScriptCommandType.CC_ImageOverlay, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 82, ScriptCommandType.CC_ImageOverlay, '#um');
-		assertMonsterCommandRefersToVars(monster, 83, ScriptCommandType.CC_ImageOverlay, '#umm');
-		assertMonsterCommandRefersToVars(monster, 84, ScriptCommandType.CC_ImageOverlay, '#uum');
-		assertMonsterCommandRefersToVars(monster, 85, ScriptCommandType.CC_ImageOverlay, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			70,
+			ScriptCommandType.CC_ImageOverlay,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			71,
+			ScriptCommandType.CC_ImageOverlay,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			72,
+			ScriptCommandType.CC_ImageOverlay,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			73,
+			ScriptCommandType.CC_ImageOverlay,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			74,
+			ScriptCommandType.CC_ImageOverlay,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			75,
+			ScriptCommandType.CC_ImageOverlay,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			76,
+			ScriptCommandType.CC_ImageOverlay,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			77,
+			ScriptCommandType.CC_ImageOverlay,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			78,
+			ScriptCommandType.CC_ImageOverlay,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			79,
+			ScriptCommandType.CC_ImageOverlay,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			80,
+			ScriptCommandType.CC_ImageOverlay,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			81,
+			ScriptCommandType.CC_ImageOverlay,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			82,
+			ScriptCommandType.CC_ImageOverlay,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			83,
+			ScriptCommandType.CC_ImageOverlay,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			84,
+			ScriptCommandType.CC_ImageOverlay,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			85,
+			ScriptCommandType.CC_ImageOverlay,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 90, ScriptCommandType.CC_Question, 'um');
-		assertMonsterCommandRefersToVars(monster, 91, ScriptCommandType.CC_Question, 'umm');
-		assertMonsterCommandRefersToVars(monster, 92, ScriptCommandType.CC_Question, 'uum');
-		assertMonsterCommandRefersToVars(monster, 93, ScriptCommandType.CC_Question, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 94, ScriptCommandType.CC_Question, '.um');
-		assertMonsterCommandRefersToVars(monster, 95, ScriptCommandType.CC_Question, '.umm');
-		assertMonsterCommandRefersToVars(monster, 96, ScriptCommandType.CC_Question, '.uum');
-		assertMonsterCommandRefersToVars(monster, 97, ScriptCommandType.CC_Question, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 98, ScriptCommandType.CC_Question, '@um');
-		assertMonsterCommandRefersToVars(monster, 99, ScriptCommandType.CC_Question, '@umm');
-		assertMonsterCommandRefersToVars(monster, 100, ScriptCommandType.CC_Question, '@uum');
-		assertMonsterCommandRefersToVars(monster, 101, ScriptCommandType.CC_Question, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 102, ScriptCommandType.CC_Question, '#um');
-		assertMonsterCommandRefersToVars(monster, 103, ScriptCommandType.CC_Question, '#umm');
-		assertMonsterCommandRefersToVars(monster, 104, ScriptCommandType.CC_Question, '#uum');
-		assertMonsterCommandRefersToVars(monster, 105, ScriptCommandType.CC_Question, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			90,
+			ScriptCommandType.CC_Question,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			91,
+			ScriptCommandType.CC_Question,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			92,
+			ScriptCommandType.CC_Question,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			93,
+			ScriptCommandType.CC_Question,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			94,
+			ScriptCommandType.CC_Question,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			95,
+			ScriptCommandType.CC_Question,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			96,
+			ScriptCommandType.CC_Question,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			97,
+			ScriptCommandType.CC_Question,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			98,
+			ScriptCommandType.CC_Question,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			99,
+			ScriptCommandType.CC_Question,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			100,
+			ScriptCommandType.CC_Question,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			101,
+			ScriptCommandType.CC_Question,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			102,
+			ScriptCommandType.CC_Question,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			103,
+			ScriptCommandType.CC_Question,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			104,
+			ScriptCommandType.CC_Question,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			105,
+			ScriptCommandType.CC_Question,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 110, ScriptCommandType.CC_RoomLocationText, 'um');
-		assertMonsterCommandRefersToVars(monster, 111, ScriptCommandType.CC_RoomLocationText, 'umm');
-		assertMonsterCommandRefersToVars(monster, 112, ScriptCommandType.CC_RoomLocationText, 'uum');
-		assertMonsterCommandRefersToVars(monster, 113, ScriptCommandType.CC_RoomLocationText, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 114, ScriptCommandType.CC_RoomLocationText, '.um');
-		assertMonsterCommandRefersToVars(monster, 115, ScriptCommandType.CC_RoomLocationText, '.umm');
-		assertMonsterCommandRefersToVars(monster, 116, ScriptCommandType.CC_RoomLocationText, '.uum');
-		assertMonsterCommandRefersToVars(monster, 117, ScriptCommandType.CC_RoomLocationText, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 118, ScriptCommandType.CC_RoomLocationText, '@um');
-		assertMonsterCommandRefersToVars(monster, 119, ScriptCommandType.CC_RoomLocationText, '@umm');
-		assertMonsterCommandRefersToVars(monster, 120, ScriptCommandType.CC_RoomLocationText, '@uum');
-		assertMonsterCommandRefersToVars(monster, 121, ScriptCommandType.CC_RoomLocationText, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 122, ScriptCommandType.CC_RoomLocationText, '#um');
-		assertMonsterCommandRefersToVars(monster, 123, ScriptCommandType.CC_RoomLocationText, '#umm');
-		assertMonsterCommandRefersToVars(monster, 124, ScriptCommandType.CC_RoomLocationText, '#uum');
-		assertMonsterCommandRefersToVars(monster, 125, ScriptCommandType.CC_RoomLocationText, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			110,
+			ScriptCommandType.CC_RoomLocationText,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			111,
+			ScriptCommandType.CC_RoomLocationText,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			112,
+			ScriptCommandType.CC_RoomLocationText,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			113,
+			ScriptCommandType.CC_RoomLocationText,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			114,
+			ScriptCommandType.CC_RoomLocationText,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			115,
+			ScriptCommandType.CC_RoomLocationText,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			116,
+			ScriptCommandType.CC_RoomLocationText,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			117,
+			ScriptCommandType.CC_RoomLocationText,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			118,
+			ScriptCommandType.CC_RoomLocationText,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			119,
+			ScriptCommandType.CC_RoomLocationText,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			120,
+			ScriptCommandType.CC_RoomLocationText,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			121,
+			ScriptCommandType.CC_RoomLocationText,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			122,
+			ScriptCommandType.CC_RoomLocationText,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			123,
+			ScriptCommandType.CC_RoomLocationText,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			124,
+			ScriptCommandType.CC_RoomLocationText,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			125,
+			ScriptCommandType.CC_RoomLocationText,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 130, ScriptCommandType.CC_ArrayVarSet, '@um');
-		assertMonsterCommandRefersToVars(monster, 131, ScriptCommandType.CC_ArrayVarSet, '@umm');
-		assertMonsterCommandRefersToVars(monster, 132, ScriptCommandType.CC_ArrayVarSet, '@uum');
-		assertMonsterCommandRefersToVars(monster, 133, ScriptCommandType.CC_ArrayVarSet, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 134, ScriptCommandType.CC_ArrayVarSet, '@other', '@um');
-		assertMonsterCommandRefersToVars(monster, 135, ScriptCommandType.CC_ArrayVarSet, '@other', '@umm');
-		assertMonsterCommandRefersToVars(monster, 136, ScriptCommandType.CC_ArrayVarSet, '@other', '@uum');
-		assertMonsterCommandRefersToVars(monster, 137, ScriptCommandType.CC_ArrayVarSet, '@other', '@uumm');
-		assertMonsterCommandRefersToVars(monster, 138, ScriptCommandType.CC_ArrayVarSet, '#um');
-		assertMonsterCommandRefersToVars(monster, 139, ScriptCommandType.CC_ArrayVarSet, '#umm');
-		assertMonsterCommandRefersToVars(monster, 140, ScriptCommandType.CC_ArrayVarSet, '#uum');
-		assertMonsterCommandRefersToVars(monster, 141, ScriptCommandType.CC_ArrayVarSet, '#uumm');
-		assertMonsterCommandRefersToVars(monster, 142, ScriptCommandType.CC_ArrayVarSet, '#other', '#um');
-		assertMonsterCommandRefersToVars(monster, 143, ScriptCommandType.CC_ArrayVarSet, '#other', '#umm');
-		assertMonsterCommandRefersToVars(monster, 144, ScriptCommandType.CC_ArrayVarSet, '#other', '#uum');
-		assertMonsterCommandRefersToVars(monster, 145, ScriptCommandType.CC_ArrayVarSet, '#other', '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			130,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			131,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			132,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			133,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			134,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@other",
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			135,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@other",
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			136,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@other",
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			137,
+			ScriptCommandType.CC_ArrayVarSet,
+			"@other",
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			138,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			139,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			140,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			141,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			142,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#other",
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			143,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#other",
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			144,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#other",
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			145,
+			ScriptCommandType.CC_ArrayVarSet,
+			"#other",
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 150, ScriptCommandType.CC_ArrayVarSetAt, '@um');
-		assertMonsterCommandRefersToVars(monster, 151, ScriptCommandType.CC_ArrayVarSetAt, '@umm');
-		assertMonsterCommandRefersToVars(monster, 152, ScriptCommandType.CC_ArrayVarSetAt, '@uum');
-		assertMonsterCommandRefersToVars(monster, 153, ScriptCommandType.CC_ArrayVarSetAt, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 154, ScriptCommandType.CC_ArrayVarSetAt, '@other', '@um');
-		assertMonsterCommandRefersToVars(monster, 155, ScriptCommandType.CC_ArrayVarSetAt, '@other', '@umm');
-		assertMonsterCommandRefersToVars(monster, 156, ScriptCommandType.CC_ArrayVarSetAt, '@other', '@uum');
-		assertMonsterCommandRefersToVars(monster, 157, ScriptCommandType.CC_ArrayVarSetAt, '@other', '@uumm');
-		assertMonsterCommandRefersToVars(monster, 158, ScriptCommandType.CC_ArrayVarSetAt, '#um');
-		assertMonsterCommandRefersToVars(monster, 159, ScriptCommandType.CC_ArrayVarSetAt, '#umm');
-		assertMonsterCommandRefersToVars(monster, 160, ScriptCommandType.CC_ArrayVarSetAt, '#uum');
-		assertMonsterCommandRefersToVars(monster, 161, ScriptCommandType.CC_ArrayVarSetAt, '#uumm');
-		assertMonsterCommandRefersToVars(monster, 162, ScriptCommandType.CC_ArrayVarSetAt, '#other', '#um');
-		assertMonsterCommandRefersToVars(monster, 163, ScriptCommandType.CC_ArrayVarSetAt, '#other', '#umm');
-		assertMonsterCommandRefersToVars(monster, 164, ScriptCommandType.CC_ArrayVarSetAt, '#other', '#uum');
-		assertMonsterCommandRefersToVars(monster, 165, ScriptCommandType.CC_ArrayVarSetAt, '#other', '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			150,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			151,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			152,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			153,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			154,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@other",
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			155,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@other",
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			156,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@other",
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			157,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"@other",
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			158,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			159,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			160,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			161,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			162,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#other",
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			163,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#other",
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			164,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#other",
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			165,
+			ScriptCommandType.CC_ArrayVarSetAt,
+			"#other",
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 170, ScriptCommandType.CC_VarSet, 'um');
-		assertMonsterCommandRefersToVars(monster, 171, ScriptCommandType.CC_VarSet, 'umm');
-		assertMonsterCommandRefersToVars(monster, 172, ScriptCommandType.CC_VarSet, 'uum');
-		assertMonsterCommandRefersToVars(monster, 173, ScriptCommandType.CC_VarSet, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 174, ScriptCommandType.CC_VarSet, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 175, ScriptCommandType.CC_VarSet, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 176, ScriptCommandType.CC_VarSet, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 177, ScriptCommandType.CC_VarSet, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 178, ScriptCommandType.CC_VarSet, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 179, ScriptCommandType.CC_VarSet, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 180, ScriptCommandType.CC_VarSet, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 181, ScriptCommandType.CC_VarSet, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 182, ScriptCommandType.CC_VarSet, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 183, ScriptCommandType.CC_VarSet, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 184, ScriptCommandType.CC_VarSet, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 185, ScriptCommandType.CC_VarSet, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 186, ScriptCommandType.CC_VarSet, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 187, ScriptCommandType.CC_VarSet, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 188, ScriptCommandType.CC_VarSet, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 189, ScriptCommandType.CC_VarSet, 'other', 'uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			170,
+			ScriptCommandType.CC_VarSet,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			171,
+			ScriptCommandType.CC_VarSet,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			172,
+			ScriptCommandType.CC_VarSet,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			173,
+			ScriptCommandType.CC_VarSet,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			174,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			175,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			176,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			177,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			178,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			179,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			180,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			181,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			182,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			183,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			184,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			185,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			186,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			187,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			188,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			189,
+			ScriptCommandType.CC_VarSet,
+			"other",
+			"uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 190, ScriptCommandType.CC_VarSet, '.um');
-		assertMonsterCommandRefersToVars(monster, 191, ScriptCommandType.CC_VarSet, '.umm');
-		assertMonsterCommandRefersToVars(monster, 192, ScriptCommandType.CC_VarSet, '.uum');
-		assertMonsterCommandRefersToVars(monster, 193, ScriptCommandType.CC_VarSet, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 194, ScriptCommandType.CC_VarSet, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 195, ScriptCommandType.CC_VarSet, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 196, ScriptCommandType.CC_VarSet, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 197, ScriptCommandType.CC_VarSet, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 198, ScriptCommandType.CC_VarSet, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 199, ScriptCommandType.CC_VarSet, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 200, ScriptCommandType.CC_VarSet, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 201, ScriptCommandType.CC_VarSet, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 202, ScriptCommandType.CC_VarSet, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 203, ScriptCommandType.CC_VarSet, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 204, ScriptCommandType.CC_VarSet, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 205, ScriptCommandType.CC_VarSet, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 206, ScriptCommandType.CC_VarSet, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 207, ScriptCommandType.CC_VarSet, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 208, ScriptCommandType.CC_VarSet, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 209, ScriptCommandType.CC_VarSet, '.other', '.uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			190,
+			ScriptCommandType.CC_VarSet,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			191,
+			ScriptCommandType.CC_VarSet,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			192,
+			ScriptCommandType.CC_VarSet,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			193,
+			ScriptCommandType.CC_VarSet,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			194,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			195,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			196,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			197,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			198,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			199,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			200,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			201,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			202,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			203,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			204,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			205,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			206,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			207,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			208,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			209,
+			ScriptCommandType.CC_VarSet,
+			".other",
+			".uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 210, ScriptCommandType.CC_VarSetAt, 'um');
-		assertMonsterCommandRefersToVars(monster, 211, ScriptCommandType.CC_VarSetAt, 'umm');
-		assertMonsterCommandRefersToVars(monster, 212, ScriptCommandType.CC_VarSetAt, 'uum');
-		assertMonsterCommandRefersToVars(monster, 213, ScriptCommandType.CC_VarSetAt, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 214, ScriptCommandType.CC_VarSetAt, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 215, ScriptCommandType.CC_VarSetAt, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 216, ScriptCommandType.CC_VarSetAt, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 217, ScriptCommandType.CC_VarSetAt, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 218, ScriptCommandType.CC_VarSetAt, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 219, ScriptCommandType.CC_VarSetAt, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 220, ScriptCommandType.CC_VarSetAt, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 221, ScriptCommandType.CC_VarSetAt, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 222, ScriptCommandType.CC_VarSetAt, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 223, ScriptCommandType.CC_VarSetAt, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 224, ScriptCommandType.CC_VarSetAt, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 225, ScriptCommandType.CC_VarSetAt, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 226, ScriptCommandType.CC_VarSetAt, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 227, ScriptCommandType.CC_VarSetAt, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 228, ScriptCommandType.CC_VarSetAt, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 229, ScriptCommandType.CC_VarSetAt, 'other', 'uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			210,
+			ScriptCommandType.CC_VarSetAt,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			211,
+			ScriptCommandType.CC_VarSetAt,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			212,
+			ScriptCommandType.CC_VarSetAt,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			213,
+			ScriptCommandType.CC_VarSetAt,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			214,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			215,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			216,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			217,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			218,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			219,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			220,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			221,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			222,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			223,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			224,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			225,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			226,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			227,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			228,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			229,
+			ScriptCommandType.CC_VarSetAt,
+			"other",
+			"uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 230, ScriptCommandType.CC_VarSetAt, '.um');
-		assertMonsterCommandRefersToVars(monster, 231, ScriptCommandType.CC_VarSetAt, '.umm');
-		assertMonsterCommandRefersToVars(monster, 232, ScriptCommandType.CC_VarSetAt, '.uum');
-		assertMonsterCommandRefersToVars(monster, 233, ScriptCommandType.CC_VarSetAt, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 234, ScriptCommandType.CC_VarSetAt, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 235, ScriptCommandType.CC_VarSetAt, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 236, ScriptCommandType.CC_VarSetAt, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 237, ScriptCommandType.CC_VarSetAt, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 238, ScriptCommandType.CC_VarSetAt, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 239, ScriptCommandType.CC_VarSetAt, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 240, ScriptCommandType.CC_VarSetAt, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 241, ScriptCommandType.CC_VarSetAt, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 242, ScriptCommandType.CC_VarSetAt, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 243, ScriptCommandType.CC_VarSetAt, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 244, ScriptCommandType.CC_VarSetAt, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 245, ScriptCommandType.CC_VarSetAt, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 246, ScriptCommandType.CC_VarSetAt, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 247, ScriptCommandType.CC_VarSetAt, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 248, ScriptCommandType.CC_VarSetAt, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 249, ScriptCommandType.CC_VarSetAt, '.other', '.uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			230,
+			ScriptCommandType.CC_VarSetAt,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			231,
+			ScriptCommandType.CC_VarSetAt,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			232,
+			ScriptCommandType.CC_VarSetAt,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			233,
+			ScriptCommandType.CC_VarSetAt,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			234,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			235,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			236,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			237,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			238,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			239,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			240,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			241,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			242,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			243,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			244,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			245,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			246,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			247,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			248,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			249,
+			ScriptCommandType.CC_VarSetAt,
+			".other",
+			".uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 250, ScriptCommandType.CC_Speech, 'um');
-		assertMonsterCommandRefersToVars(monster, 251, ScriptCommandType.CC_Speech, 'umm');
-		assertMonsterCommandRefersToVars(monster, 252, ScriptCommandType.CC_Speech, 'uum');
-		assertMonsterCommandRefersToVars(monster, 253, ScriptCommandType.CC_Speech, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 254, ScriptCommandType.CC_Speech, '.um');
-		assertMonsterCommandRefersToVars(monster, 255, ScriptCommandType.CC_Speech, '.umm');
-		assertMonsterCommandRefersToVars(monster, 256, ScriptCommandType.CC_Speech, '.uum');
-		assertMonsterCommandRefersToVars(monster, 257, ScriptCommandType.CC_Speech, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 258, ScriptCommandType.CC_Speech, '@um');
-		assertMonsterCommandRefersToVars(monster, 259, ScriptCommandType.CC_Speech, '@umm');
-		assertMonsterCommandRefersToVars(monster, 260, ScriptCommandType.CC_Speech, '@uum');
-		assertMonsterCommandRefersToVars(monster, 261, ScriptCommandType.CC_Speech, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 262, ScriptCommandType.CC_Speech, '#um');
-		assertMonsterCommandRefersToVars(monster, 263, ScriptCommandType.CC_Speech, '#umm');
-		assertMonsterCommandRefersToVars(monster, 264, ScriptCommandType.CC_Speech, '#uum');
-		assertMonsterCommandRefersToVars(monster, 265, ScriptCommandType.CC_Speech, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			250,
+			ScriptCommandType.CC_Speech,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			251,
+			ScriptCommandType.CC_Speech,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			252,
+			ScriptCommandType.CC_Speech,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			253,
+			ScriptCommandType.CC_Speech,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			254,
+			ScriptCommandType.CC_Speech,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			255,
+			ScriptCommandType.CC_Speech,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			256,
+			ScriptCommandType.CC_Speech,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			257,
+			ScriptCommandType.CC_Speech,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			258,
+			ScriptCommandType.CC_Speech,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			259,
+			ScriptCommandType.CC_Speech,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			260,
+			ScriptCommandType.CC_Speech,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			261,
+			ScriptCommandType.CC_Speech,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			262,
+			ScriptCommandType.CC_Speech,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			263,
+			ScriptCommandType.CC_Speech,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			264,
+			ScriptCommandType.CC_Speech,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			265,
+			ScriptCommandType.CC_Speech,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 270, ScriptCommandType.CC_WaitForArrayEntry, '@um');
-		assertMonsterCommandRefersToVars(monster, 271, ScriptCommandType.CC_WaitForArrayEntry, '@umm');
-		assertMonsterCommandRefersToVars(monster, 272, ScriptCommandType.CC_WaitForArrayEntry, '@uum');
-		assertMonsterCommandRefersToVars(monster, 273, ScriptCommandType.CC_WaitForArrayEntry, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 274, ScriptCommandType.CC_WaitForArrayEntry, '@other', '@um');
-		assertMonsterCommandRefersToVars(monster, 275, ScriptCommandType.CC_WaitForArrayEntry, '@other', '@umm');
-		assertMonsterCommandRefersToVars(monster, 276, ScriptCommandType.CC_WaitForArrayEntry, '@other', '@uum');
-		assertMonsterCommandRefersToVars(monster, 277, ScriptCommandType.CC_WaitForArrayEntry, '@other', '@uumm');
-		assertMonsterCommandRefersToVars(monster, 278, ScriptCommandType.CC_WaitForArrayEntry, '#um');
-		assertMonsterCommandRefersToVars(monster, 279, ScriptCommandType.CC_WaitForArrayEntry, '#umm');
-		assertMonsterCommandRefersToVars(monster, 280, ScriptCommandType.CC_WaitForArrayEntry, '#uum');
-		assertMonsterCommandRefersToVars(monster, 281, ScriptCommandType.CC_WaitForArrayEntry, '#uumm');
-		assertMonsterCommandRefersToVars(monster, 282, ScriptCommandType.CC_WaitForArrayEntry, '#other', '#um');
-		assertMonsterCommandRefersToVars(monster, 283, ScriptCommandType.CC_WaitForArrayEntry, '#other', '#umm');
-		assertMonsterCommandRefersToVars(monster, 284, ScriptCommandType.CC_WaitForArrayEntry, '#other', '#uum');
-		assertMonsterCommandRefersToVars(monster, 285, ScriptCommandType.CC_WaitForArrayEntry, '#other', '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			270,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			271,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			272,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			273,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			274,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@other",
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			275,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@other",
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			276,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@other",
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			277,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"@other",
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			278,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			279,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			280,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			281,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			282,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#other",
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			283,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#other",
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			284,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#other",
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			285,
+			ScriptCommandType.CC_WaitForArrayEntry,
+			"#other",
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 290, ScriptCommandType.CC_WaitForExpression, 'um');
-		assertMonsterCommandRefersToVars(monster, 291, ScriptCommandType.CC_WaitForExpression, 'umm');
-		assertMonsterCommandRefersToVars(monster, 292, ScriptCommandType.CC_WaitForExpression, 'uum');
-		assertMonsterCommandRefersToVars(monster, 293, ScriptCommandType.CC_WaitForExpression, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 294, ScriptCommandType.CC_WaitForExpression, '.um');
-		assertMonsterCommandRefersToVars(monster, 295, ScriptCommandType.CC_WaitForExpression, '.umm');
-		assertMonsterCommandRefersToVars(monster, 296, ScriptCommandType.CC_WaitForExpression, '.uum');
-		assertMonsterCommandRefersToVars(monster, 297, ScriptCommandType.CC_WaitForExpression, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 298, ScriptCommandType.CC_WaitForExpression, '@um');
-		assertMonsterCommandRefersToVars(monster, 299, ScriptCommandType.CC_WaitForExpression, '@umm');
-		assertMonsterCommandRefersToVars(monster, 300, ScriptCommandType.CC_WaitForExpression, '@uum');
-		assertMonsterCommandRefersToVars(monster, 301, ScriptCommandType.CC_WaitForExpression, '@uumm');
-		assertMonsterCommandRefersToVars(monster, 302, ScriptCommandType.CC_WaitForExpression, '#um');
-		assertMonsterCommandRefersToVars(monster, 303, ScriptCommandType.CC_WaitForExpression, '#umm');
-		assertMonsterCommandRefersToVars(monster, 304, ScriptCommandType.CC_WaitForExpression, '#uum');
-		assertMonsterCommandRefersToVars(monster, 305, ScriptCommandType.CC_WaitForExpression, '#uumm');
+		assertMonsterCommandRefersToVars(
+			monster,
+			290,
+			ScriptCommandType.CC_WaitForExpression,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			291,
+			ScriptCommandType.CC_WaitForExpression,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			292,
+			ScriptCommandType.CC_WaitForExpression,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			293,
+			ScriptCommandType.CC_WaitForExpression,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			294,
+			ScriptCommandType.CC_WaitForExpression,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			295,
+			ScriptCommandType.CC_WaitForExpression,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			296,
+			ScriptCommandType.CC_WaitForExpression,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			297,
+			ScriptCommandType.CC_WaitForExpression,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			298,
+			ScriptCommandType.CC_WaitForExpression,
+			"@um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			299,
+			ScriptCommandType.CC_WaitForExpression,
+			"@umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			300,
+			ScriptCommandType.CC_WaitForExpression,
+			"@uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			301,
+			ScriptCommandType.CC_WaitForExpression,
+			"@uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			302,
+			ScriptCommandType.CC_WaitForExpression,
+			"#um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			303,
+			ScriptCommandType.CC_WaitForExpression,
+			"#umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			304,
+			ScriptCommandType.CC_WaitForExpression,
+			"#uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			305,
+			ScriptCommandType.CC_WaitForExpression,
+			"#uumm",
+		);
 
-		assertMonsterCommandRefersToVars(monster, 310, ScriptCommandType.CC_WaitForVar, 'um');
-		assertMonsterCommandRefersToVars(monster, 311, ScriptCommandType.CC_WaitForVar, 'umm');
-		assertMonsterCommandRefersToVars(monster, 312, ScriptCommandType.CC_WaitForVar, 'uum');
-		assertMonsterCommandRefersToVars(monster, 313, ScriptCommandType.CC_WaitForVar, 'uumm');
-		assertMonsterCommandRefersToVars(monster, 314, ScriptCommandType.CC_WaitForVar, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 315, ScriptCommandType.CC_WaitForVar, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 316, ScriptCommandType.CC_WaitForVar, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 317, ScriptCommandType.CC_WaitForVar, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 318, ScriptCommandType.CC_WaitForVar, 'other', 'um');
-		assertMonsterCommandRefersToVars(monster, 319, ScriptCommandType.CC_WaitForVar, 'other', 'umm');
-		assertMonsterCommandRefersToVars(monster, 320, ScriptCommandType.CC_WaitForVar, 'other', 'uum');
-		assertMonsterCommandRefersToVars(monster, 321, ScriptCommandType.CC_WaitForVar, 'other', 'uumm');
-		assertMonsterCommandRefersToVars(monster, 322, ScriptCommandType.CC_WaitForVar, '.um');
-		assertMonsterCommandRefersToVars(monster, 323, ScriptCommandType.CC_WaitForVar, '.umm');
-		assertMonsterCommandRefersToVars(monster, 324, ScriptCommandType.CC_WaitForVar, '.uum');
-		assertMonsterCommandRefersToVars(monster, 325, ScriptCommandType.CC_WaitForVar, '.uumm');
-		assertMonsterCommandRefersToVars(monster, 326, ScriptCommandType.CC_WaitForVar, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 327, ScriptCommandType.CC_WaitForVar, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 328, ScriptCommandType.CC_WaitForVar, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 329, ScriptCommandType.CC_WaitForVar, '.other', '.uumm');
-		assertMonsterCommandRefersToVars(monster, 330, ScriptCommandType.CC_WaitForVar, '.other', '.um');
-		assertMonsterCommandRefersToVars(monster, 331, ScriptCommandType.CC_WaitForVar, '.other', '.umm');
-		assertMonsterCommandRefersToVars(monster, 332, ScriptCommandType.CC_WaitForVar, '.other', '.uum');
-		assertMonsterCommandRefersToVars(monster, 333, ScriptCommandType.CC_WaitForVar, '.other', '.uumm');
-
+		assertMonsterCommandRefersToVars(
+			monster,
+			310,
+			ScriptCommandType.CC_WaitForVar,
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			311,
+			ScriptCommandType.CC_WaitForVar,
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			312,
+			ScriptCommandType.CC_WaitForVar,
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			313,
+			ScriptCommandType.CC_WaitForVar,
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			314,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			315,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			316,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			317,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			318,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			319,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			320,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			321,
+			ScriptCommandType.CC_WaitForVar,
+			"other",
+			"uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			322,
+			ScriptCommandType.CC_WaitForVar,
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			323,
+			ScriptCommandType.CC_WaitForVar,
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			324,
+			ScriptCommandType.CC_WaitForVar,
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			325,
+			ScriptCommandType.CC_WaitForVar,
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			326,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			327,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			328,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			329,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".uumm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			330,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".um",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			331,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".umm",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			332,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".uum",
+		);
+		assertMonsterCommandRefersToVars(
+			monster,
+			333,
+			ScriptCommandType.CC_WaitForVar,
+			".other",
+			".uumm",
+		);
 	} catch (e) {
 		console.log("Variable uses:");
-		hold.variables.find(v => v.name.newValue === '@um')?.$uses.forEach(ref => console.log(serializeRef(ref)));
+		hold.variables
+			.find(v => v.name.newValue === "@um")
+			?.$uses.forEach(ref => {
+				console.log(serializeRef(ref));
+			});
 		throw e;
 	}
 });
 
-function assertMonsterCommandRefersToVars(monster: HoldMonster, commandIndex: number, expectedCommandType: ScriptCommandType, ...expectedVariableNames: string[]) {
+function assertMonsterCommandRefersToVars(
+	monster: HoldMonster,
+	commandIndex: number,
+	expectedCommandType: ScriptCommandType,
+	...expectedVariableNames: string[]
+) {
 	assert.ok(monster.$commandList);
 
 	const command = monster.$commandList.commands[commandIndex];
-	assert.strictEqual(command.type, expectedCommandType, `At ${commandIndex}: Sanity check - check correct command type`);
+	assert.strictEqual(
+		command.type,
+		expectedCommandType,
+		`At ${commandIndex}: Sanity check - check correct command type`,
+	);
 
 	for (const variable of monster.$hold.variables.values()) {
 		const varName = variable.name.newValue;
 
-		const ref = variable.$uses.find(ref => ref.model === HoldRefModel.MonsterCommand
-			&& ref.roomId === monster.$room.id
-			&& ref.monsterIndex === monster.$index
-			&& ref.commandIndex === commandIndex
+		const ref = variable.$uses.find(
+			ref =>
+				ref.model === HoldRefModel.MonsterCommand
+				&& ref.roomId === monster.$room.id
+				&& ref.monsterIndex === monster.$index
+				&& ref.commandIndex === commandIndex,
 		);
 
 		if (expectedVariableNames.includes(varName)) {
-			assert.ok(ref, `At ${commandIndex}: expected to find ref for variable ${varName}`);
-
+			assert.ok(
+				ref,
+				`At ${commandIndex}: expected to find ref for variable ${varName}`,
+			);
 		} else {
 			if (ref) {
-				assert.fail(`At ${commandIndex}: found ref for ${varName} but that was not expected`)
+				assert.fail(
+					`At ${commandIndex}: found ref for ${varName} but that was not expected`,
+				);
 			}
-
 		}
 	}
 }

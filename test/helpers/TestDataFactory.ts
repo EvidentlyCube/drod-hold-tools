@@ -1,33 +1,39 @@
-import path, { dirname } from "path";
-import { VERSION_TSS_509 } from "../../src/Constants";
-import { Hold } from "../../src/data/datatypes/Hold"
-import { HoldVariable } from "../../src/data/datatypes/HoldVariable";
-import { HoldVersion } from "../../src/data/HoldVersion";
-import { stringToWCharBase64 } from "../../src/data/Utils";
-import { fileURLToPath } from "url";
-import { readFile } from "fs/promises";
-import { readHold } from "../../src/processor/readHold";
 import assert from "node:assert";
+import { readFile } from "node:fs/promises";
+import path, { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { VERSION_TSS_509 } from "../../src/Constants";
+import {
+	MonsterType,
+	Mood,
+	Orientation,
+	ScriptCommandType,
+	Speaker,
+} from "../../src/data/DrodEnums";
+import { Hold } from "../../src/data/datatypes/Hold";
+import { HoldCharacter } from "../../src/data/datatypes/HoldCharacter";
+import { HoldEntrance } from "../../src/data/datatypes/HoldEntrance";
 import { HoldLevel } from "../../src/data/datatypes/HoldLevel";
-import { HoldRoom, HoldScroll } from "../../src/data/datatypes/HoldRoom";
-import { MonsterType, Mood, Orientation, ScriptCommandType, Speaker } from "../../src/data/DrodEnums";
 import { HoldMonster } from "../../src/data/datatypes/HoldMonster";
+import { HoldRoom, HoldScroll } from "../../src/data/datatypes/HoldRoom";
+import { HoldSpeech } from "../../src/data/datatypes/HoldSpeech";
+import { HoldVariable } from "../../src/data/datatypes/HoldVariable";
+import type { ScriptCommand } from "../../src/data/datatypes/ScriptCommand";
+import { HoldVersion } from "../../src/data/HoldVersion";
 import { PackedVars } from "../../src/data/PackedVars";
 import { writePackedVars } from "../../src/data/PackedVarsUtils";
-import { HoldSpeech } from "../../src/data/datatypes/HoldSpeech";
-import { ScriptCommand } from "../../src/data/datatypes/ScriptCommand";
+import { stringToWCharBase64 } from "../../src/data/Utils";
+import { readHold } from "../../src/processor/readHold";
 import { SignalUpdatableValue } from "../../src/utils/SignalUpdatableValue";
-import { HoldEntrance } from "../../src/data/datatypes/HoldEntrance";
-import { HoldCharacter } from "../../src/data/datatypes/HoldCharacter";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const __rootTest = dirname(__dirname);
 
-export class TestDataFactory {
-	private static _lastHold?: Hold;
+let _lastHold: Hold | undefined;
 
-	public static newHold(): Hold {
-		TestDataFactory._lastHold = new Hold({
+export const TestDataFactory = {
+	newHold(): Hold {
+		_lastHold = new Hold({
 			$holdReaderId: 1,
 			$isDataFrontLoaded: true,
 			$hasEndHoldMessage: true,
@@ -39,10 +45,10 @@ export class TestDataFactory {
 			playerId: 1,
 			lastUpdated: 1,
 			status: 1,
-			encName: '',
-			encDescriptionMessage: '',
-			encEndHoldMessage: '',
-			encDrodInfo: '',
+			encName: "",
+			encDescriptionMessage: "",
+			encEndHoldMessage: "",
+			encDrodInfo: "",
 			lastScriptId: 0,
 			lastVarId: 1,
 			lastCharId: 0,
@@ -50,23 +56,20 @@ export class TestDataFactory {
 			startingLevelId: 0,
 		});
 
-		return TestDataFactory._lastHold;
-	}
-
-	public static async loadHold(name: string): Promise<Hold> {
+		return _lastHold;
+	},
+	async loadHold(name: string): Promise<Hold> {
 		const holdBuffer = await readFile(`${__rootTest}/holds/${name}`);
 		const holdBytes = new Uint8Array(holdBuffer);
 		const result = await readHold(0, { data: holdBytes });
 		assert.ok(result.isSuccess);
 
 		return result.hold;
-	}
-
-	public static hold(): Hold {
-		return TestDataFactory._lastHold ?? TestDataFactory.newHold();
-	}
-
-	public static level(name: string = "Test") {
+	},
+	hold(): Hold {
+		return _lastHold ?? TestDataFactory.newHold();
+	},
+	level(name: string = "Test") {
 		const hold = TestDataFactory.hold();
 
 		const existing = hold.levels.find(level => level.name.newValue === name);
@@ -89,11 +92,12 @@ export class TestDataFactory {
 
 		hold.levels.set(newLevel.id, newLevel);
 		return newLevel;
-	}
-
-	public static room(level: HoldLevel, x: number, y: number) {
+	},
+	room(level: HoldLevel, x: number, y: number) {
 		const hold = TestDataFactory.hold();
-		const existing = hold.rooms.find(room => room.levelId === level.id && room.roomX === x && room.roomY === y);
+		const existing = hold.rooms.find(
+			room => room.levelId === level.id && room.roomX === x && room.roomY === y,
+		);
 
 		if (existing) {
 			return existing;
@@ -102,7 +106,7 @@ export class TestDataFactory {
 		const newRoom = new HoldRoom(hold, {
 			id: 10000 + hold.rooms.size,
 			levelId: level.id,
-			encStyleName: stringToWCharBase64('foundation'),
+			encStyleName: stringToWCharBase64("foundation"),
 			roomX: x,
 			roomY: y,
 			roomCols: 38,
@@ -117,10 +121,11 @@ export class TestDataFactory {
 
 		hold.rooms.set(newRoom.id, newRoom);
 		return newRoom;
-	}
-
-	public static monsterCharacter(room: HoldRoom, x: number, y: number): HoldMonster {
-		const existing = room.monsters.find(monster => monster.x === x && monster.y === y);
+	},
+	monsterCharacter(room: HoldRoom, x: number, y: number): HoldMonster {
+		const existing = room.monsters.find(
+			monster => monster.x === x && monster.y === y,
+		);
 
 		if (existing) {
 			assert.strictEqual(existing.type, MonsterType.Character);
@@ -128,7 +133,7 @@ export class TestDataFactory {
 		}
 
 		const packedVars = new PackedVars();
-		packedVars.writeByteBuffer('Commands', []);
+		packedVars.writeByteBuffer("Commands", []);
 
 		const monster = new HoldMonster(room, room.monsters.length, {
 			x,
@@ -136,23 +141,24 @@ export class TestDataFactory {
 			o: Orientation.S,
 			type: MonsterType.Character,
 			processSequence: 1000,
-			encExtraVars: writePackedVars(packedVars)
+			encExtraVars: writePackedVars(packedVars),
 		});
 
 		room.monsters.push(monster);
 		return monster;
-	}
-
-	public static character(name: string): HoldCharacter {
+	},
+	character(name: string): HoldCharacter {
 		const hold = TestDataFactory.hold();
-		const existing = hold.characters.find(character => character.name.newValue === name);
+		const existing = hold.characters.find(
+			character => character.name.newValue === name,
+		);
 
 		if (existing) {
 			return existing;
 		}
 
 		const packedVars = new PackedVars();
-		packedVars.writeByteBuffer('Commands', []);
+		packedVars.writeByteBuffer("Commands", []);
 
 		const character = new HoldCharacter(hold, {
 			id: 10000 + hold.characters.size,
@@ -164,23 +170,21 @@ export class TestDataFactory {
 		hold.characters.set(character.id, character);
 
 		return character;
-	}
-
-	public static speech() {
+	},
+	speech() {
 		const hold = TestDataFactory.hold();
 		const speech = new HoldSpeech(hold, {
 			id: 100000 + hold.speeches.size,
 			character: Speaker.Self,
 			delay: 0,
-			encMessage: '',
+			encMessage: "",
 			mood: Mood.Normal,
 		});
 
 		hold.speeches.set(speech.id, speech);
 		return speech;
-	}
-
-	public static scriptCommand(monster: HoldMonster | HoldCharacter) {
+	},
+	scriptCommand(monster: HoldMonster | HoldCharacter) {
 		assert.strictEqual(monster.type, MonsterType.Character);
 
 		const commands = monster.$commandList?.commands;
@@ -194,19 +198,20 @@ export class TestDataFactory {
 			w: 0,
 			h: 0,
 			flags: 0,
-			label: new SignalUpdatableValue(''),
+			label: new SignalUpdatableValue(""),
 			speechId: new SignalUpdatableValue(0),
 		};
 
 		(commands as ScriptCommand[]).push(command);
 
 		return command;
-	}
+	},
+	variable(name: string) {
+		const hold = TestDataFactory.hold();
 
-	public static variable(name: string) {
-		const hold = TestDataFactory.hold()
-
-		const existing = hold.variables.find(variable => variable.name.newValue === name);
+		const existing = hold.variables.find(
+			variable => variable.name.newValue === name,
+		);
 
 		if (existing) {
 			return existing;
@@ -219,29 +224,33 @@ export class TestDataFactory {
 		hold.variables.set(newVariable.id, newVariable);
 
 		return newVariable;
-	}
-
-	public static scroll(room: HoldRoom, x: number, y: number) {
-		const existing = room.scrolls.find(scroll => scroll.x === x && scroll.y === y);
+	},
+	scroll(room: HoldRoom, x: number, y: number) {
+		const existing = room.scrolls.find(
+			scroll => scroll.x === x && scroll.y === y,
+		);
 
 		if (existing) {
 			return existing;
 		}
 
 		const scroll = new HoldScroll(room.$hold, {
-			x, y,
-			encMessage: '',
-			roomId: room.id
+			x,
+			y,
+			encMessage: "",
+			roomId: room.id,
 		});
 
 		room.scrolls.push(scroll);
 
 		return scroll;
-	}
-
-	public static entrance(room: HoldRoom, x: number, y: number) {
+	},
+	entrance(room: HoldRoom, x: number, y: number) {
 		const hold = room.$hold;
-		const existing = hold.entrances.find(entrance => entrance.roomId === room.id && entrance.x === x && entrance.y === y);
+		const existing = hold.entrances.find(
+			entrance =>
+				entrance.roomId === room.id && entrance.x === x && entrance.y === y,
+		);
 
 		if (existing) {
 			return existing;
@@ -250,15 +259,16 @@ export class TestDataFactory {
 		const entrance = new HoldEntrance(hold, {
 			id: 10000 + hold.entrances.size,
 			isMainEntrance: false,
-			x, y,
+			x,
+			y,
 			o: Orientation.S,
 			roomId: room.id,
 			showDescription: 1,
-			encDescription: ''
+			encDescription: "",
 		});
 
 		hold.entrances.set(entrance.id, entrance);
 
 		return entrance;
-	}
-}
+	},
+};
