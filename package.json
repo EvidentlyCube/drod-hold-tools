@@ -41,7 +41,8 @@
 		"test": "npx tsx --test --test-reporter dot --import ./test/bootstrap.ts test/**/*.test.ts",
 		"test-watch": "npx tsx --test --watch --import ./test/bootstrap.ts test/**/*.test.ts",
 		"lint": "npx @biomejs/biome check src/",
-		"lint-fix": "npx @biomejs/biome check --write src/"
+		"lint-fix": "npx @biomejs/biome check --write src/",
+		"type-check": "npx tsc --noemit"
 	},
 	"browserslist": {
 		"production": [
