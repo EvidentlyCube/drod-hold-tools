@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { HoldRefModel, type HoldRefRoom } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
@@ -61,7 +62,7 @@ export class HoldEntrance {
 		this.isMainEntrance = opts.isMainEntrance;
 		this.showDescription = new SignalUpdatableValue(opts.showDescription);
 		this.description = new SignalUpdatableValue(
-			wcharBase64ToString(opts.encDescription),
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encDescription)),
 		);
 	}
 }

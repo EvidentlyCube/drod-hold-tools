@@ -308,6 +308,10 @@ export class HoldChangeList {
 	public readonly list = new SignalSet<HoldChange>();
 	public readonly onChange = new Signal<HoldChange>();
 
+	public get length() {
+		return this.list.size;
+	}
+
 	public loadStored(changes: HoldChange[]) {
 		changes.forEach(change => void this.list.add(change));
 	}

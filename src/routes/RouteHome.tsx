@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { Changelog } from "../Changelog";
 
 export default function RouteHome() {
 	return (
@@ -109,260 +110,7 @@ export default function RouteHome() {
 						<div className="card-content">
 							<div className="content">
 								<h3>Changelog</h3>
-								<h5 className="subtitle is-6">
-									v1.1.0 <span className="is-muted">(Unreleased)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Can now edit hold description and end message.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v1.0.0 <span className="is-muted">(2026-03-31)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Script export displays imperatives by name
-									</li>
-									<li>
-										<Feat />
-										Mechanism to replace data files in bulk.
-									</li>
-									<li>
-										<Feat />
-										Updated everything to work with 5.2.
-									</li>
-									<li>
-										<Feat />
-										Optimized variable usage calculating.
-									</li>
-									<li>
-										<Feat />
-										Fixed a bunch of subtle bugs with variable renaming.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.9 <span className="is-muted">(2026-02-20)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Added indents for script export to improve readability,
-										especially in editors that automatically support sticky
-										headers based on indentation.
-									</li>
-									<li>
-										<Feat />
-										Added missing enumerations for script export.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.8 <span className="is-muted">(2026-02-20)</span>
-								</h5>
-								<ul>
-									<li>
-										<Bug />
-										Fixed a case where variable use would not be caught if the
-										variable had no spacing around it; which would be also
-										anytime a variable "touched" the start or end of the
-										formula. Nasty, especially for variable rename.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.7 <span className="is-muted">(2026-02-20)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Detect and list problems with the hold.
-									</li>
-									<li>
-										<Feat />
-										Variable renaming.
-									</li>
-									<li>
-										<Feat />
-										Scanning hold for known issues.
-									</li>
-									<li>
-										<Bug />
-										Fix error on import in a few places caused by references to
-										non-existent data.
-									</li>
-									<li>
-										<Bug />
-										Fix error which prevented Data usage to be recorded.
-									</li>
-									<li>
-										<Bug />
-										DROD-style newlines (carriage return character) now display
-										properly in changes list.
-									</li>
-									<li>
-										<Bug />
-										Fix variable usage not being properly recognized in text.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.6 <span className="is-muted">(2026-02-19)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Allow listing variable uses.
-									</li>
-									<li>
-										<Feat />
-										Allow listing character uses.
-									</li>
-									<li>
-										<Feat />
-										Allow deleting data.
-									</li>
-									<li>
-										<Feat />
-										Allow deleting unused speech.
-									</li>
-									<li>
-										<Bug />
-										Fix speaker display in speech to show proper values.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.5 <span className="is-muted">(2026-02-10)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Added exporting all hold's scripts.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.4 <span className="is-muted">(2024-10-13)</span>
-								</h5>
-								<ul>
-									<li>
-										<Bug />
-										Players who only own demos and not levels are now included
-										in the exported Hold.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.3 <span className="is-muted">(2024-09-01)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Added page for viewing variables
-									</li>
-									<li>
-										<Bug />
-										Tables were not displaying every 25th element
-									</li>
-									<li>
-										<Bug />
-										Exported hold did not change Last Updated date which made it
-										impossible to import the hold without deleting it first
-									</li>
-									<li>
-										<Bug />
-										Players with name changes should now correctly update after
-										importing to DROD
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.2 <span className="is-muted">(2024-08-29)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat />
-										Players list &rarr; Added
-									</li>
-									<li>
-										<Feat />
-										Levels list &rarr; Edit author + Edit created
-									</li>
-									<li>
-										<Feat />
-										World Map list &rarr; Edit data
-									</li>
-									<li>
-										<Feat />
-										Improved how references are displayed
-									</li>
-									<li>
-										<Bug />
-										Data <strong>uses</strong> update when used data is changed
-										anywhere
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.1 <span className="is-muted">(2024-07-12)</span>
-								</h5>
-								<ul>
-									<li>
-										<Feat /> Characters list + edit name
-									</li>
-									<li>
-										<Feat /> Entrances list + edit description/show description
-									</li>
-									<li>
-										<Feat /> Scrolls list + edit message
-									</li>
-									<li>
-										<Feat /> Change list sorting + better location displaying
-									</li>
-									<li>
-										<Feat /> Added a step after importing that validates the
-										hold exports correctly
-									</li>
-									<li>
-										<Feat /> Added version validation at the start
-									</li>
-									<li>
-										<Feat /> Speeches list &rarr; Edit Mood
-									</li>
-									<li>
-										<Feat /> Speeches list &rarr; Edit Data
-									</li>
-									<li>
-										<Feat /> Entrances list &rarr; Edit Data
-									</li>
-									<li>
-										<Feat /> World Maps list + Edit name
-									</li>
-									<li>
-										<Feat /> Characters list &rarr; Edit avatar & tile data IDs
-									</li>
-									<li>
-										<Bug /> Table state and config is no longer shared between
-										holds
-									</li>
-									<li>
-										<Bug /> Hiding columns no longer break the table if it has
-										any filters
-									</li>
-									<li>
-										<Bug /> Fixed a bunch of small differences between
-										DROD-created hold data and the data created by the tool
-									</li>
-									<li>
-										<Bug /> Fixed saved games and demos not being lost during
-										export.
-									</li>
-								</ul>
-								<h5 className="subtitle is-6">
-									v0.1.0 <span className="is-muted">(2024-07-08)</span>
-								</h5>
-								<ul>
-									<li>Currently released version</li>
-									<li>Import & Export</li>
-									<li>Backup hold & changes in browser storage</li>
-									<li>Edit speeches and level names and data names</li>
-									<li>Replace data files</li>
-								</ul>
+								<ChangelogComponent />
 							</div>
 						</div>
 					</div>
@@ -370,6 +118,26 @@ export default function RouteHome() {
 			</div>
 		</div>
 	);
+}
+
+function ChangelogComponent() {
+	return Changelog.map(log => (
+		<>
+			<h5 className="subtitle is-6">
+				{log.version} <span className="is-muted">({log.releaseDate})</span>
+			</h5>
+			<ul>
+				{log.logs.map((change, index) => (
+					// biome-ignore lint: source of data is static, it's fine
+					<li key={index}>
+						{change.type === "bug" && <Bug />}
+						{change.type === "feature" && <Feat />}
+						{change.description}
+					</li>
+				))}
+			</ul>
+		</>
+	));
 }
 
 interface CardProps {

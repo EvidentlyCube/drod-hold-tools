@@ -1,3 +1,4 @@
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
@@ -33,7 +34,9 @@ export class HoldDemo {
 		this.id = opts.id;
 		this.savedGameId = opts.savedGameId;
 		this.isHidden = opts.isHidden;
-		this.description = wcharBase64ToString(opts.encDescription);
+		this.description = drodMultilineStringToHtmlString(
+			wcharBase64ToString(opts.encDescription),
+		);
 		this.showSequenceNo = opts.showSequenceNo;
 		this.beginTurnNo = opts.beginTurnNo;
 		this.endTurnNo = opts.endTurnNo;

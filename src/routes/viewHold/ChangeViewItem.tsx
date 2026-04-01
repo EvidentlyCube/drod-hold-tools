@@ -17,7 +17,6 @@ import {
 } from "../../data/Utils";
 import { shouldBeUnreachable } from "../../utils/Interfaces";
 import { formatBytes } from "../../utils/Language";
-import { fixCarriageReturnForDisplay } from "../../utils/StringUtils";
 
 export interface ChangeViewItem {
 	id: string;
@@ -196,7 +195,7 @@ export function changeToViewItem(
 				},
 				before: (
 					<div className="is-white-space-pre">
-						{entrance.description.oldValue.replace(/\r/g, "\n")}
+						{entrance.description.oldValue}
 					</div>
 				),
 				after: (
@@ -542,8 +541,8 @@ export function changeToViewItem(
 					characterId: change.location.characterId,
 					commandIndex: change.location.commandIndex,
 				},
-				before: fixCarriageReturnForDisplay(command.label.oldValue),
-				after: fixCarriageReturnForDisplay(command.label.newValue),
+				before: command.label.oldValue,
+				after: command.label.newValue,
 			};
 		}
 
@@ -585,8 +584,8 @@ export function changeToViewItem(
 					monsterIndex: change.location.monsterIndex,
 					commandIndex: change.location.commandIndex,
 				},
-				before: fixCarriageReturnForDisplay(command.label.oldValue),
-				after: fixCarriageReturnForDisplay(command.label.newValue),
+				before: command.label.oldValue,
+				after: command.label.newValue,
 			};
 		}
 

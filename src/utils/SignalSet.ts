@@ -19,6 +19,10 @@ export class SignalSet<TElement> {
 		return this._set;
 	}
 
+	public get size() {
+		return this._set.size;
+	}
+
 	public add(element: TElement) {
 		if (!this._set.has(element)) {
 			this._set.add(element);

@@ -43,7 +43,7 @@
 		"lint": "npx @biomejs/biome check",
 		"lint-fix": "npx @biomejs/biome check --write",
 		"type-check": "npx tsc --noemit",
-		"pre-commit": "npm run lint && npm run type-check && npm run test"
+		"pre-commit": "npm run lint-fix && npm run type-check && npm run test"
 	},
 	"browserslist": {
 		"production": [

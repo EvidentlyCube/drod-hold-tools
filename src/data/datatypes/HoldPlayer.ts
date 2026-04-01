@@ -1,5 +1,6 @@
 import { Memoizer } from "../../utils/Memoizer";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { type HoldRef, HoldRefModel } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
@@ -63,7 +64,9 @@ export class HoldPlayer {
 		this.id = opts.id;
 		this.gidOriginalName = wcharBase64ToString(opts.encOriginalName);
 		this.gidCreated = opts.gidCreated;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encName)),
+		);
 		this.encEmailMessage = opts.encEmailMessage;
 
 		this.$isNewlyAdded = opts.$isNewlyAdded;

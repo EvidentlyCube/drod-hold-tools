@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { doesCommandUseSpeech } from "../CommandUtils";
 import {
 	type HoldRefCharacterCommand,
@@ -93,7 +94,7 @@ export class HoldSpeech {
 		this.mood = new SignalUpdatableValue(opts.mood);
 		this.delay = opts.delay;
 		this.message = new SignalUpdatableValue(
-			wcharBase64ToString(opts.encMessage),
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encMessage)),
 		);
 
 		this.$isDeleted = new SignalUpdatableValue(false);

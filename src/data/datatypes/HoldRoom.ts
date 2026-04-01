@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import type { Point } from "../DrodCommonTypes";
 import type { PackedVars } from "../PackedVars";
 import { readPackedVars } from "../PackedVarsUtils";
@@ -62,7 +63,7 @@ export class HoldScroll {
 		this.x = opts.x;
 		this.y = opts.y;
 		this.message = new SignalUpdatableValue(
-			wcharBase64ToString(opts.encMessage),
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encMessage)),
 		);
 
 		this.$roomId = opts.roomId;

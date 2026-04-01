@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../utils/SignalUpdatableValue";
+import { htmlStringToDrodMultilineString } from "../utils/StringUtils";
 import { PackedVars } from "./PackedVars";
 import { writePackedVars } from "./PackedVarsUtils";
 import { stringToWCharBase64 } from "./Utils";
@@ -64,7 +65,9 @@ export class XMLWriter {
 		if (value instanceof PackedVars) {
 			this._xml += writePackedVars(value);
 		} else if (value instanceof SignalUpdatableValue) {
-			this._xml += stringToWCharBase64(value.newValue);
+			this._xml += stringToWCharBase64(
+				htmlStringToDrodMultilineString(value.newValue),
+			);
 		} else if (typeof value === "boolean") {
 			this._xml += value ? "1" : "0";
 		} else if (typeof value === "number") {

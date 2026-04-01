@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import type {
 	HoldRefCharacterCommand,
 	HoldRefEntrance,
@@ -58,7 +59,9 @@ export class HoldVariable {
 		this.hold = hold;
 
 		this.id = opts.id;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encName)),
+		);
 
 		// Clear cache when name changes
 		this.name.onChange.add(() => {

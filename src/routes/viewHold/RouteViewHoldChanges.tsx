@@ -37,14 +37,14 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 		displayName: "Before",
 		widthPercent: 35,
 		canHide: true,
-		render: change => change.before,
+		render: change => <div>{change.before}</div>,
 	},
 	{
 		id: "after",
 		displayName: "After",
 		widthPercent: 35,
 		canHide: true,
-		render: change => change.after,
+		render: change => <div>{change.after}</div>,
 	},
 ];
 
@@ -60,7 +60,10 @@ export default function RouteViewHoldChanges() {
 	}, [hold]);
 
 	const doDelete = useCallback(() => {
-		if (window.confirm("Are you sure you want to delete this hold?")) {
+		if (
+			hold.$changes.length === 0
+			|| window.confirm("Are you sure you want to delete this hold?")
+		) {
 			HoldReaders.deleteById(hold.$holdReaderId);
 			navigate("/");
 		}

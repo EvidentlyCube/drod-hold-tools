@@ -1,4 +1,5 @@
 import { tryToYieldToUi } from "../utils/AsyncUtils";
+import { htmlStringToDrodMultilineString } from "../utils/StringUtils";
 import type { CommandsList } from "./CommandList";
 import { getCommandDataId } from "./CommandUtils";
 import { DEFAULT_PROCESSING_SEQUENCE } from "./DrodCommonTypes";
@@ -161,7 +162,11 @@ async function writePlayer(
 	const { $isModified } = player;
 	const originalName = $isModified
 		? player.name
-		: { _safeString: stringToWCharBase64(player.gidOriginalName) };
+		: {
+				_safeString: stringToWCharBase64(
+					htmlStringToDrodMultilineString(player.gidOriginalName),
+				),
+			};
 	const gidCreated = $isModified ? (Date.now() / 1000) | 0 : player.gidCreated;
 
 	refs.playerIds.add(player.id);

@@ -67,6 +67,22 @@ export function fixCarriageReturnForStorage(s: string): string {
 	return s.replace(/\n/g, "\r");
 }
 
+/**
+ * DROD stores multiline strings with Carriage Return character (\r) signifying
+ * a new line. HTML requires Carriage Return followed by newline character
+ * (\r\n). This function together with `htmlStringToDrodMultilineString()`
+ * allow these to work.
+ *
+ * Use this when reading a hold file and storing everything in the system.
+ *
+ */
+export function drodMultilineStringToHtmlString(s: string) {
+	return s.replace(/\r/g, "\r\n");
+}
+
+export function htmlStringToDrodMultilineString(s: string) {
+	return s.replace(/\r\n/g, "\r");
+}
 export function pluralize(
 	countOrArray: number | unknown[],
 	word: string,

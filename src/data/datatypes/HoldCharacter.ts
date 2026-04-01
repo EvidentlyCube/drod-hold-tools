@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import type { CommandsList } from "../CommandList";
 import { packCommands, unpackCommands } from "../CommandUtils";
 import type { PackedVars } from "../PackedVars";
@@ -51,7 +52,9 @@ export class HoldCharacter {
 		this.$hold = hold;
 
 		this.id = options.id;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(options.encName)),
+		);
 		this.type = options.type;
 		this.animationSpeed = options.animationSpeed;
 		this.extraVars = readPackedVars(options.encExtraVars);

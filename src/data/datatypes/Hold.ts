@@ -1,5 +1,6 @@
 import { OrderedMap } from "../../utils/OrderedMap";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import type { HoldVersion } from "../HoldVersion";
 import {
 	areReferencesIdentical,
@@ -146,10 +147,14 @@ export class Hold {
 		this.status = options.status;
 		this.name = new SignalUpdatableValue(wcharBase64ToString(options.encName));
 		this.descriptionMessage = new SignalUpdatableValue(
-			wcharBase64ToString(options.encDescriptionMessage),
+			drodMultilineStringToHtmlString(
+				wcharBase64ToString(options.encDescriptionMessage),
+			),
 		);
 		this.endHoldMessage = new SignalUpdatableValue(
-			wcharBase64ToString(options.encEndHoldMessage),
+			drodMultilineStringToHtmlString(
+				wcharBase64ToString(options.encEndHoldMessage),
+			),
 		);
 		this.lastScriptId = options.lastScriptId;
 		this.lastVarId = options.lastVarId;

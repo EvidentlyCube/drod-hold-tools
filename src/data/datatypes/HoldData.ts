@@ -1,5 +1,6 @@
 import { SignalNullable } from "../../utils/SignalNullable";
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import type { DataFormat } from "../DrodEnums";
 import { type HoldRef, HoldRefModel } from "../references/HoldReference";
 import { wcharBase64ToString } from "../Utils";
@@ -40,7 +41,9 @@ export class HoldData {
 
 		this.id = opts.id;
 		this.holdId = opts.holdId;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encName)),
+		);
 		this.details = new SignalUpdatableValue({
 			format: opts.format,
 			rawEncodedData: opts.encRawData ?? "",

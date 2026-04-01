@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { getMainEntranceId } from "../HoldUtils";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
@@ -74,7 +75,9 @@ export class HoldLevel {
 		this.playerId = new SignalUpdatableValue(opts.playerId);
 		this.gidLevelIndex = opts.gidLevelIndex;
 		this.orderIndex = opts.orderIndex;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encName)),
+		);
 		this.createdTimestamp = new SignalUpdatableValue(opts.created * 1000);
 		this.lastUpdated = opts.lastUpdated;
 		this.isRequired = opts.isRequired;

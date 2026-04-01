@@ -1,4 +1,5 @@
 import { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
+import { drodMultilineStringToHtmlString } from "../../utils/StringUtils";
 import { wcharBase64ToString } from "../Utils";
 import type { Hold } from "./Hold";
 
@@ -31,6 +32,8 @@ export class HoldWorldMap {
 		this.dataId = new SignalUpdatableValue(opts.dataId);
 		this.displayType = opts.displayType;
 		this.orderIndex = opts.orderIndex;
-		this.name = new SignalUpdatableValue(wcharBase64ToString(opts.encName));
+		this.name = new SignalUpdatableValue(
+			drodMultilineStringToHtmlString(wcharBase64ToString(opts.encName)),
+		);
 	}
 }
