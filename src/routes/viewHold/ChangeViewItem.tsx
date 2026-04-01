@@ -611,6 +611,32 @@ export function changeToViewItem(
 			};
 		}
 
+		case HoldChangeType.HoldDescription: {
+			return {
+				id,
+				type: "Hold Description",
+				location: {
+					model: HoldRefModel.Hold,
+					hold,
+				},
+				before: hold.descriptionMessage.oldValue,
+				after: hold.descriptionMessage.newValue,
+			};
+		}
+
+		case HoldChangeType.HoldEndMessage: {
+			return {
+				id,
+				type: "Hold End message",
+				location: {
+					model: HoldRefModel.Hold,
+					hold,
+				},
+				before: hold.endHoldMessage.oldValue,
+				after: hold.endHoldMessage.newValue,
+			};
+		}
+
 		default:
 			shouldBeUnreachable(changeType);
 			return invalid(

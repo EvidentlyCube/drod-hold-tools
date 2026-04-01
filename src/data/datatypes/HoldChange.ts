@@ -30,6 +30,8 @@ export enum HoldChangeType {
 	CharacterCommandLabel = 23,
 	MonsterCommandLabel = 24,
 	VariableName = 25,
+	HoldDescription = 26,
+	HoldEndMessage = 27,
 }
 
 export type HoldChangeCharacterAvatarDataId = {
@@ -37,7 +39,7 @@ export type HoldChangeCharacterAvatarDataId = {
 	location: { characterId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number | undefined;
 };
 
 export type HoldChangeCharacterName = {
@@ -53,7 +55,7 @@ export type HoldChangeCharacterTilesDataId = {
 	location: { characterId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number | undefined;
 };
 
 export type HoldChangeCharacterCommandLabel = {
@@ -93,7 +95,7 @@ export type HoldChangeEntranceDataId = {
 	location: { entranceId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number | undefined;
 };
 
 export type HoldChangeEntranceDescription = {
@@ -177,7 +179,7 @@ export interface HoldChangeSpeechDataId {
 	location: { speechId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number | undefined;
 }
 
 export interface HoldChangeSpeechMessage {
@@ -209,7 +211,7 @@ export interface HoldChangeWorldMapDataId {
 	location: { worldMapId: number };
 
 	hasChange: boolean;
-	value?: number;
+	value: number | undefined;
 }
 
 export interface HoldChangeWorldMapName {
@@ -244,6 +246,22 @@ export type HoldChangeVariableName = {
 	value: string;
 };
 
+export type HoldChangeHoldDescription = {
+	type: HoldChangeType.HoldDescription;
+	location: { [key: string]: never };
+
+	hasChange: boolean;
+	value: string;
+};
+
+export type HoldChangeHoldEndMessage = {
+	type: HoldChangeType.HoldEndMessage;
+	location: { [key: string]: never };
+
+	hasChange: boolean;
+	value: string;
+};
+
 export type HoldChange =
 	| HoldChangeCharacterAvatarDataId
 	| HoldChangeCharacterCommandLabel
@@ -252,6 +270,8 @@ export type HoldChange =
 	| HoldChangeDataDeletion
 	| HoldChangeDataFile
 	| HoldChangeDataName
+	| HoldChangeHoldEndMessage
+	| HoldChangeHoldDescription
 	| HoldChangeEntranceDataId
 	| HoldChangeEntranceDescription
 	| HoldChangeEntranceShowDescription
@@ -271,6 +291,12 @@ export type HoldChange =
 	| HoldChangeWorldMapDataId
 	| HoldChangeWorldMapName
 	| HoldChangeVariableName;
+
+export type ExtractByValueType<Union, ValueType> = Union extends {
+	value: ValueType;
+}
+	? Union
+	: never;
 
 function match(left: HoldChange, right: HoldChange) {
 	return (

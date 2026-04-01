@@ -178,6 +178,14 @@ export function applyHoldChanges(hold: Hold) {
 					.name.set(change.hasChange, change.value);
 				break;
 
+			case HoldChangeType.HoldDescription:
+				hold.descriptionMessage.set(change.hasChange, change.value);
+				break;
+
+			case HoldChangeType.HoldEndMessage:
+				hold.endHoldMessage.set(change.hasChange, change.value);
+				break;
+
 			default:
 				shouldBeUnreachable(changeType);
 				break;

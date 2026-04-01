@@ -2,6 +2,7 @@ import type { SignalUpdatableValue } from "../../utils/SignalUpdatableValue";
 import { regenerateHoldDataUses } from "../HoldUtils";
 import type { Hold } from "./Hold";
 import {
+	type ExtractByValueType,
 	type HoldChange,
 	type HoldChangeCharacterAvatarDataId,
 	type HoldChangeCharacterCommandLabel,
@@ -13,6 +14,8 @@ import {
 	type HoldChangeEntranceDataId,
 	type HoldChangeEntranceDescription,
 	type HoldChangeEntranceShowDescription,
+	type HoldChangeHoldDescription,
+	type HoldChangeHoldEndMessage,
 	type HoldChangeHoldPlayer,
 	type HoldChangeLevelCreated,
 	type HoldChangeLevelName,
@@ -45,6 +48,8 @@ import type { HoldWorldMap } from "./HoldWorldMap";
 export class HoldChangeListener {
 	public register(hold: Hold) {
 		this.registerHoldPlayerChange(hold);
+		this.registerHoldDescriptionChange(hold);
+		this.registerHoldEndMessageChange(hold);
 
 		hold.variables.forEach(variable => {
 			this.registerVariableNameChange(variable);
@@ -109,8 +114,32 @@ export class HoldChangeListener {
 			value: hold.playerId.newValue,
 		});
 
-		registerTextChange(hold, change, hold.playerId);
+		registerGenericChange(hold, change, hold.playerId);
 		registerPlayerRestoration(hold, hold.playerId);
+	}
+
+	private registerHoldDescriptionChange(hold: Hold) {
+		const { descriptionMessage } = hold;
+		const change = hold.$changes.create<HoldChangeHoldDescription>({
+			type: HoldChangeType.HoldDescription,
+			location: {},
+			hasChange: false,
+			value: descriptionMessage.newValue,
+		});
+
+		registerGenericChange(hold, change, descriptionMessage);
+	}
+
+	private registerHoldEndMessageChange(hold: Hold) {
+		const { endHoldMessage } = hold;
+		const change = hold.$changes.create<HoldChangeHoldEndMessage>({
+			type: HoldChangeType.HoldEndMessage,
+			location: {},
+			hasChange: false,
+			value: endHoldMessage.newValue,
+		});
+
+		registerGenericChange(hold, change, endHoldMessage);
 	}
 
 	private registerCharacterAvatarDataIdChange(character: HoldCharacter) {
@@ -123,7 +152,8 @@ export class HoldChangeListener {
 			value: avatarDataId.newValue,
 		});
 
-		registerTextChange($hold, change, avatarDataId);
+		registerGenericChange($hold, change, avatarDataId);
+		registerDataUseRefreshOnChange($hold, avatarDataId);
 	}
 
 	private registerVariableNameChange(variable: HoldVariable) {
@@ -136,7 +166,7 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange(hold, change, name);
+		registerGenericChange(hold, change, name);
 	}
 
 	private registerCharacterNameChange(character: HoldCharacter) {
@@ -149,7 +179,7 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange($hold, change, name);
+		registerGenericChange($hold, change, name);
 	}
 
 	private registerCharacterTilesDataIdChange(character: HoldCharacter) {
@@ -162,8 +192,8 @@ export class HoldChangeListener {
 			value: tilesDataId.newValue,
 		});
 
-		registerTextChange($hold, change, tilesDataId);
-		registerDataChange($hold, tilesDataId);
+		registerGenericChange($hold, change, tilesDataId);
+		registerDataUseRefreshOnChange($hold, tilesDataId);
 	}
 
 	private registerCharacterCommandLabelChange(character: HoldCharacter) {
@@ -182,7 +212,7 @@ export class HoldChangeListener {
 				value: label.newValue,
 			});
 
-			registerTextChange($hold, change, label);
+			registerGenericChange($hold, change, label);
 		}
 	}
 
@@ -207,7 +237,7 @@ export class HoldChangeListener {
 				value: label.newValue,
 			});
 
-			registerTextChange($hold, change, label);
+			registerGenericChange($hold, change, label);
 		}
 	}
 
@@ -221,7 +251,7 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange($hold, change, name);
+		registerGenericChange($hold, change, name);
 	}
 
 	private registerDataFileChange(data: HoldData) {
@@ -234,7 +264,7 @@ export class HoldChangeListener {
 			value: details.newValue,
 		});
 
-		registerTextChange($hold, change, details);
+		registerGenericChange($hold, change, details);
 	}
 
 	private registerDataDeletion(data: HoldData) {
@@ -247,7 +277,7 @@ export class HoldChangeListener {
 			value: $isDeleted.newValue,
 		});
 
-		registerTextChange($hold, change, $isDeleted);
+		registerGenericChange($hold, change, $isDeleted);
 	}
 
 	private registerEntranceDataIdChange(entrance: HoldEntrance) {
@@ -260,8 +290,8 @@ export class HoldChangeListener {
 			value: dataId.newValue,
 		});
 
-		registerTextChange($hold, change, dataId);
-		registerDataChange($hold, dataId);
+		registerGenericChange($hold, change, dataId);
+		registerDataUseRefreshOnChange($hold, dataId);
 	}
 
 	private registerEntranceDescriptionChange(entrance: HoldEntrance) {
@@ -274,7 +304,7 @@ export class HoldChangeListener {
 			value: description.newValue,
 		});
 
-		registerTextChange($hold, change, description);
+		registerGenericChange($hold, change, description);
 	}
 
 	private registerEntranceShowDescriptionChange(entrance: HoldEntrance) {
@@ -287,7 +317,7 @@ export class HoldChangeListener {
 			value: showDescription.newValue,
 		});
 
-		registerTextChange($hold, change, showDescription);
+		registerGenericChange($hold, change, showDescription);
 	}
 
 	private registerLevelCreatedChange(level: HoldLevel) {
@@ -300,7 +330,7 @@ export class HoldChangeListener {
 			value: createdTimestamp.newValue,
 		});
 
-		registerTextChange($hold, change, createdTimestamp);
+		registerGenericChange($hold, change, createdTimestamp);
 	}
 
 	private registerLevelNameChange(level: HoldLevel) {
@@ -313,7 +343,7 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange($hold, change, name);
+		registerGenericChange($hold, change, name);
 	}
 
 	private registerLevelPlayerIdChange(level: HoldLevel) {
@@ -326,7 +356,7 @@ export class HoldChangeListener {
 			value: playerId.newValue,
 		});
 
-		registerTextChange($hold, change, playerId);
+		registerGenericChange($hold, change, playerId);
 		registerPlayerRestoration($hold, playerId);
 	}
 
@@ -340,7 +370,7 @@ export class HoldChangeListener {
 			value: $isDeleted.newValue,
 		});
 
-		registerTextChange($hold, change, $isDeleted);
+		registerGenericChange($hold, change, $isDeleted);
 	}
 
 	private registerPlayerInsertion(player: HoldPlayer) {
@@ -383,7 +413,7 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange($hold, change, name);
+		registerGenericChange($hold, change, name);
 	}
 
 	private registerScrollMessageChange(scroll: HoldScroll) {
@@ -397,7 +427,7 @@ export class HoldChangeListener {
 			value: message.newValue,
 		});
 
-		registerTextChange($hold, change, message);
+		registerGenericChange($hold, change, message);
 	}
 
 	private registerSpeechDataIdChange(speech: HoldSpeech) {
@@ -410,8 +440,8 @@ export class HoldChangeListener {
 			value: dataId.newValue,
 		});
 
-		registerTextChange($hold, change, dataId);
-		registerDataChange($hold, dataId);
+		registerGenericChange($hold, change, dataId);
+		registerDataUseRefreshOnChange($hold, dataId);
 	}
 
 	private registerSpeechMessageChange(speech: HoldSpeech) {
@@ -424,7 +454,7 @@ export class HoldChangeListener {
 			value: message.newValue,
 		});
 
-		registerTextChange($hold, change, message);
+		registerGenericChange($hold, change, message);
 	}
 
 	private registerSpeechMoodChange(speech: HoldSpeech) {
@@ -437,7 +467,7 @@ export class HoldChangeListener {
 			value: mood.newValue,
 		});
 
-		registerTextChange($hold, change, mood);
+		registerGenericChange($hold, change, mood);
 	}
 
 	private registerSpeechDeletion(speech: HoldSpeech) {
@@ -450,7 +480,7 @@ export class HoldChangeListener {
 			value: $isDeleted.newValue,
 		});
 
-		registerTextChange($hold, change, $isDeleted);
+		registerGenericChange($hold, change, $isDeleted);
 	}
 
 	private registerWorldMapDataIdChange(worldMap: HoldWorldMap) {
@@ -463,7 +493,8 @@ export class HoldChangeListener {
 			value: dataId.newValue,
 		});
 
-		registerTextChange($hold, change, dataId);
+		registerGenericChange($hold, change, dataId);
+		registerDataUseRefreshOnChange($hold, dataId);
 	}
 
 	private registerWorldMapNameChange(worldMap: HoldWorldMap) {
@@ -476,19 +507,18 @@ export class HoldChangeListener {
 			value: name.newValue,
 		});
 
-		registerTextChange($hold, change, name);
+		registerGenericChange($hold, change, name);
 	}
 }
 
-function registerTextChange(
+function registerGenericChange<T>(
 	hold: Hold,
-	change: HoldChange,
-	// biome-ignore lint: It works and proper typing would be more effort than benefit
-	updatableValue: SignalUpdatableValue<any>,
+	change: ExtractByValueType<HoldChange, T>,
+	updatableValue: SignalUpdatableValue<T>,
 ) {
 	updatableValue.onChange.add(props => {
 		change.hasChange = props.hasNewValue;
-		change.value = props.value;
+		(change as { value: T }).value = props.value;
 
 		if (!props.hasNewValue || props.value === updatableValue.oldValue) {
 			hold.$changes.del(change);
@@ -498,10 +528,9 @@ function registerTextChange(
 	});
 }
 
-function registerDataChange(
+function registerDataUseRefreshOnChange(
 	hold: Hold,
-	// biome-ignore lint: It works and proper typing would be more effort than benefit
-	updatableValue: SignalUpdatableValue<any>,
+	updatableValue: SignalUpdatableValue<number | undefined>,
 ) {
 	updatableValue.onChange.add(({ value, previousValue }) => {
 		if (previousValue) {

@@ -2,6 +2,7 @@ import { type ReactElement, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import TextsExportButton from "../../components/viewHold/actions/TextsExportButton";
 import TextImportButton from "../../components/viewHold/actions/TextsImportButton";
+import DrodTextEditor from "../../components/viewHold/editables/DrodTextEditor";
 import { PlayerRefViewByIdDynamic } from "../../components/viewHold/PlayerRefView";
 import SwapPlayerButton from "../../components/viewHold/preview/SwapPlayerButton";
 import HoldProblems from "../../components/viewHold/summary/HoldProblems";
@@ -20,7 +21,12 @@ const DataPoints: Record<string, GetData> = {
 			<PlayerRefViewByIdDynamic hold={hold} playerIdSource={hold.playerId} />
 		</div>
 	),
-	Description: hold => hold.descriptionMessage.oldValue,
+	Description: hold => (
+		<DrodTextEditor text={hold.descriptionMessage} tag="textarea" />
+	),
+	"End Hold Message": hold => (
+		<DrodTextEditor text={hold.endHoldMessage} tag="textarea" />
+	),
 	"Levels No.": hold => hold.levels.size,
 	"Rooms No.": hold => hold.rooms.size,
 	"Datas No.": hold => hold.datas.size,

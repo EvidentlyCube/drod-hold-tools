@@ -110,7 +110,16 @@ export default function RouteHome() {
 							<div className="content">
 								<h3>Changelog</h3>
 								<h5 className="subtitle is-6">
-									v1.0.0 <span className="is-muted">(Unreleased)</span>
+									v1.1.0 <span className="is-muted">(Unreleased)</span>
+								</h5>
+								<ul>
+									<li>
+										<Feat />
+										Can now edit hold description and end message.
+									</li>
+								</ul>
+								<h5 className="subtitle is-6">
+									v1.0.0 <span className="is-muted">(2026-03-31)</span>
 								</h5>
 								<ul>
 									<li>
