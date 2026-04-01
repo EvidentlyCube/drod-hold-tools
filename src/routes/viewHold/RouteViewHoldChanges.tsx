@@ -37,14 +37,14 @@ const Columns: SortableTableColumn<ChangeViewItem>[] = [
 		displayName: "Before",
 		widthPercent: 35,
 		canHide: true,
-		render: change => <div>{change.before}</div>,
+		render: change => <div className="is-pre">{change.before}</div>,
 	},
 	{
 		id: "after",
 		displayName: "After",
 		widthPercent: 35,
 		canHide: true,
-		render: change => <div>{change.after}</div>,
+		render: change => <div className="is-pre">{change.after}</div>,
 	},
 ];
 

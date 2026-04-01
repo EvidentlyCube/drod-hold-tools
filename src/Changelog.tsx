@@ -21,6 +21,10 @@ export const Changelog: readonly ChangelogVersion[] = [
 				description: <>Can now edit hold description and end message.</>,
 			},
 			{
+				type: "feature",
+				description: <>Changes list now correctly displays line breaks.</>,
+			},
+			{
 				type: "bug",
 				description: (
 					<>

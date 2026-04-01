@@ -130,3 +130,7 @@
 .delete[disabled]:before {
 	opacity: 0.5;
 }
+
+.is-pre {
+	white-space: pre;
+}
