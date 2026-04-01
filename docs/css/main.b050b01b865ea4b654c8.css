@@ -30867,6 +30867,10 @@ readers do not read off random characters that represent icons */
 	opacity: 0.5;
 }
 
+.is-pre {
+	white-space: pre;
+}
+
 #route-drop-hold {
 	background: #ddd;
 	position: absolute;
@@ -31046,4 +31050,4 @@ i.fa-icon {
 
 
 
-/*# sourceMappingURL=main.c04556f0cf0dedd672f6.css.map*/
+/*# sourceMappingURL=main.b050b01b865ea4b654c8.css.map*/
