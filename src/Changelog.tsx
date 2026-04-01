@@ -14,7 +14,7 @@ export interface ChangelogVersion {
 export const Changelog: readonly ChangelogVersion[] = [
 	{
 		version: "v1.1.0",
-		releaseDate: "Unreleased",
+		releaseDate: "2026-04-01",
 		logs: [
 			{
 				type: "feature",
@@ -31,6 +31,15 @@ export const Changelog: readonly ChangelogVersion[] = [
 						Because DROD stores newlines differently from how HTML handles them
 						editing multiline strings could cause things to behave weird in
 						DROD. This is fixed now.
+					</>
+				),
+			},
+			{
+				type: "bug",
+				description: (
+					<>
+						Fixed a few cases where data use would not be updated when changing
+						data usage.
 					</>
 				),
 			},
