@@ -1,4 +1,5 @@
 import type { CommandsList } from "./CommandList";
+import { INT_MAX, UINT_MAX } from "./DrodCommonTypes";
 import {
 	type AttackTileType,
 	Mood,
@@ -35,7 +36,6 @@ import {
 } from "./DrodEnumToName";
 import type { Hold } from "./datatypes/Hold";
 import type { ScriptCommand } from "./datatypes/ScriptCommand";
-import { INT_MAX, UINT_MAX } from "./DrodCommonTypes";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];
@@ -179,7 +179,7 @@ export const TextUtils = {
 	lightColor(id: number): string {
 		return LightColorToName.get(id) ?? `UnknownLightColor_${id}`;
 	},
-	join(items: (string|number)[]): string {
+	join(items: (string | number)[]): string {
 		return items
 			.filter(x => x !== null && x !== undefined && x !== "")
 			.join("");
@@ -342,5 +342,5 @@ export const TextUtils = {
 		} else {
 			return value;
 		}
-	}
+	},
 };
