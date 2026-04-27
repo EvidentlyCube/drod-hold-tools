@@ -198,6 +198,7 @@ export function getCommandToString(
 		appearancePlayer,
 		attack,
 		behavior,
+		dataName,
 		dir,
 		displayFilter,
 		effect,
@@ -321,7 +322,7 @@ export function getCommandToString(
 		case ScriptCommandType.CC_IfEnd:
 			return `If End`;
 		case ScriptCommandType.CC_ImageOverlay:
-			return `Image overlay ${c.w},${stripNewline(c.label.newValue)}`;
+			return `Image overlay ${dataName(c.w, hold)},${stripNewline(c.label.newValue)}`;
 		case ScriptCommandType.CC_Imperative:
 			return `Imperative ${imperative(c.x)}`;
 		case ScriptCommandType.CC_Label:

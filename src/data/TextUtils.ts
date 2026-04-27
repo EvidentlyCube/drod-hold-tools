@@ -35,6 +35,7 @@ import {
 } from "./DrodEnumToName";
 import type { Hold } from "./datatypes/Hold";
 import type { ScriptCommand } from "./datatypes/ScriptCommand";
+import { INT_MAX, UINT_MAX } from "./DrodCommonTypes";
 
 function bitMask(bitField: number, callback: (id: number) => string): string[] {
 	const results: string[] = [];
@@ -57,6 +58,9 @@ export const TextUtils = {
 	},
 	behavior(id: number): string {
 		return BehaviorToName.get(id) ?? `UnknownBehavior_${id}`;
+	},
+	dataName(id: number, hold: Hold): string {
+		return `"${hold.datas.get(id)?.name.newValue ?? id}"`;
 	},
 	playerBehavior(id: number): string {
 		return PlayerBehaviorToName.get(id) ?? `UnknownPlayerBehavior_${id}`;
@@ -175,7 +179,7 @@ export const TextUtils = {
 	lightColor(id: number): string {
 		return LightColorToName.get(id) ?? `UnknownLightColor_${id}`;
 	},
-	join(items: string[]): string {
+	join(items: (string|number)[]): string {
 		return items
 			.filter(x => x !== null && x !== undefined && x !== "")
 			.join("");
@@ -187,13 +191,13 @@ export const TextUtils = {
 		return AttackTileTypeToName.get(id) ?? `UnknownAttackTileType_${id}`;
 	},
 	xy(command: ScriptCommand): string {
-		return `${command.x},${command.y}`;
+		return `${TextUtils.uintToInt(command.x)},${TextUtils.uintToInt(command.y)}`;
 	},
 	wh(command: ScriptCommand): string {
-		return `${command.w},${command.h}`;
+		return `${TextUtils.uintToInt(command.w)},${TextUtils.uintToInt(command.h)}`;
 	},
 	xywh(command: ScriptCommand): string {
-		return `(${command.x},${command.y}),(${command.x + command.w},${command.y + command.h})`;
+		return `(${TextUtils.uintToInt(command.x)},${TextUtils.uintToInt(command.y)}),(${TextUtils.uintToInt(command.x + command.w)},${TextUtils.uintToInt(command.y + command.h)})`;
 	},
 	onOff(value: number): string {
 		return value ? "On" : "Off";
@@ -275,7 +279,7 @@ export const TextUtils = {
 			`"${TextUtils.variable(c.x, context.hold)}" `,
 			`${TextUtils.scriptVarOp(c.y)} `,
 			c.label.newValue,
-			c.label.newValue ? "" : c.w.toString(),
+			c.label.newValue ? "" : TextUtils.uintToInt(c.w).toString(),
 		]);
 	},
 	varSetAt(c: ScriptCommand, context: CommandsList) {
@@ -285,7 +289,7 @@ export const TextUtils = {
 			` "${TextUtils.variable(c.w, context.hold)}" `,
 			`${TextUtils.scriptVarOp(c.h)} `,
 			c.label.newValue,
-			c.label.newValue ? "" : c.flags.toString(),
+			c.label.newValue ? "" : TextUtils.uintToInt(c.flags).toString(),
 		]);
 	},
 	waitForOpenTile(c: ScriptCommand) {
@@ -306,7 +310,7 @@ export const TextUtils = {
 			`${TextUtils.variable(c.x, context.hold)}[] `,
 			`${TextUtils.scriptVarOp(c.y)} `,
 			c.label.newValue,
-			c.label.newValue ? "" : c.w.toString(),
+			c.label.newValue ? "" : TextUtils.uintToInt(c.w).toString(),
 		]);
 	},
 	waitForArrayEntry(c: ScriptCommand, context: CommandsList) {
@@ -315,7 +319,7 @@ export const TextUtils = {
 			`${TextUtils.variable(c.x, context.hold)}[] `,
 			`${TextUtils.scriptVarOp(c.y)} `,
 			c.label.newValue,
-			c.label.newValue ? "" : c.w.toString(),
+			c.label.newValue ? "" : TextUtils.uintToInt(c.w).toString(),
 		]);
 	},
 	waitForVar(c: ScriptCommand, context: CommandsList) {
@@ -324,7 +328,7 @@ export const TextUtils = {
 			`"${TextUtils.variable(c.x, context.hold)}" `,
 			`${TextUtils.scriptVarComp(c.y)} `,
 			c.label.newValue,
-			c.label.newValue ? "" : c.w.toString(),
+			c.label.newValue ? "" : TextUtils.uintToInt(c.w).toString(),
 		]);
 	},
 	music(c: ScriptCommand) {
@@ -332,4 +336,11 @@ export const TextUtils = {
 			? `0,${c.y},${c.label.newValue}`
 			: `${TextUtils.xy(c)}`;
 	},
+	uintToInt(value: number) {
+		if (value > INT_MAX) {
+			return value - UINT_MAX;
+		} else {
+			return value;
+		}
+	}
 };

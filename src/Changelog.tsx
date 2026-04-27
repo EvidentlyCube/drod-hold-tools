@@ -13,6 +13,26 @@ export interface ChangelogVersion {
 
 export const Changelog: readonly ChangelogVersion[] = [
 	{
+		version: "v1.1.1",
+		releaseDate: "Unreleased",
+		logs: [
+			{
+				type: "feature",
+				description: <>
+					When exporting scripts the negative numbers are now correctly displayed as negative.
+					(DROD stores all script variables as unsigned integers but they are displayed
+					and often treated as signed integers).
+				</>,
+			},
+			{
+				type: "feature",
+				description: <>
+					Exporting scripts displays data names instead of IDs.
+				</>,
+			}
+		]
+	},
+	{
 		version: "v1.1.0",
 		releaseDate: "2026-04-01",
 		logs: [
